@@ -402,6 +402,10 @@ class HeySpeak {
                   </div>
                 </div>
                 <div class="flex gap-2">
+                  <button onclick="heyspeak.showStats()" 
+                    class="px-4 py-2 text-purple-600 hover:text-purple-800 transition-colors">
+                    <i class="fas fa-chart-line mr-2"></i>Stats
+                  </button>
                   <button onclick="heyspeak.showHistory()" 
                     class="px-4 py-2 text-indigo-600 hover:text-indigo-800 transition-colors">
                     <i class="fas fa-history mr-2"></i>History
@@ -968,6 +972,295 @@ class HeySpeak {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  // Statistics feature
+  async showStats() {
+    try {
+      const response = await axios.get(`/api/history/stats/${this.currentUser.id}`);
+      const stats = response.data.stats;
+
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="min-h-screen p-4 md:p-8">
+          <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+              <div class="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                  <h1 class="text-2xl md:text-3xl font-bold text-gray-800">📊 Learning Statistics</h1>
+                  <p class="text-gray-600 mt-2">Track your learning progress and insights</p>
+                </div>
+                <button onclick="heyspeak.showTopicSelection()" 
+                  class="px-4 py-2 text-indigo-600 hover:text-indigo-800 transition-colors">
+                  <i class="fas fa-arrow-left mr-2"></i>Back to Topics
+                </button>
+              </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl shadow-lg p-6">
+                <div class="text-4xl mb-2">📚</div>
+                <div class="text-3xl font-bold text-blue-700">${stats.totalSessions}</div>
+                <div class="text-sm text-blue-600">Total Sessions</div>
+              </div>
+              <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl shadow-lg p-6">
+                <div class="text-4xl mb-2">💬</div>
+                <div class="text-3xl font-bold text-green-700">${stats.totalMessages}</div>
+                <div class="text-sm text-green-600">Total Messages</div>
+              </div>
+              <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl shadow-lg p-6">
+                <div class="text-4xl mb-2">🗣️</div>
+                <div class="text-3xl font-bold text-purple-700">${stats.totalWords.toLocaleString()}</div>
+                <div class="text-sm text-purple-600">Words Spoken</div>
+              </div>
+              <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl shadow-lg p-6">
+                <div class="text-4xl mb-2">🔥</div>
+                <div class="text-3xl font-bold text-orange-700">${stats.currentStreak}</div>
+                <div class="text-sm text-orange-600">Day Streak</div>
+              </div>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <!-- Daily Activity Chart -->
+              <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">📈 Daily Activity (Last 30 Days)</h3>
+                <canvas id="dailyActivityChart"></canvas>
+              </div>
+
+              <!-- Topic Distribution Chart -->
+              <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">🎯 Learning by Topic</h3>
+                <canvas id="topicDistributionChart"></canvas>
+              </div>
+
+              <!-- Weekly Progress Chart -->
+              <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">📅 Weekly Progress (Last 12 Weeks)</h3>
+                <canvas id="weeklyProgressChart"></canvas>
+              </div>
+
+              <!-- Level Distribution Chart -->
+              <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">🎓 Learning by Level</h3>
+                <canvas id="levelDistributionChart"></canvas>
+              </div>
+
+              <!-- Time of Day Chart -->
+              <div class="bg-white rounded-2xl shadow-lg p-6 lg:col-span-2">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">⏰ Learning Time Patterns</h3>
+                <canvas id="timeOfDayChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Wait for DOM to be ready
+      setTimeout(() => {
+        this.renderCharts(stats);
+      }, 100);
+    } catch (error) {
+      console.error('Error loading statistics:', error);
+      alert('Failed to load statistics. Please try again.');
+    }
+  }
+
+  renderCharts(stats) {
+    // Daily Activity Chart
+    if (stats.recentActivity && stats.recentActivity.length > 0) {
+      const dailyCtx = document.getElementById('dailyActivityChart');
+      if (dailyCtx) {
+        new Chart(dailyCtx, {
+          type: 'line',
+          data: {
+            labels: stats.recentActivity.map(d => new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
+            datasets: [{
+              label: 'Sessions',
+              data: stats.recentActivity.map(d => d.sessions),
+              borderColor: 'rgb(99, 102, 241)',
+              backgroundColor: 'rgba(99, 102, 241, 0.1)',
+              tension: 0.4,
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: {
+                display: false
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  stepSize: 1
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // Topic Distribution Chart
+    if (stats.topicStats && stats.topicStats.length > 0) {
+      const topicCtx = document.getElementById('topicDistributionChart');
+      if (topicCtx) {
+        new Chart(topicCtx, {
+          type: 'doughnut',
+          data: {
+            labels: stats.topicStats.map(t => `${t.topic_icon} ${t.topic_name}`),
+            datasets: [{
+              data: stats.topicStats.map(t => t.session_count),
+              backgroundColor: [
+                'rgba(255, 193, 7, 0.8)',
+                'rgba(33, 150, 243, 0.8)',
+                'rgba(76, 175, 80, 0.8)',
+                'rgba(233, 30, 99, 0.8)',
+                'rgba(156, 39, 176, 0.8)'
+              ]
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: {
+                position: 'bottom'
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // Weekly Progress Chart
+    if (stats.weeklyActivity && stats.weeklyActivity.length > 0) {
+      const weeklyCtx = document.getElementById('weeklyProgressChart');
+      if (weeklyCtx) {
+        new Chart(weeklyCtx, {
+          type: 'bar',
+          data: {
+            labels: stats.weeklyActivity.map(w => {
+              const date = new Date(w.week_start);
+              return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            }),
+            datasets: [{
+              label: 'Sessions',
+              data: stats.weeklyActivity.map(w => w.sessions),
+              backgroundColor: 'rgba(99, 102, 241, 0.8)',
+              borderRadius: 8
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: {
+                display: false
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  stepSize: 1
+                }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // Level Distribution Chart
+    if (stats.levelStats && stats.levelStats.length > 0) {
+      const levelCtx = document.getElementById('levelDistributionChart');
+      if (levelCtx) {
+        new Chart(levelCtx, {
+          type: 'pie',
+          data: {
+            labels: stats.levelStats.map(l => l.level.charAt(0).toUpperCase() + l.level.slice(1)),
+            datasets: [{
+              data: stats.levelStats.map(l => l.session_count),
+              backgroundColor: [
+                'rgba(76, 175, 80, 0.8)',
+                'rgba(255, 193, 7, 0.8)',
+                'rgba(244, 67, 54, 0.8)'
+              ]
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: {
+                position: 'bottom'
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // Time of Day Chart
+    if (stats.timeOfDay && stats.timeOfDay.length > 0) {
+      const timeCtx = document.getElementById('timeOfDayChart');
+      if (timeCtx) {
+        // Create full 24-hour array
+        const hourlyData = new Array(24).fill(0);
+        stats.timeOfDay.forEach(t => {
+          hourlyData[t.hour] = t.session_count;
+        });
+
+        new Chart(timeCtx, {
+          type: 'bar',
+          data: {
+            labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+            datasets: [{
+              label: 'Sessions',
+              data: hourlyData,
+              backgroundColor: (context) => {
+                const hour = context.dataIndex;
+                if (hour >= 6 && hour < 12) return 'rgba(255, 193, 7, 0.8)'; // Morning
+                if (hour >= 12 && hour < 18) return 'rgba(33, 150, 243, 0.8)'; // Afternoon
+                if (hour >= 18 && hour < 22) return 'rgba(156, 39, 176, 0.8)'; // Evening
+                return 'rgba(63, 81, 181, 0.8)'; // Night
+              },
+              borderRadius: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+              legend: {
+                display: false
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  stepSize: 1
+                }
+              },
+              x: {
+                ticks: {
+                  maxRotation: 45,
+                  minRotation: 45
+                }
+              }
+            }
+          }
+        });
+      }
+    }
   }
 }
 

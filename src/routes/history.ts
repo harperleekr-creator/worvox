@@ -147,7 +147,7 @@ history.get('/stats/:userId', async (c: Context<{ Bindings: Bindings }>) => {
       ORDER BY message_count DESC
     `).bind(userId).all()
 
-    // Recent activity (last 7 days)
+    // Recent activity (last 30 days for better graph)
     const { results: recentActivity } = await c.env.DB.prepare(`
       SELECT 
         DATE(s.started_at) as date,
@@ -156,10 +156,84 @@ history.get('/stats/:userId', async (c: Context<{ Bindings: Bindings }>) => {
       FROM sessions s
       LEFT JOIN messages m ON s.id = m.session_id
       WHERE s.user_id = ?
-        AND s.started_at >= datetime('now', '-7 days')
+        AND s.started_at >= datetime('now', '-30 days')
       GROUP BY DATE(s.started_at)
-      ORDER BY date DESC
+      ORDER BY date ASC
     `).bind(userId).all()
+
+    // Weekly activity (last 12 weeks)
+    const { results: weeklyActivity } = await c.env.DB.prepare(`
+      SELECT 
+        strftime('%Y-W%W', s.started_at) as week,
+        COUNT(DISTINCT s.id) as sessions,
+        COUNT(m.id) as messages,
+        MIN(DATE(s.started_at)) as week_start
+      FROM sessions s
+      LEFT JOIN messages m ON s.id = m.session_id
+      WHERE s.user_id = ?
+        AND s.started_at >= datetime('now', '-84 days')
+      GROUP BY strftime('%Y-W%W', s.started_at)
+      ORDER BY week ASC
+    `).bind(userId).all()
+
+    // Level progression
+    const { results: levelStats } = await c.env.DB.prepare(`
+      SELECT 
+        level,
+        COUNT(DISTINCT s.id) as session_count,
+        COUNT(m.id) as message_count
+      FROM sessions s
+      LEFT JOIN messages m ON s.id = m.session_id
+      WHERE s.user_id = ?
+      GROUP BY level
+      ORDER BY 
+        CASE level
+          WHEN 'beginner' THEN 1
+          WHEN 'intermediate' THEN 2
+          WHEN 'advanced' THEN 3
+          ELSE 4
+        END
+    `).bind(userId).all()
+
+    // Time of day analysis
+    const { results: timeOfDay } = await c.env.DB.prepare(`
+      SELECT 
+        CAST(strftime('%H', s.started_at) as INTEGER) as hour,
+        COUNT(DISTINCT s.id) as session_count
+      FROM sessions s
+      WHERE s.user_id = ?
+      GROUP BY hour
+      ORDER BY hour
+    `).bind(userId).all()
+
+    // Learning streak
+    const { results: streakData } = await c.env.DB.prepare(`
+      SELECT DISTINCT DATE(started_at) as date
+      FROM sessions
+      WHERE user_id = ?
+      ORDER BY date DESC
+      LIMIT 30
+    `).bind(userId).all()
+
+    // Calculate current streak
+    let currentStreak = 0
+    if (streakData && streakData.length > 0) {
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      
+      for (let i = 0; i < streakData.length; i++) {
+        const sessionDate = new Date(streakData[i].date as string)
+        sessionDate.setHours(0, 0, 0, 0)
+        
+        const daysDiff = Math.floor((today.getTime() - sessionDate.getTime()) / (1000 * 60 * 60 * 24))
+        
+        if (daysDiff === i) {
+          currentStreak++
+        } else {
+          break
+        }
+      }
+    }
 
     return c.json({
       success: true,
@@ -167,8 +241,12 @@ history.get('/stats/:userId', async (c: Context<{ Bindings: Bindings }>) => {
         totalSessions: sessionCount?.[0]?.count || 0,
         totalMessages: messageCount?.[0]?.count || 0,
         totalWords: Math.floor((messageCount?.[0]?.count || 0) / 2) * 10,
+        currentStreak: currentStreak,
         topicStats: topicStats || [],
-        recentActivity: recentActivity || []
+        recentActivity: recentActivity || [],
+        weeklyActivity: weeklyActivity || [],
+        levelStats: levelStats || [],
+        timeOfDay: timeOfDay || []
       }
     })
   } catch (error: any) {
