@@ -42,7 +42,7 @@ class HeySpeak {
     // Wait for Google Sign-In library to load
     if (typeof google !== 'undefined' && google.accounts) {
       google.accounts.id.initialize({
-        client_id: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
+        client_id: '506018364729-ichplnfnqlk2hmh1bhblepm0un44ltdr.apps.googleusercontent.com',
         callback: this.handleGoogleSignIn.bind(this),
         auto_select: false,
       });
