@@ -401,10 +401,16 @@ class HeySpeak {
                     </p>
                   </div>
                 </div>
-                <button onclick="heyspeak.logout()" 
-                  class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
-                  <i class="fas fa-sign-out-alt mr-2"></i>Logout
-                </button>
+                <div class="flex gap-2">
+                  <button onclick="heyspeak.showHistory()" 
+                    class="px-4 py-2 text-indigo-600 hover:text-indigo-800 transition-colors">
+                    <i class="fas fa-history mr-2"></i>History
+                  </button>
+                  <button onclick="heyspeak.logout()" 
+                    class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
+                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                  </button>
+                </div>
               </div>
 
               <!-- Additional Stats Cards -->
@@ -744,6 +750,218 @@ class HeySpeak {
     this.currentTopic = null;
     this.messages = [];
     this.showLogin();
+  }
+
+  // History feature
+  async showHistory() {
+    try {
+      const response = await axios.get(`/api/history/sessions/${this.currentUser.id}`);
+      const sessions = response.data.sessions;
+
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="min-h-screen p-4 md:p-8">
+          <div class="max-w-6xl mx-auto">
+            <!-- Header -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+              <div class="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                  <h1 class="text-2xl md:text-3xl font-bold text-gray-800">📚 Learning History</h1>
+                  <p class="text-gray-600 mt-2">Review your past conversations and track your progress</p>
+                </div>
+                <button onclick="heyspeak.showTopicSelection()" 
+                  class="px-4 py-2 text-indigo-600 hover:text-indigo-800 transition-colors">
+                  <i class="fas fa-arrow-left mr-2"></i>Back to Topics
+                </button>
+              </div>
+            </div>
+
+            <!-- Sessions List -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+              ${sessions.length === 0 ? `
+                <div class="text-center py-12">
+                  <div class="text-6xl mb-4">📝</div>
+                  <h3 class="text-xl font-bold text-gray-800 mb-2">No Learning History Yet</h3>
+                  <p class="text-gray-600 mb-6">Start a conversation to see your learning history here!</p>
+                  <button onclick="heyspeak.showTopicSelection()" 
+                    class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all">
+                    Start Learning
+                  </button>
+                </div>
+              ` : `
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Your Sessions (${sessions.length})</h2>
+                <div class="space-y-4">
+                  ${this.groupSessionsByDate(sessions)}
+                </div>
+              `}
+            </div>
+          </div>
+        </div>
+      `;
+    } catch (error) {
+      console.error('Error loading history:', error);
+      alert('Failed to load history. Please try again.');
+    }
+  }
+
+  groupSessionsByDate(sessions) {
+    // Group sessions by date
+    const grouped = {};
+    
+    sessions.forEach(session => {
+      const date = new Date(session.started_at).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      
+      if (!grouped[date]) {
+        grouped[date] = [];
+      }
+      grouped[date].push(session);
+    });
+
+    // Generate HTML
+    let html = '';
+    for (const [date, dateSessions] of Object.entries(grouped)) {
+      html += `
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold text-gray-700 mb-3 flex items-center">
+            <i class="fas fa-calendar-day mr-2 text-indigo-600"></i>${date}
+          </h3>
+          <div class="space-y-3">
+            ${dateSessions.map(session => this.renderSessionCard(session)).join('')}
+          </div>
+        </div>
+      `;
+    }
+    
+    return html;
+  }
+
+  renderSessionCard(session) {
+    const startTime = new Date(session.started_at).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
+    const duration = session.ended_at 
+      ? Math.round((new Date(session.ended_at) - new Date(session.started_at)) / 1000 / 60)
+      : 'In progress';
+    
+    return `
+      <div class="border-2 border-gray-200 rounded-xl p-4 cursor-pointer hover:border-indigo-500 transition-all card-hover"
+        onclick="heyspeak.showConversation(${session.id})">
+        <div class="flex items-start justify-between">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-2xl">${session.topic_icon || '📚'}</span>
+              <h4 class="text-lg font-bold text-gray-800">${session.topic_name || 'Conversation'}</h4>
+            </div>
+            <div class="flex items-center gap-4 text-sm text-gray-600 flex-wrap">
+              <span><i class="fas fa-clock mr-1"></i>${startTime}</span>
+              <span><i class="fas fa-hourglass-half mr-1"></i>${duration}${typeof duration === 'number' ? ' min' : ''}</span>
+              <span><i class="fas fa-comment mr-1"></i>${session.message_count} messages</span>
+              <span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold">
+                ${session.level}
+              </span>
+            </div>
+            ${session.topic_description ? `
+              <p class="text-gray-600 text-sm mt-2">${session.topic_description}</p>
+            ` : ''}
+          </div>
+          <i class="fas fa-chevron-right text-gray-400"></i>
+        </div>
+      </div>
+    `;
+  }
+
+  async showConversation(sessionId) {
+    try {
+      const response = await axios.get(`/api/history/conversation/${sessionId}`);
+      const { session, messages } = response.data;
+
+      const startTime = new Date(session.started_at).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="min-h-screen p-4 md:p-8">
+          <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+              <button onclick="heyspeak.showHistory()" 
+                class="text-indigo-600 hover:text-indigo-800 transition-colors mb-4">
+                <i class="fas fa-arrow-left mr-2"></i>Back to History
+              </button>
+              
+              <div class="flex items-start gap-4">
+                <span class="text-4xl">${session.topic_icon || '📚'}</span>
+                <div class="flex-1">
+                  <h1 class="text-2xl font-bold text-gray-800 mb-2">${session.topic_name}</h1>
+                  <div class="flex items-center gap-4 text-sm text-gray-600 flex-wrap">
+                    <span><i class="fas fa-user mr-1"></i>${session.username}</span>
+                    <span><i class="fas fa-calendar mr-1"></i>${startTime}</span>
+                    <span><i class="fas fa-comment mr-1"></i>${messages.length} messages</span>
+                    <span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold">
+                      ${session.level}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Conversation -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+              <h2 class="text-xl font-bold text-gray-800 mb-6">Conversation</h2>
+              
+              ${messages.length === 0 ? `
+                <div class="text-center py-12 text-gray-500">
+                  <i class="fas fa-comment-slash text-4xl mb-4"></i>
+                  <p>No messages in this conversation</p>
+                </div>
+              ` : `
+                <div class="space-y-4">
+                  ${messages.map(msg => this.renderHistoryMessage(msg)).join('')}
+                </div>
+              `}
+            </div>
+          </div>
+        </div>
+      `;
+    } catch (error) {
+      console.error('Error loading conversation:', error);
+      alert('Failed to load conversation. Please try again.');
+    }
+  }
+
+  renderHistoryMessage(message) {
+    const time = new Date(message.created_at).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
+    const isUser = message.role === 'user';
+    
+    return `
+      <div class="flex ${isUser ? 'justify-end' : 'justify-start'}">
+        <div class="max-w-xs md:max-w-md lg:max-w-lg">
+          <div class="inline-block px-4 py-3 rounded-2xl ${
+            isUser 
+              ? 'bg-indigo-600 text-white' 
+              : 'bg-gray-200 text-gray-800'
+          }">
+            <p class="text-sm md:text-base">${this.escapeHtml(message.content)}</p>
+          </div>
+          <p class="text-xs text-gray-500 mt-1 ${isUser ? 'text-right' : 'text-left'}">${time}</p>
+        </div>
+      </div>
+    `;
   }
 
   escapeHtml(text) {

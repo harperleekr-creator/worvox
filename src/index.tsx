@@ -10,6 +10,7 @@ import chat from './routes/chat';
 import sessions from './routes/sessions';
 import users from './routes/users';
 import topics from './routes/topics';
+import history from './routes/history';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -26,6 +27,7 @@ app.route('/api/chat', chat);
 app.route('/api/sessions', sessions);
 app.route('/api/users', users);
 app.route('/api/topics', topics);
+app.route('/api/history', history);
 
 // Health check
 app.get('/api/health', (c) => {
