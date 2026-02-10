@@ -15,7 +15,8 @@ AI 기반 실시간 영어 회화 학습 웹 애플리케이션입니다. 사용
 ## ✨ 현재 완성된 기능
 
 ### 핵심 기능
-- ✅ **사용자 인증**: 사용자명과 레벨(초급/중급/고급) 선택
+- ✅ **6단계 온보딩**: 이름, 레벨, 유입경로, 나이대, 성별, 직업 수집
+- ✅ **사용자 프로필**: 상세한 사용자 정보 관리 및 분석
 - ✅ **다양한 학습 주제**: 
   - ☀️ Daily Conversation (일상 대화)
   - 💼 Business English (비즈니스 영어)
@@ -24,10 +25,11 @@ AI 기반 실시간 영어 회화 학습 웹 애플리케이션입니다. 사용
   - 🗣️ Free Talk (자유 대화)
 - ✅ **음성 녹음**: 브라우저 마이크를 통한 실시간 녹음
 - ✅ **음성 인식 (STT)**: OpenAI Whisper API를 통한 음성→텍스트 변환
-- ✅ **AI 대화 생성**: GPT-3.5-turbo를 활용한 빠른 영어 대화
-- ✅ **음성 합성 (TTS)**: ElevenLabs를 통한 자연스러운 영어 발음
-- ✅ **대화 히스토리**: 모든 대화 내역 저장 및 조회
-- ✅ **학습 통계**: 세션 및 메시지 통계 추적
+- ✅ **AI 대화 생성**: GPT-3.5-turbo를 활용한 빠른 영어 대화 (1-2초 응답)
+- ✅ **음성 합성 (TTS)**: OpenAI TTS (nova 음성)를 통한 자연스러운 영어 발음
+- ✅ **학습 히스토리**: 날짜별 세션 목록 및 전체 대화 내용 조회
+- ✅ **학습 통계 대시보드**: 총 세션, 메시지, 단어 수, 학습 스트릭 표시
+- ✅ **실시간 단어 카운트**: 학습한 단어 수 실시간 표시
 
 ### API 엔드포인트
 
@@ -48,13 +50,18 @@ AI 기반 실시간 영어 회화 학습 웹 애플리케이션입니다. 사용
 - `GET /api/sessions/:sessionId` - 세션 상세 정보
 - `GET /api/sessions/user/:userId` - 사용자의 모든 세션
 
+#### 학습 히스토리
+- `GET /api/history/sessions/:userId` - 사용자의 모든 세션 목록 (최근 50개)
+- `GET /api/history/conversation/:sessionId` - 특정 세션의 전체 대화 내용
+- `GET /api/history/stats/:userId` - 사용자 학습 통계 (주제별, 일별)
+
 #### 대화 처리
 - `POST /api/chat/message` - AI 응답 생성 및 저장
 - `GET /api/chat/history/:sessionId` - 대화 히스토리 조회
 
 #### 음성 처리
-- `POST /api/stt/transcribe` - 음성을 텍스트로 변환
-- `POST /api/tts/speak` - 텍스트를 음성으로 변환
+- `POST /api/stt/transcribe` - 음성을 텍스트로 변환 (Whisper)
+- `POST /api/tts/speak` - 텍스트를 음성으로 변환 (OpenAI TTS)
 - `GET /api/tts/voices` - 사용 가능한 음성 목록
 
 ## 🗄️ 데이터 아키텍처
@@ -67,6 +74,10 @@ AI 기반 실시간 영어 회화 학습 웹 애플리케이션입니다. 사용
 - username: 사용자명
 - email: 이메일 (선택)
 - level: 학습 레벨 (beginner/intermediate/advanced)
+- referral_source: 유입 경로 (search/social/friend/ad/other)
+- age_group: 나이대 (10s/20s/30s/40s/50s_plus)
+- gender: 성별 (male/female/other/prefer_not_to_say)
+- occupation: 직업 (entrepreneur/employee/freelancer/student)
 - created_at: 가입일시
 ```
 
