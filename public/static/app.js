@@ -285,17 +285,17 @@ class HeySpeak {
     }
   }
 
-  async processAudio(audioBlob) {
+  async processAudio(recordedAudio) {
     try {
-      console.log('Processing audio blob:', audioBlob.size, 'bytes, type:', audioBlob.type);
+      console.log('Processing audio blob:', recordedAudio.size, 'bytes, type:', recordedAudio.type);
       
       // Step 1: Transcribe audio
       const formData = new FormData();
       // Determine file extension based on mime type
-      const fileExt = audioBlob.type.includes('webm') ? 'webm' : 
-                     audioBlob.type.includes('mp4') ? 'm4a' : 
-                     audioBlob.type.includes('ogg') ? 'ogg' : 'webm';
-      formData.append('audio', audioBlob, `recording.${fileExt}`);
+      const fileExt = recordedAudio.type.includes('webm') ? 'webm' : 
+                     recordedAudio.type.includes('mp4') ? 'm4a' : 
+                     recordedAudio.type.includes('ogg') ? 'ogg' : 'webm';
+      formData.append('audio', recordedAudio, `recording.${fileExt}`);
 
       console.log('Sending to STT API...');
       const transcriptionResponse = await axios.post('/api/stt/transcribe', formData, {
