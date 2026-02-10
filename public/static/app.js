@@ -10,6 +10,17 @@ class HeySpeak {
     this.isRecording = false;
     this.currentAudio = null;
     
+    // Onboarding state
+    this.onboardingData = {
+      username: '',
+      level: '',
+      referralSource: '',
+      ageGroup: '',
+      gender: '',
+      occupation: ''
+    };
+    this.onboardingStep = 1;
+    
     this.init();
   }
 
@@ -26,57 +37,324 @@ class HeySpeak {
 
   // UI Rendering Methods
   showLogin() {
+    this.onboardingStep = 1;
+    this.showOnboardingStep();
+  }
+
+  showOnboardingStep() {
     const app = document.getElementById('app');
+    
+    const steps = [
+      this.getStep1HTML(),
+      this.getStep2HTML(),
+      this.getStep3HTML(),
+      this.getStep4HTML(),
+      this.getStep5HTML(),
+      this.getStep6HTML()
+    ];
+
+    const progress = Math.round((this.onboardingStep / 6) * 100);
+
     app.innerHTML = `
-      <div class="min-h-screen flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
-          <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold gradient-text mb-2">HeySpeak</h1>
-            <p class="text-gray-600">AI-Powered English Learning</p>
+      <div class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg">
+          <!-- Header -->
+          <div class="text-center mb-6">
+            <h1 class="text-3xl font-bold gradient-text mb-2">HeySpeak</h1>
+            <p class="text-gray-600 text-sm">Step ${this.onboardingStep} of 6</p>
           </div>
-          
-          <form id="loginForm" class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
-              <input type="text" id="username" required
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                placeholder="Enter your name">
-            </div>
-            
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Level</label>
-              <select id="level" 
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                <option value="beginner">🌱 Beginner</option>
-                <option value="intermediate">🌿 Intermediate</option>
-                <option value="advanced">🌳 Advanced</option>
-              </select>
-            </div>
-            
-            <button type="submit" 
-              class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all btn-hover">
-              Get Started
-            </button>
-          </form>
+
+          <!-- Progress Bar -->
+          <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 h-2 rounded-full transition-all duration-300" 
+                 style="width: ${progress}%"></div>
+          </div>
+
+          <!-- Current Step Content -->
+          ${steps[this.onboardingStep - 1]}
         </div>
       </div>
     `;
 
-    document.getElementById('loginForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      this.handleLogin();
-    });
+    this.attachOnboardingListeners();
   }
 
-  async handleLogin() {
-    const username = document.getElementById('username').value;
-    const level = document.getElementById('level').value;
+  getStep1HTML() {
+    return `
+      <div class="space-y-6">
+        <div class="text-center">
+          <div class="text-5xl mb-4">👋</div>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome!</h2>
+          <p class="text-gray-600">What should we call you?</p>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+          <input type="text" id="username" value="${this.onboardingData.username}"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg"
+            placeholder="Enter your name" autofocus>
+        </div>
 
+        <button onclick="heyspeak.nextStep()" 
+          class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all btn-hover">
+          Continue
+        </button>
+      </div>
+    `;
+  }
+
+  getStep2HTML() {
+    const levels = [
+      { value: 'beginner', icon: '🌱', label: 'Beginner', desc: 'Just starting out' },
+      { value: 'intermediate', icon: '🌿', label: 'Intermediate', desc: 'Some experience' },
+      { value: 'advanced', icon: '🌳', label: 'Advanced', desc: 'Confident speaker' }
+    ];
+
+    return `
+      <div class="space-y-6">
+        <div class="text-center">
+          <div class="text-5xl mb-4">📚</div>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">English Level</h2>
+          <p class="text-gray-600">What's your current level?</p>
+        </div>
+        
+        <div class="space-y-3">
+          ${levels.map(level => `
+            <button onclick="heyspeak.selectOption('level', '${level.value}')" 
+              class="w-full p-4 border-2 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left ${this.onboardingData.level === level.value ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}">
+              <div class="flex items-center">
+                <span class="text-3xl mr-4">${level.icon}</span>
+                <div class="flex-1">
+                  <div class="font-semibold text-gray-800">${level.label}</div>
+                  <div class="text-sm text-gray-600">${level.desc}</div>
+                </div>
+                ${this.onboardingData.level === level.value ? '<span class="text-indigo-600">✓</span>' : ''}
+              </div>
+            </button>
+          `).join('')}
+        </div>
+
+        <button onclick="heyspeak.prevStep()" 
+          class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
+          Back
+        </button>
+      </div>
+    `;
+  }
+
+  getStep3HTML() {
+    const sources = [
+      { value: 'search', icon: '🔍', label: 'Search Engine', desc: 'Google, Naver, etc.' },
+      { value: 'social', icon: '📱', label: 'Social Media', desc: 'Instagram, YouTube, etc.' },
+      { value: 'friend', icon: '👥', label: 'Friend Referral', desc: 'Someone told me' },
+      { value: 'ad', icon: '📢', label: 'Advertisement', desc: 'Saw an ad' },
+      { value: 'other', icon: '💭', label: 'Other', desc: 'Different source' }
+    ];
+
+    return `
+      <div class="space-y-6">
+        <div class="text-center">
+          <div class="text-5xl mb-4">🤔</div>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">How did you find us?</h2>
+          <p class="text-gray-600">Help us improve our reach</p>
+        </div>
+        
+        <div class="space-y-3 max-h-96 overflow-y-auto">
+          ${sources.map(source => `
+            <button onclick="heyspeak.selectOption('referralSource', '${source.value}')" 
+              class="w-full p-4 border-2 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left ${this.onboardingData.referralSource === source.value ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}">
+              <div class="flex items-center">
+                <span class="text-3xl mr-4">${source.icon}</span>
+                <div class="flex-1">
+                  <div class="font-semibold text-gray-800">${source.label}</div>
+                  <div class="text-sm text-gray-600">${source.desc}</div>
+                </div>
+                ${this.onboardingData.referralSource === source.value ? '<span class="text-indigo-600">✓</span>' : ''}
+              </div>
+            </button>
+          `).join('')}
+        </div>
+
+        <button onclick="heyspeak.prevStep()" 
+          class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
+          Back
+        </button>
+      </div>
+    `;
+  }
+
+  getStep4HTML() {
+    const ageGroups = [
+      { value: '10s', icon: '🎮', label: '10대', desc: 'Teenager' },
+      { value: '20s', icon: '🎓', label: '20대', desc: 'Twenty-something' },
+      { value: '30s', icon: '💼', label: '30대', desc: 'Thirty-something' },
+      { value: '40s', icon: '👔', label: '40대', desc: 'Forty-something' },
+      { value: '50+', icon: '🌟', label: '50대+', desc: 'Fifty and beyond' }
+    ];
+
+    return `
+      <div class="space-y-6">
+        <div class="text-center">
+          <div class="text-5xl mb-4">🎂</div>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">Age Group</h2>
+          <p class="text-gray-600">What's your age range?</p>
+        </div>
+        
+        <div class="space-y-3">
+          ${ageGroups.map(age => `
+            <button onclick="heyspeak.selectOption('ageGroup', '${age.value}')" 
+              class="w-full p-4 border-2 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left ${this.onboardingData.ageGroup === age.value ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}">
+              <div class="flex items-center">
+                <span class="text-3xl mr-4">${age.icon}</span>
+                <div class="flex-1">
+                  <div class="font-semibold text-gray-800">${age.label}</div>
+                  <div class="text-sm text-gray-600">${age.desc}</div>
+                </div>
+                ${this.onboardingData.ageGroup === age.value ? '<span class="text-indigo-600">✓</span>' : ''}
+              </div>
+            </button>
+          `).join('')}
+        </div>
+
+        <button onclick="heyspeak.prevStep()" 
+          class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
+          Back
+        </button>
+      </div>
+    `;
+  }
+
+  getStep5HTML() {
+    const genders = [
+      { value: 'male', icon: '👨', label: 'Male', desc: '남성' },
+      { value: 'female', icon: '👩', label: 'Female', desc: '여성' },
+      { value: 'other', icon: '🧑', label: 'Other/Prefer not to say', desc: '기타/선택 안함' }
+    ];
+
+    return `
+      <div class="space-y-6">
+        <div class="text-center">
+          <div class="text-5xl mb-4">🙋</div>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">Gender</h2>
+          <p class="text-gray-600">How do you identify?</p>
+        </div>
+        
+        <div class="space-y-3">
+          ${genders.map(gender => `
+            <button onclick="heyspeak.selectOption('gender', '${gender.value}')" 
+              class="w-full p-4 border-2 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left ${this.onboardingData.gender === gender.value ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}">
+              <div class="flex items-center">
+                <span class="text-3xl mr-4">${gender.icon}</span>
+                <div class="flex-1">
+                  <div class="font-semibold text-gray-800">${gender.label}</div>
+                  <div class="text-sm text-gray-600">${gender.desc}</div>
+                </div>
+                ${this.onboardingData.gender === gender.value ? '<span class="text-indigo-600">✓</span>' : ''}
+              </div>
+            </button>
+          `).join('')}
+        </div>
+
+        <button onclick="heyspeak.prevStep()" 
+          class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
+          Back
+        </button>
+      </div>
+    `;
+  }
+
+  getStep6HTML() {
+    const occupations = [
+      { value: 'entrepreneur', icon: '🚀', label: 'Entrepreneur', desc: '사업가' },
+      { value: 'employee', icon: '💼', label: 'Employee', desc: '직장인' },
+      { value: 'freelancer', icon: '💻', label: 'Freelancer', desc: '프리랜서' },
+      { value: 'student', icon: '📚', label: 'Student', desc: '학생' }
+    ];
+
+    return `
+      <div class="space-y-6">
+        <div class="text-center">
+          <div class="text-5xl mb-4">💼</div>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">Occupation</h2>
+          <p class="text-gray-600">What do you do?</p>
+        </div>
+        
+        <div class="space-y-3">
+          ${occupations.map(occ => `
+            <button onclick="heyspeak.selectOption('occupation', '${occ.value}')" 
+              class="w-full p-4 border-2 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left ${this.onboardingData.occupation === occ.value ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}">
+              <div class="flex items-center">
+                <span class="text-3xl mr-4">${occ.icon}</span>
+                <div class="flex-1">
+                  <div class="font-semibold text-gray-800">${occ.label}</div>
+                  <div class="text-sm text-gray-600">${occ.desc}</div>
+                </div>
+                ${this.onboardingData.occupation === occ.value ? '<span class="text-indigo-600">✓</span>' : ''}
+              </div>
+            </button>
+          `).join('')}
+        </div>
+
+        <button onclick="heyspeak.prevStep()" 
+          class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
+          Back
+        </button>
+      </div>
+    `;
+  }
+
+  attachOnboardingListeners() {
+    if (this.onboardingStep === 1) {
+      const input = document.getElementById('username');
+      if (input) {
+        input.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            this.nextStep();
+          }
+        });
+      }
+    }
+  }
+
+  nextStep() {
+    // Validate current step
+    if (this.onboardingStep === 1) {
+      const username = document.getElementById('username').value.trim();
+      if (!username) {
+        alert('Please enter your name');
+        return;
+      }
+      this.onboardingData.username = username;
+    }
+
+    this.onboardingStep++;
+    this.showOnboardingStep();
+  }
+
+  prevStep() {
+    if (this.onboardingStep > 1) {
+      this.onboardingStep--;
+      this.showOnboardingStep();
+    }
+  }
+
+  selectOption(field, value) {
+    this.onboardingData[field] = value;
+    
+    // Auto-advance to next step after selection
+    setTimeout(() => {
+      if (this.onboardingStep < 6) {
+        this.nextStep();
+      } else {
+        // Last step - complete onboarding
+        this.completeOnboarding();
+      }
+    }, 300);
+  }
+
+  async completeOnboarding() {
     try {
-      const response = await axios.post('/api/users/auth', {
-        username,
-        level
-      });
+      const response = await axios.post('/api/users/auth', this.onboardingData);
 
       if (response.data.success) {
         this.currentUser = response.data.user;
@@ -84,8 +362,8 @@ class HeySpeak {
         this.showTopicSelection();
       }
     } catch (error) {
-      console.error('Login error:', error);
-      alert('Failed to login. Please try again.');
+      console.error('Onboarding error:', error);
+      alert('Failed to complete registration. Please try again.');
     }
   }
 

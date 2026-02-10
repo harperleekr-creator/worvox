@@ -6,7 +6,7 @@ const users = new Hono<{ Bindings: Bindings }>();
 // Create or get user
 users.post('/auth', async (c) => {
   try {
-    const { username, email, level } = await c.req.json();
+    const { username, email, level, referralSource, ageGroup, gender, occupation } = await c.req.json();
 
     if (!username) {
       return c.json({ error: 'Username is required' }, 400);
@@ -24,10 +24,19 @@ users.post('/auth', async (c) => {
       });
     }
 
-    // Create new user
+    // Create new user with all profile fields
     const result = await c.env.DB.prepare(
-      'INSERT INTO users (username, email, level) VALUES (?, ?, ?)'
-    ).bind(username, email || null, level || 'beginner').run();
+      `INSERT INTO users (username, email, level, referral_source, age_group, gender, occupation) 
+       VALUES (?, ?, ?, ?, ?, ?, ?)`
+    ).bind(
+      username, 
+      email || null, 
+      level || 'beginner',
+      referralSource || null,
+      ageGroup || null,
+      gender || null,
+      occupation || null
+    ).run();
 
     const userId = result.meta.last_row_id;
 
