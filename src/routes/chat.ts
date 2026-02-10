@@ -56,7 +56,7 @@ chat.post('/message', async (c) => {
         'Authorization': `Bearer ${openaiApiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4',
+        model: 'gpt-3.5-turbo', // Fast and efficient for conversation
         messages: messages,
         temperature: 0.7,
         max_tokens: 150,
