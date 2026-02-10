@@ -141,13 +141,14 @@ AI 기반 실시간 영어 회화 학습 웹 애플리케이션입니다. 사용
 - **Frontend**: Vanilla JavaScript + TailwindCSS
 - **Database**: Cloudflare D1 (SQLite)
 - **AI Services**: 
-  - OpenAI Whisper (STT)
-  - OpenAI GPT-4 (Chat)
-  - ElevenLabs (TTS)
+  - OpenAI Whisper (STT - 음성 인식)
+  - OpenAI GPT-4 (Chat - AI 대화)
+  - OpenAI TTS (TTS - 음성 합성) ✨ Nova voice
 - **Deployment**: Cloudflare Pages/Workers (프로덕션 배포 준비 완료)
 
 ### 최근 업데이트
 - **2026-02-10**: 초기 버전 완성 및 모든 기능 구현
+- **2026-02-10**: OpenAI TTS로 전환 (ElevenLabs → OpenAI TTS with Nova voice)
 
 ## ⚙️ 설치 및 실행
 
@@ -167,8 +168,10 @@ npm install
 `.dev.vars` 파일 생성:
 ```bash
 OPENAI_API_KEY=your-openai-api-key
-ELEVENLABS_API_KEY=your-elevenlabs-api-key
+ELEVENLABS_API_KEY=your-elevenlabs-api-key  # (옵션, OpenAI TTS 사용 중)
 ```
+
+**참고**: 현재는 OpenAI TTS를 사용하므로 OpenAI API 키만 필요합니다.
 
 ### 데이터베이스 마이그레이션
 ```bash
