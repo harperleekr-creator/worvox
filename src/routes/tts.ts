@@ -3,7 +3,7 @@ import type { Bindings } from '../types';
 
 const tts = new Hono<{ Bindings: Bindings }>();
 
-// Text-to-Speech using ElevenLabs
+// Text-to-Speech using OpenAI TTS
 tts.post('/speak', async (c) => {
   try {
     const { text } = await c.req.json();
@@ -12,38 +12,32 @@ tts.post('/speak', async (c) => {
       return c.json({ error: 'Text is required' }, 400);
     }
 
-    const elevenlabsApiKey = c.env.ELEVENLABS_API_KEY;
+    const openaiApiKey = c.env.OPENAI_API_KEY;
+    const openaiApiBase = c.env.OPENAI_API_BASE || 'https://api.openai.com/v1';
 
-    if (!elevenlabsApiKey) {
-      return c.json({ error: 'ElevenLabs API key not configured' }, 500);
+    if (!openaiApiKey) {
+      return c.json({ error: 'OpenAI API key not configured' }, 500);
     }
 
-    // Using Rachel voice (a clear, friendly female English voice)
-    const voiceId = '21m00Tcm4TlvDq8ikWAM';
-
-    const response = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
-      {
-        method: 'POST',
-        headers: {
-          'Accept': 'audio/mpeg',
-          'Content-Type': 'application/json',
-          'xi-api-key': elevenlabsApiKey,
-        },
-        body: JSON.stringify({
-          text: text,
-          model_id: 'eleven_turbo_v2_5', // Updated to latest model for free tier
-          voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.5,
-          },
-        }),
-      }
-    );
+    // Using OpenAI TTS with 'alloy' voice (natural, balanced English voice)
+    // Available voices: alloy, echo, fable, onyx, nova, shimmer
+    const response = await fetch(`${openaiApiBase}/audio/speech`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openaiApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'tts-1', // tts-1 is optimized for speed, tts-1-hd for quality
+        input: text,
+        voice: 'nova', // nova is a warm, friendly female voice
+        speed: 1.0, // 0.25 to 4.0
+      }),
+    });
 
     if (!response.ok) {
       const error = await response.text();
-      console.error('ElevenLabs API error:', error);
+      console.error('OpenAI TTS API error:', error);
       return c.json({ error: 'Failed to generate speech' }, 500);
     }
 
@@ -65,27 +59,23 @@ tts.post('/speak', async (c) => {
   }
 });
 
-// Get available voices (optional)
+// Get available OpenAI voices
 tts.get('/voices', async (c) => {
   try {
-    const elevenlabsApiKey = c.env.ELEVENLABS_API_KEY;
+    // OpenAI TTS available voices
+    const voices = [
+      { id: 'alloy', name: 'Alloy', description: 'Neutral and balanced' },
+      { id: 'echo', name: 'Echo', description: 'Male, clear and articulate' },
+      { id: 'fable', name: 'Fable', description: 'Male, warm and expressive' },
+      { id: 'onyx', name: 'Onyx', description: 'Male, deep and authoritative' },
+      { id: 'nova', name: 'Nova', description: 'Female, warm and friendly (default)' },
+      { id: 'shimmer', name: 'Shimmer', description: 'Female, soft and gentle' },
+    ];
 
-    if (!elevenlabsApiKey) {
-      return c.json({ error: 'ElevenLabs API key not configured' }, 500);
-    }
-
-    const response = await fetch('https://api.elevenlabs.io/v1/voices', {
-      headers: {
-        'xi-api-key': elevenlabsApiKey,
-      },
+    return c.json({
+      voices,
+      success: true,
     });
-
-    if (!response.ok) {
-      return c.json({ error: 'Failed to fetch voices' }, 500);
-    }
-
-    const data = await response.json();
-    return c.json(data);
 
   } catch (error) {
     console.error('Voices error:', error);
