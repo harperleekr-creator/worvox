@@ -24,7 +24,7 @@ AI 기반 실시간 영어 회화 학습 웹 애플리케이션입니다. 사용
   - 🗣️ Free Talk (자유 대화)
 - ✅ **음성 녹음**: 브라우저 마이크를 통한 실시간 녹음
 - ✅ **음성 인식 (STT)**: OpenAI Whisper API를 통한 음성→텍스트 변환
-- ✅ **AI 대화 생성**: GPT-4를 활용한 맥락 기반 영어 대화
+- ✅ **AI 대화 생성**: GPT-3.5-turbo를 활용한 빠른 영어 대화
 - ✅ **음성 합성 (TTS)**: ElevenLabs를 통한 자연스러운 영어 발음
 - ✅ **대화 히스토리**: 모든 대화 내역 저장 및 조회
 - ✅ **학습 통계**: 세션 및 메시지 통계 추적
@@ -109,7 +109,7 @@ AI 기반 실시간 영어 회화 학습 웹 애플리케이션입니다. 사용
 ### 데이터 흐름
 1. 사용자 음성 입력 → 브라우저에서 녹음
 2. 음성 파일 → `/api/stt/transcribe` → OpenAI Whisper
-3. 텍스트 → `/api/chat/message` → GPT-4 → AI 응답
+3. 텍스트 → `/api/chat/message` → GPT-3.5-turbo → AI 응답
 4. AI 응답 텍스트 → `/api/tts/speak` → ElevenLabs → 음성
 5. 모든 대화 → D1 데이터베이스에 저장
 
@@ -142,13 +142,14 @@ AI 기반 실시간 영어 회화 학습 웹 애플리케이션입니다. 사용
 - **Database**: Cloudflare D1 (SQLite)
 - **AI Services**: 
   - OpenAI Whisper (STT - 음성 인식)
-  - OpenAI GPT-4 (Chat - AI 대화)
+  - OpenAI GPT-3.5-turbo (Chat - AI 대화) ⚡ Fast!
   - OpenAI TTS (TTS - 음성 합성) ✨ Nova voice
 - **Deployment**: Cloudflare Pages/Workers (프로덕션 배포 준비 완료)
 
 ### 최근 업데이트
 - **2026-02-10**: 초기 버전 완성 및 모든 기능 구현
 - **2026-02-10**: OpenAI TTS로 전환 (ElevenLabs → OpenAI TTS with Nova voice)
+- **2026-02-10**: GPT-3.5-turbo로 변경 (빠른 응답 속도)
 
 ## ⚙️ 설치 및 실행
 
@@ -273,7 +274,7 @@ MIT License - 자유롭게 사용, 수정, 배포 가능합니다.
 이 프로젝트는 다음 기술들로 만들어졌습니다:
 - [Hono](https://hono.dev/) - 초고속 웹 프레임워크
 - [Cloudflare Workers](https://workers.cloudflare.com/) - Edge 컴퓨팅 플랫폼
-- [OpenAI](https://openai.com/) - AI 모델 (Whisper, GPT-4)
+- [OpenAI](https://openai.com/) - AI 모델 (Whisper, GPT-3.5-turbo)
 - [ElevenLabs](https://elevenlabs.io/) - 음성 합성 기술
 - [TailwindCSS](https://tailwindcss.com/) - 유틸리티 CSS 프레임워크
 
