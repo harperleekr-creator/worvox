@@ -337,8 +337,8 @@ class HeySpeak {
       console.log('TTS Response received:', ttsResponse.data.byteLength, 'bytes');
       
       // Play audio
-      const audioBlob = new Blob([ttsResponse.data], { type: 'audio/mpeg' });
-      const audioUrl = URL.createObjectURL(audioBlob);
+      const ttsAudioBlob = new Blob([ttsResponse.data], { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(ttsAudioBlob);
       this.playAudio(audioUrl);
 
       // Reset UI
