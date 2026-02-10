@@ -221,15 +221,33 @@ class HeySpeak {
   async startRecording() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      this.mediaRecorder = new MediaRecorder(stream);
+      
+      // Try to use audio/webm with opus codec, fallback to default
+      let options = { mimeType: 'audio/webm;codecs=opus' };
+      if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+        console.log('audio/webm;codecs=opus not supported, trying audio/webm');
+        options = { mimeType: 'audio/webm' };
+        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+          console.log('audio/webm not supported, using default');
+          options = {};
+        }
+      }
+      
+      this.mediaRecorder = new MediaRecorder(stream, options);
       this.audioChunks = [];
 
+      console.log('MediaRecorder created with mimeType:', this.mediaRecorder.mimeType);
+
       this.mediaRecorder.ondataavailable = (event) => {
-        this.audioChunks.push(event.data);
+        if (event.data.size > 0) {
+          this.audioChunks.push(event.data);
+        }
       };
 
       this.mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
+        const mimeType = this.mediaRecorder.mimeType || 'audio/webm';
+        const audioBlob = new Blob(this.audioChunks, { type: mimeType });
+        console.log('Recording stopped. Blob size:', audioBlob.size, 'type:', audioBlob.type);
         await this.processAudio(audioBlob);
         stream.getTracks().forEach(track => track.stop());
       };
@@ -245,7 +263,11 @@ class HeySpeak {
 
     } catch (error) {
       console.error('Error starting recording:', error);
-      alert('Unable to access microphone. Please check permissions.');
+      if (error.name === 'NotAllowedError') {
+        alert('Microphone access denied. Please allow microphone access in your browser settings.');
+      } else {
+        alert('Unable to access microphone: ' + error.message);
+      }
     }
   }
 
@@ -265,38 +287,55 @@ class HeySpeak {
 
   async processAudio(audioBlob) {
     try {
+      console.log('Processing audio blob:', audioBlob.size, 'bytes, type:', audioBlob.type);
+      
       // Step 1: Transcribe audio
       const formData = new FormData();
-      formData.append('audio', audioBlob, 'recording.webm');
+      // Determine file extension based on mime type
+      const fileExt = audioBlob.type.includes('webm') ? 'webm' : 
+                     audioBlob.type.includes('mp4') ? 'm4a' : 
+                     audioBlob.type.includes('ogg') ? 'ogg' : 'webm';
+      formData.append('audio', audioBlob, `recording.${fileExt}`);
 
+      console.log('Sending to STT API...');
       const transcriptionResponse = await axios.post('/api/stt/transcribe', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
+      console.log('STT Response:', transcriptionResponse.data);
       const transcription = transcriptionResponse.data.transcription;
+      
+      if (!transcription || transcription.trim() === '') {
+        throw new Error('No transcription received. Please speak clearly.');
+      }
       
       // Add user message to UI
       this.addMessage('user', transcription);
 
       // Step 2: Get AI response
+      console.log('Sending to Chat API...');
       const chatResponse = await axios.post('/api/chat/message', {
         sessionId: this.currentSession,
         userMessage: transcription,
         systemPrompt: this.currentTopic.systemPrompt
       });
 
+      console.log('Chat Response:', chatResponse.data);
       const aiMessage = chatResponse.data.message;
       
       // Add AI message to UI
       this.addMessage('assistant', aiMessage);
 
       // Step 3: Generate speech for AI response
+      console.log('Sending to TTS API...');
       const ttsResponse = await axios.post('/api/tts/speak', {
         text: aiMessage
       }, {
         responseType: 'arraybuffer'
       });
 
+      console.log('TTS Response received:', ttsResponse.data.byteLength, 'bytes');
+      
       // Play audio
       const audioBlob = new Blob([ttsResponse.data], { type: 'audio/mpeg' });
       const audioUrl = URL.createObjectURL(audioBlob);
@@ -311,7 +350,16 @@ class HeySpeak {
 
     } catch (error) {
       console.error('Error processing audio:', error);
-      alert('Failed to process your message. Please try again.');
+      
+      let errorMessage = 'Failed to process your message.';
+      if (error.response) {
+        console.error('API Error Response:', error.response.data);
+        errorMessage = `API Error: ${error.response.data.error || error.response.statusText}`;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      alert(errorMessage + ' Please try again.');
       
       // Reset UI
       const recordBtn = document.getElementById('recordBtn');
