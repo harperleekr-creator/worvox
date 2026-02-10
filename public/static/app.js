@@ -246,9 +246,9 @@ class HeySpeak {
 
       this.mediaRecorder.onstop = async () => {
         const mimeType = this.mediaRecorder.mimeType || 'audio/webm';
-        const audioBlob = new Blob(this.audioChunks, { type: mimeType });
-        console.log('Recording stopped. Blob size:', audioBlob.size, 'type:', audioBlob.type);
-        await this.processAudio(audioBlob);
+        const recordedAudio = new Blob(this.audioChunks, { type: mimeType });
+        console.log('Recording stopped. Blob size:', recordedAudio.size, 'type:', recordedAudio.type);
+        await this.processAudio(recordedAudio);
         stream.getTracks().forEach(track => track.stop());
       };
 
