@@ -369,24 +369,62 @@ class HeySpeak {
 
   async showTopicSelection() {
     try {
-      const response = await axios.get('/api/topics');
-      const topics = response.data.topics;
+      // Fetch topics
+      const topicsResponse = await axios.get('/api/topics');
+      const topics = topicsResponse.data.topics;
+
+      // Fetch user statistics
+      const statsResponse = await axios.get(`/api/users/${this.currentUser.id}/stats`);
+      const stats = statsResponse.data.stats;
+
+      // Calculate total words spoken (approximate)
+      const totalWords = Math.floor(stats.totalMessages / 2) * 10; // Assume ~10 words per user message
 
       const app = document.getElementById('app');
       app.innerHTML = `
         <div class="min-h-screen p-4 md:p-8">
           <div class="max-w-6xl mx-auto">
-            <!-- Header -->
+            <!-- Header with Stats -->
             <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
-              <div class="flex items-center justify-between">
-                <div>
-                  <h1 class="text-3xl font-bold text-gray-800">Welcome, ${this.currentUser.username}! 👋</h1>
-                  <p class="text-gray-600 mt-1">Level: <span class="font-semibold text-indigo-600">${this.currentUser.level}</span></p>
+              <div class="flex items-center justify-between flex-wrap gap-4">
+                <div class="flex-1">
+                  <div class="flex items-center gap-4">
+                    <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Welcome, ${this.currentUser.username}! 👋</h1>
+                  </div>
+                  <div class="flex items-center gap-4 mt-2 flex-wrap">
+                    <p class="text-gray-600">
+                      Level: <span class="font-semibold text-indigo-600">${this.currentUser.level}</span>
+                    </p>
+                    <span class="text-gray-400">•</span>
+                    <p class="text-gray-600">
+                      Words spoken: <span class="font-bold text-green-600">${totalWords.toLocaleString()}</span> 💬
+                    </p>
+                  </div>
                 </div>
                 <button onclick="heyspeak.logout()" 
                   class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
                   <i class="fas fa-sign-out-alt mr-2"></i>Logout
                 </button>
+              </div>
+
+              <!-- Additional Stats Cards -->
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4">
+                  <div class="text-2xl font-bold text-blue-700">${stats.totalSessions}</div>
+                  <div class="text-sm text-blue-600">Total Sessions</div>
+                </div>
+                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4">
+                  <div class="text-2xl font-bold text-green-700">${stats.totalMessages}</div>
+                  <div class="text-sm text-green-600">Total Messages</div>
+                </div>
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4">
+                  <div class="text-2xl font-bold text-purple-700">${totalWords.toLocaleString()}</div>
+                  <div class="text-sm text-purple-600">Words Spoken</div>
+                </div>
+                <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-4">
+                  <div class="text-2xl font-bold text-orange-700">${stats.totalSessions > 0 ? '🔥' : '✨'}</div>
+                  <div class="text-sm text-orange-600">${stats.totalSessions > 0 ? 'Keep it up!' : 'Start today!'}</div>
+                </div>
               </div>
             </div>
 
