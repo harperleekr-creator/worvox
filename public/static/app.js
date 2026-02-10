@@ -25,6 +25,9 @@ class HeySpeak {
   }
 
   async init() {
+    // Initialize Google Sign-In
+    this.initGoogleSignIn();
+    
     // Check for existing user in localStorage
     const savedUser = localStorage.getItem('heyspeak_user');
     if (savedUser) {
@@ -32,6 +35,59 @@ class HeySpeak {
       this.showTopicSelection();
     } else {
       this.showLogin();
+    }
+  }
+
+  initGoogleSignIn() {
+    // Wait for Google Sign-In library to load
+    if (typeof google !== 'undefined' && google.accounts) {
+      google.accounts.id.initialize({
+        client_id: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com',
+        callback: this.handleGoogleSignIn.bind(this),
+        auto_select: false,
+      });
+    } else {
+      // Retry after 500ms if library not loaded yet
+      setTimeout(() => this.initGoogleSignIn(), 500);
+    }
+  }
+
+  async handleGoogleSignIn(response) {
+    try {
+      console.log('Google Sign-In response:', response);
+      
+      // Decode JWT token to get user info
+      const base64Url = response.credential.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      
+      const profileObj = JSON.parse(jsonPayload);
+      console.log('Decoded profile:', profileObj);
+
+      // Send to backend
+      const authResponse = await axios.post('/api/users/auth/google', {
+        credential: response.credential,
+        profileObj: profileObj
+      });
+
+      if (authResponse.data.success) {
+        this.currentUser = authResponse.data.user;
+        localStorage.setItem('heyspeak_user', JSON.stringify(this.currentUser));
+        
+        // If new user, show onboarding for additional info
+        if (authResponse.data.isNew) {
+          this.onboardingStep = 2; // Skip name step
+          this.onboardingData.username = this.currentUser.username;
+          this.showOnboardingStep();
+        } else {
+          this.showTopicSelection();
+        }
+      }
+    } catch (error) {
+      console.error('Google Sign-In error:', error);
+      alert('Failed to sign in with Google. Please try again.');
     }
   }
 
@@ -85,14 +141,26 @@ class HeySpeak {
         <div class="text-center">
           <div class="text-5xl mb-4">👋</div>
           <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome!</h2>
-          <p class="text-gray-600">What should we call you?</p>
+          <p class="text-gray-600">Sign in to get started</p>
+        </div>
+        
+        <!-- Google Sign-In Button -->
+        <div id="googleSignInButton" class="flex justify-center"></div>
+        
+        <div class="relative">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-300"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-4 bg-white text-gray-500">Or continue with name</span>
+          </div>
         </div>
         
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
           <input type="text" id="username" value="${this.onboardingData.username}"
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg"
-            placeholder="Enter your name" autofocus>
+            placeholder="Enter your name">
         </div>
 
         <button onclick="heyspeak.nextStep()" 
@@ -313,6 +381,24 @@ class HeySpeak {
           }
         });
       }
+      
+      // Render Google Sign-In button
+      setTimeout(() => {
+        const googleButtonDiv = document.getElementById('googleSignInButton');
+        if (googleButtonDiv && typeof google !== 'undefined' && google.accounts) {
+          google.accounts.id.renderButton(
+            googleButtonDiv,
+            { 
+              theme: 'outline', 
+              size: 'large',
+              width: 400,
+              text: 'signin_with',
+              shape: 'rectangular',
+              logo_alignment: 'left'
+            }
+          );
+        }
+      }, 100);
     }
   }
 

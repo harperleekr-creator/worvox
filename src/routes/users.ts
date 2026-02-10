@@ -3,7 +3,99 @@ import type { Bindings } from '../types';
 
 const users = new Hono<{ Bindings: Bindings }>();
 
-// Create or get user
+// Google OAuth login
+users.post('/auth/google', async (c) => {
+  try {
+    const { credential, profileObj } = await c.req.json();
+
+    if (!credential && !profileObj) {
+      return c.json({ error: 'Google credential or profile is required' }, 400);
+    }
+
+    // Extract user info from Google profile
+    const googleId = profileObj?.googleId || profileObj?.sub;
+    const email = profileObj?.email;
+    const name = profileObj?.name || profileObj?.given_name || email?.split('@')[0];
+    const picture = profileObj?.picture || profileObj?.imageUrl;
+
+    if (!googleId || !email) {
+      return c.json({ error: 'Invalid Google profile data' }, 400);
+    }
+
+    // Check if user exists with this Google ID
+    const existingUser = await c.env.DB.prepare(
+      'SELECT * FROM users WHERE google_id = ?'
+    ).bind(googleId).first();
+
+    if (existingUser) {
+      // Update profile picture if changed
+      if (picture && existingUser.google_picture !== picture) {
+        await c.env.DB.prepare(
+          'UPDATE users SET google_picture = ? WHERE id = ?'
+        ).bind(picture, existingUser.id).run();
+      }
+
+      return c.json({
+        user: { ...existingUser, google_picture: picture },
+        success: true,
+        isNew: false,
+      });
+    }
+
+    // Check if user exists with this email (migration case)
+    const emailUser = await c.env.DB.prepare(
+      'SELECT * FROM users WHERE email = ? OR google_email = ?'
+    ).bind(email, email).first();
+
+    if (emailUser) {
+      // Link Google account to existing user
+      await c.env.DB.prepare(
+        `UPDATE users SET google_id = ?, google_email = ?, google_picture = ?, auth_provider = 'google' 
+         WHERE id = ?`
+      ).bind(googleId, email, picture, emailUser.id).run();
+
+      const updatedUser = await c.env.DB.prepare(
+        'SELECT * FROM users WHERE id = ?'
+      ).bind(emailUser.id).first();
+
+      return c.json({
+        user: updatedUser,
+        success: true,
+        isNew: false,
+        linked: true,
+      });
+    }
+
+    // Create new user with Google account
+    const username = name || email.split('@')[0];
+    
+    const result = await c.env.DB.prepare(
+      `INSERT INTO users (username, email, google_id, google_email, google_picture, auth_provider, level) 
+       VALUES (?, ?, ?, ?, ?, 'google', 'beginner')`
+    ).bind(username, email, googleId, email, picture).run();
+
+    const userId = result.meta.last_row_id;
+
+    const newUser = await c.env.DB.prepare(
+      'SELECT * FROM users WHERE id = ?'
+    ).bind(userId).first();
+
+    return c.json({
+      user: newUser,
+      success: true,
+      isNew: true,
+    });
+
+  } catch (error) {
+    console.error('Google auth error:', error);
+    return c.json({ 
+      error: 'Failed to authenticate with Google',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
+// Create or get user (legacy local auth)
 users.post('/auth', async (c) => {
   try {
     const { username, email, level, referralSource, ageGroup, gender, occupation } = await c.req.json();
