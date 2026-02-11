@@ -36,13 +36,20 @@ AI 기반 실시간 영어 회화 학습 웹 애플리케이션입니다. 사용
   - ⏰ 시간대별 학습 패턴
   - 🔥 학습 스트릭 (연속 학습 일수)
 - ✅ **실시간 단어 카운트**: 학습한 단어 수 실시간 표시
-- ✅ **단어 학습 기능** (Vocabulary): **NEW!**
-  - 📚 영어 단어 카드 형식으로 표시
+- ✅ **단어 학습 기능** (Vocabulary): **🌟 FULLY UPGRADED!**
+  - 📚 **3가지 학습 모드**:
+    - 📋 **List 모드**: 단어 카드 그리드 뷰
+    - 🃏 **Flashcard 모드**: 카드 넘기기 인터랙티브 학습
+    - 🎯 **Quiz 모드**: 4지선다 퀴즈 및 점수 시스템
   - 🇰🇷 한국어 뜻 제공
   - 🔊 단어 발음 듣기 (OpenAI TTS)
   - 📝 예문과 품사 정보
+  - ✅ **학습 진도 추적**: 단어별 학습 완료 체크
+  - ⭐ **북마크 기능**: 즐겨찾기 단어 저장
+  - 📊 **진도율 표시**: 실시간 학습 진행도
   - 🎯 난이도별 분류 (beginner/intermediate/advanced)
-  - 35개 이상의 기본 단어 제공
+  - 📖 **125개 이상의 단어**: beginner(40+), intermediate(40+), advanced(40+)
+  - 📚 **커스텀 단어장**: 사용자별 맞춤 단어 목록 생성 (API)
 
 ### API 엔드포인트
 
@@ -77,13 +84,23 @@ AI 기반 실시간 영어 회화 학습 웹 애플리케이션입니다. 사용
 - `POST /api/tts/speak` - 텍스트를 음성으로 변환 (OpenAI TTS)
 - `GET /api/tts/voices` - 사용 가능한 음성 목록
 
-#### 단어 학습 (Vocabulary)
+#### 단어 학습 (Vocabulary) - FULLY UPGRADED
 - `GET /api/vocabulary/list` - 모든 단어 목록 (최대 50개)
 - `GET /api/vocabulary/words/random` - 랜덤 단어 가져오기
 - `GET /api/vocabulary/words/category/:category` - 카테고리별 단어
 - `GET /api/vocabulary/categories` - 모든 카테고리 목록
 - `POST /api/vocabulary/progress` - 단어 학습 진도 저장
 - `GET /api/vocabulary/progress/:userId/stats` - 사용자 단어 학습 통계
+- `GET /api/vocabulary/progress/:userId/all` - 모든 학습 진도 조회
+- `POST /api/vocabulary/bookmarks` - 북마크 추가
+- `GET /api/vocabulary/bookmarks/:userId` - 사용자 북마크 목록
+- `DELETE /api/vocabulary/bookmarks/:userId/:wordId` - 북마크 삭제
+- `POST /api/vocabulary/wordbooks` - 커스텀 단어장 생성
+- `GET /api/vocabulary/wordbooks/:userId` - 사용자 단어장 목록
+- `POST /api/vocabulary/wordbooks/:wordbookId/words` - 단어장에 단어 추가
+- `GET /api/vocabulary/wordbooks/:wordbookId/words` - 단어장 내 단어 목록
+- `DELETE /api/vocabulary/wordbooks/:wordbookId/words/:wordId` - 단어장에서 단어 삭제
+- `DELETE /api/vocabulary/wordbooks/:wordbookId` - 단어장 삭제
 
 ## 🗄️ 데이터 아키텍처
 
@@ -158,6 +175,33 @@ AI 기반 실시간 영어 회화 학습 웹 애플리케이션입니다. 사용
 - created_at: 생성 시간
 ```
 
+#### Vocabulary Bookmarks (단어 북마크)
+```sql
+- id: 북마크 ID
+- user_id: 사용자 ID
+- word_id: 단어 ID
+- created_at: 생성 시간
+- UNIQUE(user_id, word_id): 중복 방지
+```
+
+#### Custom Wordbooks (커스텀 단어장)
+```sql
+- id: 단어장 ID
+- user_id: 사용자 ID
+- name: 단어장 이름
+- description: 설명
+- created_at: 생성 시간
+```
+
+#### Wordbook Words (단어장 내 단어)
+```sql
+- id: 레코드 ID
+- wordbook_id: 단어장 ID
+- word_id: 단어 ID
+- created_at: 추가 시간
+- UNIQUE(wordbook_id, word_id): 중복 방지
+```
+
 ### 저장소 서비스
 - **Cloudflare D1**: 모든 데이터 저장 (사용자, 세션, 메시지, 통계)
 - **로컬 개발**: SQLite with `--local` 플래그
@@ -203,6 +247,13 @@ AI 기반 실시간 영어 회화 학습 웹 애플리케이션입니다. 사용
 - **Deployment**: Cloudflare Pages/Workers (프로덕션 배포 준비 완료)
 
 ### 최근 업데이트
+- **2026-02-11**: 🎉 **Vocabulary 기능 대폭 업그레이드** - 6가지 향상 기능 모두 구현 완료!
+  - ✅ 학습 진도 추적 (체크박스 및 진도율)
+  - ✅ 플래시 카드 모드 (카드 넘기기)
+  - ✅ 퀴즈 모드 (4지선다 + 점수 시스템)
+  - ✅ 북마크 기능 (즐겨찾기)
+  - ✅ 단어 확장 (125개 이상)
+  - ✅ 커스텀 단어장 (API 완료)
 - **2026-02-11**: 🆕 **Vocabulary 기능 추가** - 단어 학습 카드와 발음 듣기
 - **2026-02-11**: 히스토리 날짜/시간 표시를 한국어 형식으로 개선
 - **2026-02-10**: 초기 버전 완성 및 모든 기능 구현
