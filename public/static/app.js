@@ -1035,9 +1035,16 @@ class HeySpeak {
                     <!-- English Word -->
                     <div class="text-center">
                       <h3 class="text-3xl font-bold text-indigo-600 mb-2">${this.escapeHtml(word.word)}</h3>
-                      <span class="inline-block px-3 py-1 bg-indigo-100 text-indigo-800 text-sm rounded-full">
-                        ${this.escapeHtml(word.part_of_speech)}
-                      </span>
+                      <div class="flex items-center justify-center gap-2">
+                        <span class="inline-block px-3 py-1 bg-indigo-100 text-indigo-800 text-sm rounded-full">
+                          ${this.escapeHtml(word.part_of_speech)}
+                        </span>
+                        ${word.toeic_related ? `
+                        <span class="inline-block px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-semibold rounded">
+                          TOEIC
+                        </span>
+                        ` : ''}
+                      </div>
                     </div>
 
                     <!-- Korean Meaning -->
@@ -1218,9 +1225,16 @@ class HeySpeak {
                onclick="heyspeak.flipFlashcard()">
             <div id="flashcard-front" class="text-center">
               <h2 class="text-5xl font-bold text-indigo-600 mb-4">${this.escapeHtml(word.word)}</h2>
-              <span class="inline-block px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full">
-                ${this.escapeHtml(word.part_of_speech)}
-              </span>
+              <div class="flex items-center justify-center gap-2 mb-4">
+                <span class="inline-block px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full">
+                  ${this.escapeHtml(word.part_of_speech)}
+                </span>
+                ${word.toeic_related ? `
+                <span class="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-sm font-semibold rounded">
+                  TOEIC
+                </span>
+                ` : ''}
+              </div>
               <p class="mt-8 text-gray-500 text-sm">클릭하여 뜻 보기</p>
             </div>
           </div>
@@ -1292,9 +1306,16 @@ class HeySpeak {
       
       frontDiv.innerHTML = `
         <h2 class="text-5xl font-bold text-indigo-600 mb-4">${this.escapeHtml(word.word)}</h2>
-        <span class="inline-block px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full">
-          ${this.escapeHtml(word.part_of_speech)}
-        </span>
+        <div class="flex items-center justify-center gap-2">
+          <span class="inline-block px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full">
+            ${this.escapeHtml(word.part_of_speech)}
+          </span>
+          ${word.toeic_related ? `
+          <span class="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-sm font-semibold rounded">
+            TOEIC
+          </span>
+          ` : ''}
+        </div>
         <p class="mt-8 text-gray-500 text-sm">클릭하여 뜻 보기</p>
       `;
       this.flashcardFlipped = false;
@@ -1399,11 +1420,18 @@ class HeySpeak {
         <div class="bg-white rounded-2xl shadow-lg p-8 mb-6">
           <div class="text-center mb-8">
             <h2 class="text-4xl font-bold text-indigo-600 mb-4">${this.escapeHtml(word.word)}</h2>
-            <span class="inline-block px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full">
-              ${this.escapeHtml(word.part_of_speech)}
-            </span>
+            <div class="flex items-center justify-center gap-2 mb-4">
+              <span class="inline-block px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full">
+                ${this.escapeHtml(word.part_of_speech)}
+              </span>
+              ${word.toeic_related ? `
+              <span class="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-sm font-semibold rounded">
+                TOEIC
+              </span>
+              ` : ''}
+            </div>
             <button onclick="heyspeak.pronounceFlashcardWord('${this.escapeHtml(word.word)}')" 
-              class="ml-4 p-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors">
+              class="p-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors">
               <i class="fas fa-volume-up"></i>
             </button>
           </div>
