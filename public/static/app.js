@@ -747,7 +747,7 @@ class HeySpeak {
       console.log('Chat Response:', chatResponse.data);
       const aiMessage = chatResponse.data.message;
       
-      // Add AI message to UI
+      // Add AI message to UI (without audio yet)
       this.addMessage('assistant', aiMessage);
 
       // Step 3: Generate speech for AI response
@@ -760,9 +760,18 @@ class HeySpeak {
 
       console.log('TTS Response received:', ttsResponse.data.byteLength, 'bytes');
       
-      // Play audio
+      // Create audio blob and URL
       const ttsAudioBlob = new Blob([ttsResponse.data], { type: 'audio/mpeg' });
       const audioUrl = URL.createObjectURL(ttsAudioBlob);
+      
+      // Store audio URL for replay button
+      const lastMessageIndex = this.messages.length - 1;
+      this.messages[lastMessageIndex].audioUrl = audioUrl;
+      
+      // Add replay button to the last AI message
+      this.addReplayButton(lastMessageIndex);
+      
+      // Play audio
       this.playAudio(audioUrl);
 
       // Reset UI
@@ -795,7 +804,8 @@ class HeySpeak {
   }
 
   addMessage(role, content) {
-    this.messages.push({ role, content });
+    const messageIndex = this.messages.length;
+    this.messages.push({ role, content, audioUrl: null });
     
     const chatMessages = document.getElementById('chatMessages');
     
@@ -806,6 +816,7 @@ class HeySpeak {
 
     const messageDiv = document.createElement('div');
     messageDiv.className = `mb-4 ${role === 'user' ? 'text-right' : 'text-left'} message-${role}`;
+    messageDiv.id = `message-${messageIndex}`;
     
     messageDiv.innerHTML = `
       <div class="inline-block max-w-xs md:max-w-md lg:max-w-lg px-4 py-3 rounded-2xl ${
@@ -814,11 +825,80 @@ class HeySpeak {
           : 'bg-gray-200 text-gray-800'
       }">
         <p class="text-sm md:text-base">${this.escapeHtml(content)}</p>
+        ${role === 'assistant' ? '<div id="replay-container-' + messageIndex + '" class="mt-2"></div>' : ''}
       </div>
     `;
     
     chatMessages.appendChild(messageDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  addReplayButton(messageIndex) {
+    const replayContainer = document.getElementById(`replay-container-${messageIndex}`);
+    if (replayContainer) {
+      replayContainer.innerHTML = `
+        <button 
+          onclick="heyspeak.replayAudio(${messageIndex})" 
+          id="replay-btn-${messageIndex}"
+          class="flex items-center gap-1 px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs rounded-lg transition-colors">
+          <i class="fas fa-redo"></i>
+          <span>다시 듣기</span>
+        </button>
+      `;
+    }
+  }
+
+  async replayAudio(messageIndex) {
+    const message = this.messages[messageIndex];
+    const replayBtn = document.getElementById(`replay-btn-${messageIndex}`);
+    
+    if (!message || !message.audioUrl) {
+      alert('Audio not available');
+      return;
+    }
+    
+    try {
+      // Update button state
+      if (replayBtn) {
+        replayBtn.disabled = true;
+        replayBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>재생 중...</span>';
+      }
+      
+      // Play audio
+      if (this.currentAudio) {
+        this.currentAudio.pause();
+      }
+      
+      this.currentAudio = new Audio(message.audioUrl);
+      
+      this.currentAudio.onended = () => {
+        if (replayBtn) {
+          replayBtn.disabled = false;
+          replayBtn.innerHTML = '<i class="fas fa-redo"></i><span>다시 듣기</span>';
+        }
+      };
+      
+      this.currentAudio.onerror = () => {
+        if (replayBtn) {
+          replayBtn.disabled = false;
+          replayBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>오류</span>';
+          setTimeout(() => {
+            replayBtn.innerHTML = '<i class="fas fa-redo"></i><span>다시 듣기</span>';
+          }, 2000);
+        }
+      };
+      
+      await this.currentAudio.play();
+    } catch (error) {
+      console.error('Error replaying audio:', error);
+      if (replayBtn) {
+        replayBtn.disabled = false;
+        replayBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>오류</span>';
+        setTimeout(() => {
+          replayBtn.innerHTML = '<i class="fas fa-redo"></i><span>다시 듣기</span>';
+        }, 2000);
+      }
+    }
   }
 
   playAudio(url) {
