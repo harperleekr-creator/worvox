@@ -9,6 +9,29 @@ type Bindings = {
 
 const vocabulary = new Hono<{ Bindings: Bindings }>()
 
+// Get all vocabulary words (for basic list view)
+vocabulary.get('/list', async (c: Context<{ Bindings: Bindings }>) => {
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT * FROM vocabulary_words
+      ORDER BY difficulty, id
+      LIMIT 50
+    `).all()
+
+    return c.json({
+      success: true,
+      words: results || []
+    })
+  } catch (error: any) {
+    console.error('Error fetching vocabulary list:', error)
+    return c.json({
+      success: false,
+      error: 'Failed to fetch vocabulary',
+      details: error.message
+    }, 500)
+  }
+})
+
 // Get random words for learning
 vocabulary.get('/words/random', async (c: Context<{ Bindings: Bindings }>) => {
   try {
