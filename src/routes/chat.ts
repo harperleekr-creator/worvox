@@ -75,16 +75,16 @@ chat.post('/message', async (c) => {
 
     const assistantMessage = result.choices[0]?.message?.content || 'Sorry, I could not generate a response.';
 
-    // Save messages to database if sessionId is provided
+    // Save messages to database if sessionId is provided (with KST timezone)
     if (sessionId) {
-      // Save user message
+      // Save user message with KST timestamp
       await c.env.DB.prepare(
-        'INSERT INTO messages (session_id, role, content, transcription) VALUES (?, ?, ?, ?)'
+        'INSERT INTO messages (session_id, role, content, transcription, created_at) VALUES (?, ?, ?, ?, datetime("now", "+9 hours"))'
       ).bind(sessionId, 'user', userMessage, userMessage).run();
 
-      // Save assistant message
+      // Save assistant message with KST timestamp
       await c.env.DB.prepare(
-        'INSERT INTO messages (session_id, role, content) VALUES (?, ?, ?)'
+        'INSERT INTO messages (session_id, role, content, created_at) VALUES (?, ?, ?, datetime("now", "+9 hours"))'
       ).bind(sessionId, 'assistant', assistantMessage).run();
 
       // Update session message count

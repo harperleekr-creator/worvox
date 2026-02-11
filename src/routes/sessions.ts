@@ -21,9 +21,9 @@ sessions.post('/create', async (c) => {
       return c.json({ error: 'Topic not found' }, 404);
     }
 
-    // Create new session
+    // Create new session with KST timezone (UTC+9)
     const result = await c.env.DB.prepare(
-      'INSERT INTO sessions (user_id, topic, level, started_at) VALUES (?, ?, ?, datetime("now"))'
+      'INSERT INTO sessions (user_id, topic, level, started_at) VALUES (?, ?, ?, datetime("now", "+9 hours"))'
     ).bind(userId, topicResult.name, level || topicResult.level).run();
 
     const sessionId = result.meta.last_row_id;
@@ -49,7 +49,7 @@ sessions.post('/end/:sessionId', async (c) => {
     const sessionId = c.req.param('sessionId');
 
     await c.env.DB.prepare(
-      'UPDATE sessions SET ended_at = datetime("now") WHERE id = ?'
+      'UPDATE sessions SET ended_at = datetime("now", "+9 hours") WHERE id = ?'
     ).bind(sessionId).run();
 
     return c.json({
