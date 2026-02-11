@@ -1272,9 +1272,13 @@ class HeySpeak {
     }
 
     if (!this.quizData) {
-      // Initialize quiz
+      // Initialize quiz with random words
+      // Shuffle all words and pick 10
+      const shuffledWords = [...words].sort(() => Math.random() - 0.5);
+      const selectedWords = shuffledWords.slice(0, Math.min(10, words.length));
+      
       this.quizData = {
-        questions: words.slice(0, Math.min(10, words.length)).map(word => ({
+        questions: selectedWords.map(word => ({
           word: word,
           options: this.generateQuizOptions(word, words),
           userAnswer: null,
@@ -1284,6 +1288,9 @@ class HeySpeak {
         score: 0,
         finished: false
       };
+      
+      // Reset the flag
+      this.quizNeedsNewWords = false;
     }
 
     const quiz = this.quizData;
@@ -1453,9 +1460,13 @@ class HeySpeak {
           </div>
 
           <div class="space-y-3">
-            <button onclick="heyspeak.restartQuiz()" 
+            <button onclick="heyspeak.startNewQuiz()" 
               class="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-colors">
-              <i class="fas fa-redo mr-2"></i>다시 풀기
+              <i class="fas fa-forward mr-2"></i>Next Quiz (새로운 단어)
+            </button>
+            <button onclick="heyspeak.restartQuiz()" 
+              class="w-full px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-semibold transition-colors">
+              <i class="fas fa-redo mr-2"></i>다시 풀기 (같은 단어)
             </button>
             <button onclick="heyspeak.showVocabulary('list')" 
               class="w-full px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold transition-colors">
@@ -1470,6 +1481,17 @@ class HeySpeak {
   async restartQuiz() {
     this.quizData = null;
     this.flashcardIndex = 0;
+    await this.showVocabulary('quiz');
+  }
+
+  async startNewQuiz() {
+    // Reset quiz data to generate new questions with different words
+    this.quizData = null;
+    this.flashcardIndex = 0;
+    
+    // Mark that we want new words (not just resetting the same quiz)
+    this.quizNeedsNewWords = true;
+    
     await this.showVocabulary('quiz');
   }
 
