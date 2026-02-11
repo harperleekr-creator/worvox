@@ -1044,6 +1044,11 @@ class HeySpeak {
                           TOEIC
                         </span>
                         ` : ''}
+                        ${word.toefl_related ? `
+                        <span class="inline-block px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded">
+                          TOEFL
+                        </span>
+                        ` : ''}
                       </div>
                     </div>
 
@@ -1234,6 +1239,11 @@ class HeySpeak {
                   TOEIC
                 </span>
                 ` : ''}
+                ${word.toefl_related ? `
+                <span class="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-sm font-semibold rounded">
+                  TOEFL
+                </span>
+                ` : ''}
               </div>
               <p class="mt-8 text-gray-500 text-sm">클릭하여 뜻 보기</p>
             </div>
@@ -1313,6 +1323,11 @@ class HeySpeak {
           ${word.toeic_related ? `
           <span class="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-sm font-semibold rounded">
             TOEIC
+          </span>
+          ` : ''}
+          ${word.toefl_related ? `
+          <span class="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-sm font-semibold rounded">
+            TOEFL
           </span>
           ` : ''}
         </div>
@@ -1427,6 +1442,11 @@ class HeySpeak {
               ${word.toeic_related ? `
               <span class="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-sm font-semibold rounded">
                 TOEIC
+              </span>
+              ` : ''}
+              ${word.toefl_related ? `
+              <span class="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-sm font-semibold rounded">
+                TOEFL
               </span>
               ` : ''}
             </div>
