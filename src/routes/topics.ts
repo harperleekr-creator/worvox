@@ -10,11 +10,11 @@ topics.get('/', async (c) => {
       `SELECT * FROM topics 
        ORDER BY 
          CASE name
-           WHEN 'Daily Conversation' THEN 1
-           WHEN 'Travel English' THEN 2
-           WHEN 'Job Interview' THEN 3
-           WHEN 'Business English' THEN 4
-           WHEN 'Vocabulary' THEN 5
+           WHEN 'Vocabulary' THEN 1
+           WHEN 'Daily Conversation' THEN 2
+           WHEN 'Travel English' THEN 3
+           WHEN 'Job Interview' THEN 4
+           WHEN 'Business English' THEN 5
            ELSE 6
          END`
     ).all();
