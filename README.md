@@ -19,10 +19,10 @@ AI 기반 실시간 영어 회화 학습 웹 애플리케이션입니다. 사용
 - ✅ **사용자 프로필**: 상세한 사용자 정보 관리 및 분석
 - ✅ **다양한 학습 주제**: 
   - ☀️ Daily Conversation (일상 대화)
-  - 💼 Business English (비즈니스 영어)
   - ✈️ Travel English (여행 영어)
   - 🎯 Job Interview (면접 준비)
-  - 🗣️ Free Talk (자유 대화)
+  - 💼 Business English (비즈니스 영어)
+  - 📚 **Vocabulary** (단어 학습) - **NEW!**
 - ✅ **음성 녹음**: 브라우저 마이크를 통한 실시간 녹음
 - ✅ **음성 인식 (STT)**: OpenAI Whisper API를 통한 음성→텍스트 변환
 - ✅ **AI 대화 생성**: GPT-3.5-turbo를 활용한 빠른 영어 대화 (1-2초 응답)
@@ -36,6 +36,13 @@ AI 기반 실시간 영어 회화 학습 웹 애플리케이션입니다. 사용
   - ⏰ 시간대별 학습 패턴
   - 🔥 학습 스트릭 (연속 학습 일수)
 - ✅ **실시간 단어 카운트**: 학습한 단어 수 실시간 표시
+- ✅ **단어 학습 기능** (Vocabulary): **NEW!**
+  - 📚 영어 단어 카드 형식으로 표시
+  - 🇰🇷 한국어 뜻 제공
+  - 🔊 단어 발음 듣기 (OpenAI TTS)
+  - 📝 예문과 품사 정보
+  - 🎯 난이도별 분류 (beginner/intermediate/advanced)
+  - 35개 이상의 기본 단어 제공
 
 ### API 엔드포인트
 
@@ -69,6 +76,14 @@ AI 기반 실시간 영어 회화 학습 웹 애플리케이션입니다. 사용
 - `POST /api/stt/transcribe` - 음성을 텍스트로 변환 (Whisper)
 - `POST /api/tts/speak` - 텍스트를 음성으로 변환 (OpenAI TTS)
 - `GET /api/tts/voices` - 사용 가능한 음성 목록
+
+#### 단어 학습 (Vocabulary)
+- `GET /api/vocabulary/list` - 모든 단어 목록 (최대 50개)
+- `GET /api/vocabulary/words/random` - 랜덤 단어 가져오기
+- `GET /api/vocabulary/words/category/:category` - 카테고리별 단어
+- `GET /api/vocabulary/categories` - 모든 카테고리 목록
+- `POST /api/vocabulary/progress` - 단어 학습 진도 저장
+- `GET /api/vocabulary/progress/:userId/stats` - 사용자 단어 학습 통계
 
 ## 🗄️ 데이터 아키텍처
 
@@ -119,6 +134,30 @@ AI 기반 실시간 영어 회화 학습 웹 애플리케이션입니다. 사용
 - created_at: 생성 시간
 ```
 
+#### Vocabulary Words (단어 목록)
+```sql
+- id: 단어 ID
+- word: 영어 단어
+- meaning_ko: 한국어 뜻
+- pronunciation: 발음 기호
+- part_of_speech: 품사 (noun/verb/adjective 등)
+- example_sentence: 예문
+- difficulty: 난이도 (beginner/intermediate/advanced)
+- category: 카테고리 (nouns/verbs/adjectives 등)
+- created_at: 생성 시간
+```
+
+#### User Vocabulary Progress (단어 학습 진도)
+```sql
+- id: 진도 ID
+- user_id: 사용자 ID
+- word_id: 단어 ID
+- is_learned: 학습 완료 여부 (0/1)
+- review_count: 복습 횟수
+- last_reviewed_at: 마지막 복습 시간
+- created_at: 생성 시간
+```
+
 ### 저장소 서비스
 - **Cloudflare D1**: 모든 데이터 저장 (사용자, 세션, 메시지, 통계)
 - **로컬 개발**: SQLite with `--local` 플래그
@@ -164,6 +203,8 @@ AI 기반 실시간 영어 회화 학습 웹 애플리케이션입니다. 사용
 - **Deployment**: Cloudflare Pages/Workers (프로덕션 배포 준비 완료)
 
 ### 최근 업데이트
+- **2026-02-11**: 🆕 **Vocabulary 기능 추가** - 단어 학습 카드와 발음 듣기
+- **2026-02-11**: 히스토리 날짜/시간 표시를 한국어 형식으로 개선
 - **2026-02-10**: 초기 버전 완성 및 모든 기능 구현
 - **2026-02-10**: OpenAI TTS로 전환 (ElevenLabs → OpenAI TTS with Nova voice)
 - **2026-02-10**: GPT-3.5-turbo로 변경 (빠른 응답 속도)
@@ -251,7 +292,9 @@ webapp/
 │   │   ├── chat.ts        # AI 대화
 │   │   ├── sessions.ts    # 세션 관리
 │   │   ├── users.ts       # 사용자 관리
-│   │   └── topics.ts      # 주제 관리
+│   │   ├── topics.ts      # 주제 관리
+│   │   ├── history.ts     # 학습 히스토리
+│   │   └── vocabulary.ts  # 단어 학습 (NEW!)
 │   └── types/             # TypeScript 타입 정의
 ├── public/static/
 │   ├── app.js             # 프론트엔드 JavaScript
