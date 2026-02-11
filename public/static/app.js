@@ -855,10 +855,37 @@ class HeySpeak {
   }
 
   // Vocabulary feature
-  async showVocabulary() {
+  async showVocabulary(mode = 'list') {
+    this.vocabularyMode = mode; // 'list', 'flashcard', 'quiz'
     try {
       const response = await axios.get('/api/vocabulary/list');
       const words = response.data.words;
+      
+      // Store vocabulary data for flashcard/quiz access
+      document.getElementById('app').dataset.vocabularyData = JSON.stringify(response.data);
+      
+      // Get user progress
+      let progressData = {};
+      let bookmarkedWords = [];
+      if (this.currentUser) {
+        try {
+          const progressResponse = await axios.get(`/api/vocabulary/progress/${this.currentUser.id}/all`);
+          const bookmarksResponse = await axios.get(`/api/vocabulary/bookmarks/${this.currentUser.id}`);
+          
+          if (progressResponse.data.success) {
+            const progress = progressResponse.data.progress || [];
+            progress.forEach(p => {
+              progressData[p.word_id] = p;
+            });
+          }
+          
+          if (bookmarksResponse.data.success) {
+            bookmarkedWords = bookmarksResponse.data.bookmarks.map(b => b.word_id);
+          }
+        } catch (e) {
+          console.log('Progress/bookmarks not loaded:', e);
+        }
+      }
 
       const app = document.getElementById('app');
       app.innerHTML = `
@@ -871,17 +898,58 @@ class HeySpeak {
                   <h1 class="text-2xl md:text-3xl font-bold text-gray-800">📚 Vocabulary Study</h1>
                   <p class="text-gray-600 mt-2">Learn and practice English vocabulary with pronunciations</p>
                 </div>
-                <button onclick="heyspeak.showTopicSelection()" 
-                  class="px-4 py-2 text-indigo-600 hover:text-indigo-800 transition-colors">
-                  <i class="fas fa-arrow-left mr-2"></i>Back to Topics
-                </button>
+                <div class="flex items-center gap-2">
+                  <button onclick="heyspeak.showVocabulary('list')" 
+                    class="px-4 py-2 ${mode === 'list' ? 'bg-indigo-600 text-white' : 'text-indigo-600 hover:bg-indigo-50'} rounded-lg transition-colors">
+                    <i class="fas fa-list mr-2"></i>List
+                  </button>
+                  <button onclick="heyspeak.showVocabulary('flashcard')" 
+                    class="px-4 py-2 ${mode === 'flashcard' ? 'bg-indigo-600 text-white' : 'text-indigo-600 hover:bg-indigo-50'} rounded-lg transition-colors">
+                    <i class="fas fa-clone mr-2"></i>Flashcard
+                  </button>
+                  <button onclick="heyspeak.showVocabulary('quiz')" 
+                    class="px-4 py-2 ${mode === 'quiz' ? 'bg-indigo-600 text-white' : 'text-indigo-600 hover:bg-indigo-50'} rounded-lg transition-colors">
+                    <i class="fas fa-graduation-cap mr-2"></i>Quiz
+                  </button>
+                  <button onclick="heyspeak.showTopicSelection()" 
+                    class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
+                    <i class="fas fa-arrow-left mr-2"></i>Back
+                  </button>
+                </div>
               </div>
+              
+              <!-- Progress Stats -->
+              ${this.currentUser ? `
+                <div class="mt-4 flex items-center gap-4 text-sm">
+                  <div class="flex items-center gap-2">
+                    <span class="text-gray-600">진도:</span>
+                    <span class="font-bold text-green-600">${Object.values(progressData).filter(p => p.is_learned).length} / ${words.length}</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-gray-600">북마크:</span>
+                    <span class="font-bold text-yellow-600">${bookmarkedWords.length}</span>
+                  </div>
+                </div>
+              ` : ''}
             </div>
 
             <!-- Vocabulary List -->
+            ${mode === 'list' ? `
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              ${words.map((word, index) => `
-                <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+              ${words.map((word, index) => {
+                const progress = progressData[word.id];
+                const isLearned = progress?.is_learned || false;
+                const isBookmarked = bookmarkedWords.includes(word.id);
+                return `
+                <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow relative">
+                  <!-- Bookmark Button -->
+                  ${this.currentUser ? `
+                  <button onclick="heyspeak.toggleBookmark(${word.id}, ${isBookmarked})" 
+                    class="absolute top-4 right-4 text-2xl ${isBookmarked ? 'text-yellow-500' : 'text-gray-300'} hover:text-yellow-500 transition-colors">
+                    <i class="fas fa-star"></i>
+                  </button>
+                  ` : ''}
+                  
                   <!-- Word Card -->
                   <div class="space-y-4">
                     <!-- English Word -->
@@ -914,10 +982,26 @@ class HeySpeak {
                         <p class="text-gray-700 italic text-sm">${this.escapeHtml(word.example_sentence)}</p>
                       </div>
                     ` : ''}
+                    
+                    <!-- Progress Checkbox -->
+                    ${this.currentUser ? `
+                      <div class="border-t pt-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                          <input type="checkbox" 
+                            ${isLearned ? 'checked' : ''}
+                            onchange="heyspeak.toggleLearnedStatus(${word.id}, this.checked)"
+                            class="w-5 h-5 text-green-600 rounded focus:ring-2 focus:ring-green-500">
+                          <span class="text-sm ${isLearned ? 'text-green-600 font-semibold' : 'text-gray-600'}">
+                            ${isLearned ? '✓ 학습 완료' : '학습 완료 표시'}
+                          </span>
+                        </label>
+                      </div>
+                    ` : ''}
                   </div>
                 </div>
-              `).join('')}
+              `; }).join('')}
             </div>
+            ` : mode === 'flashcard' ? this.renderFlashcardMode(words, progressData, bookmarkedWords) : this.renderQuizMode(words, progressData)}
 
             ${words.length === 0 ? `
               <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
@@ -979,6 +1063,414 @@ class HeySpeak {
         btn.disabled = false;
       }, 2000);
     }
+  }
+
+  // Toggle learned status
+  async toggleLearnedStatus(wordId, isLearned) {
+    if (!this.currentUser) return;
+    
+    try {
+      await axios.post('/api/vocabulary/progress', {
+        userId: this.currentUser.id,
+        wordId: wordId,
+        isLearned: isLearned
+      });
+      
+      // Refresh to update progress count
+      await this.showVocabulary(this.vocabularyMode);
+    } catch (error) {
+      console.error('Error updating progress:', error);
+      alert('Failed to update progress');
+    }
+  }
+
+  // Toggle bookmark
+  async toggleBookmark(wordId, isCurrentlyBookmarked) {
+    if (!this.currentUser) return;
+    
+    try {
+      if (isCurrentlyBookmarked) {
+        await axios.delete(`/api/vocabulary/bookmarks/${this.currentUser.id}/${wordId}`);
+      } else {
+        await axios.post('/api/vocabulary/bookmarks', {
+          userId: this.currentUser.id,
+          wordId: wordId
+        });
+      }
+      
+      // Refresh to update bookmark display
+      await this.showVocabulary(this.vocabularyMode);
+    } catch (error) {
+      console.error('Error toggling bookmark:', error);
+      alert('Failed to update bookmark');
+    }
+  }
+
+  // Flashcard Mode
+  renderFlashcardMode(words, progressData, bookmarkedWords) {
+    if (!words || words.length === 0) {
+      return `
+        <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
+          <div class="text-6xl mb-4">📖</div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">No Vocabulary Yet</h3>
+          <p class="text-gray-600">Vocabulary words will be added soon!</p>
+        </div>
+      `;
+    }
+
+    this.flashcardIndex = this.flashcardIndex || 0;
+    this.flashcardFlipped = false;
+    const word = words[this.flashcardIndex];
+    const progress = progressData[word.id];
+    const isLearned = progress?.is_learned || false;
+    const isBookmarked = bookmarkedWords.includes(word.id);
+
+    return `
+      <div class="max-w-2xl mx-auto">
+        <!-- Card Counter -->
+        <div class="text-center mb-4">
+          <span class="text-gray-600">Card ${this.flashcardIndex + 1} / ${words.length}</span>
+        </div>
+
+        <!-- Flashcard -->
+        <div id="flashcard-container" class="perspective-1000">
+          <div id="flashcard" class="bg-white rounded-2xl shadow-2xl p-12 min-h-96 flex flex-col items-center justify-center cursor-pointer transform transition-transform duration-500"
+               onclick="heyspeak.flipFlashcard()">
+            <div id="flashcard-front" class="text-center">
+              <h2 class="text-5xl font-bold text-indigo-600 mb-4">${this.escapeHtml(word.word)}</h2>
+              <span class="inline-block px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full">
+                ${this.escapeHtml(word.part_of_speech)}
+              </span>
+              <p class="mt-8 text-gray-500 text-sm">클릭하여 뜻 보기</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="mt-6 flex items-center justify-between">
+          <button onclick="heyspeak.previousFlashcard()" 
+            class="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold transition-colors ${this.flashcardIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}"
+            ${this.flashcardIndex === 0 ? 'disabled' : ''}>
+            <i class="fas fa-arrow-left mr-2"></i>이전
+          </button>
+
+          <div class="flex items-center gap-2">
+            ${this.currentUser ? `
+              <button onclick="heyspeak.toggleBookmark(${word.id}, ${isBookmarked}); event.stopPropagation();" 
+                class="p-3 text-2xl ${isBookmarked ? 'text-yellow-500' : 'text-gray-300'} hover:text-yellow-500 transition-colors">
+                <i class="fas fa-star"></i>
+              </button>
+              <button onclick="heyspeak.toggleLearnedStatus(${word.id}, ${!isLearned}); event.stopPropagation();" 
+                class="px-4 py-2 ${isLearned ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-800'} rounded-lg font-semibold hover:opacity-80 transition-opacity">
+                ${isLearned ? '✓ 학습 완료' : '학습 완료 표시'}
+              </button>
+            ` : ''}
+            <button onclick="heyspeak.pronounceFlashcardWord('${this.escapeHtml(word.word)}')" 
+              class="p-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors">
+              <i class="fas fa-volume-up"></i>
+            </button>
+          </div>
+
+          <button onclick="heyspeak.nextFlashcard()" 
+            class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-colors ${this.flashcardIndex >= words.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}"
+            ${this.flashcardIndex >= words.length - 1 ? 'disabled' : ''}>
+            다음<i class="fas fa-arrow-right ml-2"></i>
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  flipFlashcard() {
+    const flashcard = document.getElementById('flashcard');
+    const frontDiv = document.getElementById('flashcard-front');
+    
+    if (!this.flashcardFlipped) {
+      // Show back
+      const response = JSON.parse(document.getElementById('app').dataset.vocabularyData);
+      const words = response.words;
+      const word = words[this.flashcardIndex];
+      
+      frontDiv.innerHTML = `
+        <div class="text-center">
+          <h2 class="text-4xl font-bold text-gray-800 mb-4">${this.escapeHtml(word.meaning_ko)}</h2>
+          ${word.example_sentence ? `
+            <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+              <p class="text-gray-600 text-sm mb-2">예문:</p>
+              <p class="text-gray-800 italic">${this.escapeHtml(word.example_sentence)}</p>
+            </div>
+          ` : ''}
+          <p class="mt-8 text-gray-500 text-sm">클릭하여 영어 단어 보기</p>
+        </div>
+      `;
+      this.flashcardFlipped = true;
+    } else {
+      // Show front
+      const response = JSON.parse(document.getElementById('app').dataset.vocabularyData);
+      const words = response.words;
+      const word = words[this.flashcardIndex];
+      
+      frontDiv.innerHTML = `
+        <h2 class="text-5xl font-bold text-indigo-600 mb-4">${this.escapeHtml(word.word)}</h2>
+        <span class="inline-block px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full">
+          ${this.escapeHtml(word.part_of_speech)}
+        </span>
+        <p class="mt-8 text-gray-500 text-sm">클릭하여 뜻 보기</p>
+      `;
+      this.flashcardFlipped = false;
+    }
+  }
+
+  async pronounceFlashcardWord(word) {
+    try {
+      const response = await axios.post('/api/tts/speak', {
+        text: word,
+        voice: 'nova'
+      }, {
+        responseType: 'arraybuffer'
+      });
+
+      const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audio.onended = () => URL.revokeObjectURL(audioUrl);
+      await audio.play();
+    } catch (error) {
+      console.error('Error playing pronunciation:', error);
+    }
+  }
+
+  async nextFlashcard() {
+    const response = JSON.parse(document.getElementById('app').dataset.vocabularyData);
+    const words = response.words;
+    
+    if (this.flashcardIndex < words.length - 1) {
+      this.flashcardIndex++;
+      this.flashcardFlipped = false;
+      await this.showVocabulary('flashcard');
+    }
+  }
+
+  async previousFlashcard() {
+    if (this.flashcardIndex > 0) {
+      this.flashcardIndex--;
+      this.flashcardFlipped = false;
+      await this.showVocabulary('flashcard');
+    }
+  }
+
+  // Quiz Mode
+  renderQuizMode(words, progressData) {
+    if (!words || words.length === 0) {
+      return `
+        <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
+          <div class="text-6xl mb-4">📖</div>
+          <h3 class="text-xl font-bold text-gray-800 mb-2">No Vocabulary Yet</h3>
+          <p class="text-gray-600">Vocabulary words will be added soon!</p>
+        </div>
+      `;
+    }
+
+    if (!this.quizData) {
+      // Initialize quiz
+      this.quizData = {
+        questions: words.slice(0, Math.min(10, words.length)).map(word => ({
+          word: word,
+          options: this.generateQuizOptions(word, words),
+          userAnswer: null,
+          correct: null
+        })),
+        currentIndex: 0,
+        score: 0,
+        finished: false
+      };
+    }
+
+    const quiz = this.quizData;
+    
+    if (quiz.finished) {
+      return this.renderQuizResults();
+    }
+
+    const question = quiz.questions[quiz.currentIndex];
+    const word = question.word;
+
+    return `
+      <div class="max-w-3xl mx-auto">
+        <!-- Quiz Progress -->
+        <div class="mb-6">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-gray-600">Question ${quiz.currentIndex + 1} / ${quiz.questions.length}</span>
+            <span class="text-indigo-600 font-bold">Score: ${quiz.score} / ${quiz.currentIndex}</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div class="bg-indigo-600 h-2 rounded-full transition-all" style="width: ${(quiz.currentIndex / quiz.questions.length) * 100}%"></div>
+          </div>
+        </div>
+
+        <!-- Question Card -->
+        <div class="bg-white rounded-2xl shadow-lg p-8 mb-6">
+          <div class="text-center mb-8">
+            <h2 class="text-4xl font-bold text-indigo-600 mb-4">${this.escapeHtml(word.word)}</h2>
+            <span class="inline-block px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full">
+              ${this.escapeHtml(word.part_of_speech)}
+            </span>
+            <button onclick="heyspeak.pronounceFlashcardWord('${this.escapeHtml(word.word)}')" 
+              class="ml-4 p-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors">
+              <i class="fas fa-volume-up"></i>
+            </button>
+          </div>
+
+          <p class="text-gray-700 text-lg mb-6 text-center">이 단어의 뜻은 무엇일까요?</p>
+
+          <!-- Options -->
+          <div class="space-y-3">
+            ${question.options.map((option, index) => {
+              const isSelected = question.userAnswer === option;
+              const isCorrect = option === word.meaning_ko;
+              let buttonClass = 'bg-white hover:bg-gray-50 border-2 border-gray-200';
+              
+              if (question.userAnswer !== null) {
+                if (isCorrect) {
+                  buttonClass = 'bg-green-100 border-2 border-green-500';
+                } else if (isSelected) {
+                  buttonClass = 'bg-red-100 border-2 border-red-500';
+                }
+              }
+              
+              return `
+                <button onclick="heyspeak.selectQuizAnswer('${this.escapeHtml(option)}')" 
+                  class="w-full p-4 ${buttonClass} rounded-lg text-left font-semibold transition-all ${question.userAnswer !== null ? 'cursor-not-allowed' : 'cursor-pointer'}"
+                  ${question.userAnswer !== null ? 'disabled' : ''}>
+                  <span class="text-gray-700">${index + 1}. ${this.escapeHtml(option)}</span>
+                  ${question.userAnswer !== null && isCorrect ? '<i class="fas fa-check text-green-600 float-right"></i>' : ''}
+                  ${question.userAnswer !== null && isSelected && !isCorrect ? '<i class="fas fa-times text-red-600 float-right"></i>' : ''}
+                </button>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- Next Button -->
+        ${question.userAnswer !== null ? `
+          <div class="text-center">
+            <button onclick="heyspeak.nextQuizQuestion()" 
+              class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-colors">
+              ${quiz.currentIndex < quiz.questions.length - 1 ? '다음 문제' : '결과 보기'} <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  generateQuizOptions(correctWord, allWords) {
+    const options = [correctWord.meaning_ko];
+    const otherWords = allWords.filter(w => w.id !== correctWord.id);
+    
+    // Add 3 random wrong answers
+    while (options.length < 4 && otherWords.length > 0) {
+      const randomIndex = Math.floor(Math.random() * otherWords.length);
+      const randomWord = otherWords[randomIndex];
+      
+      if (!options.includes(randomWord.meaning_ko)) {
+        options.push(randomWord.meaning_ko);
+      }
+      
+      otherWords.splice(randomIndex, 1);
+    }
+    
+    // Shuffle options
+    return options.sort(() => Math.random() - 0.5);
+  }
+
+  async selectQuizAnswer(answer) {
+    const question = this.quizData.questions[this.quizData.currentIndex];
+    
+    if (question.userAnswer !== null) return; // Already answered
+    
+    question.userAnswer = answer;
+    question.correct = (answer === question.word.meaning_ko);
+    
+    if (question.correct) {
+      this.quizData.score++;
+    }
+    
+    // Re-render to show result
+    await this.showVocabulary('quiz');
+  }
+
+  async nextQuizQuestion() {
+    this.quizData.currentIndex++;
+    
+    if (this.quizData.currentIndex >= this.quizData.questions.length) {
+      this.quizData.finished = true;
+    }
+    
+    await this.showVocabulary('quiz');
+  }
+
+  renderQuizResults() {
+    const quiz = this.quizData;
+    const percentage = Math.round((quiz.score / quiz.questions.length) * 100);
+    let message = '';
+    let emoji = '';
+    
+    if (percentage >= 90) {
+      emoji = '🎉';
+      message = '완벽해요! 정말 잘하셨어요!';
+    } else if (percentage >= 70) {
+      emoji = '👏';
+      message = '잘했어요! 조금만 더 연습하면 완벽할 거예요!';
+    } else if (percentage >= 50) {
+      emoji = '💪';
+      message = '괜찮아요! 계속 연습하세요!';
+    } else {
+      emoji = '📚';
+      message = '더 열심히 공부해봐요!';
+    }
+
+    return `
+      <div class="max-w-2xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
+          <div class="text-8xl mb-6">${emoji}</div>
+          <h2 class="text-3xl font-bold text-gray-800 mb-4">퀴즈 완료!</h2>
+          <p class="text-xl text-gray-600 mb-8">${message}</p>
+          
+          <div class="grid grid-cols-3 gap-4 mb-8">
+            <div class="bg-green-50 p-4 rounded-lg">
+              <p class="text-gray-600 text-sm mb-1">정답</p>
+              <p class="text-3xl font-bold text-green-600">${quiz.score}</p>
+            </div>
+            <div class="bg-red-50 p-4 rounded-lg">
+              <p class="text-gray-600 text-sm mb-1">오답</p>
+              <p class="text-3xl font-bold text-red-600">${quiz.questions.length - quiz.score}</p>
+            </div>
+            <div class="bg-indigo-50 p-4 rounded-lg">
+              <p class="text-gray-600 text-sm mb-1">정답률</p>
+              <p class="text-3xl font-bold text-indigo-600">${percentage}%</p>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <button onclick="heyspeak.restartQuiz()" 
+              class="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-colors">
+              <i class="fas fa-redo mr-2"></i>다시 풀기
+            </button>
+            <button onclick="heyspeak.showVocabulary('list')" 
+              class="w-full px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold transition-colors">
+              <i class="fas fa-list mr-2"></i>단어 목록으로
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  async restartQuiz() {
+    this.quizData = null;
+    this.flashcardIndex = 0;
+    await this.showVocabulary('quiz');
   }
 
   // History feature

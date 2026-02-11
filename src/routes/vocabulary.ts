@@ -196,4 +196,267 @@ vocabulary.get('/progress/:userId/stats', async (c: Context<{ Bindings: Bindings
   }
 })
 
+// Get all user progress (for individual word status)
+vocabulary.get('/progress/:userId/all', async (c: Context<{ Bindings: Bindings }>) => {
+  try {
+    const userId = c.req.param('userId')
+
+    const { results } = await c.env.DB.prepare(`
+      SELECT word_id, is_learned, review_count, last_reviewed_at
+      FROM user_vocabulary_progress
+      WHERE user_id = ?
+    `).bind(userId).all()
+
+    return c.json({
+      success: true,
+      progress: results || []
+    })
+  } catch (error: any) {
+    console.error('Error fetching all progress:', error)
+    return c.json({
+      success: false,
+      error: 'Failed to fetch progress',
+      details: error.message
+    }, 500)
+  }
+})
+
+// Bookmark endpoints
+vocabulary.post('/bookmarks', async (c: Context<{ Bindings: Bindings }>) => {
+  try {
+    const { userId, wordId } = await c.req.json()
+
+    if (!userId || !wordId) {
+      return c.json({ error: 'userId and wordId are required' }, 400)
+    }
+
+    await c.env.DB.prepare(`
+      INSERT INTO vocabulary_bookmarks (user_id, word_id)
+      VALUES (?, ?)
+      ON CONFLICT(user_id, word_id) DO NOTHING
+    `).bind(userId, wordId).run()
+
+    return c.json({
+      success: true,
+      message: 'Bookmark added'
+    })
+  } catch (error: any) {
+    console.error('Error adding bookmark:', error)
+    return c.json({
+      success: false,
+      error: 'Failed to add bookmark',
+      details: error.message
+    }, 500)
+  }
+})
+
+vocabulary.get('/bookmarks/:userId', async (c: Context<{ Bindings: Bindings }>) => {
+  try {
+    const userId = c.req.param('userId')
+
+    const { results } = await c.env.DB.prepare(`
+      SELECT word_id, created_at
+      FROM vocabulary_bookmarks
+      WHERE user_id = ?
+    `).bind(userId).all()
+
+    return c.json({
+      success: true,
+      bookmarks: results || []
+    })
+  } catch (error: any) {
+    console.error('Error fetching bookmarks:', error)
+    return c.json({
+      success: false,
+      error: 'Failed to fetch bookmarks',
+      details: error.message
+    }, 500)
+  }
+})
+
+vocabulary.delete('/bookmarks/:userId/:wordId', async (c: Context<{ Bindings: Bindings }>) => {
+  try {
+    const userId = c.req.param('userId')
+    const wordId = c.req.param('wordId')
+
+    await c.env.DB.prepare(`
+      DELETE FROM vocabulary_bookmarks
+      WHERE user_id = ? AND word_id = ?
+    `).bind(userId, wordId).run()
+
+    return c.json({
+      success: true,
+      message: 'Bookmark removed'
+    })
+  } catch (error: any) {
+    console.error('Error removing bookmark:', error)
+    return c.json({
+      success: false,
+      error: 'Failed to remove bookmark',
+      details: error.message
+    }, 500)
+  }
+})
+
+// Custom wordbook endpoints
+vocabulary.post('/wordbooks', async (c: Context<{ Bindings: Bindings }>) => {
+  try {
+    const { userId, name, description } = await c.req.json()
+
+    if (!userId || !name) {
+      return c.json({ error: 'userId and name are required' }, 400)
+    }
+
+    const result = await c.env.DB.prepare(`
+      INSERT INTO custom_wordbooks (user_id, name, description)
+      VALUES (?, ?, ?)
+    `).bind(userId, name, description || null).run()
+
+    return c.json({
+      success: true,
+      wordbookId: result.meta.last_row_id,
+      message: 'Wordbook created'
+    })
+  } catch (error: any) {
+    console.error('Error creating wordbook:', error)
+    return c.json({
+      success: false,
+      error: 'Failed to create wordbook',
+      details: error.message
+    }, 500)
+  }
+})
+
+vocabulary.get('/wordbooks/:userId', async (c: Context<{ Bindings: Bindings }>) => {
+  try {
+    const userId = c.req.param('userId')
+
+    const { results } = await c.env.DB.prepare(`
+      SELECT id, name, description, created_at
+      FROM custom_wordbooks
+      WHERE user_id = ?
+      ORDER BY created_at DESC
+    `).bind(userId).all()
+
+    return c.json({
+      success: true,
+      wordbooks: results || []
+    })
+  } catch (error: any) {
+    console.error('Error fetching wordbooks:', error)
+    return c.json({
+      success: false,
+      error: 'Failed to fetch wordbooks',
+      details: error.message
+    }, 500)
+  }
+})
+
+vocabulary.post('/wordbooks/:wordbookId/words', async (c: Context<{ Bindings: Bindings }>) => {
+  try {
+    const wordbookId = c.req.param('wordbookId')
+    const { wordId } = await c.req.json()
+
+    if (!wordId) {
+      return c.json({ error: 'wordId is required' }, 400)
+    }
+
+    await c.env.DB.prepare(`
+      INSERT INTO wordbook_words (wordbook_id, word_id)
+      VALUES (?, ?)
+      ON CONFLICT(wordbook_id, word_id) DO NOTHING
+    `).bind(wordbookId, wordId).run()
+
+    return c.json({
+      success: true,
+      message: 'Word added to wordbook'
+    })
+  } catch (error: any) {
+    console.error('Error adding word to wordbook:', error)
+    return c.json({
+      success: false,
+      error: 'Failed to add word',
+      details: error.message
+    }, 500)
+  }
+})
+
+vocabulary.get('/wordbooks/:wordbookId/words', async (c: Context<{ Bindings: Bindings }>) => {
+  try {
+    const wordbookId = c.req.param('wordbookId')
+
+    const { results } = await c.env.DB.prepare(`
+      SELECT w.*
+      FROM vocabulary_words w
+      JOIN wordbook_words ww ON w.id = ww.word_id
+      WHERE ww.wordbook_id = ?
+      ORDER BY ww.created_at DESC
+    `).bind(wordbookId).all()
+
+    return c.json({
+      success: true,
+      words: results || []
+    })
+  } catch (error: any) {
+    console.error('Error fetching wordbook words:', error)
+    return c.json({
+      success: false,
+      error: 'Failed to fetch words',
+      details: error.message
+    }, 500)
+  }
+})
+
+vocabulary.delete('/wordbooks/:wordbookId/words/:wordId', async (c: Context<{ Bindings: Bindings }>) => {
+  try {
+    const wordbookId = c.req.param('wordbookId')
+    const wordId = c.req.param('wordId')
+
+    await c.env.DB.prepare(`
+      DELETE FROM wordbook_words
+      WHERE wordbook_id = ? AND word_id = ?
+    `).bind(wordbookId, wordId).run()
+
+    return c.json({
+      success: true,
+      message: 'Word removed from wordbook'
+    })
+  } catch (error: any) {
+    console.error('Error removing word from wordbook:', error)
+    return c.json({
+      success: false,
+      error: 'Failed to remove word',
+      details: error.message
+    }, 500)
+  }
+})
+
+vocabulary.delete('/wordbooks/:wordbookId', async (c: Context<{ Bindings: Bindings }>) => {
+  try {
+    const wordbookId = c.req.param('wordbookId')
+
+    // Delete all words in the wordbook first
+    await c.env.DB.prepare(`
+      DELETE FROM wordbook_words WHERE wordbook_id = ?
+    `).bind(wordbookId).run()
+
+    // Delete the wordbook
+    await c.env.DB.prepare(`
+      DELETE FROM custom_wordbooks WHERE id = ?
+    `).bind(wordbookId).run()
+
+    return c.json({
+      success: true,
+      message: 'Wordbook deleted'
+    })
+  } catch (error: any) {
+    console.error('Error deleting wordbook:', error)
+    return c.json({
+      success: false,
+      error: 'Failed to delete wordbook',
+      details: error.message
+    }, 500)
+  }
+})
+
 export default vocabulary
