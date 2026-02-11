@@ -1823,6 +1823,7 @@ class HeySpeak {
     });
     
     const isUser = message.role === 'user';
+    const messageId = `history-msg-${message.id}`;
     
     return `
       <div class="flex ${isUser ? 'justify-end' : 'justify-start'}">
@@ -1833,11 +1834,81 @@ class HeySpeak {
               : 'bg-gray-200 text-gray-800'
           }">
             <p class="text-sm md:text-base">${this.escapeHtml(message.content)}</p>
+            ${!isUser ? `
+              <div class="mt-2">
+                <button 
+                  onclick="heyspeak.playHistoryMessage('${this.escapeHtml(message.content)}', '${messageId}')" 
+                  id="${messageId}"
+                  class="flex items-center gap-1 px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs rounded-lg transition-colors">
+                  <i class="fas fa-redo"></i>
+                  <span>다시 듣기</span>
+                </button>
+              </div>
+            ` : ''}
           </div>
           <p class="text-xs text-gray-500 mt-1 ${isUser ? 'text-right' : 'text-left'}">${time}</p>
         </div>
       </div>
     `;
+  }
+
+  async playHistoryMessage(text, buttonId) {
+    const btn = document.getElementById(buttonId);
+    
+    try {
+      // Update button state
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>재생 중...</span>';
+      }
+      
+      // Call TTS API
+      const response = await axios.post('/api/tts/speak', {
+        text: text,
+        voice: 'nova'
+      }, {
+        responseType: 'arraybuffer'
+      });
+
+      // Play audio
+      const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      if (this.currentAudio) {
+        this.currentAudio.pause();
+      }
+      
+      this.currentAudio = new Audio(audioUrl);
+      
+      this.currentAudio.onended = () => {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-redo"></i><span>다시 듣기</span>';
+        }
+        URL.revokeObjectURL(audioUrl);
+      };
+      
+      this.currentAudio.onerror = () => {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>오류</span>';
+          setTimeout(() => {
+            btn.innerHTML = '<i class="fas fa-redo"></i><span>다시 듣기</span>';
+          }, 2000);
+        }
+      };
+      
+      await this.currentAudio.play();
+    } catch (error) {
+      console.error('Error playing history message:', error);
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>오류</span>';
+        setTimeout(() => {
+          btn.innerHTML = '<i class="fas fa-redo"></i><span>다시 듣기</span>';
+        }, 2000);
+      }
+    }
   }
 
   escapeHtml(text) {
