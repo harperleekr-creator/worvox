@@ -50,7 +50,8 @@ AI 기반 실시간 영어 회화 학습 웹 애플리케이션입니다. 사용
   - ⭐ **북마크 기능**: 즐겨찾기 단어 저장
   - 📊 **진도율 표시**: 실시간 학습 진행도
   - 🎯 난이도별 분류 (beginner/intermediate/advanced)
-  - 📖 **125개 이상의 단어**: beginner(40+), intermediate(40+), advanced(40+)
+  - 📖 **185개 이상의 단어**: beginner(57개), intermediate(60개), advanced(68개)
+  - 🏆 **TOEIC 단어 표시**: TOEIC 시험 출제 단어에 'TOEIC' 라벨 표시 (88개)
   - 📚 **커스텀 단어장**: 사용자별 맞춤 단어 목록 생성 (API)
 
 ### API 엔드포인트
