@@ -895,7 +895,7 @@ class HeySpeak {
                     <!-- Korean Meaning -->
                     <div class="border-t pt-4">
                       <p class="text-gray-600 text-sm mb-1">한국어 뜻:</p>
-                      <p class="text-xl font-semibold text-gray-800">${this.escapeHtml(word.korean_meaning)}</p>
+                      <p class="text-xl font-semibold text-gray-800">${this.escapeHtml(word.meaning_ko)}</p>
                     </div>
 
                     <!-- Pronunciation Button -->
