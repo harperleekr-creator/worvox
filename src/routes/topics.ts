@@ -7,7 +7,15 @@ const topics = new Hono<{ Bindings: Bindings }>();
 topics.get('/', async (c) => {
   try {
     const result = await c.env.DB.prepare(
-      'SELECT * FROM topics ORDER BY level, name'
+      `SELECT * FROM topics 
+       ORDER BY 
+         CASE name
+           WHEN 'Daily Conversation' THEN 1
+           WHEN 'Travel English' THEN 2
+           WHEN 'Job Interview' THEN 3
+           WHEN 'Business English' THEN 4
+           ELSE 5
+         END`
     ).all();
 
     return c.json({
