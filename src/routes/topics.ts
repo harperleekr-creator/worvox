@@ -14,7 +14,8 @@ topics.get('/', async (c) => {
            WHEN 'Travel English' THEN 2
            WHEN 'Job Interview' THEN 3
            WHEN 'Business English' THEN 4
-           ELSE 5
+           WHEN 'Vocabulary' THEN 5
+           ELSE 6
          END`
     ).all();
 

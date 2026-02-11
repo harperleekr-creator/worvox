@@ -552,6 +552,18 @@ class HeySpeak {
 
   async startSession(topicId, topicName, systemPrompt, level) {
     try {
+      // Special handling for Vocabulary topic
+      if (topicName === 'Vocabulary') {
+        await this.showVocabulary();
+        return;
+      }
+      
+      // Check if it's Vocabulary topic
+      if (topicName === 'Vocabulary') {
+        this.showVocabularyLearning();
+        return;
+      }
+
       const response = await axios.post('/api/sessions/create', {
         userId: this.currentUser.id,
         topicId: topicId,
@@ -840,6 +852,133 @@ class HeySpeak {
     this.currentTopic = null;
     this.messages = [];
     this.showLogin();
+  }
+
+  // Vocabulary feature
+  async showVocabulary() {
+    try {
+      const response = await axios.get('/api/vocabulary/list');
+      const words = response.data.words;
+
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="min-h-screen p-4 md:p-8">
+          <div class="max-w-6xl mx-auto">
+            <!-- Header -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+              <div class="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                  <h1 class="text-2xl md:text-3xl font-bold text-gray-800">📚 Vocabulary Study</h1>
+                  <p class="text-gray-600 mt-2">Learn and practice English vocabulary with pronunciations</p>
+                </div>
+                <button onclick="heyspeak.showTopicSelection()" 
+                  class="px-4 py-2 text-indigo-600 hover:text-indigo-800 transition-colors">
+                  <i class="fas fa-arrow-left mr-2"></i>Back to Topics
+                </button>
+              </div>
+            </div>
+
+            <!-- Vocabulary List -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              ${words.map((word, index) => `
+                <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                  <!-- Word Card -->
+                  <div class="space-y-4">
+                    <!-- English Word -->
+                    <div class="text-center">
+                      <h3 class="text-3xl font-bold text-indigo-600 mb-2">${this.escapeHtml(word.word)}</h3>
+                      <span class="inline-block px-3 py-1 bg-indigo-100 text-indigo-800 text-sm rounded-full">
+                        ${this.escapeHtml(word.part_of_speech)}
+                      </span>
+                    </div>
+
+                    <!-- Korean Meaning -->
+                    <div class="border-t pt-4">
+                      <p class="text-gray-600 text-sm mb-1">한국어 뜻:</p>
+                      <p class="text-xl font-semibold text-gray-800">${this.escapeHtml(word.korean_meaning)}</p>
+                    </div>
+
+                    <!-- Pronunciation Button -->
+                    <button 
+                      onclick="heyspeak.pronounceWord('${this.escapeHtml(word.word)}', ${index})"
+                      id="pronounce-btn-${index}"
+                      class="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-lg font-semibold hover:from-green-600 hover:to-teal-600 transition-all flex items-center justify-center space-x-2">
+                      <i class="fas fa-volume-up"></i>
+                      <span>발음 듣기</span>
+                    </button>
+
+                    <!-- Example Sentence (if available) -->
+                    ${word.example_sentence ? `
+                      <div class="border-t pt-4">
+                        <p class="text-gray-600 text-sm mb-1">예문:</p>
+                        <p class="text-gray-700 italic text-sm">${this.escapeHtml(word.example_sentence)}</p>
+                      </div>
+                    ` : ''}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+
+            ${words.length === 0 ? `
+              <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
+                <div class="text-6xl mb-4">📖</div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">No Vocabulary Yet</h3>
+                <p class="text-gray-600">Vocabulary words will be added soon!</p>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    } catch (error) {
+      console.error('Error loading vocabulary:', error);
+      alert('Failed to load vocabulary. Please try again.');
+    }
+  }
+
+  async pronounceWord(word, index) {
+    try {
+      const btn = document.getElementById(`pronounce-btn-${index}`);
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>재생 중...</span>';
+      btn.disabled = true;
+
+      // Call TTS API
+      const response = await axios.post('/api/tts/speak', {
+        text: word,
+        voice: 'nova' // Clear, natural voice for pronunciation
+      }, {
+        responseType: 'arraybuffer'
+      });
+
+      // Play audio
+      const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      
+      audio.onended = () => {
+        btn.innerHTML = '<i class="fas fa-volume-up"></i><span>발음 듣기</span>';
+        btn.disabled = false;
+        URL.revokeObjectURL(audioUrl);
+      };
+      
+      audio.onerror = () => {
+        btn.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>오류</span>';
+        btn.disabled = false;
+        setTimeout(() => {
+          btn.innerHTML = '<i class="fas fa-volume-up"></i><span>발음 듣기</span>';
+        }, 2000);
+      };
+      
+      await audio.play();
+    } catch (error) {
+      console.error('Error playing pronunciation:', error);
+      const btn = document.getElementById(`pronounce-btn-${index}`);
+      btn.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>오류</span>';
+      btn.disabled = false;
+      setTimeout(() => {
+        btn.innerHTML = '<i class="fas fa-volume-up"></i><span>발음 듣기</span>';
+        btn.disabled = false;
+      }, 2000);
+    }
   }
 
   // History feature
@@ -1400,6 +1539,228 @@ class HeySpeak {
         });
       }
     }
+  }
+
+  // Vocabulary Learning Feature
+  async showVocabularyLearning() {
+    try {
+      this.vocabularyWords = [];
+      this.currentWordIndex = 0;
+      
+      // Fetch random words based on user's level
+      const response = await axios.get(`/api/vocabulary/words/random`, {
+        params: {
+          difficulty: this.currentUser.level,
+          limit: 20,
+          userId: this.currentUser.id
+        }
+      });
+
+      if (response.data.success && response.data.words.length > 0) {
+        this.vocabularyWords = response.data.words;
+        this.showVocabularyCard();
+      } else {
+        alert('No words available for your level. Try a different level!');
+        this.showTopicSelection();
+      }
+    } catch (error) {
+      console.error('Error loading vocabulary:', error);
+      alert('Failed to load vocabulary. Please try again.');
+      this.showTopicSelection();
+    }
+  }
+
+  showVocabularyCard() {
+    const word = this.vocabularyWords[this.currentWordIndex];
+    const progress = this.currentWordIndex + 1;
+    const total = this.vocabularyWords.length;
+
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="min-h-screen p-4 md:p-8 bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div class="max-w-2xl mx-auto">
+          <!-- Header -->
+          <div class="flex items-center justify-between mb-6">
+            <button onclick="heyspeak.showTopicSelection()" 
+              class="px-4 py-2 text-indigo-600 hover:text-indigo-800 transition-colors">
+              <i class="fas fa-arrow-left mr-2"></i>Back
+            </button>
+            <div class="text-gray-600 font-semibold">
+              ${progress} / ${total}
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 h-2 rounded-full transition-all duration-300" 
+                 style="width: ${(progress / total) * 100}%"></div>
+          </div>
+
+          <!-- Vocabulary Card -->
+          <div class="bg-white rounded-2xl shadow-2xl p-8 md:p-12">
+            <!-- Word -->
+            <div class="text-center mb-8">
+              <div class="text-6xl md:text-7xl font-bold text-gray-800 mb-4">
+                ${word.word}
+              </div>
+              <div class="text-gray-500 text-lg mb-2">
+                ${word.part_of_speech || ''}
+              </div>
+              <div class="text-gray-400 text-sm mb-4">
+                ${word.pronunciation || ''}
+              </div>
+              
+              <!-- Pronunciation Button -->
+              <button onclick="heyspeak.playWordPronunciation('${word.word}')" 
+                class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-semibold hover:from-green-600 hover:to-green-700 transition-all">
+                <i class="fas fa-volume-up"></i>
+                발음 듣기
+              </button>
+            </div>
+
+            <!-- Meaning -->
+            <div class="border-t border-gray-200 pt-6 mb-6">
+              <div class="text-gray-600 text-sm mb-2">한국어 뜻</div>
+              <div class="text-2xl font-semibold text-gray-800 mb-4">
+                ${word.meaning_ko}
+              </div>
+            </div>
+
+            <!-- Example Sentence -->
+            ${word.example_sentence ? `
+              <div class="border-t border-gray-200 pt-6 mb-6">
+                <div class="text-gray-600 text-sm mb-2">예문</div>
+                <div class="text-lg text-gray-700 italic">
+                  "${word.example_sentence}"
+                </div>
+              </div>
+            ` : ''}
+
+            <!-- Category Badge -->
+            <div class="flex items-center justify-center gap-2 mb-8">
+              <span class="px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full text-sm font-semibold">
+                ${word.category || 'general'}
+              </span>
+              <span class="px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold">
+                ${word.difficulty}
+              </span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-4">
+              <button onclick="heyspeak.markWordAsLearned(${word.id}, false)" 
+                class="flex-1 px-6 py-4 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-all">
+                <i class="fas fa-times mr-2"></i>다시 보기
+              </button>
+              <button onclick="heyspeak.markWordAsLearned(${word.id}, true)" 
+                class="flex-1 px-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all">
+                <i class="fas fa-check mr-2"></i>알았어요!
+              </button>
+            </div>
+          </div>
+
+          <!-- Navigation Buttons -->
+          <div class="flex gap-4 mt-6">
+            ${this.currentWordIndex > 0 ? `
+              <button onclick="heyspeak.previousWord()" 
+                class="px-6 py-3 bg-white text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-all shadow-md">
+                <i class="fas fa-chevron-left mr-2"></i>이전 단어
+              </button>
+            ` : ''}
+            ${this.currentWordIndex < this.vocabularyWords.length - 1 ? `
+              <button onclick="heyspeak.nextWord()" 
+                class="ml-auto px-6 py-3 bg-white text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-all shadow-md">
+                다음 단어<i class="fas fa-chevron-right ml-2"></i>
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  async playWordPronunciation(word) {
+    try {
+      const response = await axios.post('/api/tts/speak', {
+        text: word
+      }, {
+        responseType: 'blob'
+      });
+
+      const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audio.play();
+    } catch (error) {
+      console.error('Error playing pronunciation:', error);
+      alert('Failed to play pronunciation. Please try again.');
+    }
+  }
+
+  async markWordAsLearned(wordId, isLearned) {
+    try {
+      await axios.post('/api/vocabulary/progress', {
+        userId: this.currentUser.id,
+        wordId: wordId,
+        isLearned: isLearned
+      });
+
+      // Move to next word
+      if (this.currentWordIndex < this.vocabularyWords.length - 1) {
+        this.nextWord();
+      } else {
+        // Show completion message
+        this.showVocabularyCompletion();
+      }
+    } catch (error) {
+      console.error('Error marking word:', error);
+      // Still allow moving to next word even if save fails
+      if (this.currentWordIndex < this.vocabularyWords.length - 1) {
+        this.nextWord();
+      } else {
+        this.showVocabularyCompletion();
+      }
+    }
+  }
+
+  nextWord() {
+    if (this.currentWordIndex < this.vocabularyWords.length - 1) {
+      this.currentWordIndex++;
+      this.showVocabularyCard();
+    }
+  }
+
+  previousWord() {
+    if (this.currentWordIndex > 0) {
+      this.currentWordIndex--;
+      this.showVocabularyCard();
+    }
+  }
+
+  showVocabularyCompletion() {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 md:p-12 text-center max-w-lg">
+          <div class="text-6xl mb-6">🎉</div>
+          <h2 class="text-3xl font-bold text-gray-800 mb-4">완료했습니다!</h2>
+          <p class="text-gray-600 mb-8">
+            ${this.vocabularyWords.length}개의 단어를 학습했습니다!
+          </p>
+          
+          <div class="flex gap-4">
+            <button onclick="heyspeak.showVocabularyLearning()" 
+              class="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all">
+              <i class="fas fa-redo mr-2"></i>더 학습하기
+            </button>
+            <button onclick="heyspeak.showTopicSelection()" 
+              class="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-all">
+              <i class="fas fa-home mr-2"></i>홈으로
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
   }
 }
 
