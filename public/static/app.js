@@ -895,20 +895,43 @@ class HeySpeak {
   }
 
   groupSessionsByDate(sessions) {
-    // Group sessions by date
+    // Group sessions by date with Korean timezone
     const grouped = {};
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     
     sessions.forEach(session => {
-      const date = new Date(session.started_at).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
+      const sessionDate = new Date(session.started_at);
+      const dateOnly = new Date(sessionDate);
+      dateOnly.setHours(0, 0, 0, 0);
       
-      if (!grouped[date]) {
-        grouped[date] = [];
+      // Calculate days difference
+      const daysDiff = Math.floor((today - dateOnly) / (1000 * 60 * 60 * 24));
+      
+      let dateLabel;
+      if (daysDiff === 0) {
+        dateLabel = '오늘 (Today)';
+      } else if (daysDiff === 1) {
+        dateLabel = '어제 (Yesterday)';
+      } else if (daysDiff < 7) {
+        dateLabel = `${daysDiff}일 전 (${sessionDate.toLocaleDateString('ko-KR', { 
+          month: 'long', 
+          day: 'numeric',
+          weekday: 'short'
+        })})`;
+      } else {
+        dateLabel = sessionDate.toLocaleDateString('ko-KR', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          weekday: 'short'
+        });
       }
-      grouped[date].push(session);
+      
+      if (!grouped[dateLabel]) {
+        grouped[dateLabel] = [];
+      }
+      grouped[dateLabel].push(session);
     });
 
     // Generate HTML
@@ -930,13 +953,37 @@ class HeySpeak {
   }
 
   renderSessionCard(session) {
-    const startTime = new Date(session.started_at).toLocaleTimeString('en-US', {
+    const sessionDate = new Date(session.started_at);
+    
+    // Format time in 24-hour format (Korean standard)
+    const startTime = sessionDate.toLocaleTimeString('ko-KR', {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      hour12: false
     });
     
+    // Calculate relative time
+    const now = new Date();
+    const diffMs = now - sessionDate;
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    let relativeTime;
+    if (diffMins < 1) {
+      relativeTime = '방금 전';
+    } else if (diffMins < 60) {
+      relativeTime = `${diffMins}분 전`;
+    } else if (diffHours < 24) {
+      relativeTime = `${diffHours}시간 전`;
+    } else if (diffDays < 7) {
+      relativeTime = `${diffDays}일 전`;
+    } else {
+      relativeTime = startTime;
+    }
+    
     const duration = session.ended_at 
-      ? Math.round((new Date(session.ended_at) - new Date(session.started_at)) / 1000 / 60)
+      ? Math.round((new Date(session.ended_at) - sessionDate) / 1000 / 60)
       : 'In progress';
     
     return `
@@ -949,8 +996,8 @@ class HeySpeak {
               <h4 class="text-lg font-bold text-gray-800">${session.topic_name || 'Conversation'}</h4>
             </div>
             <div class="flex items-center gap-4 text-sm text-gray-600 flex-wrap">
-              <span><i class="fas fa-clock mr-1"></i>${startTime}</span>
-              <span><i class="fas fa-hourglass-half mr-1"></i>${duration}${typeof duration === 'number' ? ' min' : ''}</span>
+              <span><i class="fas fa-clock mr-1"></i>${startTime} (${relativeTime})</span>
+              <span><i class="fas fa-hourglass-half mr-1"></i>${duration}${typeof duration === 'number' ? '분' : ''}</span>
               <span><i class="fas fa-comment mr-1"></i>${session.message_count} messages</span>
               <span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold">
                 ${session.level}
@@ -971,12 +1018,15 @@ class HeySpeak {
       const response = await axios.get(`/api/history/conversation/${sessionId}`);
       const { session, messages } = response.data;
 
-      const startTime = new Date(session.started_at).toLocaleString('en-US', {
+      const sessionDate = new Date(session.started_at);
+      const startTime = sessionDate.toLocaleString('ko-KR', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
+        weekday: 'short',
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
+        hour12: false
       });
 
       const app = document.getElementById('app');
@@ -1031,9 +1081,12 @@ class HeySpeak {
   }
 
   renderHistoryMessage(message) {
-    const time = new Date(message.created_at).toLocaleTimeString('en-US', {
+    const messageDate = new Date(message.created_at);
+    const time = messageDate.toLocaleTimeString('ko-KR', {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
     });
     
     const isUser = message.role === 'user';
