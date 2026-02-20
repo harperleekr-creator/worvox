@@ -2132,19 +2132,51 @@ class WorVox {
     }
   }
   
+  async playPronunciation(word) {
+    try {
+      const response = await axios.post('/api/tts/speak', {
+        text: word,
+        language: 'en'
+      }, {
+        responseType: 'blob'
+      });
+      
+      const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+      };
+      
+      audio.play();
+    } catch (error) {
+      console.error('TTS error:', error);
+      alert('Failed to play pronunciation. Please try again.');
+    }
+  }
+  
   async playExampleSentence(sentence) {
     try {
       const response = await axios.post('/api/tts/speak', {
         text: sentence,
         language: 'en'
+      }, {
+        responseType: 'blob'
       });
       
-      if (response.data.success) {
-        const audio = new Audio(response.data.audioUrl);
-        audio.play();
-      }
+      const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+      };
+      
+      audio.play();
     } catch (error) {
       console.error('TTS error:', error);
+      alert('Failed to play sentence. Please try again.');
     }
   }
 
