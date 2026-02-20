@@ -519,10 +519,68 @@ class WorVox {
       if (this.onboardingStep < 3) {
         this.nextStep();
       } else {
-        // Last step - complete onboarding
-        this.completeOnboarding();
+        // Last step - show headphone recommendation
+        this.showHeadphoneRecommendation();
       }
     }, 300);
+  }
+
+  showHeadphoneRecommendation() {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg text-center">
+          <!-- Headphone Icon -->
+          <div class="mb-6">
+            <div class="w-24 h-24 mx-auto bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center">
+              <i class="fas fa-headphones text-5xl text-indigo-600"></i>
+            </div>
+          </div>
+          
+          <!-- Title -->
+          <h2 class="text-2xl font-bold text-gray-800 mb-4">🎧 Headphones Recommended</h2>
+          
+          <!-- Message -->
+          <p class="text-gray-600 mb-2">
+            For the best learning experience, we recommend using headphones or earphones.
+          </p>
+          <p class="text-gray-500 text-sm mb-8">
+            This will help you hear pronunciations clearly and practice speaking without disturbing others.
+          </p>
+          
+          <!-- Benefits -->
+          <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 mb-8 text-left">
+            <div class="flex items-start gap-3 mb-3">
+              <i class="fas fa-check-circle text-green-500 text-lg mt-0.5"></i>
+              <div>
+                <div class="font-semibold text-gray-800">Better Audio Quality</div>
+                <div class="text-sm text-gray-600">Hear pronunciations more clearly</div>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 mb-3">
+              <i class="fas fa-check-circle text-green-500 text-lg mt-0.5"></i>
+              <div>
+                <div class="font-semibold text-gray-800">Focused Learning</div>
+                <div class="text-sm text-gray-600">Minimize distractions around you</div>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <i class="fas fa-check-circle text-green-500 text-lg mt-0.5"></i>
+              <div>
+                <div class="font-semibold text-gray-800">Privacy</div>
+                <div class="text-sm text-gray-600">Practice speaking freely</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Continue Button -->
+          <button onclick="worvox.completeOnboarding()" 
+            class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg">
+            Got it! Let's Start Learning
+          </button>
+        </div>
+      </div>
+    `;
   }
 
   async completeOnboarding() {
