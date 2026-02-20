@@ -9,6 +9,45 @@ type Bindings = {
 
 const vocabulary = new Hono<{ Bindings: Bindings }>()
 
+// Search vocabulary words
+vocabulary.get('/search', async (c: Context<{ Bindings: Bindings }>) => {
+  try {
+    const query = c.req.query('query')?.trim().toLowerCase()
+    
+    if (!query) {
+      return c.json({
+        success: false,
+        error: 'Search query is required'
+      }, 400)
+    }
+
+    // Search by word (exact or starts with)
+    const { results } = await c.env.DB.prepare(`
+      SELECT * FROM vocabulary_words
+      WHERE LOWER(word) = ? OR LOWER(word) LIKE ?
+      ORDER BY 
+        CASE 
+          WHEN LOWER(word) = ? THEN 0
+          ELSE 1
+        END,
+        difficulty
+      LIMIT 10
+    `).bind(query, `${query}%`, query).all()
+
+    return c.json({
+      success: true,
+      words: results || []
+    })
+  } catch (error: any) {
+    console.error('Error searching vocabulary:', error)
+    return c.json({
+      success: false,
+      error: 'Failed to search vocabulary',
+      details: error.message
+    }, 500)
+  }
+})
+
 // Get all vocabulary words (for basic list view)
 vocabulary.get('/list', async (c: Context<{ Bindings: Bindings }>) => {
   try {

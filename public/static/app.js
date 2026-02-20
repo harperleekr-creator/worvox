@@ -527,7 +527,27 @@ class HeySpeak {
             <!-- Topics -->
             <div class="bg-white rounded-2xl shadow-lg p-6">
               <h2 class="text-2xl font-bold text-gray-800 mb-6">Choose a Topic 📚</h2>
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              
+              <!-- Word Search Section -->
+              <div class="mb-6">
+                <div class="relative">
+                  <input 
+                    type="text" 
+                    id="wordSearch" 
+                    placeholder="영어 단어 검색" 
+                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 text-gray-700 placeholder-gray-400"
+                    onkeypress="if(event.key==='Enter') heyspeak.searchWord()"
+                  />
+                  <button 
+                    onclick="heyspeak.searchWord()"
+                    class="absolute right-3 top-1/2 transform -translate-y-1/2 text-indigo-600 hover:text-indigo-800">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+                <div id="searchResult" class="mt-4"></div>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 ${topics.map(topic => `
                   <div class="border-2 border-gray-200 rounded-xl p-6 cursor-pointer hover:border-indigo-500 transition-all card-hover"
                     onclick="heyspeak.startSession(${topic.id}, '${topic.name}', '${topic.system_prompt}', '${topic.level}')">
@@ -1963,6 +1983,107 @@ class HeySpeak {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  // Word Search Feature
+  async searchWord() {
+    const searchInput = document.getElementById('wordSearch');
+    const searchResult = document.getElementById('searchResult');
+    const searchTerm = searchInput.value.trim().toLowerCase();
+    
+    if (!searchTerm) {
+      searchResult.innerHTML = '';
+      return;
+    }
+    
+    try {
+      // Search in vocabulary
+      const response = await axios.get('/api/vocabulary/search', {
+        params: { query: searchTerm }
+      });
+      
+      if (response.data.success && response.data.words.length > 0) {
+        const word = response.data.words[0]; // Get first match
+        
+        searchResult.innerHTML = `
+          <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 border-2 border-indigo-200 animate-fadeIn">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                  <h3 class="text-2xl font-bold text-gray-800">${word.word}</h3>
+                  <button 
+                    onclick="heyspeak.playPronunciation('${word.word}')"
+                    class="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-all">
+                    <i class="fas fa-volume-up"></i>
+                  </button>
+                </div>
+                <div class="flex items-center gap-2 flex-wrap mb-3">
+                  <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+                    ${word.part_of_speech}
+                  </span>
+                  ${word.toeic_related ? '<span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">TOEIC</span>' : ''}
+                  ${word.toefl_related ? '<span class="px-3 py-1 bg-sky-100 text-sky-700 rounded-full text-sm font-semibold">TOEFL</span>' : ''}
+                  <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                    ${word.difficulty}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              <div class="text-lg font-semibold text-gray-700 mb-1">뜻:</div>
+              <div class="text-gray-800">${word.meaning_ko}</div>
+            </div>
+            
+            ${word.example_sentence ? `
+              <div class="bg-white rounded-lg p-4 border border-indigo-100">
+                <div class="flex items-center justify-between mb-2">
+                  <div class="text-sm font-semibold text-indigo-700">예문:</div>
+                  <button 
+                    onclick="heyspeak.playExampleSentence('${word.example_sentence.replace(/'/g, "\\'")}')"
+                    class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs hover:bg-indigo-200 transition-all">
+                    <i class="fas fa-volume-up mr-1"></i>듣기
+                  </button>
+                </div>
+                <div class="text-gray-700 italic">${word.example_sentence}</div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      } else {
+        searchResult.innerHTML = `
+          <div class="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 text-center">
+            <i class="fas fa-search text-yellow-600 text-3xl mb-2"></i>
+            <p class="text-gray-700">단어를 찾을 수 없습니다: "<strong>${searchTerm}</strong>"</p>
+            <p class="text-sm text-gray-600 mt-2">다른 단어를 검색해보세요.</p>
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+      searchResult.innerHTML = `
+        <div class="bg-red-50 border-2 border-red-200 rounded-xl p-4 text-center">
+          <i class="fas fa-exclamation-circle text-red-600 text-3xl mb-2"></i>
+          <p class="text-gray-700">검색 중 오류가 발생했습니다.</p>
+        </div>
+      `;
+    }
+  }
+  
+  async playExampleSentence(sentence) {
+    try {
+      const response = await axios.post('/api/tts/speak', {
+        text: sentence,
+        language: 'en'
+      });
+      
+      if (response.data.success) {
+        const audio = new Audio(response.data.audioUrl);
+        audio.play();
+      }
+    } catch (error) {
+      console.error('TTS error:', error);
+    }
   }
 
   // Statistics feature
