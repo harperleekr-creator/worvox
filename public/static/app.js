@@ -103,13 +103,10 @@ class WorVox {
     const steps = [
       this.getStep1HTML(),
       this.getStep2HTML(),
-      this.getStep3HTML(),
-      this.getStep4HTML(),
-      this.getStep5HTML(),
-      this.getStep6HTML()
+      this.getStep3HTML()
     ];
 
-    const progress = Math.round((this.onboardingStep / 6) * 100);
+    const progress = Math.round((this.onboardingStep / 3) * 100);
 
     app.innerHTML = `
       <div class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -117,7 +114,7 @@ class WorVox {
           <!-- Header -->
           <div class="text-center mb-6">
             <h1 class="text-3xl font-bold gradient-text mb-2">WorVox</h1>
-            <p class="text-gray-600 text-sm">Step ${this.onboardingStep} of 6</p>
+            <p class="text-gray-600 text-sm">Step ${this.onboardingStep} of 3</p>
           </div>
 
           <!-- Progress Bar -->
@@ -211,33 +208,32 @@ class WorVox {
   }
 
   getStep3HTML() {
-    const sources = [
-      { value: 'search', icon: '🔍', label: 'Search Engine', desc: 'Google, Naver, etc.' },
-      { value: 'social', icon: '📱', label: 'Social Media', desc: 'Instagram, YouTube, etc.' },
-      { value: 'friend', icon: '👥', label: 'Friend Referral', desc: 'Someone told me' },
-      { value: 'ad', icon: '📢', label: 'Advertisement', desc: 'Saw an ad' },
-      { value: 'other', icon: '💭', label: 'Other', desc: 'Different source' }
+    const occupations = [
+      { value: 'entrepreneur', icon: '🚀', label: 'Entrepreneur', desc: 'Business owner' },
+      { value: 'employee', icon: '💼', label: 'Employee', desc: 'Office worker' },
+      { value: 'freelancer', icon: '💻', label: 'Freelancer', desc: 'Independent contractor' },
+      { value: 'student', icon: '📚', label: 'Student', desc: 'Currently studying' }
     ];
 
     return `
       <div class="space-y-6">
         <div class="text-center">
-          <div class="text-5xl mb-4">🤔</div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">How did you find us?</h2>
-          <p class="text-gray-600">Help us improve our reach</p>
+          <div class="text-5xl mb-4">💼</div>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">Occupation</h2>
+          <p class="text-gray-600">What do you do?</p>
         </div>
         
         <div class="space-y-3 max-h-96 overflow-y-auto">
-          ${sources.map(source => `
-            <button onclick="worvox.selectOption('referralSource', '${source.value}')" 
-              class="w-full p-4 border-2 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left ${this.onboardingData.referralSource === source.value ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}">
+          ${occupations.map(occ => `
+            <button onclick="worvox.selectOption('occupation', '${occ.value}')" 
+              class="w-full p-4 border-2 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left ${this.onboardingData.occupation === occ.value ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}">
               <div class="flex items-center">
-                <span class="text-3xl mr-4">${source.icon}</span>
+                <span class="text-3xl mr-4">${occ.icon}</span>
                 <div class="flex-1">
-                  <div class="font-semibold text-gray-800">${source.label}</div>
-                  <div class="text-sm text-gray-600">${source.desc}</div>
+                  <div class="font-semibold text-gray-800">${occ.label}</div>
+                  <div class="text-sm text-gray-600">${occ.desc}</div>
                 </div>
-                ${this.onboardingData.referralSource === source.value ? '<span class="text-indigo-600">✓</span>' : ''}
+                ${this.onboardingData.occupation === occ.value ? '<span class="text-indigo-600">✓</span>' : ''}
               </div>
             </button>
           `).join('')}
@@ -331,12 +327,12 @@ class WorVox {
     `;
   }
 
-  getStep6HTML() {
+  getStep4HTML() {
     const occupations = [
-      { value: 'entrepreneur', icon: '🚀', label: 'Entrepreneur', desc: '사업가' },
-      { value: 'employee', icon: '💼', label: 'Employee', desc: '직장인' },
-      { value: 'freelancer', icon: '💻', label: 'Freelancer', desc: '프리랜서' },
-      { value: 'student', icon: '📚', label: 'Student', desc: '학생' }
+      { value: 'entrepreneur', icon: '🚀', label: 'Entrepreneur', desc: 'Business owner' },
+      { value: 'employee', icon: '💼', label: 'Employee', desc: 'Office worker' },
+      { value: 'freelancer', icon: '💻', label: 'Freelancer', desc: 'Independent contractor' },
+      { value: 'student', icon: '📚', label: 'Student', desc: 'Currently studying' }
     ];
 
     return `
@@ -448,7 +444,7 @@ class WorVox {
     
     // Auto-advance to next step after selection
     setTimeout(() => {
-      if (this.onboardingStep < 6) {
+      if (this.onboardingStep < 3) {
         this.nextStep();
       } else {
         // Last step - complete onboarding
