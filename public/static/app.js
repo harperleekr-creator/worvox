@@ -100,15 +100,6 @@ class WorVox {
           <h1 class="text-xl font-bold">WorVox</h1>
         </div>
         
-        <!-- New Conversation -->
-        <div class="p-3">
-          <button onclick="worvox.showTopicSelection()" 
-            class="w-full bg-transparent border border-gray-600 hover:bg-gray-800 text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all">
-            <i class="fas fa-plus"></i>
-            <span class="font-medium">New Conversation</span>
-          </button>
-        </div>
-        
         <!-- Menu Items -->
         <nav class="flex-1 p-3 space-y-2 overflow-y-auto">
           <a href="#" onclick="worvox.showTopicSelection(); return false;" 
@@ -566,80 +557,7 @@ class WorVox {
       app.innerHTML = `
         <div class="flex h-screen bg-gray-50">
           <!-- Sidebar -->
-          <div class="w-64 bg-gray-900 text-white flex flex-col">
-            <!-- Logo -->
-            <div class="p-4 border-b border-gray-700">
-              <h1 class="text-xl font-bold">WorVox</h1>
-            </div>
-            
-            <!-- New Conversation -->
-            <div class="p-3">
-              <button onclick="worvox.showTopicSelection()" 
-                class="w-full bg-transparent border border-gray-600 hover:bg-gray-800 text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all">
-                <i class="fas fa-plus"></i>
-                <span class="font-medium">New Conversation</span>
-              </button>
-            </div>
-            
-            <!-- Menu Items -->
-            <nav class="flex-1 p-3 space-y-2 overflow-y-auto">
-              <a href="#" onclick="worvox.showTopicSelection(); return false;" 
-                class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-800 transition-all">
-                <i class="fas fa-home" style="width: 20px; text-align: center;"></i>
-                <span>Home</span>
-              </a>
-              <a href="#" onclick="worvox.startSession(${topics.find(t => t.name === 'AI English Conversation')?.id}, 'AI English Conversation', '${topics.find(t => t.name === 'AI English Conversation')?.system_prompt}', 'beginner'); return false;" 
-                class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-800 transition-all">
-                <i class="fas fa-comments" style="width: 20px; text-align: center;"></i>
-                <span>AI Conversation</span>
-              </a>
-              <a href="#" onclick="worvox.startSession(${topics.find(t => t.name === 'Vocabulary')?.id}, 'Vocabulary', '', 'beginner'); return false;" 
-                class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-800 transition-all">
-                <i class="fas fa-book" style="width: 20px; text-align: center;"></i>
-                <span>Vocabulary</span>
-              </a>
-              <a href="#" onclick="worvox.showHistory(); return false;" 
-                class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-800 transition-all">
-                <i class="fas fa-history" style="width: 20px; text-align: center;"></i>
-                <span>History</span>
-              </a>
-              <a href="#" onclick="worvox.showStats(); return false;" 
-                class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-800 transition-all">
-                <i class="fas fa-chart-line" style="width: 20px; text-align: center;"></i>
-                <span>Statistics</span>
-              </a>
-              
-              <!-- Recent Conversations -->
-              ${stats.recentSessions && stats.recentSessions.length > 0 ? `
-                <div class="pt-4 mt-4 border-t border-gray-700">
-                  <div class="text-xs text-gray-400 mb-2 px-3">Recent</div>
-                  ${stats.recentSessions.slice(0, 5).map(session => `
-                    <a href="#" onclick="worvox.resumeSession(${session.id}); return false;" 
-                      class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-800 transition-all text-sm">
-                      <i class="fas fa-message" style="width: 20px; text-align: center; font-size: 0.75rem;"></i>
-                      <span class="truncate">${session.topic_name || 'Conversation'}</span>
-                    </a>
-                  `).join('')}
-                </div>
-              ` : ''}
-            </nav>
-            
-            <!-- User Profile -->
-            <div class="p-4 border-t border-gray-700">
-              <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-white font-semibold">
-                  ${this.currentUser.username.charAt(0).toUpperCase()}
-                </div>
-                <div class="flex-1">
-                  <div class="font-medium text-sm">${this.currentUser.username}</div>
-                  <div class="text-xs text-gray-400">${this.currentUser.level}</div>
-                </div>
-                <button onclick="worvox.logout()" class="text-gray-400 hover:text-white">
-                  <i class="fas fa-ellipsis-vertical"></i>
-                </button>
-              </div>
-            </div>
-          </div>
+          ${this.getSidebar('home')}
           
           <!-- Main Content -->
           <div class="flex-1 flex flex-col">
