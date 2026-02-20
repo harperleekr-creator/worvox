@@ -1985,39 +1985,52 @@ class HeySpeak {
     return div.innerHTML;
   }
 
-  // Word Search Feature
+  // Word Search Feature with Hybrid Approach
   async searchWord() {
     const searchInput = document.getElementById('wordSearch');
     const searchResult = document.getElementById('searchResult');
-    const searchTerm = searchInput.value.trim().toLowerCase();
+    const searchTerm = searchInput.value.trim();
     
     if (!searchTerm) {
       searchResult.innerHTML = '';
       return;
     }
     
+    // Show loading state
+    searchResult.innerHTML = `
+      <div class="bg-gray-50 border-2 border-gray-200 rounded-xl p-6 text-center">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-3"></div>
+        <p class="text-gray-600">검색 중...</p>
+      </div>
+    `;
+    
     try {
-      // Search in vocabulary
+      // Search in vocabulary (DB first, then ChatGPT if not found)
       const response = await axios.get('/api/vocabulary/search', {
-        params: { query: searchTerm }
+        params: { query: searchTerm.toLowerCase() }
       });
       
       if (response.data.success && response.data.words.length > 0) {
         const word = response.data.words[0]; // Get first match
+        const source = response.data.source; // 'database' or 'chatgpt'
+        const summary = word.summary || [];
         
         searchResult.innerHTML = `
           <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 border-2 border-indigo-200 animate-fadeIn">
+            <!-- Header with Word and Pronunciation -->
             <div class="flex items-start justify-between mb-4">
               <div class="flex-1">
                 <div class="flex items-center gap-3 mb-2">
                   <h3 class="text-2xl font-bold text-gray-800">${word.word}</h3>
                   <button 
                     onclick="heyspeak.playPronunciation('${word.word}')"
-                    class="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-all">
+                    class="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-all shadow-md hover:shadow-lg">
                     <i class="fas fa-volume-up"></i>
                   </button>
+                  ${source === 'chatgpt' ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">✨ AI</span>' : ''}
                 </div>
-                <div class="flex items-center gap-2 flex-wrap mb-3">
+                <div class="text-sm text-gray-500 mb-3">${word.pronunciation || ''}</div>
+                <div class="flex items-center gap-2 flex-wrap">
                   <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
                     ${word.part_of_speech}
                   </span>
@@ -2030,13 +2043,30 @@ class HeySpeak {
               </div>
             </div>
             
-            <div class="mb-4">
+            <!-- Korean Meaning -->
+            <div class="mb-4 pb-4 border-b border-indigo-100">
               <div class="text-lg font-semibold text-gray-700 mb-1">뜻:</div>
-              <div class="text-gray-800">${word.meaning_ko}</div>
+              <div class="text-gray-800 text-lg">${word.meaning_ko}</div>
             </div>
             
+            ${summary.length > 0 ? `
+              <!-- 5-Point Summary (from ChatGPT) -->
+              <div class="mb-4 pb-4 border-b border-indigo-100">
+                <div class="text-sm font-semibold text-indigo-700 mb-3">📌 핵심 요약:</div>
+                <div class="space-y-2">
+                  ${summary.map((point, index) => `
+                    <div class="flex items-start gap-2">
+                      <span class="text-indigo-600 font-bold mt-0.5">✓</span>
+                      <span class="text-gray-700 text-sm">${point}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+            
             ${word.example_sentence ? `
-              <div class="bg-white rounded-lg p-4 border border-indigo-100">
+              <!-- Example Sentence -->
+              <div class="bg-white rounded-lg p-4 border border-indigo-100 mb-4">
                 <div class="flex items-center justify-between mb-2">
                   <div class="text-sm font-semibold text-indigo-700">예문:</div>
                   <button 
@@ -2045,9 +2075,40 @@ class HeySpeak {
                     <i class="fas fa-volume-up mr-1"></i>듣기
                   </button>
                 </div>
-                <div class="text-gray-700 italic">${word.example_sentence}</div>
+                <div class="text-gray-700 italic">"${word.example_sentence}"</div>
               </div>
             ` : ''}
+            
+            <!-- External Links -->
+            <div class="bg-white rounded-lg p-4 border border-indigo-100">
+              <div class="text-sm font-semibold text-indigo-700 mb-3">🔗 자세히 보기:</div>
+              <div class="grid grid-cols-2 gap-2">
+                <a href="https://dictionary.cambridge.org/dictionary/english/${encodeURIComponent(word.word)}" 
+                  target="_blank" 
+                  class="flex items-center gap-2 px-3 py-2 bg-blue-50 hover:bg-blue-100 rounded-lg text-blue-700 text-sm transition-all">
+                  <i class="fas fa-book"></i>
+                  <span>Cambridge</span>
+                </a>
+                <a href="https://www.oxfordlearnersdictionaries.com/definition/english/${encodeURIComponent(word.word)}" 
+                  target="_blank" 
+                  class="flex items-center gap-2 px-3 py-2 bg-red-50 hover:bg-red-100 rounded-lg text-red-700 text-sm transition-all">
+                  <i class="fas fa-book-open"></i>
+                  <span>Oxford</span>
+                </a>
+                <a href="https://youglish.com/pronounce/${encodeURIComponent(word.word)}/english" 
+                  target="_blank" 
+                  class="flex items-center gap-2 px-3 py-2 bg-purple-50 hover:bg-purple-100 rounded-lg text-purple-700 text-sm transition-all">
+                  <i class="fas fa-video"></i>
+                  <span>Youglish</span>
+                </a>
+                <a href="https://www.wordreference.com/definition/${encodeURIComponent(word.word)}" 
+                  target="_blank" 
+                  class="flex items-center gap-2 px-3 py-2 bg-green-50 hover:bg-green-100 rounded-lg text-green-700 text-sm transition-all">
+                  <i class="fas fa-language"></i>
+                  <span>WordRef</span>
+                </a>
+              </div>
+            </div>
           </div>
         `;
       } else {
@@ -2065,6 +2126,7 @@ class HeySpeak {
         <div class="bg-red-50 border-2 border-red-200 rounded-xl p-4 text-center">
           <i class="fas fa-exclamation-circle text-red-600 text-3xl mb-2"></i>
           <p class="text-gray-700">검색 중 오류가 발생했습니다.</p>
+          <p class="text-sm text-gray-600 mt-2">${error.response?.data?.message || '다시 시도해주세요.'}</p>
         </div>
       `;
     }

@@ -9,7 +9,7 @@ type Bindings = {
 
 const vocabulary = new Hono<{ Bindings: Bindings }>()
 
-// Search vocabulary words
+// Search vocabulary words with hybrid approach (DB + ChatGPT)
 vocabulary.get('/search', async (c: Context<{ Bindings: Bindings }>) => {
   try {
     const query = c.req.query('query')?.trim().toLowerCase()
@@ -21,7 +21,7 @@ vocabulary.get('/search', async (c: Context<{ Bindings: Bindings }>) => {
       }, 400)
     }
 
-    // Search by word (exact or starts with)
+    // Step 1: Search in DB first (fast + free)
     const { results } = await c.env.DB.prepare(`
       SELECT * FROM vocabulary_words
       WHERE LOWER(word) = ? OR LOWER(word) LIKE ?
@@ -34,10 +34,110 @@ vocabulary.get('/search', async (c: Context<{ Bindings: Bindings }>) => {
       LIMIT 10
     `).bind(query, `${query}%`, query).all()
 
+    if (results && results.length > 0) {
+      // Found in DB
+      return c.json({
+        success: true,
+        source: 'database',
+        words: results
+      })
+    }
+
+    // Step 2: Not in DB, use ChatGPT API to generate
+    const openaiResponse = await fetch(`${c.env.OPENAI_API_BASE}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${c.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an English vocabulary expert. Provide concise, accurate definitions for English words with Korean translations.'
+          },
+          {
+            role: 'user',
+            content: `Provide information about the English word "${query}" in the following JSON format:
+{
+  "word": "${query}",
+  "meaning_ko": "Korean translation",
+  "pronunciation": "IPA pronunciation",
+  "part_of_speech": "noun/verb/adjective/etc",
+  "example_sentence": "One simple example sentence",
+  "difficulty": "beginner/intermediate/advanced",
+  "toeic_related": true/false,
+  "toefl_related": true/false,
+  "summary": [
+    "Core meaning in 1-2 lines",
+    "TOEIC/TOEFL tip if applicable, or usage context",
+    "2-3 synonyms or related words",
+    "One common collocation or phrase",
+    "Pronunciation tip or common mistake to avoid"
+  ]
+}
+
+Return ONLY valid JSON, no other text. If the word doesn't exist or is invalid, return {"error": "Word not found"}.`
+          }
+        ],
+        temperature: 0.3
+      })
+    })
+
+    if (!openaiResponse.ok) {
+      throw new Error('OpenAI API request failed')
+    }
+
+    const openaiData = await openaiResponse.json() as any
+    const content = openaiData.choices[0].message.content.trim()
+    
+    // Parse JSON response
+    let wordData
+    try {
+      wordData = JSON.parse(content)
+    } catch (parseError) {
+      console.error('Failed to parse OpenAI response:', content)
+      throw new Error('Failed to parse word data')
+    }
+
+    if (wordData.error) {
+      return c.json({
+        success: false,
+        error: 'Word not found',
+        message: `"${query}" is not a valid English word.`
+      }, 404)
+    }
+
+    // Step 3: Save to DB for future searches (caching)
+    try {
+      await c.env.DB.prepare(`
+        INSERT INTO vocabulary_words 
+        (word, meaning_ko, pronunciation, part_of_speech, example_sentence, difficulty, category, toeic_related, toefl_related)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).bind(
+        wordData.word,
+        wordData.meaning_ko,
+        wordData.pronunciation,
+        wordData.part_of_speech,
+        wordData.example_sentence,
+        wordData.difficulty,
+        'ai_generated',
+        wordData.toeic_related ? 1 : 0,
+        wordData.toefl_related ? 1 : 0
+      ).run()
+    } catch (dbError) {
+      console.error('Failed to save word to DB:', dbError)
+      // Continue anyway - word will be returned even if save fails
+    }
+
+    // Return ChatGPT generated word with summary
     return c.json({
       success: true,
-      words: results || []
+      source: 'chatgpt',
+      words: [wordData]
     })
+
   } catch (error: any) {
     console.error('Error searching vocabulary:', error)
     return c.json({
