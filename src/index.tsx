@@ -12,6 +12,7 @@ import users from './routes/users';
 import topics from './routes/topics';
 import history from './routes/history';
 import vocabulary from './routes/vocabulary';
+import preview from './routes/preview';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -30,6 +31,9 @@ app.route('/api/users', users);
 app.route('/api/topics', topics);
 app.route('/api/history', history);
 app.route('/api/vocabulary', vocabulary);
+
+// Preview routes
+app.route('/preview', preview);
 
 // Health check
 app.get('/api/health', (c) => {
