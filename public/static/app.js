@@ -92,6 +92,87 @@ class WorVox {
   }
 
   // UI Rendering Methods
+  getSidebar(activeItem = 'home') {
+    return `
+      <div class="w-64 bg-gray-900 text-white flex flex-col">
+        <!-- Logo -->
+        <div class="p-4 border-b border-gray-700">
+          <h1 class="text-xl font-bold">WorVox</h1>
+        </div>
+        
+        <!-- New Conversation -->
+        <div class="p-3">
+          <button onclick="worvox.showTopicSelection()" 
+            class="w-full bg-transparent border border-gray-600 hover:bg-gray-800 text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all">
+            <i class="fas fa-plus"></i>
+            <span class="font-medium">New Conversation</span>
+          </button>
+        </div>
+        
+        <!-- Menu Items -->
+        <nav class="flex-1 p-3 space-y-2 overflow-y-auto">
+          <a href="#" onclick="worvox.showTopicSelection(); return false;" 
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'home' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
+            <i class="fas fa-home" style="width: 20px; text-align: center;"></i>
+            <span>Home</span>
+          </a>
+          <a href="#" onclick="worvox.startConversation(); return false;" 
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'conversation' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
+            <i class="fas fa-comments" style="width: 20px; text-align: center;"></i>
+            <span>AI Conversation</span>
+          </a>
+          <a href="#" onclick="worvox.startVocabulary(); return false;" 
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'vocabulary' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
+            <i class="fas fa-book" style="width: 20px; text-align: center;"></i>
+            <span>Vocabulary</span>
+          </a>
+          <a href="#" onclick="worvox.showHistory(); return false;" 
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'history' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
+            <i class="fas fa-history" style="width: 20px; text-align: center;"></i>
+            <span>History</span>
+          </a>
+          <a href="#" onclick="worvox.showStats(); return false;" 
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'stats' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
+            <i class="fas fa-chart-line" style="width: 20px; text-align: center;"></i>
+            <span>Statistics</span>
+          </a>
+        </nav>
+        
+        <!-- User Profile -->
+        <div class="p-4 border-t border-gray-700">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-white font-semibold">
+              ${this.currentUser.username.charAt(0).toUpperCase()}
+            </div>
+            <div class="flex-1">
+              <div class="font-medium text-sm">${this.currentUser.username}</div>
+              <div class="text-xs text-gray-400">${this.currentUser.level}</div>
+            </div>
+            <button onclick="worvox.logout()" class="text-gray-400 hover:text-white" title="Logout">
+              <i class="fas fa-sign-out-alt"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  async startConversation() {
+    const topics = await axios.get('/api/topics');
+    const conversationTopic = topics.data.topics.find(t => t.name === 'AI English Conversation');
+    if (conversationTopic) {
+      this.startSession(conversationTopic.id, conversationTopic.name, conversationTopic.system_prompt, conversationTopic.level);
+    }
+  }
+
+  async startVocabulary() {
+    const topics = await axios.get('/api/topics');
+    const vocabTopic = topics.data.topics.find(t => t.name === 'Vocabulary');
+    if (vocabTopic) {
+      this.startSession(vocabTopic.id, vocabTopic.name, '', vocabTopic.level);
+    }
+  }
+
   showLogin() {
     this.onboardingStep = 1;
     this.showOnboardingStep();
@@ -707,43 +788,48 @@ class WorVox {
   showChatInterface() {
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="min-h-screen flex flex-col">
-        <!-- Header -->
-        <div class="bg-white shadow-md">
-          <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-            <div class="flex items-center space-x-4">
-              <button onclick="worvox.endSession()" 
-                class="text-gray-600 hover:text-gray-800">
-                <i class="fas fa-arrow-left text-xl"></i>
-              </button>
-              <div>
-                <h2 class="text-xl font-bold text-gray-800">${this.currentTopic.name}</h2>
-                <p class="text-sm text-gray-600">Practice your English!</p>
+      <div class="flex h-screen bg-gray-50">
+        <!-- Sidebar -->
+        ${this.getSidebar('conversation')}
+        
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col">
+          <!-- Header -->
+          <div class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <h2 class="text-lg font-semibold text-gray-800">${this.currentTopic.name}</h2>
+              <span class="text-sm text-gray-500">Practice your English!</span>
+            </div>
+            <button onclick="worvox.endSession()" 
+              class="text-gray-600 hover:text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-100 transition-all">
+              <i class="fas fa-times mr-2"></i>End Session
+            </button>
+          </div>
+
+          <!-- Chat Container -->
+          <div class="flex-1 overflow-hidden flex flex-col">
+            <div id="chatMessages" class="flex-1 overflow-y-auto p-6 chat-container">
+              <div class="max-w-3xl mx-auto">
+                <div class="text-center text-gray-500 py-12">
+                  <i class="fas fa-comments text-5xl mb-4"></i>
+                  <p class="text-lg">Start speaking to practice English!</p>
+                  <p class="text-sm text-gray-400 mt-2">Tap the microphone button below</p>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Chat Container -->
-        <div class="flex-1 overflow-hidden flex flex-col">
-          <div id="chatMessages" class="flex-1 overflow-y-auto p-4 chat-container max-w-4xl w-full mx-auto">
-            <div class="text-center text-gray-500 py-8">
-              <i class="fas fa-comments text-4xl mb-2"></i>
-              <p>Start speaking to practice English!</p>
-            </div>
-          </div>
-
-          <!-- Input Area -->
-          <div class="bg-white border-t shadow-lg">
-            <div class="max-w-4xl mx-auto p-4">
-              <div class="flex items-center space-x-4">
-                <button id="recordBtn" 
-                  class="flex-shrink-0 w-16 h-16 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-all btn-hover"
-                  onclick="worvox.toggleRecording()">
-                  <i class="fas fa-microphone text-2xl"></i>
-                </button>
-                <div class="flex-1 text-gray-600">
-                  <p id="statusText">Tap the microphone to start speaking</p>
+            <!-- Input Area -->
+            <div class="bg-white border-t border-gray-200">
+              <div class="max-w-3xl mx-auto p-6">
+                <div class="flex items-center gap-4">
+                  <button id="recordBtn" 
+                    class="flex-shrink-0 w-14 h-14 rounded-full bg-emerald-500 text-white flex items-center justify-center hover:bg-emerald-600 transition-all shadow-lg"
+                    onclick="worvox.toggleRecording()">
+                    <i class="fas fa-microphone text-xl"></i>
+                  </button>
+                  <div class="flex-1">
+                    <p id="statusText" class="text-gray-600">Tap the microphone to start speaking</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1088,52 +1174,53 @@ class WorVox {
 
       const app = document.getElementById('app');
       app.innerHTML = `
-        <div class="min-h-screen p-4 md:p-8">
-          <div class="max-w-6xl mx-auto">
+        <div class="flex h-screen bg-gray-50">
+          <!-- Sidebar -->
+          ${this.getSidebar('vocabulary')}
+          
+          <!-- Main Content -->
+          <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Header -->
-            <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+            <div class="bg-white border-b border-gray-200 px-6 py-4">
               <div class="flex items-center justify-between flex-wrap gap-4">
                 <div>
-                  <h1 class="text-2xl md:text-3xl font-bold text-gray-800">📚 Vocabulary Study</h1>
-                  <p class="text-gray-600 mt-2">Learn and practice English vocabulary with pronunciations</p>
+                  <h1 class="text-2xl font-bold text-gray-800">📚 Vocabulary Study</h1>
+                  <p class="text-gray-600 text-sm mt-1">Learn and practice English vocabulary</p>
                 </div>
                 <div class="flex items-center gap-2">
                   <button onclick="worvox.showVocabulary('list')" 
-                    class="px-4 py-2 ${mode === 'list' ? 'bg-indigo-600 text-white' : 'text-indigo-600 hover:bg-indigo-50'} rounded-lg transition-colors">
+                    class="px-4 py-2 ${mode === 'list' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'} rounded-lg transition-colors text-sm">
                     <i class="fas fa-list mr-2"></i>List
                   </button>
                   <button onclick="worvox.showVocabulary('flashcard')" 
-                    class="px-4 py-2 ${mode === 'flashcard' ? 'bg-indigo-600 text-white' : 'text-indigo-600 hover:bg-indigo-50'} rounded-lg transition-colors">
+                    class="px-4 py-2 ${mode === 'flashcard' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'} rounded-lg transition-colors text-sm">
                     <i class="fas fa-clone mr-2"></i>Flashcard
                   </button>
                   <button onclick="worvox.showVocabulary('quiz')" 
-                    class="px-4 py-2 ${mode === 'quiz' ? 'bg-indigo-600 text-white' : 'text-indigo-600 hover:bg-indigo-50'} rounded-lg transition-colors">
+                    class="px-4 py-2 ${mode === 'quiz' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'} rounded-lg transition-colors text-sm">
                     <i class="fas fa-graduation-cap mr-2"></i>Quiz
-                  </button>
-                  <button onclick="worvox.showTopicSelection()" 
-                    class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
-                    <i class="fas fa-arrow-left mr-2"></i>Back
                   </button>
                 </div>
               </div>
               
               <!-- Progress Stats -->
               ${this.currentUser ? `
-                <div class="mt-4 flex items-center gap-4 text-sm">
+                <div class="mt-4 flex items-center gap-6 text-sm">
                   <div class="flex items-center gap-2">
-                    <span class="text-gray-600">진도:</span>
-                    <span class="font-bold text-green-600">${Object.values(progressData).filter(p => p.is_learned).length} / ${words.length}</span>
+                    <span class="text-gray-600">Progress:</span>
+                    <span class="font-bold text-emerald-600">${Object.values(progressData).filter(p => p.is_learned).length} / ${words.length}</span>
                   </div>
                   <div class="flex items-center gap-2">
-                    <span class="text-gray-600">북마크:</span>
+                    <span class="text-gray-600">Bookmarked:</span>
                     <span class="font-bold text-yellow-600">${bookmarkedWords.length}</span>
                   </div>
                 </div>
               ` : ''}
             </div>
 
-            <!-- Vocabulary List -->
-            ${mode === 'list' ? `
+            <!-- Content Area -->
+            <div class="flex-1 overflow-y-auto p-6">
+              <div class="max-w-6xl mx-auto">${mode === 'list' ? `
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               ${words.map((word, index) => {
                 const progress = progressData[word.id];
@@ -1215,12 +1302,14 @@ class WorVox {
             ` : mode === 'flashcard' ? this.renderFlashcardMode(words, progressData, bookmarkedWords) : this.renderQuizMode(words, progressData)}
 
             ${words.length === 0 ? `
-              <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
+              <div class="bg-white rounded-2xl shadow-sm p-12 text-center">
                 <div class="text-6xl mb-4">📖</div>
                 <h3 class="text-xl font-bold text-gray-800 mb-2">No Vocabulary Yet</h3>
                 <p class="text-gray-600">Vocabulary words will be added soon!</p>
               </div>
             ` : ''}
+              </div>
+            </div>
           </div>
         </div>
       `;
@@ -1750,40 +1839,42 @@ class WorVox {
 
       const app = document.getElementById('app');
       app.innerHTML = `
-        <div class="min-h-screen p-4 md:p-8">
-          <div class="max-w-6xl mx-auto">
+        <div class="flex h-screen bg-gray-50">
+          <!-- Sidebar -->
+          ${this.getSidebar('history')}
+          
+          <!-- Main Content -->
+          <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Header -->
-            <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
-              <div class="flex items-center justify-between flex-wrap gap-4">
-                <div>
-                  <h1 class="text-2xl md:text-3xl font-bold text-gray-800">📚 Learning History</h1>
-                  <p class="text-gray-600 mt-2">Review your past conversations and track your progress</p>
-                </div>
-                <button onclick="worvox.showTopicSelection()" 
-                  class="px-4 py-2 text-indigo-600 hover:text-indigo-800 transition-colors">
-                  <i class="fas fa-arrow-left mr-2"></i>Back to Topics
-                </button>
+            <div class="bg-white border-b border-gray-200 px-6 py-4">
+              <div>
+                <h1 class="text-2xl font-bold text-gray-800">📚 Learning History</h1>
+                <p class="text-gray-600 text-sm mt-1">Review your past conversations and track your progress</p>
               </div>
             </div>
 
-            <!-- Sessions List -->
-            <div class="bg-white rounded-2xl shadow-lg p-6">
-              ${sessions.length === 0 ? `
-                <div class="text-center py-12">
-                  <div class="text-6xl mb-4">📝</div>
-                  <h3 class="text-xl font-bold text-gray-800 mb-2">No Learning History Yet</h3>
-                  <p class="text-gray-600 mb-6">Start a conversation to see your learning history here!</p>
-                  <button onclick="worvox.showTopicSelection()" 
-                    class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all">
-                    Start Learning
-                  </button>
-                </div>
-              ` : `
-                <h2 class="text-xl font-bold text-gray-800 mb-4">Your Sessions (${sessions.length})</h2>
-                <div class="space-y-4">
-                  ${this.groupSessionsByDate(sessions)}
-                </div>
-              `}
+            <!-- Content Area -->
+            <div class="flex-1 overflow-y-auto p-6">
+              <div class="max-w-4xl mx-auto">
+                ${sessions.length === 0 ? `
+                  <div class="bg-white rounded-2xl shadow-sm p-12 text-center">
+                    <div class="text-6xl mb-4">📝</div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">No Learning History Yet</h3>
+                    <p class="text-gray-600 mb-6">Start a conversation to see your learning history here!</p>
+                    <button onclick="worvox.showTopicSelection()" 
+                      class="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-all">
+                      Start Learning
+                    </button>
+                  </div>
+                ` : `
+                  <div class="bg-white rounded-2xl shadow-sm p-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Your Sessions (${sessions.length})</h2>
+                    <div class="space-y-4">
+                      ${this.groupSessionsByDate(sessions)}
+                    </div>
+                  </div>
+                `}
+              </div>
             </div>
           </div>
         </div>
@@ -2252,59 +2343,60 @@ class WorVox {
 
       const app = document.getElementById('app');
       app.innerHTML = `
-        <div class="min-h-screen p-4 md:p-8">
-          <div class="max-w-7xl mx-auto">
+        <div class="flex h-screen bg-gray-50">
+          <!-- Sidebar -->
+          ${this.getSidebar('stats')}
+          
+          <!-- Main Content -->
+          <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Header -->
-            <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
-              <div class="flex items-center justify-between flex-wrap gap-4">
-                <div>
-                  <h1 class="text-2xl md:text-3xl font-bold text-gray-800">📊 Learning Statistics</h1>
-                  <p class="text-gray-600 mt-2">Track your learning progress and insights</p>
+            <div class="bg-white border-b border-gray-200 px-6 py-4">
+              <div>
+                <h1 class="text-2xl font-bold text-gray-800">📊 Learning Statistics</h1>
+                <p class="text-gray-600 text-sm mt-1">Track your learning progress and insights</p>
+              </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="flex-1 overflow-y-auto p-6">
+              <div class="max-w-7xl mx-auto">
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6">
+                    <div class="text-4xl mb-2">📚</div>
+                    <div class="text-3xl font-bold text-blue-700">${stats.totalSessions}</div>
+                    <div class="text-sm text-blue-600">Total Sessions</div>
+                  </div>
+                  <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6">
+                    <div class="text-4xl mb-2">💬</div>
+                    <div class="text-3xl font-bold text-green-700">${stats.totalMessages}</div>
+                    <div class="text-sm text-green-600">Total Messages</div>
+                  </div>
+                  <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6">
+                    <div class="text-4xl mb-2">🗣️</div>
+                    <div class="text-3xl font-bold text-purple-700">${stats.totalWords.toLocaleString()}</div>
+                    <div class="text-sm text-purple-600">Words Spoken</div>
+                  </div>
+                  <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6">
+                    <div class="text-4xl mb-2">🔥</div>
+                    <div class="text-3xl font-bold text-orange-700">${stats.currentStreak}</div>
+                    <div class="text-sm text-orange-600">Day Streak</div>
+                  </div>
                 </div>
-                <button onclick="worvox.showTopicSelection()" 
-                  class="px-4 py-2 text-indigo-600 hover:text-indigo-800 transition-colors">
-                  <i class="fas fa-arrow-left mr-2"></i>Back to Topics
-                </button>
-              </div>
-            </div>
 
-            <!-- Summary Cards -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl shadow-lg p-6">
-                <div class="text-4xl mb-2">📚</div>
-                <div class="text-3xl font-bold text-blue-700">${stats.totalSessions}</div>
-                <div class="text-sm text-blue-600">Total Sessions</div>
-              </div>
-              <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl shadow-lg p-6">
-                <div class="text-4xl mb-2">💬</div>
-                <div class="text-3xl font-bold text-green-700">${stats.totalMessages}</div>
-                <div class="text-sm text-green-600">Total Messages</div>
-              </div>
-              <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl shadow-lg p-6">
-                <div class="text-4xl mb-2">🗣️</div>
-                <div class="text-3xl font-bold text-purple-700">${stats.totalWords.toLocaleString()}</div>
-                <div class="text-sm text-purple-600">Words Spoken</div>
-              </div>
-              <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl shadow-lg p-6">
-                <div class="text-4xl mb-2">🔥</div>
-                <div class="text-3xl font-bold text-orange-700">${stats.currentStreak}</div>
-                <div class="text-sm text-orange-600">Day Streak</div>
-              </div>
-            </div>
+                <!-- Charts Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <!-- Daily Activity Chart -->
+                  <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">📈 Daily Activity (Last 30 Days)</h3>
+                    <canvas id="dailyActivityChart"></canvas>
+                  </div>
 
-            <!-- Charts Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <!-- Daily Activity Chart -->
-              <div class="bg-white rounded-2xl shadow-lg p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">📈 Daily Activity (Last 30 Days)</h3>
-                <canvas id="dailyActivityChart"></canvas>
-              </div>
-
-              <!-- Topic Distribution Chart -->
-              <div class="bg-white rounded-2xl shadow-lg p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">🎯 Learning by Topic</h3>
-                <canvas id="topicDistributionChart"></canvas>
-              </div>
+                  <!-- Topic Distribution Chart -->
+                  <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">🎯 Learning by Topic</h3>
+                    <canvas id="topicDistributionChart"></canvas>
+                  </div>
 
               <!-- Weekly Progress Chart -->
               <div class="bg-white rounded-2xl shadow-lg p-6">
@@ -2322,6 +2414,8 @@ class WorVox {
               <div class="bg-white rounded-2xl shadow-lg p-6 lg:col-span-2">
                 <h3 class="text-xl font-bold text-gray-800 mb-4">⏰ Learning Time Patterns</h3>
                 <canvas id="timeOfDayChart"></canvas>
+              </div>
+            </div>
               </div>
             </div>
           </div>
