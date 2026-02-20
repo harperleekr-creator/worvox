@@ -3,6 +3,34 @@ import type { Bindings } from '../types';
 
 const users = new Hono<{ Bindings: Bindings }>();
 
+// Check if username exists (for real-time validation)
+users.post('/check-username', async (c) => {
+  try {
+    const { username } = await c.req.json();
+
+    if (!username) {
+      return c.json({ error: 'Username is required' }, 400);
+    }
+
+    const existingUser = await c.env.DB.prepare(
+      'SELECT id FROM users WHERE username = ?'
+    ).bind(username).first();
+
+    return c.json({
+      exists: !!existingUser,
+      available: !existingUser,
+      success: true
+    });
+
+  } catch (error) {
+    console.error('Username check error:', error);
+    return c.json({ 
+      error: 'Failed to check username',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
 // Google OAuth login
 users.post('/auth/google', async (c) => {
   try {
@@ -110,11 +138,12 @@ users.post('/auth', async (c) => {
     ).bind(username).first();
 
     if (existingUser) {
+      // Username already exists (shouldn't happen as frontend checks first)
       return c.json({
-        error: 'Username already exists',
-        message: 'This username is already taken. Please choose a different name.',
-        userExists: true
-      }, 409);
+        user: existingUser,
+        success: true,
+        existing: true
+      });
     }
 
     // Create new user with all profile fields

@@ -402,7 +402,7 @@ class WorVox {
     }
   }
 
-  nextStep() {
+  async nextStep() {
     // Validate current step
     if (this.onboardingStep === 1) {
       const username = document.getElementById('username').value.trim();
@@ -410,7 +410,26 @@ class WorVox {
         alert('Please enter your name');
         return;
       }
-      this.onboardingData.username = username;
+      
+      // Check for duplicate username
+      try {
+        const checkResponse = await axios.post('/api/users/check-username', { username });
+        
+        if (checkResponse.data.exists) {
+          alert('❌ Username already exists!\n\nThis name is already taken. Please choose a different name.');
+          return;
+        }
+        
+        this.onboardingData.username = username;
+      } catch (error) {
+        console.error('Username check error:', error);
+        if (error.response && error.response.status === 409) {
+          alert('❌ Username already exists!\n\nThis name is already taken. Please choose a different name.');
+          return;
+        }
+        // If check fails for other reasons, proceed anyway
+        this.onboardingData.username = username;
+      }
     }
 
     this.onboardingStep++;
@@ -449,16 +468,7 @@ class WorVox {
       }
     } catch (error) {
       console.error('Onboarding error:', error);
-      
-      // Check if username already exists
-      if (error.response && error.response.status === 409) {
-        alert('❌ Username already exists!\n\nThis name is already taken. Please choose a different name.');
-        // Go back to name input step
-        this.onboardingStep = 1;
-        this.showOnboarding();
-      } else {
-        alert('Failed to complete registration. Please try again.');
-      }
+      alert('Failed to complete registration. Please try again.');
     }
   }
 
