@@ -1,5 +1,5 @@
-// HeySpeak - AI English Learning App
-class HeySpeak {
+// WorVox - AI English Learning App
+class WorVox {
   constructor() {
     this.currentUser = null;
     this.currentSession = null;
@@ -29,7 +29,7 @@ class HeySpeak {
     this.initGoogleSignIn();
     
     // Check for existing user in localStorage
-    const savedUser = localStorage.getItem('heyspeak_user');
+    const savedUser = localStorage.getItem('worvox_user');
     if (savedUser) {
       this.currentUser = JSON.parse(savedUser);
       this.showTopicSelection();
@@ -74,7 +74,7 @@ class HeySpeak {
 
       if (authResponse.data.success) {
         this.currentUser = authResponse.data.user;
-        localStorage.setItem('heyspeak_user', JSON.stringify(this.currentUser));
+        localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
         
         // If new user, show onboarding for additional info
         if (authResponse.data.isNew) {
@@ -112,17 +112,17 @@ class HeySpeak {
     const progress = Math.round((this.onboardingStep / 6) * 100);
 
     app.innerHTML = `
-      <div class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-lg">
+      <div class="min-h-screen flex items-center justify-center p-4 bg-luxury-dark">
+        <div class="glass-card hover-luxury p-8 w-full max-w-lg">
           <!-- Header -->
           <div class="text-center mb-6">
-            <h1 class="text-3xl font-bold gradient-text mb-2">HeySpeak</h1>
+            <h1 class="text-3xl font-bold gradient-text mb-2">WorVox</h1>
             <p class="text-gray-600 text-sm">Step ${this.onboardingStep} of 6</p>
           </div>
 
           <!-- Progress Bar -->
           <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
-            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 h-2 rounded-full transition-all duration-300" 
+            <div class="bg-gradient-to-r gold-metallic h-2 rounded-full transition-all duration-300" 
                  style="width: ${progress}%"></div>
           </div>
 
@@ -163,8 +163,8 @@ class HeySpeak {
             placeholder="Enter your name">
         </div>
 
-        <button onclick="heyspeak.nextStep()" 
-          class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all btn-hover">
+        <button onclick="worvox.nextStep()" 
+          class="w-full bg-gradient-to-r gold-metallic text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all btn-hover">
           Continue
         </button>
       </div>
@@ -188,7 +188,7 @@ class HeySpeak {
         
         <div class="space-y-3">
           ${levels.map(level => `
-            <button onclick="heyspeak.selectOption('level', '${level.value}')" 
+            <button onclick="worvox.selectOption('level', '${level.value}')" 
               class="w-full p-4 border-2 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left ${this.onboardingData.level === level.value ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}">
               <div class="flex items-center">
                 <span class="text-3xl mr-4">${level.icon}</span>
@@ -202,7 +202,7 @@ class HeySpeak {
           `).join('')}
         </div>
 
-        <button onclick="heyspeak.prevStep()" 
+        <button onclick="worvox.prevStep()" 
           class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
           Back
         </button>
@@ -229,7 +229,7 @@ class HeySpeak {
         
         <div class="space-y-3 max-h-96 overflow-y-auto">
           ${sources.map(source => `
-            <button onclick="heyspeak.selectOption('referralSource', '${source.value}')" 
+            <button onclick="worvox.selectOption('referralSource', '${source.value}')" 
               class="w-full p-4 border-2 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left ${this.onboardingData.referralSource === source.value ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}">
               <div class="flex items-center">
                 <span class="text-3xl mr-4">${source.icon}</span>
@@ -243,7 +243,7 @@ class HeySpeak {
           `).join('')}
         </div>
 
-        <button onclick="heyspeak.prevStep()" 
+        <button onclick="worvox.prevStep()" 
           class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
           Back
         </button>
@@ -270,7 +270,7 @@ class HeySpeak {
         
         <div class="space-y-3">
           ${ageGroups.map(age => `
-            <button onclick="heyspeak.selectOption('ageGroup', '${age.value}')" 
+            <button onclick="worvox.selectOption('ageGroup', '${age.value}')" 
               class="w-full p-4 border-2 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left ${this.onboardingData.ageGroup === age.value ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}">
               <div class="flex items-center">
                 <span class="text-3xl mr-4">${age.icon}</span>
@@ -284,7 +284,7 @@ class HeySpeak {
           `).join('')}
         </div>
 
-        <button onclick="heyspeak.prevStep()" 
+        <button onclick="worvox.prevStep()" 
           class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
           Back
         </button>
@@ -309,7 +309,7 @@ class HeySpeak {
         
         <div class="space-y-3">
           ${genders.map(gender => `
-            <button onclick="heyspeak.selectOption('gender', '${gender.value}')" 
+            <button onclick="worvox.selectOption('gender', '${gender.value}')" 
               class="w-full p-4 border-2 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left ${this.onboardingData.gender === gender.value ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}">
               <div class="flex items-center">
                 <span class="text-3xl mr-4">${gender.icon}</span>
@@ -323,7 +323,7 @@ class HeySpeak {
           `).join('')}
         </div>
 
-        <button onclick="heyspeak.prevStep()" 
+        <button onclick="worvox.prevStep()" 
           class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
           Back
         </button>
@@ -349,7 +349,7 @@ class HeySpeak {
         
         <div class="space-y-3">
           ${occupations.map(occ => `
-            <button onclick="heyspeak.selectOption('occupation', '${occ.value}')" 
+            <button onclick="worvox.selectOption('occupation', '${occ.value}')" 
               class="w-full p-4 border-2 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left ${this.onboardingData.occupation === occ.value ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}">
               <div class="flex items-center">
                 <span class="text-3xl mr-4">${occ.icon}</span>
@@ -363,7 +363,7 @@ class HeySpeak {
           `).join('')}
         </div>
 
-        <button onclick="heyspeak.prevStep()" 
+        <button onclick="worvox.prevStep()" 
           class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
           Back
         </button>
@@ -444,7 +444,7 @@ class HeySpeak {
 
       if (response.data.success) {
         this.currentUser = response.data.user;
-        localStorage.setItem('heyspeak_user', JSON.stringify(this.currentUser));
+        localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
         this.showTopicSelection();
       }
     } catch (error) {
@@ -488,15 +488,15 @@ class HeySpeak {
                   </div>
                 </div>
                 <div class="flex gap-2">
-                  <button onclick="heyspeak.showStats()" 
+                  <button onclick="worvox.showStats()" 
                     class="px-4 py-2 text-purple-600 hover:text-purple-800 transition-colors">
                     <i class="fas fa-chart-line mr-2"></i>Stats
                   </button>
-                  <button onclick="heyspeak.showHistory()" 
+                  <button onclick="worvox.showHistory()" 
                     class="px-4 py-2 text-indigo-600 hover:text-indigo-800 transition-colors">
                     <i class="fas fa-history mr-2"></i>History
                   </button>
-                  <button onclick="heyspeak.logout()" 
+                  <button onclick="worvox.logout()" 
                     class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
                     <i class="fas fa-sign-out-alt mr-2"></i>Logout
                   </button>
@@ -536,10 +536,10 @@ class HeySpeak {
                     id="wordSearch" 
                     placeholder="Search Words!" 
                     class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 text-gray-700 placeholder-gray-400"
-                    onkeypress="if(event.key==='Enter') heyspeak.searchWord()"
+                    onkeypress="if(event.key==='Enter') worvox.searchWord()"
                   />
                   <button 
-                    onclick="heyspeak.searchWord()"
+                    onclick="worvox.searchWord()"
                     class="absolute right-3 top-1/2 transform -translate-y-1/2 text-indigo-600 hover:text-indigo-800">
                     <i class="fas fa-search"></i>
                   </button>
@@ -550,7 +550,7 @@ class HeySpeak {
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 ${topics.map(topic => `
                   <div class="border-2 border-gray-200 rounded-xl p-6 cursor-pointer hover:border-indigo-500 transition-all card-hover"
-                    onclick="heyspeak.startSession(${topic.id}, '${topic.name}', '${topic.system_prompt}', '${topic.level}')">
+                    onclick="worvox.startSession(${topic.id}, '${topic.name}', '${topic.system_prompt}', '${topic.level}')">
                     <div class="text-4xl mb-3">${topic.icon}</div>
                     <h3 class="text-xl font-bold text-gray-800 mb-2">${topic.name}</h3>
                     <p class="text-gray-600 text-sm mb-3">${topic.description}</p>
@@ -613,7 +613,7 @@ class HeySpeak {
         <div class="bg-white shadow-md">
           <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
             <div class="flex items-center space-x-4">
-              <button onclick="heyspeak.endSession()" 
+              <button onclick="worvox.endSession()" 
                 class="text-gray-600 hover:text-gray-800">
                 <i class="fas fa-arrow-left text-xl"></i>
               </button>
@@ -640,7 +640,7 @@ class HeySpeak {
               <div class="flex items-center space-x-4">
                 <button id="recordBtn" 
                   class="flex-shrink-0 w-16 h-16 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition-all btn-hover"
-                  onclick="heyspeak.toggleRecording()">
+                  onclick="worvox.toggleRecording()">
                   <i class="fas fa-microphone text-2xl"></i>
                 </button>
                 <div class="flex-1 text-gray-600">
@@ -858,7 +858,7 @@ class HeySpeak {
     if (replayContainer) {
       replayContainer.innerHTML = `
         <button 
-          onclick="heyspeak.replayAudio(${messageIndex})" 
+          onclick="worvox.replayAudio(${messageIndex})" 
           id="replay-btn-${messageIndex}"
           class="flex items-center gap-1 px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs rounded-lg transition-colors">
           <i class="fas fa-redo"></i>
@@ -946,7 +946,7 @@ class HeySpeak {
   }
 
   logout() {
-    localStorage.removeItem('heyspeak_user');
+    localStorage.removeItem('worvox_user');
     this.currentUser = null;
     this.currentSession = null;
     this.currentTopic = null;
@@ -999,19 +999,19 @@ class HeySpeak {
                   <p class="text-gray-600 mt-2">Learn and practice English vocabulary with pronunciations</p>
                 </div>
                 <div class="flex items-center gap-2">
-                  <button onclick="heyspeak.showVocabulary('list')" 
+                  <button onclick="worvox.showVocabulary('list')" 
                     class="px-4 py-2 ${mode === 'list' ? 'bg-indigo-600 text-white' : 'text-indigo-600 hover:bg-indigo-50'} rounded-lg transition-colors">
                     <i class="fas fa-list mr-2"></i>List
                   </button>
-                  <button onclick="heyspeak.showVocabulary('flashcard')" 
+                  <button onclick="worvox.showVocabulary('flashcard')" 
                     class="px-4 py-2 ${mode === 'flashcard' ? 'bg-indigo-600 text-white' : 'text-indigo-600 hover:bg-indigo-50'} rounded-lg transition-colors">
                     <i class="fas fa-clone mr-2"></i>Flashcard
                   </button>
-                  <button onclick="heyspeak.showVocabulary('quiz')" 
+                  <button onclick="worvox.showVocabulary('quiz')" 
                     class="px-4 py-2 ${mode === 'quiz' ? 'bg-indigo-600 text-white' : 'text-indigo-600 hover:bg-indigo-50'} rounded-lg transition-colors">
                     <i class="fas fa-graduation-cap mr-2"></i>Quiz
                   </button>
-                  <button onclick="heyspeak.showTopicSelection()" 
+                  <button onclick="worvox.showTopicSelection()" 
                     class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
                     <i class="fas fa-arrow-left mr-2"></i>Back
                   </button>
@@ -1044,7 +1044,7 @@ class HeySpeak {
                 <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow relative">
                   <!-- Bookmark Button -->
                   ${this.currentUser ? `
-                  <button onclick="heyspeak.toggleBookmark(${word.id}, ${isBookmarked})" 
+                  <button onclick="worvox.toggleBookmark(${word.id}, ${isBookmarked})" 
                     class="absolute top-4 right-4 text-2xl ${isBookmarked ? 'text-yellow-500' : 'text-gray-300'} hover:text-yellow-500 transition-colors">
                     <i class="fas fa-star"></i>
                   </button>
@@ -1080,7 +1080,7 @@ class HeySpeak {
 
                     <!-- Pronunciation Button -->
                     <button 
-                      onclick="heyspeak.pronounceWord('${this.escapeHtml(word.word)}', ${index})"
+                      onclick="worvox.pronounceWord('${this.escapeHtml(word.word)}', ${index})"
                       id="pronounce-btn-${index}"
                       class="w-full px-4 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-lg font-semibold hover:from-green-600 hover:to-teal-600 transition-all flex items-center justify-center space-x-2">
                       <i class="fas fa-volume-up"></i>
@@ -1101,7 +1101,7 @@ class HeySpeak {
                         <label class="flex items-center gap-2 cursor-pointer">
                           <input type="checkbox" 
                             ${isLearned ? 'checked' : ''}
-                            onchange="heyspeak.toggleLearnedStatus(${word.id}, this.checked)"
+                            onchange="worvox.toggleLearnedStatus(${word.id}, this.checked)"
                             class="w-5 h-5 text-green-600 rounded focus:ring-2 focus:ring-green-500">
                           <span class="text-sm ${isLearned ? 'text-green-600 font-semibold' : 'text-gray-600'}">
                             ${isLearned ? '✓ 학습 완료' : '학습 완료 표시'}
@@ -1246,8 +1246,8 @@ class HeySpeak {
 
         <!-- Flashcard -->
         <div id="flashcard-container" class="perspective-1000">
-          <div id="flashcard" class="bg-white rounded-2xl shadow-2xl p-12 min-h-96 flex flex-col items-center justify-center cursor-pointer transform transition-transform duration-500"
-               onclick="heyspeak.flipFlashcard()">
+          <div id="flashcard" class="glass-card hover-luxury p-12 min-h-96 flex flex-col items-center justify-center cursor-pointer transform transition-transform duration-500"
+               onclick="worvox.flipFlashcard()">
             <div id="flashcard-front" class="text-center">
               <h2 class="text-5xl font-bold text-indigo-600 mb-4">${this.escapeHtml(word.word)}</h2>
               <div class="flex items-center justify-center gap-2 mb-4">
@@ -1272,7 +1272,7 @@ class HeySpeak {
 
         <!-- Controls -->
         <div class="mt-6 flex items-center justify-between">
-          <button onclick="heyspeak.previousFlashcard()" 
+          <button onclick="worvox.previousFlashcard()" 
             class="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold transition-colors ${this.flashcardIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}"
             ${this.flashcardIndex === 0 ? 'disabled' : ''}>
             <i class="fas fa-arrow-left mr-2"></i>이전
@@ -1280,22 +1280,22 @@ class HeySpeak {
 
           <div class="flex items-center gap-2">
             ${this.currentUser ? `
-              <button onclick="heyspeak.toggleBookmark(${word.id}, ${isBookmarked}); event.stopPropagation();" 
+              <button onclick="worvox.toggleBookmark(${word.id}, ${isBookmarked}); event.stopPropagation();" 
                 class="p-3 text-2xl ${isBookmarked ? 'text-yellow-500' : 'text-gray-300'} hover:text-yellow-500 transition-colors">
                 <i class="fas fa-star"></i>
               </button>
-              <button onclick="heyspeak.toggleLearnedStatus(${word.id}, ${!isLearned}); event.stopPropagation();" 
+              <button onclick="worvox.toggleLearnedStatus(${word.id}, ${!isLearned}); event.stopPropagation();" 
                 class="px-4 py-2 ${isLearned ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-800'} rounded-lg font-semibold hover:opacity-80 transition-opacity">
                 ${isLearned ? '✓ 학습 완료' : '학습 완료 표시'}
               </button>
             ` : ''}
-            <button onclick="heyspeak.pronounceFlashcardWord('${this.escapeHtml(word.word)}')" 
+            <button onclick="worvox.pronounceFlashcardWord('${this.escapeHtml(word.word)}')" 
               class="p-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors">
               <i class="fas fa-volume-up"></i>
             </button>
           </div>
 
-          <button onclick="heyspeak.nextFlashcard()" 
+          <button onclick="worvox.nextFlashcard()" 
             class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-colors ${this.flashcardIndex >= words.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}"
             ${this.flashcardIndex >= words.length - 1 ? 'disabled' : ''}>
             다음<i class="fas fa-arrow-right ml-2"></i>
@@ -1470,7 +1470,7 @@ class HeySpeak {
               </span>
               ` : ''}
             </div>
-            <button onclick="heyspeak.pronounceFlashcardWord('${this.escapeHtml(word.word)}')" 
+            <button onclick="worvox.pronounceFlashcardWord('${this.escapeHtml(word.word)}')" 
               class="p-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors">
               <i class="fas fa-volume-up"></i>
             </button>
@@ -1494,7 +1494,7 @@ class HeySpeak {
               }
               
               return `
-                <button onclick="heyspeak.selectQuizAnswer('${this.escapeHtml(option)}')" 
+                <button onclick="worvox.selectQuizAnswer('${this.escapeHtml(option)}')" 
                   class="w-full p-4 ${buttonClass} rounded-lg text-left font-semibold transition-all ${question.userAnswer !== null ? 'cursor-not-allowed' : 'cursor-pointer'}"
                   ${question.userAnswer !== null ? 'disabled' : ''}>
                   <span class="text-gray-700">${index + 1}. ${this.escapeHtml(option)}</span>
@@ -1509,7 +1509,7 @@ class HeySpeak {
         <!-- Next Button -->
         ${question.userAnswer !== null ? `
           <div class="text-center">
-            <button onclick="heyspeak.nextQuizQuestion()" 
+            <button onclick="worvox.nextQuizQuestion()" 
               class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-colors">
               ${quiz.currentIndex < quiz.questions.length - 1 ? '다음 문제' : '결과 보기'} <i class="fas fa-arrow-right ml-2"></i>
             </button>
@@ -1608,15 +1608,15 @@ class HeySpeak {
           </div>
 
           <div class="space-y-3">
-            <button onclick="heyspeak.startNewQuiz()" 
+            <button onclick="worvox.startNewQuiz()" 
               class="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-colors">
               <i class="fas fa-forward mr-2"></i>Next Quiz (새로운 단어)
             </button>
-            <button onclick="heyspeak.restartQuiz()" 
+            <button onclick="worvox.restartQuiz()" 
               class="w-full px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-semibold transition-colors">
               <i class="fas fa-redo mr-2"></i>다시 풀기 (같은 단어)
             </button>
-            <button onclick="heyspeak.showVocabulary('list')" 
+            <button onclick="worvox.showVocabulary('list')" 
               class="w-full px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold transition-colors">
               <i class="fas fa-list mr-2"></i>단어 목록으로
             </button>
@@ -1660,7 +1660,7 @@ class HeySpeak {
                   <h1 class="text-2xl md:text-3xl font-bold text-gray-800">📚 Learning History</h1>
                   <p class="text-gray-600 mt-2">Review your past conversations and track your progress</p>
                 </div>
-                <button onclick="heyspeak.showTopicSelection()" 
+                <button onclick="worvox.showTopicSelection()" 
                   class="px-4 py-2 text-indigo-600 hover:text-indigo-800 transition-colors">
                   <i class="fas fa-arrow-left mr-2"></i>Back to Topics
                 </button>
@@ -1674,8 +1674,8 @@ class HeySpeak {
                   <div class="text-6xl mb-4">📝</div>
                   <h3 class="text-xl font-bold text-gray-800 mb-2">No Learning History Yet</h3>
                   <p class="text-gray-600 mb-6">Start a conversation to see your learning history here!</p>
-                  <button onclick="heyspeak.showTopicSelection()" 
-                    class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all">
+                  <button onclick="worvox.showTopicSelection()" 
+                    class="px-6 py-3 bg-gradient-to-r gold-metallic text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all">
                     Start Learning
                   </button>
                 </div>
@@ -1789,7 +1789,7 @@ class HeySpeak {
     
     return `
       <div class="border-2 border-gray-200 rounded-xl p-4 cursor-pointer hover:border-indigo-500 transition-all card-hover"
-        onclick="heyspeak.showConversation(${session.id})">
+        onclick="worvox.showConversation(${session.id})">
         <div class="flex items-start justify-between">
           <div class="flex-1">
             <div class="flex items-center gap-2 mb-2">
@@ -1836,7 +1836,7 @@ class HeySpeak {
           <div class="max-w-4xl mx-auto">
             <!-- Header -->
             <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
-              <button onclick="heyspeak.showHistory()" 
+              <button onclick="worvox.showHistory()" 
                 class="text-indigo-600 hover:text-indigo-800 transition-colors mb-4">
                 <i class="fas fa-arrow-left mr-2"></i>Back to History
               </button>
@@ -1905,7 +1905,7 @@ class HeySpeak {
             ${!isUser ? `
               <div class="mt-2">
                 <button 
-                  onclick="heyspeak.playHistoryMessage('${this.escapeHtml(message.content)}', '${messageId}')" 
+                  onclick="worvox.playHistoryMessage('${this.escapeHtml(message.content)}', '${messageId}')" 
                   id="${messageId}"
                   class="flex items-center gap-1 px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs rounded-lg transition-colors">
                   <i class="fas fa-redo"></i>
@@ -2023,7 +2023,7 @@ class HeySpeak {
                 <div class="flex items-center gap-3 mb-2">
                   <h3 class="text-2xl font-bold text-gray-800">${word.word}</h3>
                   <button 
-                    onclick="heyspeak.playPronunciation('${word.word}')"
+                    onclick="worvox.playPronunciation('${word.word}')"
                     class="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-all shadow-md hover:shadow-lg">
                     <i class="fas fa-volume-up"></i>
                   </button>
@@ -2070,7 +2070,7 @@ class HeySpeak {
                 <div class="flex items-center justify-between mb-2">
                   <div class="text-sm font-semibold text-indigo-700">예문:</div>
                   <button 
-                    onclick="heyspeak.playExampleSentence('${word.example_sentence.replace(/'/g, "\\'")}')"
+                    onclick="worvox.playExampleSentence('${word.example_sentence.replace(/'/g, "\\'")}')"
                     class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs hover:bg-indigo-200 transition-all">
                     <i class="fas fa-volume-up mr-1"></i>듣기
                   </button>
@@ -2165,7 +2165,7 @@ class HeySpeak {
                   <h1 class="text-2xl md:text-3xl font-bold text-gray-800">📊 Learning Statistics</h1>
                   <p class="text-gray-600 mt-2">Track your learning progress and insights</p>
                 </div>
-                <button onclick="heyspeak.showTopicSelection()" 
+                <button onclick="worvox.showTopicSelection()" 
                   class="px-4 py-2 text-indigo-600 hover:text-indigo-800 transition-colors">
                   <i class="fas fa-arrow-left mr-2"></i>Back to Topics
                 </button>
@@ -2473,11 +2473,11 @@ class HeySpeak {
 
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="min-h-screen p-4 md:p-8 bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div class="min-h-screen p-4 md:p-8 bg-luxury-dark">
         <div class="max-w-2xl mx-auto">
           <!-- Header -->
           <div class="flex items-center justify-between mb-6">
-            <button onclick="heyspeak.showTopicSelection()" 
+            <button onclick="worvox.showTopicSelection()" 
               class="px-4 py-2 text-indigo-600 hover:text-indigo-800 transition-colors">
               <i class="fas fa-arrow-left mr-2"></i>Back
             </button>
@@ -2488,12 +2488,12 @@ class HeySpeak {
 
           <!-- Progress Bar -->
           <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
-            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 h-2 rounded-full transition-all duration-300" 
+            <div class="bg-gradient-to-r gold-metallic h-2 rounded-full transition-all duration-300" 
                  style="width: ${(progress / total) * 100}%"></div>
           </div>
 
           <!-- Vocabulary Card -->
-          <div class="bg-white rounded-2xl shadow-2xl p-8 md:p-12">
+          <div class="glass-card hover-luxury p-8 md:p-12">
             <!-- Word -->
             <div class="text-center mb-8">
               <div class="text-6xl md:text-7xl font-bold text-gray-800 mb-4">
@@ -2507,7 +2507,7 @@ class HeySpeak {
               </div>
               
               <!-- Pronunciation Button -->
-              <button onclick="heyspeak.playWordPronunciation('${word.word}')" 
+              <button onclick="worvox.playWordPronunciation('${word.word}')" 
                 class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-semibold hover:from-green-600 hover:to-green-700 transition-all">
                 <i class="fas fa-volume-up"></i>
                 발음 듣기
@@ -2544,12 +2544,12 @@ class HeySpeak {
 
             <!-- Action Buttons -->
             <div class="flex gap-4">
-              <button onclick="heyspeak.markWordAsLearned(${word.id}, false)" 
+              <button onclick="worvox.markWordAsLearned(${word.id}, false)" 
                 class="flex-1 px-6 py-4 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-all">
                 <i class="fas fa-times mr-2"></i>다시 보기
               </button>
-              <button onclick="heyspeak.markWordAsLearned(${word.id}, true)" 
-                class="flex-1 px-6 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all">
+              <button onclick="worvox.markWordAsLearned(${word.id}, true)" 
+                class="flex-1 px-6 py-4 bg-gradient-to-r gold-metallic text-white rounded-xl font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all">
                 <i class="fas fa-check mr-2"></i>알았어요!
               </button>
             </div>
@@ -2558,13 +2558,13 @@ class HeySpeak {
           <!-- Navigation Buttons -->
           <div class="flex gap-4 mt-6">
             ${this.currentWordIndex > 0 ? `
-              <button onclick="heyspeak.previousWord()" 
+              <button onclick="worvox.previousWord()" 
                 class="px-6 py-3 bg-white text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-all shadow-md">
                 <i class="fas fa-chevron-left mr-2"></i>이전 단어
               </button>
             ` : ''}
             ${this.currentWordIndex < this.vocabularyWords.length - 1 ? `
-              <button onclick="heyspeak.nextWord()" 
+              <button onclick="worvox.nextWord()" 
                 class="ml-auto px-6 py-3 bg-white text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-all shadow-md">
                 다음 단어<i class="fas fa-chevron-right ml-2"></i>
               </button>
@@ -2636,8 +2636,8 @@ class HeySpeak {
   showVocabularyCompletion() {
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 md:p-12 text-center max-w-lg">
+      <div class="min-h-screen flex items-center justify-center p-4 bg-luxury-dark">
+        <div class="glass-card hover-luxury p-8 md:p-12 text-center max-w-lg">
           <div class="text-6xl mb-6">🎉</div>
           <h2 class="text-3xl font-bold text-gray-800 mb-4">완료했습니다!</h2>
           <p class="text-gray-600 mb-8">
@@ -2645,11 +2645,11 @@ class HeySpeak {
           </p>
           
           <div class="flex gap-4">
-            <button onclick="heyspeak.showVocabularyLearning()" 
-              class="flex-1 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all">
+            <button onclick="worvox.showVocabularyLearning()" 
+              class="flex-1 px-6 py-3 bg-gradient-to-r gold-metallic text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all">
               <i class="fas fa-redo mr-2"></i>더 학습하기
             </button>
-            <button onclick="heyspeak.showTopicSelection()" 
+            <button onclick="worvox.showTopicSelection()" 
               class="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-all">
               <i class="fas fa-home mr-2"></i>홈으로
             </button>
@@ -2661,4 +2661,6 @@ class HeySpeak {
 }
 
 // Initialize app
-const heyspeak = new HeySpeak();
+const worvox = new WorVox();
+ Backward compatibility alias
+const worvox = worvox;

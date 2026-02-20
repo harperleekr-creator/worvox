@@ -1,0 +1,310 @@
+/* WorVox - Luxury Design System */
+
+/* Custom Fonts - Luxury Typography */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  /* Luxury Color Palette */
+  --gold-light: #F4E4C1;
+  --gold: #D4AF37;
+  --gold-dark: #B8941C;
+  --gold-metallic: linear-gradient(135deg, #D4AF37 0%, #F4E4C1 50%, #D4AF37 100%);
+  
+  --black: #000000;
+  --charcoal: #1A1A1A;
+  --dark-gray: #2A2A2A;
+  --medium-gray: #4A4A4A;
+  
+  --white: #FFFFFF;
+  --cream: #FAF8F3;
+  --off-white: #F5F5F0;
+  
+  /* Luxury Shadows */
+  --shadow-soft: 0 2px 8px rgba(212, 175, 55, 0.1);
+  --shadow-medium: 0 4px 16px rgba(212, 175, 55, 0.15);
+  --shadow-hard: 0 8px 32px rgba(212, 175, 55, 0.2);
+  --shadow-luxury: 0 12px 48px rgba(0, 0, 0, 0.3);
+  
+  /* Glass Effects */
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(212, 175, 55, 0.2);
+}
+
+/* Global Luxury Styling */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 50%, #0A0A0A 100%);
+  background-attachment: fixed;
+  color: var(--cream);
+  letter-spacing: 0.3px;
+}
+
+/* Luxury Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Gradient Text Effect */
+.gradient-text {
+  background: var(--gold-metallic);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Glass Morphism Cards */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  box-shadow: var(--shadow-hard);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-luxury);
+  border-color: var(--gold);
+}
+
+/* Luxury Buttons */
+.btn-luxury {
+  background: var(--gold-metallic);
+  color: var(--charcoal);
+  font-weight: 600;
+  padding: 14px 32px;
+  border-radius: 12px;
+  border: none;
+  box-shadow: var(--shadow-medium);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+.btn-luxury::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-luxury:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn-luxury:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hard);
+}
+
+/* Luxury Input Fields */
+.input-luxury {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 2px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 16px 24px;
+  color: var(--charcoal);
+  font-size: 16px;
+  transition: all 0.3s ease;
+  font-family: 'Inter', sans-serif;
+}
+
+.input-luxury:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.input-luxury::placeholder {
+  color: var(--medium-gray);
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+/* Premium Cards with Gold Accent */
+.premium-card {
+  background: linear-gradient(135deg, var(--charcoal) 0%, var(--dark-gray) 100%);
+  border: 1px solid var(--gold);
+  border-radius: 20px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-luxury);
+}
+
+.premium-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+  animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Luxury Badges */
+.badge-luxury {
+  background: var(--gold-metallic);
+  color: var(--charcoal);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: var(--shadow-soft);
+  display: inline-block;
+}
+
+/* Smooth Animations */
+.animate-fadeIn {
+  animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideIn {
+  animation: slideIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Luxury Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--charcoal);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gold);
+  border-radius: 6px;
+  border: 2px solid var(--charcoal);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-dark);
+}
+
+/* Premium Hover Effect */
+.hover-luxury {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-luxury:hover {
+  transform: scale(1.02);
+  box-shadow: 0 20px 60px rgba(212, 175, 55, 0.3);
+}
+
+/* Gold Border Animation */
+@keyframes borderGlow {
+  0%, 100% {
+    border-color: var(--gold);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+  }
+  50% {
+    border-color: var(--gold-light);
+    box-shadow: 0 0 40px rgba(212, 175, 55, 0.5);
+  }
+}
+
+.border-glow {
+  animation: borderGlow 3s ease-in-out infinite;
+}
+
+/* Luxury Loading Spinner */
+.spinner-luxury {
+  border: 3px solid var(--glass-border);
+  border-top: 3px solid var(--gold);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Premium Selection Highlight */
+::selection {
+  background: var(--gold);
+  color: var(--charcoal);
+}
+
+::-moz-selection {
+  background: var(--gold);
+  color: var(--charcoal);
+}
+
+/* Luxury Focus States */
+*:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+/* Dark Mode Optimizations */
+.bg-luxury-dark {
+  background: linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%);
+}
+
+.text-luxury-light {
+  color: var(--cream);
+}
+
+/* Premium Divider */
+.divider-luxury {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
+  margin: 32px 0;
+}
