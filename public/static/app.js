@@ -1696,7 +1696,7 @@ class WorVox {
   }
 
   groupSessionsByDate(sessions) {
-    // Group sessions by date with Korean timezone
+    // Group sessions by date
     const grouped = {};
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -1706,28 +1706,13 @@ class WorVox {
       const dateOnly = new Date(sessionDate);
       dateOnly.setHours(0, 0, 0, 0);
       
-      // Calculate days difference
-      const daysDiff = Math.floor((today - dateOnly) / (1000 * 60 * 60 * 24));
-      
-      let dateLabel;
-      if (daysDiff === 0) {
-        dateLabel = '오늘 (Today)';
-      } else if (daysDiff === 1) {
-        dateLabel = '어제 (Yesterday)';
-      } else if (daysDiff < 7) {
-        dateLabel = `${daysDiff}일 전 (${sessionDate.toLocaleDateString('ko-KR', { 
-          month: 'long', 
-          day: 'numeric',
-          weekday: 'short'
-        })})`;
-      } else {
-        dateLabel = sessionDate.toLocaleDateString('ko-KR', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          weekday: 'short'
-        });
-      }
+      // Format date in English
+      const dateLabel = sessionDate.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        weekday: 'short'
+      });
       
       if (!grouped[dateLabel]) {
         grouped[dateLabel] = [];
@@ -1756,32 +1741,12 @@ class WorVox {
   renderSessionCard(session) {
     const sessionDate = new Date(session.started_at);
     
-    // Format time in 24-hour format (Korean standard)
-    const startTime = sessionDate.toLocaleTimeString('ko-KR', {
+    // Format time in English (12-hour format with AM/PM)
+    const startTime = sessionDate.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: false
+      hour12: true
     });
-    
-    // Calculate relative time
-    const now = new Date();
-    const diffMs = now - sessionDate;
-    const diffMins = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    
-    let relativeTime;
-    if (diffMins < 1) {
-      relativeTime = '방금 전';
-    } else if (diffMins < 60) {
-      relativeTime = `${diffMins}분 전`;
-    } else if (diffHours < 24) {
-      relativeTime = `${diffHours}시간 전`;
-    } else if (diffDays < 7) {
-      relativeTime = `${diffDays}일 전`;
-    } else {
-      relativeTime = startTime;
-    }
     
     const duration = session.ended_at 
       ? Math.round((new Date(session.ended_at) - sessionDate) / 1000 / 60)
@@ -1797,8 +1762,8 @@ class WorVox {
               <h4 class="text-lg font-bold text-gray-800">${session.topic_name || 'Conversation'}</h4>
             </div>
             <div class="flex items-center gap-4 text-sm text-gray-600 flex-wrap">
-              <span><i class="fas fa-clock mr-1"></i>${startTime} (${relativeTime})</span>
-              <span><i class="fas fa-hourglass-half mr-1"></i>${duration}${typeof duration === 'number' ? '분' : ''}</span>
+              <span><i class="fas fa-clock mr-1"></i>${startTime}</span>
+              <span><i class="fas fa-hourglass-half mr-1"></i>${duration}${typeof duration === 'number' ? ' min' : ''}</span>
               <span><i class="fas fa-comment mr-1"></i>${session.message_count} messages</span>
               <span class="px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold">
                 ${session.level}
@@ -1820,14 +1785,14 @@ class WorVox {
       const { session, messages } = response.data;
 
       const sessionDate = new Date(session.started_at);
-      const startTime = sessionDate.toLocaleString('ko-KR', {
+      const startTime = sessionDate.toLocaleString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
         weekday: 'short',
         hour: '2-digit',
         minute: '2-digit',
-        hour12: false
+        hour12: true
       });
 
       const app = document.getElementById('app');
@@ -1883,7 +1848,7 @@ class WorVox {
 
   renderHistoryMessage(message) {
     const messageDate = new Date(message.created_at);
-    const time = messageDate.toLocaleTimeString('ko-KR', {
+    const time = messageDate.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
