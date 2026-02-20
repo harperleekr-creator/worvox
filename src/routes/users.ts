@@ -111,9 +111,10 @@ users.post('/auth', async (c) => {
 
     if (existingUser) {
       return c.json({
-        user: existingUser,
-        success: true,
-      });
+        error: 'Username already exists',
+        message: 'This username is already taken. Please choose a different name.',
+        userExists: true
+      }, 409);
     }
 
     // Create new user with all profile fields

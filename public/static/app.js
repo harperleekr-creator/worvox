@@ -449,7 +449,16 @@ class WorVox {
       }
     } catch (error) {
       console.error('Onboarding error:', error);
-      alert('Failed to complete registration. Please try again.');
+      
+      // Check if username already exists
+      if (error.response && error.response.status === 409) {
+        alert('❌ Username already exists!\n\nThis name is already taken. Please choose a different name.');
+        // Go back to name input step
+        this.onboardingStep = 1;
+        this.showOnboarding();
+      } else {
+        alert('Failed to complete registration. Please try again.');
+      }
     }
   }
 
