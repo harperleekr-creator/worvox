@@ -112,12 +112,12 @@ class WorVox {
     const progress = Math.round((this.onboardingStep / 6) * 100);
 
     app.innerHTML = `
-      <div class="min-h-screen flex items-center justify-center p-4 bg-luxury-dark">
+      <div class="min-h-screen flex items-center justify-center p-4 bg-luxury-gradient">
         <div class="glass-card hover-luxury p-8 w-full max-w-lg">
           <!-- Header -->
           <div class="text-center mb-6">
             <h1 class="text-3xl font-bold gradient-text mb-2">WorVox</h1>
-            <p class="text-gray-600 text-sm">Step ${this.onboardingStep} of 6</p>
+            <p class="text-luxury-secondary text-sm">Step ${this.onboardingStep} of 6</p>
           </div>
 
           <!-- Progress Bar -->
@@ -140,8 +140,8 @@ class WorVox {
       <div class="space-y-6">
         <div class="text-center">
           <div class="text-5xl mb-4">👋</div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome!</h2>
-          <p class="text-gray-600">Sign in to get started</p>
+          <h2 class="text-2xl font-bold text-luxury-primary mb-2">Welcome!</h2>
+          <p class="text-luxury-secondary">Sign in to get started</p>
         </div>
         
         <!-- Google Sign-In Button -->
@@ -157,7 +157,7 @@ class WorVox {
         </div>
         
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+          <label class="block text-sm font-medium text-luxury-primary mb-2">Your Name</label>
           <input type="text" id="username" value="${this.onboardingData.username}"
             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg"
             placeholder="Enter your name">
@@ -182,8 +182,8 @@ class WorVox {
       <div class="space-y-6">
         <div class="text-center">
           <div class="text-5xl mb-4">📚</div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">English Level</h2>
-          <p class="text-gray-600">What's your current level?</p>
+          <h2 class="text-2xl font-bold text-luxury-primary mb-2">English Level</h2>
+          <p class="text-luxury-secondary">What's your current level?</p>
         </div>
         
         <div class="space-y-3">
@@ -193,8 +193,8 @@ class WorVox {
               <div class="flex items-center">
                 <span class="text-3xl mr-4">${level.icon}</span>
                 <div class="flex-1">
-                  <div class="font-semibold text-gray-800">${level.label}</div>
-                  <div class="text-sm text-gray-600">${level.desc}</div>
+                  <div class="font-semibold text-luxury-primary">${level.label}</div>
+                  <div class="text-sm text-luxury-secondary">${level.desc}</div>
                 </div>
                 ${this.onboardingData.level === level.value ? '<span class="text-indigo-600">✓</span>' : ''}
               </div>
@@ -203,7 +203,7 @@ class WorVox {
         </div>
 
         <button onclick="worvox.prevStep()" 
-          class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
+          class="w-full border-2 border-gray-300 text-luxury-primary py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
           Back
         </button>
       </div>
@@ -223,8 +223,8 @@ class WorVox {
       <div class="space-y-6">
         <div class="text-center">
           <div class="text-5xl mb-4">🤔</div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">How did you find us?</h2>
-          <p class="text-gray-600">Help us improve our reach</p>
+          <h2 class="text-2xl font-bold text-luxury-primary mb-2">How did you find us?</h2>
+          <p class="text-luxury-secondary">Help us improve our reach</p>
         </div>
         
         <div class="space-y-3 max-h-96 overflow-y-auto">
@@ -234,8 +234,8 @@ class WorVox {
               <div class="flex items-center">
                 <span class="text-3xl mr-4">${source.icon}</span>
                 <div class="flex-1">
-                  <div class="font-semibold text-gray-800">${source.label}</div>
-                  <div class="text-sm text-gray-600">${source.desc}</div>
+                  <div class="font-semibold text-luxury-primary">${source.label}</div>
+                  <div class="text-sm text-luxury-secondary">${source.desc}</div>
                 </div>
                 ${this.onboardingData.referralSource === source.value ? '<span class="text-indigo-600">✓</span>' : ''}
               </div>
@@ -244,7 +244,7 @@ class WorVox {
         </div>
 
         <button onclick="worvox.prevStep()" 
-          class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
+          class="w-full border-2 border-gray-300 text-luxury-primary py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
           Back
         </button>
       </div>
@@ -264,8 +264,8 @@ class WorVox {
       <div class="space-y-6">
         <div class="text-center">
           <div class="text-5xl mb-4">🎂</div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">Age Group</h2>
-          <p class="text-gray-600">What's your age range?</p>
+          <h2 class="text-2xl font-bold text-luxury-primary mb-2">Age Group</h2>
+          <p class="text-luxury-secondary">What's your age range?</p>
         </div>
         
         <div class="space-y-3">
@@ -275,8 +275,8 @@ class WorVox {
               <div class="flex items-center">
                 <span class="text-3xl mr-4">${age.icon}</span>
                 <div class="flex-1">
-                  <div class="font-semibold text-gray-800">${age.label}</div>
-                  <div class="text-sm text-gray-600">${age.desc}</div>
+                  <div class="font-semibold text-luxury-primary">${age.label}</div>
+                  <div class="text-sm text-luxury-secondary">${age.desc}</div>
                 </div>
                 ${this.onboardingData.ageGroup === age.value ? '<span class="text-indigo-600">✓</span>' : ''}
               </div>
@@ -285,7 +285,7 @@ class WorVox {
         </div>
 
         <button onclick="worvox.prevStep()" 
-          class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
+          class="w-full border-2 border-gray-300 text-luxury-primary py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
           Back
         </button>
       </div>
@@ -303,8 +303,8 @@ class WorVox {
       <div class="space-y-6">
         <div class="text-center">
           <div class="text-5xl mb-4">🙋</div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">Gender</h2>
-          <p class="text-gray-600">How do you identify?</p>
+          <h2 class="text-2xl font-bold text-luxury-primary mb-2">Gender</h2>
+          <p class="text-luxury-secondary">How do you identify?</p>
         </div>
         
         <div class="space-y-3">
@@ -314,8 +314,8 @@ class WorVox {
               <div class="flex items-center">
                 <span class="text-3xl mr-4">${gender.icon}</span>
                 <div class="flex-1">
-                  <div class="font-semibold text-gray-800">${gender.label}</div>
-                  <div class="text-sm text-gray-600">${gender.desc}</div>
+                  <div class="font-semibold text-luxury-primary">${gender.label}</div>
+                  <div class="text-sm text-luxury-secondary">${gender.desc}</div>
                 </div>
                 ${this.onboardingData.gender === gender.value ? '<span class="text-indigo-600">✓</span>' : ''}
               </div>
@@ -324,7 +324,7 @@ class WorVox {
         </div>
 
         <button onclick="worvox.prevStep()" 
-          class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
+          class="w-full border-2 border-gray-300 text-luxury-primary py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
           Back
         </button>
       </div>
@@ -343,8 +343,8 @@ class WorVox {
       <div class="space-y-6">
         <div class="text-center">
           <div class="text-5xl mb-4">💼</div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">Occupation</h2>
-          <p class="text-gray-600">What do you do?</p>
+          <h2 class="text-2xl font-bold text-luxury-primary mb-2">Occupation</h2>
+          <p class="text-luxury-secondary">What do you do?</p>
         </div>
         
         <div class="space-y-3">
@@ -354,8 +354,8 @@ class WorVox {
               <div class="flex items-center">
                 <span class="text-3xl mr-4">${occ.icon}</span>
                 <div class="flex-1">
-                  <div class="font-semibold text-gray-800">${occ.label}</div>
-                  <div class="text-sm text-gray-600">${occ.desc}</div>
+                  <div class="font-semibold text-luxury-primary">${occ.label}</div>
+                  <div class="text-sm text-luxury-secondary">${occ.desc}</div>
                 </div>
                 ${this.onboardingData.occupation === occ.value ? '<span class="text-indigo-600">✓</span>' : ''}
               </div>
@@ -364,7 +364,7 @@ class WorVox {
         </div>
 
         <button onclick="worvox.prevStep()" 
-          class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
+          class="w-full border-2 border-gray-300 text-luxury-primary py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
           Back
         </button>
       </div>
@@ -475,14 +475,14 @@ class WorVox {
               <div class="flex items-center justify-between flex-wrap gap-4">
                 <div class="flex-1">
                   <div class="flex items-center gap-4">
-                    <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Welcome, ${this.currentUser.username}! 👋</h1>
+                    <h1 class="text-2xl md:text-3xl font-bold text-luxury-primary">Welcome, ${this.currentUser.username}! 👋</h1>
                   </div>
                   <div class="flex items-center gap-4 mt-2 flex-wrap">
-                    <p class="text-gray-600">
+                    <p class="text-luxury-secondary">
                       Level: <span class="font-semibold text-indigo-600">${this.currentUser.level}</span>
                     </p>
                     <span class="text-gray-400">•</span>
-                    <p class="text-gray-600">
+                    <p class="text-luxury-secondary">
                       Words spoken: <span class="font-bold text-green-600">${totalWords.toLocaleString()}</span> 💬
                     </p>
                   </div>
@@ -497,7 +497,7 @@ class WorVox {
                     <i class="fas fa-history mr-2"></i>History
                   </button>
                   <button onclick="worvox.logout()" 
-                    class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
+                    class="px-4 py-2 text-luxury-secondary hover:text-luxury-primary transition-colors">
                     <i class="fas fa-sign-out-alt mr-2"></i>Logout
                   </button>
                 </div>
@@ -526,7 +526,7 @@ class WorVox {
 
             <!-- Topics -->
             <div class="bg-white rounded-2xl shadow-lg p-6">
-              <h2 class="text-2xl font-bold text-gray-800 mb-6">Choose a Topic 📚</h2>
+              <h2 class="text-2xl font-bold text-luxury-primary mb-6">Choose a Topic 📚</h2>
               
               <!-- Word Search Section -->
               <div class="mb-6">
@@ -535,7 +535,7 @@ class WorVox {
                     type="text" 
                     id="wordSearch" 
                     placeholder="Search Words!" 
-                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 text-gray-700 placeholder-gray-400"
+                    class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 text-luxury-primary placeholder-gray-400"
                     onkeypress="if(event.key==='Enter') worvox.searchWord()"
                   />
                   <button 
@@ -552,8 +552,8 @@ class WorVox {
                   <div class="border-2 border-gray-200 rounded-xl p-6 cursor-pointer hover:border-indigo-500 transition-all card-hover"
                     onclick="worvox.startSession(${topic.id}, '${topic.name}', '${topic.system_prompt}', '${topic.level}')">
                     <div class="text-4xl mb-3">${topic.icon}</div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">${topic.name}</h3>
-                    <p class="text-gray-600 text-sm mb-3">${topic.description}</p>
+                    <h3 class="text-xl font-bold text-luxury-primary mb-2">${topic.name}</h3>
+                    <p class="text-luxury-secondary text-sm mb-3">${topic.description}</p>
                     <span class="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold">
                       ${topic.level}
                     </span>
@@ -614,12 +614,12 @@ class WorVox {
           <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
             <div class="flex items-center space-x-4">
               <button onclick="worvox.endSession()" 
-                class="text-gray-600 hover:text-gray-800">
+                class="text-luxury-secondary hover:text-luxury-primary">
                 <i class="fas fa-arrow-left text-xl"></i>
               </button>
               <div>
-                <h2 class="text-xl font-bold text-gray-800">${this.currentTopic.name}</h2>
-                <p class="text-sm text-gray-600">Practice your English!</p>
+                <h2 class="text-xl font-bold text-luxury-primary">${this.currentTopic.name}</h2>
+                <p class="text-sm text-luxury-secondary">Practice your English!</p>
               </div>
             </div>
           </div>
@@ -643,7 +643,7 @@ class WorVox {
                   onclick="worvox.toggleRecording()">
                   <i class="fas fa-microphone text-2xl"></i>
                 </button>
-                <div class="flex-1 text-gray-600">
+                <div class="flex-1 text-luxury-secondary">
                   <p id="statusText">Tap the microphone to start speaking</p>
                 </div>
               </div>
@@ -842,7 +842,7 @@ class WorVox {
       <div class="inline-block max-w-xs md:max-w-md lg:max-w-lg px-4 py-3 rounded-2xl ${
         role === 'user' 
           ? 'bg-indigo-600 text-white' 
-          : 'bg-gray-200 text-gray-800'
+          : 'bg-gray-200 text-luxury-primary'
       }">
         <p class="text-sm md:text-base">${this.escapeHtml(content)}</p>
         ${role === 'assistant' ? '<div id="replay-container-' + messageIndex + '" class="mt-2"></div>' : ''}
@@ -995,8 +995,8 @@ class WorVox {
             <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
               <div class="flex items-center justify-between flex-wrap gap-4">
                 <div>
-                  <h1 class="text-2xl md:text-3xl font-bold text-gray-800">📚 Vocabulary Study</h1>
-                  <p class="text-gray-600 mt-2">Learn and practice English vocabulary with pronunciations</p>
+                  <h1 class="text-2xl md:text-3xl font-bold text-luxury-primary">📚 Vocabulary Study</h1>
+                  <p class="text-luxury-secondary mt-2">Learn and practice English vocabulary with pronunciations</p>
                 </div>
                 <div class="flex items-center gap-2">
                   <button onclick="worvox.showVocabulary('list')" 
@@ -1012,7 +1012,7 @@ class WorVox {
                     <i class="fas fa-graduation-cap mr-2"></i>Quiz
                   </button>
                   <button onclick="worvox.showTopicSelection()" 
-                    class="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors">
+                    class="px-4 py-2 text-luxury-secondary hover:text-luxury-primary transition-colors">
                     <i class="fas fa-arrow-left mr-2"></i>Back
                   </button>
                 </div>
@@ -1022,11 +1022,11 @@ class WorVox {
               ${this.currentUser ? `
                 <div class="mt-4 flex items-center gap-4 text-sm">
                   <div class="flex items-center gap-2">
-                    <span class="text-gray-600">진도:</span>
+                    <span class="text-luxury-secondary">진도:</span>
                     <span class="font-bold text-green-600">${Object.values(progressData).filter(p => p.is_learned).length} / ${words.length}</span>
                   </div>
                   <div class="flex items-center gap-2">
-                    <span class="text-gray-600">북마크:</span>
+                    <span class="text-luxury-secondary">북마크:</span>
                     <span class="font-bold text-yellow-600">${bookmarkedWords.length}</span>
                   </div>
                 </div>
@@ -1074,8 +1074,8 @@ class WorVox {
 
                     <!-- Korean Meaning -->
                     <div class="border-t pt-4">
-                      <p class="text-gray-600 text-sm mb-1">한국어 뜻:</p>
-                      <p class="text-xl font-semibold text-gray-800">${this.escapeHtml(word.meaning_ko)}</p>
+                      <p class="text-luxury-secondary text-sm mb-1">한국어 뜻:</p>
+                      <p class="text-xl font-semibold text-luxury-primary">${this.escapeHtml(word.meaning_ko)}</p>
                     </div>
 
                     <!-- Pronunciation Button -->
@@ -1090,8 +1090,8 @@ class WorVox {
                     <!-- Example Sentence (if available) -->
                     ${word.example_sentence ? `
                       <div class="border-t pt-4">
-                        <p class="text-gray-600 text-sm mb-1">예문:</p>
-                        <p class="text-gray-700 italic text-sm">${this.escapeHtml(word.example_sentence)}</p>
+                        <p class="text-luxury-secondary text-sm mb-1">예문:</p>
+                        <p class="text-luxury-primary italic text-sm">${this.escapeHtml(word.example_sentence)}</p>
                       </div>
                     ` : ''}
                     
@@ -1103,7 +1103,7 @@ class WorVox {
                             ${isLearned ? 'checked' : ''}
                             onchange="worvox.toggleLearnedStatus(${word.id}, this.checked)"
                             class="w-5 h-5 text-green-600 rounded focus:ring-2 focus:ring-green-500">
-                          <span class="text-sm ${isLearned ? 'text-green-600 font-semibold' : 'text-gray-600'}">
+                          <span class="text-sm ${isLearned ? 'text-green-600 font-semibold' : 'text-luxury-secondary'}">
                             ${isLearned ? '✓ 학습 완료' : '학습 완료 표시'}
                           </span>
                         </label>
@@ -1118,8 +1118,8 @@ class WorVox {
             ${words.length === 0 ? `
               <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
                 <div class="text-6xl mb-4">📖</div>
-                <h3 class="text-xl font-bold text-gray-800 mb-2">No Vocabulary Yet</h3>
-                <p class="text-gray-600">Vocabulary words will be added soon!</p>
+                <h3 class="text-xl font-bold text-luxury-primary mb-2">No Vocabulary Yet</h3>
+                <p class="text-luxury-secondary">Vocabulary words will be added soon!</p>
               </div>
             ` : ''}
           </div>
@@ -1224,8 +1224,8 @@ class WorVox {
       return `
         <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
           <div class="text-6xl mb-4">📖</div>
-          <h3 class="text-xl font-bold text-gray-800 mb-2">No Vocabulary Yet</h3>
-          <p class="text-gray-600">Vocabulary words will be added soon!</p>
+          <h3 class="text-xl font-bold text-luxury-primary mb-2">No Vocabulary Yet</h3>
+          <p class="text-luxury-secondary">Vocabulary words will be added soon!</p>
         </div>
       `;
     }
@@ -1241,7 +1241,7 @@ class WorVox {
       <div class="max-w-2xl mx-auto">
         <!-- Card Counter -->
         <div class="text-center mb-4">
-          <span class="text-gray-600">Card ${this.flashcardIndex + 1} / ${words.length}</span>
+          <span class="text-luxury-secondary">Card ${this.flashcardIndex + 1} / ${words.length}</span>
         </div>
 
         <!-- Flashcard -->
@@ -1273,7 +1273,7 @@ class WorVox {
         <!-- Controls -->
         <div class="mt-6 flex items-center justify-between">
           <button onclick="worvox.previousFlashcard()" 
-            class="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold transition-colors ${this.flashcardIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}"
+            class="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-luxury-primary rounded-lg font-semibold transition-colors ${this.flashcardIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}"
             ${this.flashcardIndex === 0 ? 'disabled' : ''}>
             <i class="fas fa-arrow-left mr-2"></i>이전
           </button>
@@ -1285,7 +1285,7 @@ class WorVox {
                 <i class="fas fa-star"></i>
               </button>
               <button onclick="worvox.toggleLearnedStatus(${word.id}, ${!isLearned}); event.stopPropagation();" 
-                class="px-4 py-2 ${isLearned ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-800'} rounded-lg font-semibold hover:opacity-80 transition-opacity">
+                class="px-4 py-2 ${isLearned ? 'bg-green-600 text-white' : 'bg-gray-200 text-luxury-primary'} rounded-lg font-semibold hover:opacity-80 transition-opacity">
                 ${isLearned ? '✓ 학습 완료' : '학습 완료 표시'}
               </button>
             ` : ''}
@@ -1317,11 +1317,11 @@ class WorVox {
       
       frontDiv.innerHTML = `
         <div class="text-center">
-          <h2 class="text-4xl font-bold text-gray-800 mb-4">${this.escapeHtml(word.meaning_ko)}</h2>
+          <h2 class="text-4xl font-bold text-luxury-primary mb-4">${this.escapeHtml(word.meaning_ko)}</h2>
           ${word.example_sentence ? `
             <div class="mt-6 p-4 bg-gray-50 rounded-lg">
-              <p class="text-gray-600 text-sm mb-2">예문:</p>
-              <p class="text-gray-800 italic">${this.escapeHtml(word.example_sentence)}</p>
+              <p class="text-luxury-secondary text-sm mb-2">예문:</p>
+              <p class="text-luxury-primary italic">${this.escapeHtml(word.example_sentence)}</p>
             </div>
           ` : ''}
           <p class="mt-8 text-gray-500 text-sm">클릭하여 영어 단어 보기</p>
@@ -1401,8 +1401,8 @@ class WorVox {
       return `
         <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
           <div class="text-6xl mb-4">📖</div>
-          <h3 class="text-xl font-bold text-gray-800 mb-2">No Vocabulary Yet</h3>
-          <p class="text-gray-600">Vocabulary words will be added soon!</p>
+          <h3 class="text-xl font-bold text-luxury-primary mb-2">No Vocabulary Yet</h3>
+          <p class="text-luxury-secondary">Vocabulary words will be added soon!</p>
         </div>
       `;
     }
@@ -1443,7 +1443,7 @@ class WorVox {
         <!-- Quiz Progress -->
         <div class="mb-6">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-gray-600">Question ${quiz.currentIndex + 1} / ${quiz.questions.length}</span>
+            <span class="text-luxury-secondary">Question ${quiz.currentIndex + 1} / ${quiz.questions.length}</span>
             <span class="text-indigo-600 font-bold">Score: ${quiz.score} / ${quiz.currentIndex}</span>
           </div>
           <div class="w-full bg-gray-200 rounded-full h-2">
@@ -1476,7 +1476,7 @@ class WorVox {
             </button>
           </div>
 
-          <p class="text-gray-700 text-lg mb-6 text-center">이 단어의 뜻은 무엇일까요?</p>
+          <p class="text-luxury-primary text-lg mb-6 text-center">이 단어의 뜻은 무엇일까요?</p>
 
           <!-- Options -->
           <div class="space-y-3">
@@ -1497,7 +1497,7 @@ class WorVox {
                 <button onclick="worvox.selectQuizAnswer('${this.escapeHtml(option)}')" 
                   class="w-full p-4 ${buttonClass} rounded-lg text-left font-semibold transition-all ${question.userAnswer !== null ? 'cursor-not-allowed' : 'cursor-pointer'}"
                   ${question.userAnswer !== null ? 'disabled' : ''}>
-                  <span class="text-gray-700">${index + 1}. ${this.escapeHtml(option)}</span>
+                  <span class="text-luxury-primary">${index + 1}. ${this.escapeHtml(option)}</span>
                   ${question.userAnswer !== null && isCorrect ? '<i class="fas fa-check text-green-600 float-right"></i>' : ''}
                   ${question.userAnswer !== null && isSelected && !isCorrect ? '<i class="fas fa-times text-red-600 float-right"></i>' : ''}
                 </button>
@@ -1589,20 +1589,20 @@ class WorVox {
       <div class="max-w-2xl mx-auto">
         <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
           <div class="text-8xl mb-6">${emoji}</div>
-          <h2 class="text-3xl font-bold text-gray-800 mb-4">퀴즈 완료!</h2>
-          <p class="text-xl text-gray-600 mb-8">${message}</p>
+          <h2 class="text-3xl font-bold text-luxury-primary mb-4">퀴즈 완료!</h2>
+          <p class="text-xl text-luxury-secondary mb-8">${message}</p>
           
           <div class="grid grid-cols-3 gap-4 mb-8">
             <div class="bg-green-50 p-4 rounded-lg">
-              <p class="text-gray-600 text-sm mb-1">정답</p>
+              <p class="text-luxury-secondary text-sm mb-1">정답</p>
               <p class="text-3xl font-bold text-green-600">${quiz.score}</p>
             </div>
             <div class="bg-red-50 p-4 rounded-lg">
-              <p class="text-gray-600 text-sm mb-1">오답</p>
+              <p class="text-luxury-secondary text-sm mb-1">오답</p>
               <p class="text-3xl font-bold text-red-600">${quiz.questions.length - quiz.score}</p>
             </div>
             <div class="bg-indigo-50 p-4 rounded-lg">
-              <p class="text-gray-600 text-sm mb-1">정답률</p>
+              <p class="text-luxury-secondary text-sm mb-1">정답률</p>
               <p class="text-3xl font-bold text-indigo-600">${percentage}%</p>
             </div>
           </div>
@@ -1617,7 +1617,7 @@ class WorVox {
               <i class="fas fa-redo mr-2"></i>다시 풀기 (같은 단어)
             </button>
             <button onclick="worvox.showVocabulary('list')" 
-              class="w-full px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold transition-colors">
+              class="w-full px-6 py-3 bg-gray-200 hover:bg-gray-300 text-luxury-primary rounded-lg font-semibold transition-colors">
               <i class="fas fa-list mr-2"></i>단어 목록으로
             </button>
           </div>
@@ -1657,8 +1657,8 @@ class WorVox {
             <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
               <div class="flex items-center justify-between flex-wrap gap-4">
                 <div>
-                  <h1 class="text-2xl md:text-3xl font-bold text-gray-800">📚 Learning History</h1>
-                  <p class="text-gray-600 mt-2">Review your past conversations and track your progress</p>
+                  <h1 class="text-2xl md:text-3xl font-bold text-luxury-primary">📚 Learning History</h1>
+                  <p class="text-luxury-secondary mt-2">Review your past conversations and track your progress</p>
                 </div>
                 <button onclick="worvox.showTopicSelection()" 
                   class="px-4 py-2 text-indigo-600 hover:text-indigo-800 transition-colors">
@@ -1672,15 +1672,15 @@ class WorVox {
               ${sessions.length === 0 ? `
                 <div class="text-center py-12">
                   <div class="text-6xl mb-4">📝</div>
-                  <h3 class="text-xl font-bold text-gray-800 mb-2">No Learning History Yet</h3>
-                  <p class="text-gray-600 mb-6">Start a conversation to see your learning history here!</p>
+                  <h3 class="text-xl font-bold text-luxury-primary mb-2">No Learning History Yet</h3>
+                  <p class="text-luxury-secondary mb-6">Start a conversation to see your learning history here!</p>
                   <button onclick="worvox.showTopicSelection()" 
                     class="px-6 py-3 bg-gradient-to-r gold-metallic text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all">
                     Start Learning
                   </button>
                 </div>
               ` : `
-                <h2 class="text-xl font-bold text-gray-800 mb-4">Your Sessions (${sessions.length})</h2>
+                <h2 class="text-xl font-bold text-luxury-primary mb-4">Your Sessions (${sessions.length})</h2>
                 <div class="space-y-4">
                   ${this.groupSessionsByDate(sessions)}
                 </div>
@@ -1740,7 +1740,7 @@ class WorVox {
     for (const [date, dateSessions] of Object.entries(grouped)) {
       html += `
         <div class="mb-6">
-          <h3 class="text-lg font-semibold text-gray-700 mb-3 flex items-center">
+          <h3 class="text-lg font-semibold text-luxury-primary mb-3 flex items-center">
             <i class="fas fa-calendar-day mr-2 text-indigo-600"></i>${date}
           </h3>
           <div class="space-y-3">
@@ -1794,9 +1794,9 @@ class WorVox {
           <div class="flex-1">
             <div class="flex items-center gap-2 mb-2">
               <span class="text-2xl">${session.topic_icon || '📚'}</span>
-              <h4 class="text-lg font-bold text-gray-800">${session.topic_name || 'Conversation'}</h4>
+              <h4 class="text-lg font-bold text-luxury-primary">${session.topic_name || 'Conversation'}</h4>
             </div>
-            <div class="flex items-center gap-4 text-sm text-gray-600 flex-wrap">
+            <div class="flex items-center gap-4 text-sm text-luxury-secondary flex-wrap">
               <span><i class="fas fa-clock mr-1"></i>${startTime} (${relativeTime})</span>
               <span><i class="fas fa-hourglass-half mr-1"></i>${duration}${typeof duration === 'number' ? '분' : ''}</span>
               <span><i class="fas fa-comment mr-1"></i>${session.message_count} messages</span>
@@ -1805,7 +1805,7 @@ class WorVox {
               </span>
             </div>
             ${session.topic_description ? `
-              <p class="text-gray-600 text-sm mt-2">${session.topic_description}</p>
+              <p class="text-luxury-secondary text-sm mt-2">${session.topic_description}</p>
             ` : ''}
           </div>
           <i class="fas fa-chevron-right text-gray-400"></i>
@@ -1844,8 +1844,8 @@ class WorVox {
               <div class="flex items-start gap-4">
                 <span class="text-4xl">${session.topic_icon || '📚'}</span>
                 <div class="flex-1">
-                  <h1 class="text-2xl font-bold text-gray-800 mb-2">${session.topic_name}</h1>
-                  <div class="flex items-center gap-4 text-sm text-gray-600 flex-wrap">
+                  <h1 class="text-2xl font-bold text-luxury-primary mb-2">${session.topic_name}</h1>
+                  <div class="flex items-center gap-4 text-sm text-luxury-secondary flex-wrap">
                     <span><i class="fas fa-user mr-1"></i>${session.username}</span>
                     <span><i class="fas fa-calendar mr-1"></i>${startTime}</span>
                     <span><i class="fas fa-comment mr-1"></i>${messages.length} messages</span>
@@ -1859,7 +1859,7 @@ class WorVox {
 
             <!-- Conversation -->
             <div class="bg-white rounded-2xl shadow-lg p-6">
-              <h2 class="text-xl font-bold text-gray-800 mb-6">Conversation</h2>
+              <h2 class="text-xl font-bold text-luxury-primary mb-6">Conversation</h2>
               
               ${messages.length === 0 ? `
                 <div class="text-center py-12 text-gray-500">
@@ -1899,7 +1899,7 @@ class WorVox {
           <div class="inline-block px-4 py-3 rounded-2xl ${
             isUser 
               ? 'bg-indigo-600 text-white' 
-              : 'bg-gray-200 text-gray-800'
+              : 'bg-gray-200 text-luxury-primary'
           }">
             <p class="text-sm md:text-base">${this.escapeHtml(message.content)}</p>
             ${!isUser ? `
@@ -2000,7 +2000,7 @@ class WorVox {
     searchResult.innerHTML = `
       <div class="bg-gray-50 border-2 border-gray-200 rounded-xl p-6 text-center">
         <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-3"></div>
-        <p class="text-gray-600">검색 중...</p>
+        <p class="text-luxury-secondary">검색 중...</p>
       </div>
     `;
     
@@ -2021,7 +2021,7 @@ class WorVox {
             <div class="flex items-start justify-between mb-4">
               <div class="flex-1">
                 <div class="flex items-center gap-3 mb-2">
-                  <h3 class="text-2xl font-bold text-gray-800">${word.word}</h3>
+                  <h3 class="text-2xl font-bold text-luxury-primary">${word.word}</h3>
                   <button 
                     onclick="worvox.playPronunciation('${word.word}')"
                     class="p-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-all shadow-md hover:shadow-lg">
@@ -2036,7 +2036,7 @@ class WorVox {
                   </span>
                   ${word.toeic_related ? '<span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold">TOEIC</span>' : ''}
                   ${word.toefl_related ? '<span class="px-3 py-1 bg-sky-100 text-sky-700 rounded-full text-sm font-semibold">TOEFL</span>' : ''}
-                  <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
+                  <span class="px-3 py-1 bg-gray-100 text-luxury-primary rounded-full text-sm">
                     ${word.difficulty}
                   </span>
                 </div>
@@ -2045,8 +2045,8 @@ class WorVox {
             
             <!-- Korean Meaning -->
             <div class="mb-4 pb-4 border-b border-indigo-100">
-              <div class="text-lg font-semibold text-gray-700 mb-1">뜻:</div>
-              <div class="text-gray-800 text-lg">${word.meaning_ko}</div>
+              <div class="text-lg font-semibold text-luxury-primary mb-1">뜻:</div>
+              <div class="text-luxury-primary text-lg">${word.meaning_ko}</div>
             </div>
             
             ${summary.length > 0 ? `
@@ -2057,7 +2057,7 @@ class WorVox {
                   ${summary.map((point, index) => `
                     <div class="flex items-start gap-2">
                       <span class="text-indigo-600 font-bold mt-0.5">✓</span>
-                      <span class="text-gray-700 text-sm">${point}</span>
+                      <span class="text-luxury-primary text-sm">${point}</span>
                     </div>
                   `).join('')}
                 </div>
@@ -2075,7 +2075,7 @@ class WorVox {
                     <i class="fas fa-volume-up mr-1"></i>듣기
                   </button>
                 </div>
-                <div class="text-gray-700 italic">"${word.example_sentence}"</div>
+                <div class="text-luxury-primary italic">"${word.example_sentence}"</div>
               </div>
             ` : ''}
             
@@ -2115,8 +2115,8 @@ class WorVox {
         searchResult.innerHTML = `
           <div class="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 text-center">
             <i class="fas fa-search text-yellow-600 text-3xl mb-2"></i>
-            <p class="text-gray-700">단어를 찾을 수 없습니다: "<strong>${searchTerm}</strong>"</p>
-            <p class="text-sm text-gray-600 mt-2">다른 단어를 검색해보세요.</p>
+            <p class="text-luxury-primary">단어를 찾을 수 없습니다: "<strong>${searchTerm}</strong>"</p>
+            <p class="text-sm text-luxury-secondary mt-2">다른 단어를 검색해보세요.</p>
           </div>
         `;
       }
@@ -2125,8 +2125,8 @@ class WorVox {
       searchResult.innerHTML = `
         <div class="bg-red-50 border-2 border-red-200 rounded-xl p-4 text-center">
           <i class="fas fa-exclamation-circle text-red-600 text-3xl mb-2"></i>
-          <p class="text-gray-700">검색 중 오류가 발생했습니다.</p>
-          <p class="text-sm text-gray-600 mt-2">${error.response?.data?.message || '다시 시도해주세요.'}</p>
+          <p class="text-luxury-primary">검색 중 오류가 발생했습니다.</p>
+          <p class="text-sm text-luxury-secondary mt-2">${error.response?.data?.message || '다시 시도해주세요.'}</p>
         </div>
       `;
     }
@@ -2162,8 +2162,8 @@ class WorVox {
             <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
               <div class="flex items-center justify-between flex-wrap gap-4">
                 <div>
-                  <h1 class="text-2xl md:text-3xl font-bold text-gray-800">📊 Learning Statistics</h1>
-                  <p class="text-gray-600 mt-2">Track your learning progress and insights</p>
+                  <h1 class="text-2xl md:text-3xl font-bold text-luxury-primary">📊 Learning Statistics</h1>
+                  <p class="text-luxury-secondary mt-2">Track your learning progress and insights</p>
                 </div>
                 <button onclick="worvox.showTopicSelection()" 
                   class="px-4 py-2 text-indigo-600 hover:text-indigo-800 transition-colors">
@@ -2200,31 +2200,31 @@ class WorVox {
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <!-- Daily Activity Chart -->
               <div class="bg-white rounded-2xl shadow-lg p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">📈 Daily Activity (Last 30 Days)</h3>
+                <h3 class="text-xl font-bold text-luxury-primary mb-4">📈 Daily Activity (Last 30 Days)</h3>
                 <canvas id="dailyActivityChart"></canvas>
               </div>
 
               <!-- Topic Distribution Chart -->
               <div class="bg-white rounded-2xl shadow-lg p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">🎯 Learning by Topic</h3>
+                <h3 class="text-xl font-bold text-luxury-primary mb-4">🎯 Learning by Topic</h3>
                 <canvas id="topicDistributionChart"></canvas>
               </div>
 
               <!-- Weekly Progress Chart -->
               <div class="bg-white rounded-2xl shadow-lg p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">📅 Weekly Progress (Last 12 Weeks)</h3>
+                <h3 class="text-xl font-bold text-luxury-primary mb-4">📅 Weekly Progress (Last 12 Weeks)</h3>
                 <canvas id="weeklyProgressChart"></canvas>
               </div>
 
               <!-- Level Distribution Chart -->
               <div class="bg-white rounded-2xl shadow-lg p-6">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">🎓 Learning by Level</h3>
+                <h3 class="text-xl font-bold text-luxury-primary mb-4">🎓 Learning by Level</h3>
                 <canvas id="levelDistributionChart"></canvas>
               </div>
 
               <!-- Time of Day Chart -->
               <div class="bg-white rounded-2xl shadow-lg p-6 lg:col-span-2">
-                <h3 class="text-xl font-bold text-gray-800 mb-4">⏰ Learning Time Patterns</h3>
+                <h3 class="text-xl font-bold text-luxury-primary mb-4">⏰ Learning Time Patterns</h3>
                 <canvas id="timeOfDayChart"></canvas>
               </div>
             </div>
@@ -2473,7 +2473,7 @@ class WorVox {
 
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="min-h-screen p-4 md:p-8 bg-luxury-dark">
+      <div class="min-h-screen p-4 md:p-8 bg-luxury-gradient">
         <div class="max-w-2xl mx-auto">
           <!-- Header -->
           <div class="flex items-center justify-between mb-6">
@@ -2481,7 +2481,7 @@ class WorVox {
               class="px-4 py-2 text-indigo-600 hover:text-indigo-800 transition-colors">
               <i class="fas fa-arrow-left mr-2"></i>Back
             </button>
-            <div class="text-gray-600 font-semibold">
+            <div class="text-luxury-secondary font-semibold">
               ${progress} / ${total}
             </div>
           </div>
@@ -2496,7 +2496,7 @@ class WorVox {
           <div class="glass-card hover-luxury p-8 md:p-12">
             <!-- Word -->
             <div class="text-center mb-8">
-              <div class="text-6xl md:text-7xl font-bold text-gray-800 mb-4">
+              <div class="text-6xl md:text-7xl font-bold text-luxury-primary mb-4">
                 ${word.word}
               </div>
               <div class="text-gray-500 text-lg mb-2">
@@ -2516,8 +2516,8 @@ class WorVox {
 
             <!-- Meaning -->
             <div class="border-t border-gray-200 pt-6 mb-6">
-              <div class="text-gray-600 text-sm mb-2">한국어 뜻</div>
-              <div class="text-2xl font-semibold text-gray-800 mb-4">
+              <div class="text-luxury-secondary text-sm mb-2">한국어 뜻</div>
+              <div class="text-2xl font-semibold text-luxury-primary mb-4">
                 ${word.meaning_ko}
               </div>
             </div>
@@ -2525,8 +2525,8 @@ class WorVox {
             <!-- Example Sentence -->
             ${word.example_sentence ? `
               <div class="border-t border-gray-200 pt-6 mb-6">
-                <div class="text-gray-600 text-sm mb-2">예문</div>
-                <div class="text-lg text-gray-700 italic">
+                <div class="text-luxury-secondary text-sm mb-2">예문</div>
+                <div class="text-lg text-luxury-primary italic">
                   "${word.example_sentence}"
                 </div>
               </div>
@@ -2545,7 +2545,7 @@ class WorVox {
             <!-- Action Buttons -->
             <div class="flex gap-4">
               <button onclick="worvox.markWordAsLearned(${word.id}, false)" 
-                class="flex-1 px-6 py-4 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-all">
+                class="flex-1 px-6 py-4 border-2 border-gray-300 text-luxury-primary rounded-xl font-semibold hover:bg-gray-50 transition-all">
                 <i class="fas fa-times mr-2"></i>다시 보기
               </button>
               <button onclick="worvox.markWordAsLearned(${word.id}, true)" 
@@ -2559,13 +2559,13 @@ class WorVox {
           <div class="flex gap-4 mt-6">
             ${this.currentWordIndex > 0 ? `
               <button onclick="worvox.previousWord()" 
-                class="px-6 py-3 bg-white text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-all shadow-md">
+                class="px-6 py-3 bg-white text-luxury-primary rounded-lg font-semibold hover:bg-gray-50 transition-all shadow-md">
                 <i class="fas fa-chevron-left mr-2"></i>이전 단어
               </button>
             ` : ''}
             ${this.currentWordIndex < this.vocabularyWords.length - 1 ? `
               <button onclick="worvox.nextWord()" 
-                class="ml-auto px-6 py-3 bg-white text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-all shadow-md">
+                class="ml-auto px-6 py-3 bg-white text-luxury-primary rounded-lg font-semibold hover:bg-gray-50 transition-all shadow-md">
                 다음 단어<i class="fas fa-chevron-right ml-2"></i>
               </button>
             ` : ''}
@@ -2636,11 +2636,11 @@ class WorVox {
   showVocabularyCompletion() {
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="min-h-screen flex items-center justify-center p-4 bg-luxury-dark">
+      <div class="min-h-screen flex items-center justify-center p-4 bg-luxury-gradient">
         <div class="glass-card hover-luxury p-8 md:p-12 text-center max-w-lg">
           <div class="text-6xl mb-6">🎉</div>
-          <h2 class="text-3xl font-bold text-gray-800 mb-4">완료했습니다!</h2>
-          <p class="text-gray-600 mb-8">
+          <h2 class="text-3xl font-bold text-luxury-primary mb-4">완료했습니다!</h2>
+          <p class="text-luxury-secondary mb-8">
             ${this.vocabularyWords.length}개의 단어를 학습했습니다!
           </p>
           
@@ -2650,7 +2650,7 @@ class WorVox {
               <i class="fas fa-redo mr-2"></i>더 학습하기
             </button>
             <button onclick="worvox.showTopicSelection()" 
-              class="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-all">
+              class="flex-1 px-6 py-3 border-2 border-gray-300 text-luxury-primary rounded-lg font-semibold hover:bg-gray-50 transition-all">
               <i class="fas fa-home mr-2"></i>홈으로
             </button>
           </div>

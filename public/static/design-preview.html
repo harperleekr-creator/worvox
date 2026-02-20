@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorVox Design Options</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        /* Design 1 - Elegant White Gold */
+        .design-1 {
+            background: linear-gradient(135deg, #FFFFFF 0%, #F8F8F8 100%);
+        }
+        .design-1 .card {
+            background: white;
+            border: 2px solid #D4AF37;
+            box-shadow: 0 10px 40px rgba(212, 175, 55, 0.15);
+        }
+        .design-1 .gradient-text {
+            background: linear-gradient(135deg, #D4AF37 0%, #F4E4C1 50%, #D4AF37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shimmer 3s linear infinite;
+        }
+        .design-1 .btn {
+            background: linear-gradient(135deg, #D4AF37 0%, #F4E4C1 50%, #D4AF37 100%);
+            color: #1A1A1A;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+        
+        /* Design 2 - Modern Dark Premium */
+        .design-2 {
+            background: linear-gradient(135deg, #1A1A2E 0%, #16213E 100%);
+        }
+        .design-2 .card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            box-shadow: 0 15px 50px rgba(212, 175, 55, 0.2);
+        }
+        .design-2 .gradient-text {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+        .design-2 .btn {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            color: #1A1A2E;
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+        }
+        
+        /* Design 3 - Cream Luxury */
+        .design-3 {
+            background: linear-gradient(135deg, #FAF8F3 0%, #E8E4DB 100%);
+        }
+        .design-3 .card {
+            background: white;
+            border: 2px solid #C9B382;
+            box-shadow: 0 10px 40px rgba(201, 179, 130, 0.2);
+        }
+        .design-3 .accent {
+            background: linear-gradient(135deg, #8B7355 0%, #A89168 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .design-3 .btn {
+            background: linear-gradient(135deg, #8B7355 0%, #A89168 100%);
+            color: white;
+            box-shadow: 0 6px 20px rgba(139, 115, 85, 0.3);
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .hover-scale:hover {
+            transform: scale(1.02);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-4xl font-bold text-center mb-12 text-gray-800">
+            WorVox Design Options
+        </h1>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Design 1: Elegant White Gold -->
+            <div class="design-1 p-8 rounded-3xl shadow-2xl">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Option 1</h2>
+                    <p class="text-sm text-gray-600">Elegant White Gold</p>
+                </div>
+                
+                <div class="card rounded-2xl p-6 mb-6 hover-scale">
+                    <div class="text-center mb-4">
+                        <h3 class="text-3xl font-bold gradient-text mb-2">WorVox</h3>
+                        <p class="text-gray-600 text-sm">Premium English Learning</p>
+                    </div>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="bg-gray-50 rounded-lg p-3 border-l-4 border-yellow-500">
+                            <p class="text-gray-700 text-sm font-medium">✨ 깔끔하고 우아한 화이트</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3 border-l-4 border-yellow-500">
+                            <p class="text-gray-700 text-sm font-medium">🎨 골드 액센트로 프리미엄</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3 border-l-4 border-yellow-500">
+                            <p class="text-gray-700 text-sm font-medium">💎 가장 읽기 쉬운 디자인</p>
+                        </div>
+                    </div>
+                    
+                    <input 
+                        type="text" 
+                        placeholder="Search Words!"
+                        class="w-full px-4 py-3 border-2 border-yellow-400 rounded-xl focus:outline-none focus:border-yellow-500 mb-4"
+                    />
+                    
+                    <button class="btn w-full py-3 rounded-xl font-semibold hover:scale-105 transition">
+                        Get Started
+                    </button>
+                </div>
+                
+                <div class="text-center">
+                    <p class="text-sm text-gray-700 font-medium">🌟 추천: 일반 사용자용</p>
+                    <p class="text-xs text-gray-500 mt-1">밝고 전문적인 이미지</p>
+                </div>
+            </div>
+            
+            <!-- Design 2: Modern Dark Premium -->
+            <div class="design-2 p-8 rounded-3xl shadow-2xl">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-white mb-2">Option 2</h2>
+                    <p class="text-sm text-gray-300">Modern Dark Premium</p>
+                </div>
+                
+                <div class="card rounded-2xl p-6 mb-6 hover-scale">
+                    <div class="text-center mb-4">
+                        <h3 class="text-3xl font-bold gradient-text mb-2">WorVox</h3>
+                        <p class="text-gray-700 text-sm">Premium English Learning</p>
+                    </div>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-3 border-l-4 border-yellow-500">
+                            <p class="text-gray-800 text-sm font-medium">🌙 모던한 다크 배경</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-3 border-l-4 border-yellow-500">
+                            <p class="text-gray-800 text-sm font-medium">✨ 밝은 글래스 카드</p>
+                        </div>
+                        <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-3 border-l-4 border-yellow-500">
+                            <p class="text-gray-800 text-sm font-medium">💫 고급스러운 대비</p>
+                        </div>
+                    </div>
+                    
+                    <input 
+                        type="text" 
+                        placeholder="Search Words!"
+                        class="w-full px-4 py-3 border-2 border-yellow-400 rounded-xl focus:outline-none focus:border-yellow-500 bg-white mb-4"
+                    />
+                    
+                    <button class="btn w-full py-3 rounded-xl font-semibold hover:scale-105 transition">
+                        Get Started
+                    </button>
+                </div>
+                
+                <div class="text-center">
+                    <p class="text-sm text-white font-medium">🔥 추천: 트렌디한 앱</p>
+                    <p class="text-xs text-gray-300 mt-1">젊고 세련된 이미지</p>
+                </div>
+            </div>
+            
+            <!-- Design 3: Cream Luxury -->
+            <div class="design-3 p-8 rounded-3xl shadow-2xl">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Option 3</h2>
+                    <p class="text-sm text-gray-600">Cream Luxury</p>
+                </div>
+                
+                <div class="card rounded-2xl p-6 mb-6 hover-scale">
+                    <div class="text-center mb-4">
+                        <h3 class="text-3xl font-bold accent mb-2">WorVox</h3>
+                        <p class="text-gray-600 text-sm">Premium English Learning</p>
+                    </div>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="bg-amber-50 rounded-lg p-3 border-l-4 border-amber-600">
+                            <p class="text-gray-700 text-sm font-medium">☕ 따뜻한 크림 톤</p>
+                        </div>
+                        <div class="bg-amber-50 rounded-lg p-3 border-l-4 border-amber-600">
+                            <p class="text-gray-700 text-sm font-medium">🎨 브라운 골드 액센트</p>
+                        </div>
+                        <div class="bg-amber-50 rounded-lg p-3 border-l-4 border-amber-600">
+                            <p class="text-gray-700 text-sm font-medium">📚 클래식한 럭셔리</p>
+                        </div>
+                    </div>
+                    
+                    <input 
+                        type="text" 
+                        placeholder="Search Words!"
+                        class="w-full px-4 py-3 border-2 border-amber-500 rounded-xl focus:outline-none focus:border-amber-600 bg-white mb-4"
+                    />
+                    
+                    <button class="btn w-full py-3 rounded-xl font-semibold hover:scale-105 transition">
+                        Get Started
+                    </button>
+                </div>
+                
+                <div class="text-center">
+                    <p class="text-sm text-gray-700 font-medium">🏆 추천: 프리미엄 서비스</p>
+                    <p class="text-xs text-gray-500 mt-1">고급스럽고 편안한 이미지</p>
+                </div>
+            </div>
+            
+        </div>
+        
+        <div class="mt-12 bg-white rounded-2xl shadow-xl p-8">
+            <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">어떤 디자인을 선택하시겠어요?</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                <div class="p-6 border-2 border-gray-200 rounded-xl hover:border-yellow-400 transition">
+                    <div class="text-4xl mb-3">1️⃣</div>
+                    <h3 class="font-bold text-lg mb-2">Elegant White Gold</h3>
+                    <p class="text-sm text-gray-600">깔끔, 밝음, 전문적</p>
+                </div>
+                
+                <div class="p-6 border-2 border-gray-200 rounded-xl hover:border-yellow-400 transition">
+                    <div class="text-4xl mb-3">2️⃣</div>
+                    <h3 class="font-bold text-lg mb-2">Modern Dark Premium</h3>
+                    <p class="text-sm text-gray-600">트렌디, 대비, 현대적</p>
+                </div>
+                
+                <div class="p-6 border-2 border-gray-200 rounded-xl hover:border-yellow-400 transition">
+                    <div class="text-4xl mb-3">3️⃣</div>
+                    <h3 class="font-bold text-lg mb-2">Cream Luxury</h3>
+                    <p class="text-sm text-gray-600">따뜻함, 고급, 편안함</p>
+                </div>
+            </div>
+            
+            <p class="text-center mt-8 text-gray-600">
+                💬 선택하신 번호를 말씀해주시면 바로 적용해드릴게요!
+            </p>
+        </div>
+    </div>
+</body>
+</html>
