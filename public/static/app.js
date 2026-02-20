@@ -1120,7 +1120,10 @@ class WorVox {
     this.vocabularyMode = mode; // 'list', 'flashcard', 'quiz'
     try {
       const response = await axios.get('/api/vocabulary/list');
-      const words = response.data.words;
+      let words = response.data.words;
+      
+      // Shuffle words randomly every time
+      words = this.shuffleArray(words);
       
       // Store vocabulary data for flashcard/quiz access
       document.getElementById('app').dataset.vocabularyData = JSON.stringify(response.data);
@@ -2108,6 +2111,16 @@ class WorVox {
         }, 2000);
       }
     }
+  }
+
+  // Shuffle array using Fisher-Yates algorithm
+  shuffleArray(array) {
+    const shuffled = [...array]; // Create a copy
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
   }
 
   escapeHtml(text) {
