@@ -534,7 +534,7 @@ class HeySpeak {
                   <input 
                     type="text" 
                     id="wordSearch" 
-                    placeholder="영어 단어 검색" 
+                    placeholder="Search Words!" 
                     class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-indigo-500 text-gray-700 placeholder-gray-400"
                     onkeypress="if(event.key==='Enter') heyspeak.searchWord()"
                   />
