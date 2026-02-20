@@ -59,7 +59,7 @@ app.get('/', (c) => {
         <script src="https://accounts.google.com/gsi/client" async defer></script>
         <meta name="google-signin-client_id" content="506018364729-ichplnfnqlk2hmh1bhblepm0un44ltdr.apps.googleusercontent.com">
     </head>
-    <body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <body>
         <div id="app"></div>
         
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
