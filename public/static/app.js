@@ -1092,6 +1092,7 @@ class WorVox {
       }
       
       this.currentAudio = new Audio(message.audioUrl);
+      this.currentAudio.playbackRate = 0.85; // 15% slower for better comprehension
       
       this.currentAudio.onended = () => {
         if (replayBtn) {
@@ -2353,6 +2354,7 @@ class WorVox {
       const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
+      audio.playbackRate = 0.85; // 15% slower for better comprehension
       
       audio.onended = () => {
         URL.revokeObjectURL(audioUrl);
@@ -2727,7 +2729,7 @@ class WorVox {
               </div>
               
               <!-- Pronunciation Button -->
-              <button onclick="worvox.playWordPronunciation('${word.word}')" 
+              <button onclick="worvox.playWordPronunciation('${word.word}', '${word.meaning_ko}')" 
                 class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-semibold hover:from-green-600 hover:to-green-700 transition-all">
                 <i class="fas fa-volume-up"></i>
                 발음 듣기
@@ -2795,18 +2797,53 @@ class WorVox {
     `;
   }
 
-  async playWordPronunciation(word) {
+  async playWordPronunciation(word, meaningKo) {
     try {
-      const response = await axios.post('/api/tts/speak', {
-        text: word
+      // Play English word first
+      const englishResponse = await axios.post('/api/tts/speak', {
+        text: word,
+        language: 'en'
       }, {
         responseType: 'blob'
       });
 
-      const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
-      audio.play();
+      const englishBlob = new Blob([englishResponse.data], { type: 'audio/mpeg' });
+      const englishUrl = URL.createObjectURL(englishBlob);
+      const englishAudio = new Audio(englishUrl);
+      englishAudio.playbackRate = 0.85; // 15% slower for better pronunciation learning
+      
+      // When English audio ends, play Korean meaning
+      englishAudio.onended = async () => {
+        URL.revokeObjectURL(englishUrl);
+        
+        try {
+          // Add a short pause before Korean
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // Play Korean meaning
+          const koreanResponse = await axios.post('/api/tts/speak', {
+            text: meaningKo,
+            language: 'ko'
+          }, {
+            responseType: 'blob'
+          });
+
+          const koreanBlob = new Blob([koreanResponse.data], { type: 'audio/mpeg' });
+          const koreanUrl = URL.createObjectURL(koreanBlob);
+          const koreanAudio = new Audio(koreanUrl);
+          koreanAudio.playbackRate = 0.85;
+          
+          koreanAudio.onended = () => {
+            URL.revokeObjectURL(koreanUrl);
+          };
+          
+          koreanAudio.play();
+        } catch (error) {
+          console.error('Error playing Korean meaning:', error);
+        }
+      };
+      
+      englishAudio.play();
     } catch (error) {
       console.error('Error playing pronunciation:', error);
       alert('Failed to play pronunciation. Please try again.');
