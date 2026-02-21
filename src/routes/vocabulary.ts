@@ -9,6 +9,96 @@ type Bindings = {
 
 const vocabulary = new Hono<{ Bindings: Bindings }>()
 
+// Admin endpoint to generate English meanings for all words
+vocabulary.post('/admin/generate-meanings', async (c: Context<{ Bindings: Bindings }>) => {
+  try {
+    // Get words without English meanings
+    const { results } = await c.env.DB.prepare(`
+      SELECT id, word, meaning_ko, part_of_speech 
+      FROM vocabulary_words 
+      WHERE meaning_en IS NULL
+      LIMIT 50
+    `).all()
+
+    if (!results || results.length === 0) {
+      return c.json({
+        success: true,
+        message: 'All words already have English meanings!',
+        processed: 0
+      })
+    }
+
+    console.log(`Processing ${results.length} words...`)
+    const updates = []
+
+    // Process each word
+    for (const row of results) {
+      try {
+        const word = row as any
+        
+        // Call OpenAI to generate English meaning
+        const response = await fetch(`${c.env.OPENAI_API_BASE}/chat/completions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${c.env.OPENAI_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: 'gpt-3.5-turbo',
+            messages: [
+              {
+                role: 'system',
+                content: 'You are an English dictionary. Provide concise, clear definitions in one sentence.'
+              },
+              {
+                role: 'user',
+                content: `Define "${word.word}" (${word.part_of_speech || 'word'}) in ONE clear sentence. Korean: ${word.meaning_ko}. Return ONLY the definition.`
+              }
+            ],
+            temperature: 0.3,
+            max_tokens: 50
+          })
+        })
+
+        if (response.ok) {
+          const data = await response.json() as any
+          const meaningEn = data.choices[0].message.content.trim()
+          
+          // Update the word
+          await c.env.DB.prepare(`
+            UPDATE vocabulary_words 
+            SET meaning_en = ? 
+            WHERE id = ?
+          `).bind(meaningEn, word.id).run()
+
+          updates.push({ word: word.word, meaning_en: meaningEn })
+          console.log(`✅ ${word.word}: ${meaningEn}`)
+        }
+
+        // Small delay to avoid rate limits
+        await new Promise(resolve => setTimeout(resolve, 100))
+      } catch (error) {
+        console.error(`Error processing word:`, error)
+      }
+    }
+
+    return c.json({
+      success: true,
+      message: `Processed ${updates.length} words`,
+      processed: updates.length,
+      remaining: results.length - updates.length,
+      sample: updates.slice(0, 5)
+    })
+  } catch (error) {
+    console.error('Error generating meanings:', error)
+    return c.json({
+      success: false,
+      error: 'Failed to generate meanings'
+    }, 500)
+  }
+})
+
+
 // Search vocabulary words with hybrid approach (DB + ChatGPT)
 vocabulary.get('/search', async (c: Context<{ Bindings: Bindings }>) => {
   try {
