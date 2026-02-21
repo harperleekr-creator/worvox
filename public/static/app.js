@@ -94,35 +94,42 @@ class WorVox {
   // UI Rendering Methods
   getSidebar(activeItem = 'home') {
     return `
-      <div class="w-64 bg-gray-900 text-white flex flex-col">
+      <!-- Mobile Sidebar Overlay -->
+      <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden" onclick="worvox.toggleMobileSidebar()"></div>
+      
+      <!-- Sidebar (hidden on mobile by default) -->
+      <div id="sidebar" class="fixed md:static inset-y-0 left-0 w-64 bg-gray-900 text-white flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
         <!-- Logo -->
-        <div class="p-4 border-b border-gray-700">
+        <div class="p-4 border-b border-gray-700 flex items-center justify-between">
           <h1 class="text-xl font-bold">WorVox</h1>
+          <button onclick="worvox.toggleMobileSidebar()" class="md:hidden text-white">
+            <i class="fas fa-times text-xl"></i>
+          </button>
         </div>
         
         <!-- Menu Items -->
         <nav class="flex-1 p-3 space-y-2 overflow-y-auto">
-          <a href="#" onclick="worvox.showTopicSelection(); return false;" 
+          <a href="#" onclick="worvox.showTopicSelection(); worvox.closeMobileSidebar(); return false;" 
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'home' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
             <i class="fas fa-home" style="width: 20px; text-align: center;"></i>
             <span>Home</span>
           </a>
-          <a href="#" onclick="worvox.startConversation(); return false;" 
+          <a href="#" onclick="worvox.startConversation(); worvox.closeMobileSidebar(); return false;" 
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'conversation' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
             <i class="fas fa-comments" style="width: 20px; text-align: center;"></i>
             <span>AI Conversation</span>
           </a>
-          <a href="#" onclick="worvox.startVocabulary(); return false;" 
+          <a href="#" onclick="worvox.startVocabulary(); worvox.closeMobileSidebar(); return false;" 
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'vocabulary' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
             <i class="fas fa-book" style="width: 20px; text-align: center;"></i>
             <span>Vocabulary</span>
           </a>
-          <a href="#" onclick="worvox.showHistory(); return false;" 
+          <a href="#" onclick="worvox.showHistory(); worvox.closeMobileSidebar(); return false;" 
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'history' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
             <i class="fas fa-history" style="width: 20px; text-align: center;"></i>
             <span>History</span>
           </a>
-          <a href="#" onclick="worvox.showStats(); return false;" 
+          <a href="#" onclick="worvox.showStats(); worvox.closeMobileSidebar(); return false;" 
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'stats' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
             <i class="fas fa-chart-line" style="width: 20px; text-align: center;"></i>
             <span>Statistics</span>
@@ -144,6 +151,38 @@ class WorVox {
             </button>
           </div>
         </div>
+      </div>
+    `;
+  }
+
+  toggleMobileSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    
+    if (sidebar && overlay) {
+      sidebar.classList.toggle('-translate-x-full');
+      overlay.classList.toggle('hidden');
+    }
+  }
+
+  closeMobileSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    
+    if (sidebar && overlay) {
+      sidebar.classList.add('-translate-x-full');
+      overlay.classList.add('hidden');
+    }
+  }
+
+  getMobileHeader(title = 'WorVox') {
+    return `
+      <div class="md:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+        <button onclick="worvox.toggleMobileSidebar()" class="text-gray-600">
+          <i class="fas fa-bars text-xl"></i>
+        </button>
+        <h1 class="text-lg font-semibold text-gray-800">${title}</h1>
+        <div class="w-6"></div>
       </div>
     `;
   }
@@ -618,9 +657,12 @@ class WorVox {
           ${this.getSidebar('home')}
           
           <!-- Main Content -->
-          <div class="flex-1 flex flex-col">
-            <!-- Top Bar -->
-            <div class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
+          <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Mobile Header -->
+            ${this.getMobileHeader('Home')}
+            
+            <!-- Desktop Top Bar -->
+            <div class="hidden md:flex bg-white border-b border-gray-200 px-6 py-3 items-center justify-between">
               <h2 class="text-lg font-semibold text-gray-800">Choose Your Learning Path</h2>
               <button class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition-all">
                 <i class="fas fa-crown mr-2"></i>Upgrade
@@ -628,36 +670,35 @@ class WorVox {
             </div>
             
             <!-- Content Area -->
-            <div class="flex-1 overflow-y-auto p-8">
+            <div class="flex-1 overflow-y-auto p-4 md:p-8">
               <div class="max-w-4xl mx-auto">
                 <!-- Welcome Message -->
-                <div class="text-center mb-12">
-                  <h1 class="text-4xl font-bold text-gray-900 mb-3">Welcome back, ${this.currentUser.username}!</h1>
-                  <p class="text-gray-600 text-lg">What would you like to learn today?</p>
+                <div class="text-center mb-8 md:mb-12">
+                  <h1 class="text-2xl md:text-4xl font-bold text-gray-900 mb-2 md:mb-3">Welcome back, ${this.currentUser.username}!</h1>
+                  <p class="text-gray-600 text-base md:text-lg">What would you like to learn today?</p>
                 </div>
                 
                 <!-- Word Search Section -->
-                <div class="mb-8">
+                <div class="mb-6 md:mb-8">
                   <div class="relative max-w-2xl mx-auto">
                     <input 
                       type="text" 
                       id="wordSearch" 
                       placeholder="Search for any English word..." 
-                      class="w-full px-6 py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-emerald-500 text-gray-700 placeholder-gray-400 text-lg"
+                      class="w-full px-4 md:px-6 py-3 md:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-emerald-500 text-gray-700 placeholder-gray-400 text-base md:text-lg pr-24"
                       onkeypress="if(event.key==='Enter') worvox.searchWord()"
                     />
                     <button 
                       onclick="worvox.searchWord()"
-                      class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2 rounded-lg transition-all">
-                      <i class="fas fa-search mr-2"></i>Search
+                      class="absolute right-2 md:right-4 top-1/2 transform -translate-y-1/2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 md:px-6 py-2 rounded-lg transition-all text-sm md:text-base">
+                      <i class="fas fa-search mr-1 md:mr-2"></i><span class="hidden sm:inline">Search</span>
                     </button>
                   </div>
-                  <div id="searchResult" class="mt-6 max-w-2xl mx-auto"></div>
+                  <div id="searchResult" class="mt-4 md:mt-6 max-w-2xl mx-auto"></div>
                 </div>
                 
                 <!-- Feature Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                  ${topics.map(topic => `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">${topics.map(topic => `
                     <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-lg hover:border-emerald-400 transition-all cursor-pointer"
                       onclick="worvox.startSession(${topic.id}, '${topic.name}', '${topic.system_prompt}', '${topic.level}')">
                       <div class="w-12 h-12 bg-${topic.name === 'AI English Conversation' ? 'emerald' : 'blue'}-100 rounded-xl flex items-center justify-center mb-4">
@@ -676,18 +717,18 @@ class WorVox {
                 <!-- Stats Summary -->
                 <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-8 text-white">
                   <h3 class="text-2xl font-bold mb-6">Your Progress</h3>
-                  <div class="grid grid-cols-3 gap-6">
+                  <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
                     <div>
-                      <div class="text-3xl font-bold mb-1">${stats.totalSessions}</div>
-                      <div class="text-emerald-100">Sessions</div>
+                      <div class="text-2xl md:text-3xl font-bold mb-1">${stats.totalSessions}</div>
+                      <div class="text-emerald-100 text-sm md:text-base">Sessions</div>
                     </div>
                     <div>
-                      <div class="text-3xl font-bold mb-1">${totalWords.toLocaleString()}</div>
-                      <div class="text-emerald-100">Words Learned</div>
+                      <div class="text-2xl md:text-3xl font-bold mb-1">${totalWords.toLocaleString()}</div>
+                      <div class="text-emerald-100 text-sm md:text-base">Words</div>
                     </div>
-                    <div>
-                      <div class="text-3xl font-bold mb-1">${Math.floor(stats.totalMessages / 2)}h</div>
-                      <div class="text-emerald-100">Study Time</div>
+                    <div class="col-span-2 md:col-span-1">
+                      <div class="text-2xl md:text-3xl font-bold mb-1">${Math.floor(stats.totalMessages / 2)}h</div>
+                      <div class="text-emerald-100 text-sm md:text-base">Study Time</div>
                     </div>
                   </div>
                 </div>
