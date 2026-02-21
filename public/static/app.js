@@ -2229,10 +2229,28 @@ class WorVox {
               </div>
             </div>
             
-            <!-- Korean Meaning -->
+            <!-- Meanings -->
             <div class="mb-4 pb-4 border-b border-indigo-100">
-              <div class="text-lg font-semibold text-gray-700 mb-1">뜻:</div>
-              <div class="text-gray-800 text-lg">${word.meaning_ko}</div>
+              <!-- Korean Meaning with Play Button -->
+              <div class="mb-3">
+                <div class="flex items-center justify-between mb-1">
+                  <div class="text-lg font-semibold text-gray-700">한국어 뜻:</div>
+                  <button onclick="worvox.playKoreanMeaning('${word.meaning_ko}')" 
+                    class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs hover:bg-blue-200 transition-all">
+                    <i class="fas fa-volume-up"></i>
+                    듣기
+                  </button>
+                </div>
+                <div class="text-gray-800 text-lg">${word.meaning_ko}</div>
+              </div>
+              
+              <!-- English Meaning -->
+              ${word.meaning_en ? `
+                <div class="pt-3 border-t border-indigo-50">
+                  <div class="text-sm font-semibold text-gray-600 mb-1">English Definition:</div>
+                  <div class="text-gray-700 text-sm italic">${word.meaning_en}</div>
+                </div>
+              ` : ''}
             </div>
             
             ${summary.length > 0 ? `
@@ -2736,12 +2754,32 @@ class WorVox {
               </button>
             </div>
 
-            <!-- Meaning -->
+            <!-- Meanings -->
             <div class="border-t border-gray-200 pt-6 mb-6">
-              <div class="text-gray-600 text-sm mb-2">한국어 뜻</div>
-              <div class="text-2xl font-semibold text-gray-800 mb-4">
-                ${word.meaning_ko}
+              <!-- Korean Meaning -->
+              <div class="mb-4">
+                <div class="flex items-center justify-between mb-2">
+                  <div class="text-gray-600 text-sm">한국어 뜻</div>
+                  <button onclick="worvox.playKoreanMeaning('${word.meaning_ko}')" 
+                    class="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs hover:bg-blue-200 transition-all">
+                    <i class="fas fa-volume-up"></i>
+                    듣기
+                  </button>
+                </div>
+                <div class="text-2xl font-semibold text-gray-800">
+                  ${word.meaning_ko}
+                </div>
               </div>
+              
+              <!-- English Meaning -->
+              ${word.meaning_en ? `
+                <div class="pt-4 border-t border-gray-100">
+                  <div class="text-gray-600 text-sm mb-2">English Definition</div>
+                  <div class="text-lg text-gray-700 italic">
+                    ${word.meaning_en}
+                  </div>
+                </div>
+              ` : ''}
             </div>
 
             <!-- Example Sentence -->
@@ -2847,6 +2885,31 @@ class WorVox {
     } catch (error) {
       console.error('Error playing pronunciation:', error);
       alert('Failed to play pronunciation. Please try again.');
+    }
+  }
+
+  async playKoreanMeaning(meaningKo) {
+    try {
+      const response = await axios.post('/api/tts/speak', {
+        text: meaningKo,
+        language: 'ko'
+      }, {
+        responseType: 'blob'
+      });
+
+      const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audio.playbackRate = 0.85; // 15% slower for better comprehension
+      
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+      };
+      
+      audio.play();
+    } catch (error) {
+      console.error('Error playing Korean meaning:', error);
+      alert('Failed to play audio. Please try again.');
     }
   }
 

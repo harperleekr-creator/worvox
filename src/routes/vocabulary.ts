@@ -63,6 +63,7 @@ vocabulary.get('/search', async (c: Context<{ Bindings: Bindings }>) => {
 {
   "word": "${query}",
   "meaning_ko": "Korean translation",
+  "meaning_en": "Simple English definition in one clear sentence",
   "pronunciation": "IPA pronunciation",
   "part_of_speech": "noun/verb/adjective/etc",
   "example_sentence": "One simple example sentence",
@@ -113,11 +114,12 @@ Return ONLY valid JSON, no other text. If the word doesn't exist or is invalid, 
     try {
       await c.env.DB.prepare(`
         INSERT INTO vocabulary_words 
-        (word, meaning_ko, pronunciation, part_of_speech, example_sentence, difficulty, category, toeic_related, toefl_related)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (word, meaning_ko, meaning_en, pronunciation, part_of_speech, example_sentence, difficulty, category, toeic_related, toefl_related)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).bind(
         wordData.word,
         wordData.meaning_ko,
+        wordData.meaning_en || null,
         wordData.pronunciation,
         wordData.part_of_speech,
         wordData.example_sentence,
