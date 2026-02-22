@@ -13,6 +13,7 @@ import topics from './routes/topics';
 import history from './routes/history';
 import vocabulary from './routes/vocabulary';
 import preview from './routes/preview';
+import gamification from './routes/gamification';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -31,6 +32,7 @@ app.route('/api/users', users);
 app.route('/api/topics', topics);
 app.route('/api/history', history);
 app.route('/api/vocabulary', vocabulary);
+app.route('/api/gamification', gamification);
 
 // Preview routes
 app.route('/preview', preview);
@@ -64,6 +66,7 @@ app.get('/', (c) => {
         
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+        <script src="/static/gamification.js"></script>
         <script src="/static/app.js"></script>
     </body>
     </html>

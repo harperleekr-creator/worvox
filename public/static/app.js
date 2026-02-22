@@ -2921,6 +2921,16 @@ class WorVox {
         isLearned: isLearned
       });
 
+      // Award XP for learning a word
+      if (isLearned && typeof gamificationManager !== 'undefined') {
+        await gamificationManager.addXP(
+          this.currentUser.id,
+          10, // 10 XP per word
+          'word_learned',
+          `Learned word ID: ${wordId}`
+        );
+      }
+
       // Move to next word
       if (this.currentWordIndex < this.vocabularyWords.length - 1) {
         this.nextWord();
