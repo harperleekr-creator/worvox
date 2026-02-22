@@ -736,6 +736,11 @@ class WorVox {
                 <div class="text-center mb-8 md:mb-12">
                   <h1 class="text-2xl md:text-4xl font-bold text-gray-900 mb-2 md:mb-3">Welcome back, ${this.currentUser.username}!</h1>
                   <p class="text-gray-600 text-base md:text-lg">What would you like to learn today?</p>
+                  
+                  <!-- Test XP Button (임시) -->
+                  <button onclick="worvox.testXP()" class="mt-4 px-6 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg font-semibold transition-all">
+                    🎮 테스트: XP +10 받기
+                  </button>
                 </div>
                 
                 <!-- Word Search Section -->
@@ -1205,6 +1210,20 @@ class WorVox {
     } catch (error) {
       console.error('Error ending session:', error);
       this.showTopicSelection();
+    }
+  }
+
+  // Test XP function (temporary for testing)
+  async testXP() {
+    if (typeof gamificationManager !== 'undefined' && this.currentUser) {
+      await gamificationManager.addXP(
+        this.currentUser.id,
+        10,
+        'test',
+        'Manual test XP'
+      );
+    } else {
+      alert('Gamification manager not loaded or user not logged in');
     }
   }
 
