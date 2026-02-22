@@ -177,6 +177,11 @@ class WorVox {
             <i class="fas fa-chart-line" style="width: 20px; text-align: center;"></i>
             <span>Statistics</span>
           </a>
+          <a href="#" onclick="worvox.showRewards(); worvox.closeMobileSidebar(); return false;" 
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'rewards' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
+            <i class="fas fa-gift" style="width: 20px; text-align: center;"></i>
+            <span>Rewards</span>
+          </a>
         </nav>
         
         <!-- User Profile -->
@@ -2764,6 +2769,147 @@ class WorVox {
         });
       }
     }
+  }
+
+  // Rewards System
+  async showRewards() {
+    try {
+      // Get user gamification stats
+      const stats = await gamificationManager.getStats(this.currentUser.id);
+      const userLevel = stats ? stats.stats.level : 1;
+
+      // Define rewards (unlocked at level 30, 40, 50, etc.)
+      const rewards = [
+        { level: 30, title: 'Bronze Champion', description: 'AI 튜터와 무제한 대화', icon: '🥉', type: 'feature', unlocked: userLevel >= 30 },
+        { level: 40, title: 'Silver Master', description: '프리미엄 단어장 액세스', icon: '🥈', type: 'feature', unlocked: userLevel >= 40 },
+        { level: 50, title: 'Gold Expert', description: '맞춤형 학습 플랜', icon: '🥇', type: 'feature', unlocked: userLevel >= 50 },
+        { level: 60, title: 'Platinum Pro', description: '발음 교정 AI 튜터', icon: '💎', type: 'feature', unlocked: userLevel >= 60 },
+        { level: 70, title: 'Diamond Elite', description: '실시간 번역 기능', icon: '💠', type: 'feature', unlocked: userLevel >= 70 },
+        { level: 80, title: 'Master Scholar', description: '비즈니스 영어 코스', icon: '👑', type: 'course', unlocked: userLevel >= 80 },
+        { level: 90, title: 'Legendary Linguist', description: 'TOEIC/TOEFL 모의고사', icon: '🏆', type: 'course', unlocked: userLevel >= 90 },
+        { level: 100, title: 'Ultimate Master', description: '평생 프리미엄 멤버십', icon: '⭐', type: 'premium', unlocked: userLevel >= 100 },
+      ];
+
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="flex h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-yellow-50">
+          <!-- Sidebar -->
+          ${this.getSidebar('rewards')}
+          
+          <!-- Main Content -->
+          <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Mobile Header -->
+            ${this.getMobileHeader('Rewards')}
+            
+            <!-- Header -->
+            <div class="bg-white border-b border-gray-200 px-6 py-4">
+              <div class="max-w-6xl mx-auto">
+                <h1 class="text-2xl font-bold text-gray-800 mb-1">🎁 Level Rewards</h1>
+                <p class="text-gray-600">Unlock exclusive rewards as you level up!</p>
+              </div>
+            </div>
+            
+            <!-- Content -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-8">
+              <div class="max-w-6xl mx-auto">
+                <!-- Current Level Card -->
+                <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 md:p-8 text-white mb-8 shadow-2xl">
+                  <div class="flex items-center justify-between mb-4">
+                    <div>
+                      <h2 class="text-3xl font-bold mb-2">Level ${userLevel}</h2>
+                      <p class="text-indigo-100">Keep learning to unlock more rewards!</p>
+                    </div>
+                    <div class="text-6xl">🎯</div>
+                  </div>
+                  <div class="bg-white bg-opacity-20 rounded-full h-4">
+                    <div class="bg-yellow-400 h-4 rounded-full transition-all" style="width: ${stats ? stats.stats.progress : 0}%"></div>
+                  </div>
+                  <div class="mt-2 text-sm text-indigo-100">
+                    ${stats ? `${stats.stats.xp} / ${stats.stats.xpForNextLevel} XP to next level` : ''}
+                  </div>
+                </div>
+
+                <!-- Rewards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  ${rewards.map(reward => `
+                    <div class="relative bg-white rounded-2xl shadow-lg overflow-hidden transition-all hover:shadow-2xl ${reward.unlocked ? 'transform hover:-translate-y-1' : ''}">
+                      <!-- Unlocked/Locked Overlay -->
+                      ${!reward.unlocked ? `
+                        <div class="absolute inset-0 bg-gray-900 bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-10">
+                          <div class="text-center">
+                            <i class="fas fa-lock text-5xl text-white mb-3"></i>
+                            <p class="text-white font-bold text-lg">Level ${reward.level} Required</p>
+                            <p class="text-gray-300 text-sm mt-1">${reward.level - userLevel} levels to go</p>
+                          </div>
+                        </div>
+                      ` : ''}
+                      
+                      <!-- Reward Content -->
+                      <div class="p-6 ${!reward.unlocked ? 'filter grayscale' : ''}">
+                        <!-- Level Badge -->
+                        <div class="flex items-center justify-between mb-4">
+                          <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-bold">
+                            Lv.${reward.level}
+                          </span>
+                          ${reward.unlocked ? `
+                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">
+                              <i class="fas fa-check mr-1"></i>UNLOCKED
+                            </span>
+                          ` : ''}
+                        </div>
+                        
+                        <!-- Icon -->
+                        <div class="text-6xl mb-4 text-center">${reward.icon}</div>
+                        
+                        <!-- Title & Description -->
+                        <h3 class="text-xl font-bold text-gray-800 mb-2 text-center">${reward.title}</h3>
+                        <p class="text-gray-600 text-center mb-4">${reward.description}</p>
+                        
+                        <!-- Type Badge -->
+                        <div class="text-center">
+                          <span class="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">
+                            ${reward.type === 'feature' ? '🎯 Feature' : reward.type === 'course' ? '📚 Course' : '👑 Premium'}
+                          </span>
+                        </div>
+                        
+                        <!-- Claim Button (if unlocked) -->
+                        ${reward.unlocked ? `
+                          <button onclick="worvox.claimReward(${reward.level})" 
+                            class="mt-4 w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all">
+                            <i class="fas fa-gift mr-2"></i>Claim Reward
+                          </button>
+                        ` : ''}
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+
+                <!-- Next Milestone -->
+                ${userLevel < 30 ? `
+                  <div class="mt-8 bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-6 text-center">
+                    <div class="text-4xl mb-3">🎯</div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">First Reward at Level 30!</h3>
+                    <p class="text-gray-600 mb-4">You need ${30 - userLevel} more levels to unlock your first reward.</p>
+                    <p class="text-sm text-gray-500">Keep completing quizzes to earn XP and level up faster!</p>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Load gamification stats after rendering
+      await this.loadGamificationStats();
+    } catch (error) {
+      console.error('Error loading rewards:', error);
+      alert('Failed to load rewards. Please try again.');
+    }
+  }
+
+  claimReward(level) {
+    // Placeholder for claim reward functionality
+    alert(`🎉 Congratulations! You've claimed the Level ${level} reward!\n\nThis feature will be available soon.`);
   }
 
   // Vocabulary Learning Feature
