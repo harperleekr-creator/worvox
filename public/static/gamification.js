@@ -109,10 +109,16 @@ class GamificationManager {
       xpBar.style.width = `${progress}%`;
     }
     
+    // Update XP text
+    const xpText = document.querySelector('#xp-text');
+    if (xpText) {
+      xpText.textContent = `${data.currentLevelXP} / ${data.xpNeededForNextLevel} XP`;
+    }
+    
     // Update coins
     const coinsDisplay = document.querySelector('#user-coins');
     if (coinsDisplay) {
-      coinsDisplay.textContent = data.totalCoins;
+      coinsDisplay.textContent = `💰 ${data.totalCoins}`;
     }
   }
 

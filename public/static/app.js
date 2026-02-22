@@ -32,9 +32,49 @@ class WorVox {
     const savedUser = localStorage.getItem('worvox_user');
     if (savedUser) {
       this.currentUser = JSON.parse(savedUser);
+      await this.loadGamificationStats();
       this.showTopicSelection();
     } else {
       this.showLogin();
+    }
+  }
+
+  async loadGamificationStats() {
+    if (!this.currentUser || typeof gamificationManager === 'undefined') return;
+    
+    try {
+      const stats = await gamificationManager.getStats(this.currentUser.id);
+      if (stats) {
+        this.updateGamificationUI(stats.stats);
+      }
+    } catch (error) {
+      console.error('Error loading gamification stats:', error);
+    }
+  }
+
+  updateGamificationUI(stats) {
+    // Update level
+    const levelBadge = document.querySelector('#user-level');
+    if (levelBadge) {
+      levelBadge.textContent = `Lv.${stats.level}`;
+    }
+    
+    // Update XP progress bar
+    const xpBar = document.querySelector('#xp-progress-bar');
+    if (xpBar) {
+      xpBar.style.width = `${stats.progress}%`;
+    }
+    
+    // Update XP text
+    const xpText = document.querySelector('#xp-text');
+    if (xpText) {
+      xpText.textContent = `${stats.xp} / ${stats.xpForNextLevel} XP`;
+    }
+    
+    // Update coins
+    const coinsDisplay = document.querySelector('#user-coins');
+    if (coinsDisplay) {
+      coinsDisplay.textContent = `💰 ${stats.coins}`;
     }
   }
 
@@ -75,6 +115,9 @@ class WorVox {
       if (authResponse.data.success) {
         this.currentUser = authResponse.data.user;
         localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
+        
+        // Load gamification stats
+        await this.loadGamificationStats();
         
         // If new user, show onboarding for additional info
         if (authResponse.data.isNew) {
@@ -138,6 +181,22 @@ class WorVox {
         
         <!-- User Profile -->
         <div class="p-4 border-t border-gray-700">
+          <!-- Level & XP Info -->
+          <div class="mb-3 bg-gray-800 rounded-lg p-3">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs text-gray-400">레벨</span>
+              <span id="user-level" class="text-sm font-bold text-yellow-400">Lv.1</span>
+            </div>
+            <div class="w-full bg-gray-700 rounded-full h-2 mb-1">
+              <div id="xp-progress-bar" class="bg-gradient-to-r from-yellow-400 to-yellow-600 h-2 rounded-full transition-all" style="width: 0%"></div>
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span id="xp-text" class="text-gray-400">0 / 100 XP</span>
+              <span id="user-coins" class="text-yellow-400">💰 0</span>
+            </div>
+          </div>
+          
+          <!-- User Info -->
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-white font-semibold">
               ${this.currentUser.username.charAt(0).toUpperCase()}
@@ -629,6 +688,7 @@ class WorVox {
       if (response.data.success) {
         this.currentUser = response.data.user;
         localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
+        await this.loadGamificationStats();
         this.showTopicSelection();
       }
     } catch (error) {
