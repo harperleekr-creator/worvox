@@ -1837,6 +1837,16 @@ class WorVox {
     
     if (question.correct) {
       this.quizData.score++;
+      
+      // Award XP for correct answer
+      if (typeof gamificationManager !== 'undefined' && this.currentUser) {
+        await gamificationManager.addXP(
+          this.currentUser.id,
+          15, // 15 XP per correct answer
+          'quiz_correct',
+          `Correct answer for word: ${question.word.word}`
+        );
+      }
     }
     
     // Re-render to show result
@@ -1848,6 +1858,16 @@ class WorVox {
     
     if (this.quizData.currentIndex >= this.quizData.questions.length) {
       this.quizData.finished = true;
+      
+      // Award bonus XP for completing quiz
+      if (typeof gamificationManager !== 'undefined' && this.currentUser) {
+        await gamificationManager.addXP(
+          this.currentUser.id,
+          50, // 50 XP bonus for completing quiz
+          'quiz_completed',
+          `Quiz completed with ${this.quizData.score}/${this.quizData.questions.length} correct`
+        );
+      }
     }
     
     await this.showVocabulary('quiz');
@@ -2999,16 +3019,6 @@ class WorVox {
         wordId: wordId,
         isLearned: isLearned
       });
-
-      // Award XP for learning a word
-      if (isLearned && typeof gamificationManager !== 'undefined') {
-        await gamificationManager.addXP(
-          this.currentUser.id,
-          10, // 10 XP per word
-          'word_learned',
-          `Learned word ID: ${wordId}`
-        );
-      }
 
       // Move to next word
       if (this.currentWordIndex < this.vocabularyWords.length - 1) {
