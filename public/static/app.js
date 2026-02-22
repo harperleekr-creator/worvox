@@ -802,6 +802,9 @@ class WorVox {
           </div>
         </div>
       `;
+      
+      // Load gamification stats after rendering
+      await this.loadGamificationStats();
     } catch (error) {
       console.error('Error loading topics:', error);
       alert('Failed to load topics. Please refresh the page.');
@@ -919,6 +922,9 @@ class WorVox {
         </div>
       </div>
     `;
+    
+    // Load gamification stats after rendering
+    setTimeout(() => this.loadGamificationStats(), 100);
   }
 
   async toggleRecording() {
@@ -1413,6 +1419,9 @@ class WorVox {
           </div>
         </div>
       `;
+      
+      // Load gamification stats after rendering
+      await this.loadGamificationStats();
     } catch (error) {
       console.error('Error loading vocabulary:', error);
       alert('Failed to load vocabulary. Please try again.');
