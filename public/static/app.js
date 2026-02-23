@@ -278,10 +278,10 @@ class WorVox {
       <div class="flex-1 flex flex-col bg-gray-50">
         ${this.getMobileHeader('Real Conversation')}
         
-        <div class="flex-1 overflow-y-auto p-4 md:p-8">
+        <div class="flex-1 overflow-y-auto p-3 md:p-6">
           <div class="max-w-4xl mx-auto">
             <!-- Header -->
-            <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-lg p-6 md:p-8 text-white mb-6">
+            <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-lg p-4 md:p-6 text-white mb-4">
               <h1 class="text-2xl md:text-3xl font-bold mb-2">
                 <i class="fas fa-user-tie mr-2"></i>
                 Real Conversation Lessons
@@ -290,11 +290,11 @@ class WorVox {
             </div>
 
             <!-- Booking Form -->
-            <div class="bg-white rounded-lg shadow-md p-6 md:p-8">
-              <h2 class="text-xl font-bold text-gray-800 mb-6">Select Your Lesson Plan</h2>
+            <div class="bg-white rounded-lg shadow-md p-4 md:p-6">
+              <h2 class="text-xl font-bold text-gray-800 mb-4">Select Your Lesson Plan</h2>
 
               <!-- Sessions Per Week -->
-              <div class="mb-6">
+              <div class="mb-5">
                 <label class="block text-sm font-semibold text-gray-700 mb-3">Sessions Per Week</label>
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
                   ${[1, 2, 3, 4, 5].map(num => `
@@ -310,7 +310,7 @@ class WorVox {
               </div>
 
               <!-- Session Duration -->
-              <div class="mb-6">
+              <div class="mb-5">
                 <label class="block text-sm font-semibold text-gray-700 mb-3">Session Duration</label>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <button 
@@ -331,10 +331,10 @@ class WorVox {
               </div>
 
               <!-- Pricing Summary -->
-              <div class="bg-gray-50 rounded-lg p-6 mb-6">
-                <h3 class="text-lg font-bold text-gray-800 mb-4">Pricing Summary</h3>
+              <div class="bg-gray-50 rounded-lg p-4 md:p-5 mb-5">
+                <h3 class="text-lg font-bold text-gray-800 mb-3">Pricing Summary</h3>
                 
-                <div class="space-y-3">
+                <div class="space-y-2">
                   <div class="flex justify-between items-center text-gray-600">
                     <span>Base Price (per session)</span>
                     <span class="font-semibold">₩16,500</span>
@@ -362,8 +362,8 @@ class WorVox {
               </div>
 
               <!-- Total & Checkout -->
-              <div class="border-t border-gray-200 pt-6">
-                <div class="flex justify-between items-center mb-4">
+              <div class="border-t border-gray-200 pt-4">
+                <div class="flex justify-between items-center mb-3">
                   <span class="text-xl font-bold text-gray-800">Total (Monthly)</span>
                   <span id="total-price" class="text-2xl font-bold text-emerald-600">₩0</span>
                 </div>
@@ -382,7 +382,7 @@ class WorVox {
             </div>
 
             <!-- Features -->
-            <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
               <div class="bg-white rounded-lg p-4 shadow-sm">
                 <i class="fas fa-certificate text-emerald-500 text-2xl mb-2"></i>
                 <h3 class="font-semibold text-gray-800 mb-1">Certified Teachers</h3>
