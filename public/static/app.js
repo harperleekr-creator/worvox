@@ -894,15 +894,25 @@ class WorVox {
         <!-- Main Content -->
         <div class="flex-1 flex flex-col">
           <!-- Header -->
-          <div class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-4">
-              <h2 class="text-lg font-semibold text-gray-800">${this.currentTopic.name}</h2>
-              <span class="text-sm text-gray-500">Practice your English!</span>
+          <div class="bg-white border-b border-gray-200 px-4 md:px-6 py-3">
+            <div class="flex items-center justify-between">
+              <!-- Back Button + Title -->
+              <div class="flex items-center gap-2 md:gap-4 flex-1">
+                <button onclick="worvox.endSession()" 
+                  class="text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all">
+                  <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <div>
+                  <h2 class="text-base md:text-lg font-semibold text-gray-800">${this.currentTopic.name}</h2>
+                  <span class="hidden md:inline text-sm text-gray-500">Practice your English!</span>
+                </div>
+              </div>
+              <!-- End Session (Desktop only) -->
+              <button onclick="worvox.endSession()" 
+                class="hidden md:flex items-center text-gray-600 hover:text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-100 transition-all">
+                <i class="fas fa-times mr-2"></i>End Session
+              </button>
             </div>
-            <button onclick="worvox.endSession()" 
-              class="text-gray-600 hover:text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-100 transition-all">
-              <i class="fas fa-times mr-2"></i>End Session
-            </button>
           </div>
 
           <!-- Chat Container -->
@@ -1287,24 +1297,30 @@ class WorVox {
           <!-- Main Content -->
           <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Header -->
-            <div class="bg-white border-b border-gray-200 px-6 py-4">
-              <div class="flex items-center justify-between flex-wrap gap-4">
-                <div>
-                  <h1 class="text-2xl font-bold text-gray-800">📚 Vocabulary Study</h1>
-                  <p class="text-gray-600 text-sm mt-1">Learn and practice English vocabulary</p>
+            <div class="bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4">
+              <div class="flex items-center justify-between flex-wrap gap-3 md:gap-4">
+                <div class="flex items-center gap-2">
+                  <button onclick="worvox.showTopicSelection()" 
+                    class="md:hidden text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                  </button>
+                  <div>
+                    <h1 class="text-lg md:text-2xl font-bold text-gray-800">📚 Vocabulary Study</h1>
+                    <p class="hidden md:block text-gray-600 text-sm mt-1">Learn and practice English vocabulary</p>
+                  </div>
                 </div>
                 <div class="flex items-center gap-2">
                   <button onclick="worvox.showVocabulary('list')" 
-                    class="px-4 py-2 ${mode === 'list' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'} rounded-lg transition-colors text-sm">
-                    <i class="fas fa-list mr-2"></i>List
+                    class="px-3 md:px-4 py-2 ${mode === 'list' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'} rounded-lg transition-colors text-xs md:text-sm">
+                    <i class="fas fa-list md:mr-2"></i><span class="hidden md:inline ml-2">List</span>
                   </button>
                   <button onclick="worvox.showVocabulary('flashcard')" 
-                    class="px-4 py-2 ${mode === 'flashcard' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'} rounded-lg transition-colors text-sm">
-                    <i class="fas fa-clone mr-2"></i>Flashcard
+                    class="px-3 md:px-4 py-2 ${mode === 'flashcard' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'} rounded-lg transition-colors text-xs md:text-sm">
+                    <i class="fas fa-clone md:mr-2"></i><span class="hidden md:inline ml-2">Flashcard</span>
                   </button>
                   <button onclick="worvox.showVocabulary('quiz')" 
-                    class="px-4 py-2 ${mode === 'quiz' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'} rounded-lg transition-colors text-sm">
-                    <i class="fas fa-graduation-cap mr-2"></i>Quiz
+                    class="px-3 md:px-4 py-2 ${mode === 'quiz' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'} rounded-lg transition-colors text-xs md:text-sm">
+                    <i class="fas fa-graduation-cap md:mr-2"></i><span class="hidden md:inline ml-2">Quiz</span>
                   </button>
                 </div>
               </div>
