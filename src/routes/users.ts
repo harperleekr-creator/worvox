@@ -44,7 +44,7 @@ users.post('/auth/google', async (c) => {
     const googleId = profileObj?.googleId || profileObj?.sub;
     const email = profileObj?.email;
     const name = profileObj?.name || profileObj?.given_name || email?.split('@')[0];
-    const picture = profileObj?.picture || profileObj?.imageUrl;
+    const picture = profileObj?.picture || profileObj?.imageUrl || null;
 
     if (!googleId || !email) {
       return c.json({ error: 'Invalid Google profile data' }, 400);
@@ -60,7 +60,7 @@ users.post('/auth/google', async (c) => {
       if (picture && existingUser.google_picture !== picture) {
         await c.env.DB.prepare(
           'UPDATE users SET google_picture = ? WHERE id = ?'
-        ).bind(picture, existingUser.id).run();
+        ).bind(picture || null, existingUser.id).run();
       }
 
       return c.json({
@@ -80,7 +80,7 @@ users.post('/auth/google', async (c) => {
       await c.env.DB.prepare(
         `UPDATE users SET google_id = ?, google_email = ?, google_picture = ?, auth_provider = 'google' 
          WHERE id = ?`
-      ).bind(googleId, email, picture, emailUser.id).run();
+      ).bind(googleId, email, picture || null, emailUser.id).run();
 
       const updatedUser = await c.env.DB.prepare(
         'SELECT * FROM users WHERE id = ?'
@@ -100,7 +100,7 @@ users.post('/auth/google', async (c) => {
     const result = await c.env.DB.prepare(
       `INSERT INTO users (username, email, google_id, google_email, google_picture, auth_provider, level) 
        VALUES (?, ?, ?, ?, ?, 'google', 'beginner')`
-    ).bind(username, email, googleId, email, picture).run();
+    ).bind(username, email, googleId, email, picture || null).run();
 
     const userId = result.meta.last_row_id;
 
