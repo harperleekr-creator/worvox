@@ -2310,7 +2310,7 @@ class WorVox {
     searchResult.innerHTML = `
       <div class="bg-gray-50 border-2 border-gray-200 rounded-xl p-6 text-center">
         <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-3"></div>
-        <p class="text-gray-600">검색 중...</p>
+        <p class="text-gray-600">Searching...</p>
       </div>
     `;
     
@@ -2443,8 +2443,8 @@ class WorVox {
         searchResult.innerHTML = `
           <div class="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 text-center">
             <i class="fas fa-search text-yellow-600 text-3xl mb-2"></i>
-            <p class="text-gray-700">단어를 찾을 수 없습니다: "<strong>${searchTerm}</strong>"</p>
-            <p class="text-sm text-gray-600 mt-2">다른 단어를 검색해보세요.</p>
+            <p class="text-gray-700">Word not found: "<strong>${searchTerm}</strong>"</p>
+            <p class="text-sm text-gray-600 mt-2">Try searching for another word.</p>
           </div>
         `;
       }
@@ -2453,8 +2453,8 @@ class WorVox {
       searchResult.innerHTML = `
         <div class="bg-red-50 border-2 border-red-200 rounded-xl p-4 text-center">
           <i class="fas fa-exclamation-circle text-red-600 text-3xl mb-2"></i>
-          <p class="text-gray-700">검색 중 오류가 발생했습니다.</p>
-          <p class="text-sm text-gray-600 mt-2">${error.response?.data?.message || '다시 시도해주세요.'}</p>
+          <p class="text-gray-700">An error occurred while searching.</p>
+          <p class="text-sm text-gray-600 mt-2">${error.response?.data?.message || 'Please try again.'}</p>
         </div>
       `;
     }
