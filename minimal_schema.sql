@@ -54,6 +54,8 @@ CREATE TABLE IF NOT EXISTS messages (
   session_id INTEGER NOT NULL,
   role TEXT NOT NULL,
   content TEXT NOT NULL,
+  audio_url TEXT,
+  transcription TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
