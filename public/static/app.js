@@ -162,6 +162,11 @@ class WorVox {
             <i class="fas fa-comments" style="width: 20px; text-align: center;"></i>
             <span>AI Conversation</span>
           </a>
+          <a href="#" onclick="worvox.showRealConversation(); worvox.closeMobileSidebar(); return false;" 
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'real-conversation' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
+            <i class="fas fa-user-tie" style="width: 20px; text-align: center;"></i>
+            <span>Real Conversation</span>
+          </a>
           <a href="#" onclick="worvox.startVocabulary(); worvox.closeMobileSidebar(); return false;" 
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'vocabulary' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
             <i class="fas fa-book" style="width: 20px; text-align: center;"></i>
@@ -264,6 +269,260 @@ class WorVox {
     const vocabTopic = topics.data.topics.find(t => t.name === 'Vocabulary');
     if (vocabTopic) {
       this.startSession(vocabTopic.id, vocabTopic.name, '', vocabTopic.level);
+    }
+  }
+
+  showRealConversation() {
+    const content = `
+      ${this.getSidebar('real-conversation')}
+      <div class="flex-1 flex flex-col bg-gray-50">
+        ${this.getMobileHeader('Real Conversation')}
+        
+        <div class="flex-1 overflow-y-auto p-4 md:p-8">
+          <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-lg p-6 md:p-8 text-white mb-6">
+              <h1 class="text-2xl md:text-3xl font-bold mb-2">
+                <i class="fas fa-user-tie mr-2"></i>
+                Real Conversation Lessons
+              </h1>
+              <p class="text-emerald-100">Book 1-on-1 lessons with certified English teachers</p>
+            </div>
+
+            <!-- Booking Form -->
+            <div class="bg-white rounded-lg shadow-md p-6 md:p-8">
+              <h2 class="text-xl font-bold text-gray-800 mb-6">Select Your Lesson Plan</h2>
+
+              <!-- Sessions Per Week -->
+              <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">Sessions Per Week</label>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                  ${[1, 2, 3, 4, 5].map(num => `
+                    <button 
+                      onclick="worvox.selectSessions(${num})"
+                      id="session-btn-${num}"
+                      class="px-4 py-3 border-2 rounded-lg font-semibold transition-all hover:border-emerald-500 hover:bg-emerald-50"
+                      data-sessions="${num}">
+                      ${num} ${num === 1 ? 'Session' : 'Sessions'}
+                    </button>
+                  `).join('')}
+                </div>
+              </div>
+
+              <!-- Session Duration -->
+              <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-3">Session Duration</label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <button 
+                    onclick="worvox.selectDuration(25)"
+                    id="duration-btn-25"
+                    class="px-4 py-3 border-2 rounded-lg font-semibold transition-all hover:border-emerald-500 hover:bg-emerald-50"
+                    data-duration="25">
+                    25 Minutes
+                  </button>
+                  <button 
+                    onclick="worvox.selectDuration(50)"
+                    id="duration-btn-50"
+                    class="px-4 py-3 border-2 rounded-lg font-semibold transition-all hover:border-emerald-500 hover:bg-emerald-50"
+                    data-duration="50">
+                    50 Minutes
+                  </button>
+                </div>
+              </div>
+
+              <!-- Pricing Summary -->
+              <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Pricing Summary</h3>
+                
+                <div class="space-y-3">
+                  <div class="flex justify-between items-center text-gray-600">
+                    <span>Base Price (per session)</span>
+                    <span class="font-semibold">₩16,500</span>
+                  </div>
+                  <div class="flex justify-between items-center text-gray-600">
+                    <span id="sessions-display">Sessions Selected</span>
+                    <span id="sessions-value" class="font-semibold">-</span>
+                  </div>
+                  <div class="flex justify-between items-center text-gray-600">
+                    <span id="duration-display">Duration</span>
+                    <span id="duration-value" class="font-semibold">-</span>
+                  </div>
+                  
+                  <div class="border-t border-gray-300 pt-3 mt-3">
+                    <div class="flex justify-between items-center text-gray-700">
+                      <span class="font-semibold">Per Week</span>
+                      <span id="weekly-price" class="font-bold text-lg text-emerald-600">₩0</span>
+                    </div>
+                    <div class="flex justify-between items-center text-gray-700 mt-2">
+                      <span class="font-semibold">Per Month (4 weeks)</span>
+                      <span id="monthly-price" class="font-bold text-lg text-emerald-600">₩0</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Total & Checkout -->
+              <div class="border-t border-gray-200 pt-6">
+                <div class="flex justify-between items-center mb-4">
+                  <span class="text-xl font-bold text-gray-800">Total (Monthly)</span>
+                  <span id="total-price" class="text-2xl font-bold text-emerald-600">₩0</span>
+                </div>
+                <button 
+                  id="checkout-btn"
+                  onclick="worvox.proceedToCheckout()"
+                  disabled
+                  class="w-full bg-emerald-500 text-white py-3 px-6 rounded-lg font-bold text-lg transition-all hover:bg-emerald-600 disabled:bg-gray-300 disabled:cursor-not-allowed">
+                  <i class="fas fa-credit-card mr-2"></i>
+                  Proceed to Payment
+                </button>
+                <p class="text-xs text-gray-500 text-center mt-2">
+                  Please select sessions and duration to continue
+                </p>
+              </div>
+            </div>
+
+            <!-- Features -->
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="bg-white rounded-lg p-4 shadow-sm">
+                <i class="fas fa-certificate text-emerald-500 text-2xl mb-2"></i>
+                <h3 class="font-semibold text-gray-800 mb-1">Certified Teachers</h3>
+                <p class="text-sm text-gray-600">All teachers are certified and experienced</p>
+              </div>
+              <div class="bg-white rounded-lg p-4 shadow-sm">
+                <i class="fas fa-calendar-check text-emerald-500 text-2xl mb-2"></i>
+                <h3 class="font-semibold text-gray-800 mb-1">Flexible Schedule</h3>
+                <p class="text-sm text-gray-600">Book lessons at your convenience</p>
+              </div>
+              <div class="bg-white rounded-lg p-4 shadow-sm">
+                <i class="fas fa-headset text-emerald-500 text-2xl mb-2"></i>
+                <h3 class="font-semibold text-gray-800 mb-1">One-on-One</h3>
+                <p class="text-sm text-gray-600">Personal attention for faster progress</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.getElementById('app').innerHTML = content;
+    
+    // Load gamification UI
+    setTimeout(() => this.loadGamificationStats(), 100);
+  }
+
+  selectSessions(num) {
+    // Remove active class from all session buttons
+    for (let i = 1; i <= 5; i++) {
+      const btn = document.getElementById(`session-btn-${i}`);
+      btn.classList.remove('border-emerald-500', 'bg-emerald-50', 'text-emerald-700');
+      btn.classList.add('border-gray-300', 'text-gray-700');
+    }
+    
+    // Add active class to selected button
+    const selectedBtn = document.getElementById(`session-btn-${num}`);
+    selectedBtn.classList.remove('border-gray-300', 'text-gray-700');
+    selectedBtn.classList.add('border-emerald-500', 'bg-emerald-50', 'text-emerald-700');
+    
+    // Store selection
+    this.bookingData = this.bookingData || {};
+    this.bookingData.sessionsPerWeek = num;
+    
+    // Update display
+    document.getElementById('sessions-value').textContent = `${num} ${num === 1 ? 'Session' : 'Sessions'} / week`;
+    
+    // Calculate price
+    this.calculateBookingPrice();
+  }
+
+  selectDuration(minutes) {
+    // Remove active class from all duration buttons
+    [25, 50].forEach(min => {
+      const btn = document.getElementById(`duration-btn-${min}`);
+      btn.classList.remove('border-emerald-500', 'bg-emerald-50', 'text-emerald-700');
+      btn.classList.add('border-gray-300', 'text-gray-700');
+    });
+    
+    // Add active class to selected button
+    const selectedBtn = document.getElementById(`duration-btn-${minutes}`);
+    selectedBtn.classList.remove('border-gray-300', 'text-gray-700');
+    selectedBtn.classList.add('border-emerald-500', 'bg-emerald-50', 'text-emerald-700');
+    
+    // Store selection
+    this.bookingData = this.bookingData || {};
+    this.bookingData.sessionDuration = minutes;
+    
+    // Update display
+    document.getElementById('duration-value').textContent = `${minutes} Minutes`;
+    
+    // Calculate price
+    this.calculateBookingPrice();
+  }
+
+  calculateBookingPrice() {
+    const data = this.bookingData || {};
+    
+    if (!data.sessionsPerWeek || !data.sessionDuration) {
+      return; // Not enough data yet
+    }
+    
+    // Base price: ₩16,500 per 25-minute session
+    const basePrice = 16500;
+    const sessionsPerWeek = data.sessionsPerWeek;
+    const durationMultiplier = data.sessionDuration / 25; // 25min = 1x, 50min = 2x
+    
+    // Calculate weekly and monthly prices
+    const weeklyPrice = basePrice * sessionsPerWeek * durationMultiplier;
+    const monthlyPrice = weeklyPrice * 4; // 4 weeks per month
+    
+    // Update display
+    document.getElementById('weekly-price').textContent = `₩${weeklyPrice.toLocaleString()}`;
+    document.getElementById('monthly-price').textContent = `₩${monthlyPrice.toLocaleString()}`;
+    document.getElementById('total-price').textContent = `₩${monthlyPrice.toLocaleString()}`;
+    
+    // Enable checkout button
+    const checkoutBtn = document.getElementById('checkout-btn');
+    checkoutBtn.disabled = false;
+    checkoutBtn.classList.remove('bg-gray-300');
+    checkoutBtn.classList.add('bg-emerald-500', 'hover:bg-emerald-600');
+    
+    // Store calculated prices
+    this.bookingData.weeklyPrice = weeklyPrice;
+    this.bookingData.monthlyPrice = monthlyPrice;
+  }
+
+  async proceedToCheckout() {
+    const data = this.bookingData;
+    
+    if (!data || !data.sessionsPerWeek || !data.sessionDuration) {
+      alert('Please select both sessions per week and session duration.');
+      return;
+    }
+    
+    // Show confirmation
+    const confirmed = confirm(`
+Booking Summary:
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Sessions: ${data.sessionsPerWeek} per week
+Duration: ${data.sessionDuration} minutes
+Weekly Price: ₩${data.weeklyPrice.toLocaleString()}
+Monthly Price: ₩${data.monthlyPrice.toLocaleString()}
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Proceed to payment?
+    `);
+    
+    if (confirmed) {
+      // TODO: Implement actual payment integration
+      alert('Payment feature coming soon! Your booking details have been saved.');
+      
+      // For now, just log the booking
+      console.log('Booking Data:', data);
+      
+      // Could send to backend to save booking
+      // await axios.post('/api/bookings', {
+      //   userId: this.currentUser.id,
+      //   ...data
+      // });
     }
   }
 
