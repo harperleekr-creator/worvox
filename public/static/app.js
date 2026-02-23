@@ -277,17 +277,24 @@ class WorVox {
       <div class="flex h-screen bg-gray-50">
         ${this.getSidebar('real-conversation')}
         <div class="flex-1 flex flex-col">
-        ${this.getMobileHeader('Real Conversation')}
         
         <div class="flex-1 overflow-y-auto p-3 md:p-4">
           <div class="max-w-4xl mx-auto">
             <!-- Header -->
             <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-lg p-4 md:p-5 text-white mb-4">
-              <h1 class="text-2xl md:text-3xl font-bold mb-1">
-                <i class="fas fa-user-tie mr-2"></i>
-                Real Conversation Lessons
-              </h1>
-              <p class="text-emerald-100">Book 1-on-1 lessons with certified English teachers</p>
+              <div class="flex items-center gap-2 md:gap-3">
+                <button onclick="worvox.showTopicSelection()" 
+                  class="md:hidden text-white hover:bg-emerald-600 p-2 rounded-lg transition-all">
+                  <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <div class="flex-1">
+                  <h1 class="text-2xl md:text-3xl font-bold mb-1">
+                    <i class="fas fa-user-tie mr-2"></i>
+                    Real Conversation Lessons
+                  </h1>
+                  <p class="text-emerald-100">Book 1-on-1 lessons with certified English teachers</p>
+                </div>
+              </div>
             </div>
 
             <!-- Booking Form -->
@@ -2252,10 +2259,16 @@ Proceed to payment?
           <!-- Main Content -->
           <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Header -->
-            <div class="bg-white border-b border-gray-200 px-6 py-4">
-              <div>
-                <h1 class="text-2xl font-bold text-gray-800">📚 Learning History</h1>
-                <p class="text-gray-600 text-sm mt-1">Review your past conversations and track your progress</p>
+            <div class="bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4">
+              <div class="flex items-center gap-2">
+                <button onclick="worvox.showTopicSelection()" 
+                  class="md:hidden text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all">
+                  <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <div>
+                  <h1 class="text-lg md:text-2xl font-bold text-gray-800">📚 Learning History</h1>
+                  <p class="hidden md:block text-gray-600 text-sm mt-1">Review your past conversations and track your progress</p>
+                </div>
               </div>
             </div>
 
@@ -3089,14 +3102,17 @@ Proceed to payment?
           
           <!-- Main Content -->
           <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Mobile Header -->
-            ${this.getMobileHeader('Rewards')}
-            
             <!-- Header -->
-            <div class="bg-white border-b border-gray-200 px-6 py-4">
-              <div class="max-w-6xl mx-auto">
-                <h1 class="text-2xl font-bold text-gray-800 mb-1">🎁 Level Rewards</h1>
-                <p class="text-gray-600">Unlock exclusive rewards as you level up!</p>
+            <div class="bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4">
+              <div class="flex items-center gap-2 max-w-6xl mx-auto">
+                <button onclick="worvox.showTopicSelection()" 
+                  class="md:hidden text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all">
+                  <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <div>
+                  <h1 class="text-lg md:text-2xl font-bold text-gray-800 mb-1">🎁 Level Rewards</h1>
+                  <p class="hidden md:block text-gray-600">Unlock exclusive rewards as you level up!</p>
+                </div>
               </div>
             </div>
             
