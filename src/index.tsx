@@ -47,6 +47,9 @@ app.get('/api/health', (c) => {
 
 // Main page
 app.get('/', (c) => {
+  // Cache busting version
+  const version = Date.now();
+  
   return c.html(`
     <!DOCTYPE html>
     <html lang="en">
@@ -56,7 +59,7 @@ app.get('/', (c) => {
         <title>WorVox - AI English Learning</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
-        <link href="/static/style.css" rel="stylesheet">
+        <link href="/static/style.css?v=${version}" rel="stylesheet">
         <!-- Google Sign-In -->
         <script src="https://accounts.google.com/gsi/client" async defer></script>
         <meta name="google-signin-client_id" content="506018364729-ichplnfnqlk2hmh1bhblepm0un44ltdr.apps.googleusercontent.com">
@@ -66,8 +69,8 @@ app.get('/', (c) => {
         
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-        <script src="/static/gamification.js"></script>
-        <script src="/static/app.js"></script>
+        <script src="/static/gamification.js?v=${version}"></script>
+        <script src="/static/app.js?v=${version}"></script>
     </body>
     </html>
   `);
