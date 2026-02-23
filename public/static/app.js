@@ -278,11 +278,11 @@ class WorVox {
       <div class="flex-1 flex flex-col bg-gray-50">
         ${this.getMobileHeader('Real Conversation')}
         
-        <div class="flex-1 overflow-y-auto p-3 md:p-6">
+        <div class="flex-1 overflow-y-auto p-3 md:p-4">
           <div class="max-w-4xl mx-auto">
             <!-- Header -->
-            <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-lg p-4 md:p-6 text-white mb-4">
-              <h1 class="text-2xl md:text-3xl font-bold mb-2">
+            <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-lg p-4 md:p-5 text-white mb-4">
+              <h1 class="text-2xl md:text-3xl font-bold mb-1">
                 <i class="fas fa-user-tie mr-2"></i>
                 Real Conversation Lessons
               </h1>
