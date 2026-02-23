@@ -557,12 +557,16 @@ class WorVox {
       setTimeout(() => {
         const googleButtonDiv = document.getElementById('googleSignInButton');
         if (googleButtonDiv && typeof google !== 'undefined' && google.accounts) {
+          // Calculate responsive width
+          const containerWidth = googleButtonDiv.offsetWidth;
+          const buttonWidth = Math.min(400, containerWidth - 40); // 40px for padding
+          
           google.accounts.id.renderButton(
             googleButtonDiv,
             { 
               theme: 'outline', 
               size: 'large',
-              width: 400,
+              width: buttonWidth,
               text: 'signin_with',
               shape: 'rectangular',
               logo_alignment: 'left'
@@ -723,13 +727,23 @@ class WorVox {
           
           <!-- Main Content -->
           <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Mobile Header -->
-            ${this.getMobileHeader('Home')}
+            <!-- Mobile Header with Upgrade -->
+            <div class="md:hidden bg-white border-b border-gray-200 px-4 py-3">
+              <div class="flex items-center justify-between">
+                <button onclick="worvox.toggleMobileSidebar()" class="text-gray-600">
+                  <i class="fas fa-bars text-xl"></i>
+                </button>
+                <h1 class="text-lg font-semibold text-gray-800">Home</h1>
+                <button onclick="worvox.showUpgrade()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-all">
+                  <i class="fas fa-crown"></i>
+                </button>
+              </div>
+            </div>
             
             <!-- Desktop Top Bar -->
             <div class="hidden md:flex bg-white border-b border-gray-200 px-6 py-3 items-center justify-between">
               <h2 class="text-lg font-semibold text-gray-800">Choose Your Learning Path</h2>
-              <button class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition-all">
+              <button onclick="worvox.showUpgrade()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition-all">
                 <i class="fas fa-crown mr-2"></i>Upgrade
               </button>
             </div>
@@ -2910,6 +2924,11 @@ class WorVox {
   claimReward(level) {
     // Placeholder for claim reward functionality
     alert(`🎉 Congratulations! You've claimed the Level ${level} reward!\n\nThis feature will be available soon.`);
+  }
+
+  showUpgrade() {
+    // Placeholder for upgrade/pricing page
+    alert('💎 Upgrade to Premium\n\nPremium features coming soon!\n\n✨ Unlimited AI conversations\n📚 Premium vocabulary\n🎯 Personalized learning\n👑 Exclusive rewards\n\nStay tuned!');
   }
 
   // Vocabulary Learning Feature
