@@ -39,3 +39,6 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Environment variables (keep .dev.vars for local development)
+# wrangler.toml contains non-sensitive config

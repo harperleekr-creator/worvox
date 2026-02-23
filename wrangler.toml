@@ -1,0 +1,27 @@
+# Cloudflare Pages configuration for WorVox
+name = "worvox"
+compatibility_date = "2026-02-10"
+pages_build_output_dir = "./dist"
+
+# Compatibility flags
+compatibility_flags = ["nodejs_compat"]
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "worvox-production"
+database_id = "a2f5a937-d5b5-48e4-9009-66b1676de98b"
+
+# Environment variables for Production
+[env.production.vars]
+OPENAI_API_BASE = "https://api.openai.com/v1"
+APP_ENV = "production"
+
+# Note: Secrets (API keys) must be set using wrangler CLI or Dashboard:
+# wrangler pages secret put OPENAI_API_KEY --project-name worvox
+# wrangler pages secret put ELEVENLABS_API_KEY --project-name worvox
+
+# Environment variables for Preview (all branches except production)
+[env.preview.vars]
+OPENAI_API_BASE = "https://api.openai.com/v1"
+APP_ENV = "preview"
