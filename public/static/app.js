@@ -274,8 +274,9 @@ class WorVox {
 
   showRealConversation() {
     const content = `
-      ${this.getSidebar('real-conversation')}
-      <div class="flex-1 flex flex-col bg-gray-50">
+      <div class="flex h-screen bg-gray-50">
+        ${this.getSidebar('real-conversation')}
+        <div class="flex-1 flex flex-col">
         ${this.getMobileHeader('Real Conversation')}
         
         <div class="flex-1 overflow-y-auto p-3 md:p-4">
@@ -400,6 +401,7 @@ class WorVox {
               </div>
             </div>
           </div>
+        </div>
         </div>
       </div>
     `;
