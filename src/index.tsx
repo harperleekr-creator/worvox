@@ -21,18 +21,14 @@ const app = new Hono<{ Bindings: Bindings }>();
 app.use('/api/*', cors());
 
 // Serve static files with no-cache headers for JS files
-app.use('/static/*', async (c, next) => {
-  const response = await serveStatic({ root: './public' })(c, next);
-  
-  // Disable caching for JavaScript files to ensure updates are immediate
-  if (c.req.path.endsWith('.js')) {
-    c.header('Cache-Control', 'no-cache, no-store, must-revalidate');
-    c.header('Pragma', 'no-cache');
-    c.header('Expires', '0');
-  }
-  
-  return response;
+app.use('/static/*.js', async (c, next) => {
+  await next();
+  c.header('Cache-Control', 'no-cache, no-store, must-revalidate');
+  c.header('Pragma', 'no-cache');
+  c.header('Expires', '0');
 });
+
+app.use('/static/*', serveStatic({ root: './public' }));
 
 // API routes
 app.route('/api/stt', stt);
