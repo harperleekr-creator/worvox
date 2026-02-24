@@ -243,15 +243,27 @@ Return ONLY valid JSON, no other text. If the word doesn't exist or is invalid, 
 // Get all vocabulary words (for basic list view)
 vocabulary.get('/list', async (c: Context<{ Bindings: Bindings }>) => {
   try {
-    const { results } = await c.env.DB.prepare(`
-      SELECT * FROM vocabulary_words
-      ORDER BY difficulty, id
-      LIMIT 50
-    `).all()
+    const difficulty = c.req.query('difficulty')
+    const limit = parseInt(c.req.query('limit') || '200')
+    
+    let query = 'SELECT * FROM vocabulary_words'
+    let params: any[] = []
+    
+    if (difficulty && ['beginner', 'intermediate', 'advanced'].includes(difficulty)) {
+      query += ' WHERE difficulty = ?'
+      params.push(difficulty)
+    }
+    
+    query += ' ORDER BY id LIMIT ?'
+    params.push(limit)
+    
+    const { results } = await c.env.DB.prepare(query).bind(...params).all()
 
     return c.json({
       success: true,
-      words: results || []
+      words: results || [],
+      difficulty: difficulty || 'all',
+      count: results?.length || 0
     })
   } catch (error: any) {
     console.error('Error fetching vocabulary list:', error)
