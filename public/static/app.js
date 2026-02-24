@@ -2301,17 +2301,6 @@ Proceed to payment?
     
     contentArea.innerHTML = this.renderQuizMode(words, this.vocabularyDifficulty);
   }
-        await gamificationManager.addXP(
-          this.currentUser.id,
-          50, // 50 XP bonus for completing quiz
-          'quiz_completed',
-          `Quiz completed with ${this.quizData.score}/${this.quizData.questions.length} correct`
-        );
-      }
-    }
-    
-    await this.showVocabulary('quiz');
-  }
 
   renderQuizResults() {
     const quiz = this.quizData;
