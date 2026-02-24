@@ -4690,17 +4690,570 @@ Proceed to payment?
 
   // Show Terms of Service
   showTerms() {
-    alert('이용약관 페이지\n\n준비 중입니다.');
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex h-screen bg-gray-50">
+        ${this.getSidebar('home')}
+        
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- Mobile Header -->
+          <div class="md:hidden bg-white border-b border-gray-200 px-4 py-3">
+            <div class="flex items-center justify-between">
+              <button onclick="worvox.showTopicSelection()" class="text-gray-600">
+                <i class="fas fa-arrow-left text-xl"></i>
+              </button>
+              <h1 class="text-lg font-semibold text-gray-800">이용약관</h1>
+              <div class="w-6"></div>
+            </div>
+          </div>
+          
+          <!-- Desktop Top Bar -->
+          <div class="hidden md:flex bg-white border-b border-gray-200 px-6 py-3 items-center">
+            <button onclick="worvox.showTopicSelection()" class="text-gray-600 hover:text-gray-800 mr-4">
+              <i class="fas fa-arrow-left text-xl"></i>
+            </button>
+            <h2 class="text-lg font-semibold text-gray-800">이용약관</h2>
+          </div>
+          
+          <!-- Content Area -->
+          <div class="flex-1 overflow-y-auto">
+            <div class="p-4 md:p-8">
+              <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-sm p-6 md:p-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-6">WorVox 이용약관</h1>
+                <p class="text-sm text-gray-500 mb-8">최종 업데이트: 2026년 2월 24일</p>
+                
+                <div class="space-y-8 text-gray-700">
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">제1조 (목적)</h2>
+                    <p class="leading-relaxed">
+                      본 약관은 하퍼잉글리쉬(이하 "회사")가 제공하는 WorVox 서비스(이하 "서비스")의 이용과 관련하여 회사와 이용자 간의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.
+                    </p>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">제2조 (정의)</h2>
+                    <ul class="list-disc pl-6 space-y-2 leading-relaxed">
+                      <li><strong>"서비스"</strong>란 회사가 제공하는 AI 기반 영어 학습 플랫폼 WorVox를 의미합니다.</li>
+                      <li><strong>"이용자"</strong>란 본 약관에 따라 회사가 제공하는 서비스를 이용하는 회원 및 비회원을 말합니다.</li>
+                      <li><strong>"회원"</strong>이란 회사와 서비스 이용계약을 체결하고 회원 ID를 부여받은 자를 말합니다.</li>
+                      <li><strong>"유료 서비스"</strong>란 회사가 유료로 제공하는 Premium, Business 플랜 및 Real Conversation 수업권 등을 말합니다.</li>
+                    </ul>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">제3조 (약관의 효력 및 변경)</h2>
+                    <ol class="list-decimal pl-6 space-y-2 leading-relaxed">
+                      <li>본 약관은 서비스를 이용하고자 하는 모든 이용자에게 그 효력이 발생합니다.</li>
+                      <li>회사는 필요한 경우 관련 법령을 위배하지 않는 범위 내에서 본 약관을 변경할 수 있습니다.</li>
+                      <li>약관이 변경될 경우, 회사는 변경사항을 시행일로부터 최소 7일 전에 공지합니다.</li>
+                      <li>이용자가 변경된 약관에 동의하지 않는 경우, 서비스 이용을 중단하고 탈퇴할 수 있습니다.</li>
+                    </ol>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">제4조 (회원 가입 및 계정)</h2>
+                    <ol class="list-decimal pl-6 space-y-2 leading-relaxed">
+                      <li>회원 가입은 이용자가 약관에 동의하고 회사가 정한 가입 양식에 따라 회원 정보를 기입하여 신청합니다.</li>
+                      <li>회사는 다음 각 호의 경우 회원 가입을 거부하거나 승인을 유보할 수 있습니다:
+                        <ul class="list-disc pl-6 mt-2 space-y-1">
+                          <li>타인의 명의를 도용한 경우</li>
+                          <li>허위 정보를 기재한 경우</li>
+                          <li>이미 가입된 회원인 경우</li>
+                          <li>기타 회사가 정한 이용 신청 요건을 충족하지 못한 경우</li>
+                        </ul>
+                      </li>
+                      <li>회원은 계정 정보를 안전하게 관리할 책임이 있으며, 타인에게 양도하거나 대여할 수 없습니다.</li>
+                    </ol>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">제5조 (서비스의 제공)</h2>
+                    <ol class="list-decimal pl-6 space-y-2 leading-relaxed">
+                      <li>회사는 다음과 같은 서비스를 제공합니다:
+                        <ul class="list-disc pl-6 mt-2 space-y-1">
+                          <li>AI 영어 대화 연습</li>
+                          <li>발음 연습 및 피드백</li>
+                          <li>단어장 및 어휘 학습</li>
+                          <li>학습 통계 및 분석</li>
+                          <li>Real Conversation (1:1 원어민 수업)</li>
+                          <li>기타 회사가 추가 개발하거나 제휴를 통해 제공하는 서비스</li>
+                        </ul>
+                      </li>
+                      <li>서비스는 연중무휴, 1일 24시간 제공을 원칙으로 합니다. 단, 시스템 점검 등 필요한 경우 서비스를 일시 중단할 수 있습니다.</li>
+                      <li>회사는 서비스 향상을 위해 서비스의 내용을 변경하거나 추가할 수 있습니다.</li>
+                    </ol>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">제6조 (유료 서비스)</h2>
+                    <ol class="list-decimal pl-6 space-y-2 leading-relaxed">
+                      <li>회사는 무료 서비스와 유료 서비스를 구분하여 제공할 수 있습니다.</li>
+                      <li>유료 서비스의 요금 및 결제 방법은 각 서비스 페이지에 명시됩니다.</li>
+                      <li>Premium 및 Business 플랜은 월 단위 정기결제로 제공됩니다.</li>
+                      <li>Real Conversation 수업권은 일회성 결제로 제공되며, 구매 후 유효기간 내 자유롭게 사용할 수 있습니다.</li>
+                      <li>유료 서비스 이용 요금의 환불은 환불정책에 따릅니다.</li>
+                    </ol>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">제7조 (회원의 의무)</h2>
+                    <ol class="list-decimal pl-6 space-y-2 leading-relaxed">
+                      <li>회원은 다음 행위를 해서는 안 됩니다:
+                        <ul class="list-disc pl-6 mt-2 space-y-1">
+                          <li>허위 정보 등록 또는 타인의 정보 도용</li>
+                          <li>회사의 서비스 운영을 방해하는 행위</li>
+                          <li>타인의 명예를 훼손하거나 불이익을 주는 행위</li>
+                          <li>서비스를 영리 목적으로 이용하는 행위</li>
+                          <li>저작권 등 타인의 권리를 침해하는 행위</li>
+                          <li>음란물, 불법 정보 등을 게시하는 행위</li>
+                        </ul>
+                      </li>
+                      <li>회원은 관련 법령, 본 약관, 이용안내 및 주의사항 등을 준수해야 합니다.</li>
+                    </ol>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">제8조 (회원 탈퇴 및 자격 상실)</h2>
+                    <ol class="list-decimal pl-6 space-y-2 leading-relaxed">
+                      <li>회원은 언제든지 회사에 탈퇴를 요청할 수 있으며, 회사는 즉시 회원 탈퇴를 처리합니다.</li>
+                      <li>회사는 회원이 본 약관을 위반한 경우 사전 통보 후 회원 자격을 제한 또는 정지시킬 수 있습니다.</li>
+                      <li>회원 탈퇴 시 남은 유료 서비스 기간에 대해서는 환불정책에 따라 처리됩니다.</li>
+                    </ol>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">제9조 (면책 조항)</h2>
+                    <ol class="list-decimal pl-6 space-y-2 leading-relaxed">
+                      <li>회사는 천재지변, 전쟁, 기간통신사업자의 서비스 중지 등 불가항력으로 인해 서비스를 제공할 수 없는 경우 책임이 면제됩니다.</li>
+                      <li>회사는 이용자의 귀책사유로 인한 서비스 이용 장애에 대해 책임지지 않습니다.</li>
+                      <li>회사는 이용자가 서비스를 통해 얻은 정보나 자료로 인한 손해에 대해 책임지지 않습니다.</li>
+                    </ol>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">제10조 (준거법 및 재판관할)</h2>
+                    <p class="leading-relaxed">
+                      본 약관과 회사와 이용자 간의 서비스 이용 계약에 대해서는 대한민국 법률을 준거법으로 하며, 분쟁 발생 시 회사의 본사 소재지를 관할하는 법원을 전속 관할 법원으로 합니다.
+                    </p>
+                  </section>
+                  
+                  <section class="pt-6 border-t border-gray-200">
+                    <p class="text-sm text-gray-600">
+                      <strong>시행일:</strong> 본 약관은 2026년 2월 24일부터 시행됩니다.
+                    </p>
+                  </section>
+                </div>
+              </div>
+              
+              ${this.getFooter()}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
   }
 
   // Show Privacy Policy
   showPrivacy() {
-    alert('개인정보처리방침 페이지\n\n준비 중입니다.');
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex h-screen bg-gray-50">
+        ${this.getSidebar('home')}
+        
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- Mobile Header -->
+          <div class="md:hidden bg-white border-b border-gray-200 px-4 py-3">
+            <div class="flex items-center justify-between">
+              <button onclick="worvox.showTopicSelection()" class="text-gray-600">
+                <i class="fas fa-arrow-left text-xl"></i>
+              </button>
+              <h1 class="text-lg font-semibold text-gray-800">개인정보처리방침</h1>
+              <div class="w-6"></div>
+            </div>
+          </div>
+          
+          <!-- Desktop Top Bar -->
+          <div class="hidden md:flex bg-white border-b border-gray-200 px-6 py-3 items-center">
+            <button onclick="worvox.showTopicSelection()" class="text-gray-600 hover:text-gray-800 mr-4">
+              <i class="fas fa-arrow-left text-xl"></i>
+            </button>
+            <h2 class="text-lg font-semibold text-gray-800">개인정보처리방침</h2>
+          </div>
+          
+          <!-- Content Area -->
+          <div class="flex-1 overflow-y-auto">
+            <div class="p-4 md:p-8">
+              <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-sm p-6 md:p-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-6">개인정보처리방침</h1>
+                <p class="text-sm text-gray-500 mb-8">최종 업데이트: 2026년 2월 24일</p>
+                
+                <div class="space-y-8 text-gray-700">
+                  <section>
+                    <p class="leading-relaxed mb-4">
+                      하퍼잉글리쉬(이하 "회사")는 이용자의 개인정보를 중요시하며, "정보통신망 이용촉진 및 정보보호에 관한 법률", "개인정보보호법" 등 관련 법령을 준수하고 있습니다.
+                    </p>
+                    <p class="leading-relaxed">
+                      회사는 개인정보처리방침을 통하여 이용자가 제공하는 개인정보가 어떠한 용도와 방식으로 이용되고 있으며, 개인정보보호를 위해 어떠한 조치가 취해지고 있는지 알려드립니다.
+                    </p>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">1. 수집하는 개인정보의 항목 및 수집방법</h2>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">가. 수집하는 개인정보의 항목</h3>
+                    <ul class="list-disc pl-6 space-y-2 leading-relaxed mb-4">
+                      <li><strong>회원가입 시:</strong> 이메일 주소, 이름, 프로필 사진(선택), 학습 레벨</li>
+                      <li><strong>소셜 로그인 시:</strong> Google 계정 정보(이메일, 이름, 프로필 사진)</li>
+                      <li><strong>유료 서비스 이용 시:</strong> 결제 정보(카드번호는 PG사에서 처리하며 회사는 저장하지 않음)</li>
+                      <li><strong>서비스 이용 과정에서 자동 수집:</strong> IP 주소, 쿠키, 접속 로그, 서비스 이용 기록, 학습 데이터</li>
+                    </ul>
+                    
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">나. 개인정보 수집방법</h3>
+                    <ul class="list-disc pl-6 space-y-2 leading-relaxed">
+                      <li>회원가입 및 서비스 이용 과정에서 이용자가 직접 입력</li>
+                      <li>Google 소셜 로그인을 통한 자동 수집</li>
+                      <li>서비스 이용 과정에서 자동으로 생성되어 수집</li>
+                    </ul>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">2. 개인정보의 수집 및 이용목적</h2>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">가. 회원관리</h3>
+                    <ul class="list-disc pl-6 space-y-2 leading-relaxed mb-4">
+                      <li>회원제 서비스 제공에 따른 본인 확인</li>
+                      <li>개인 식별, 불량회원의 부정 이용 방지</li>
+                      <li>가입 의사 확인, 연령 확인</li>
+                      <li>고충처리, 분쟁 조정을 위한 기록 보존</li>
+                    </ul>
+                    
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">나. 서비스 제공</h3>
+                    <ul class="list-disc pl-6 space-y-2 leading-relaxed mb-4">
+                      <li>AI 영어 학습 서비스 제공</li>
+                      <li>학습 진도 및 통계 관리</li>
+                      <li>맞춤형 학습 콘텐츠 추천</li>
+                      <li>Real Conversation 수업 예약 및 관리</li>
+                    </ul>
+                    
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">다. 요금 결제 및 정산</h3>
+                    <ul class="list-disc pl-6 space-y-2 leading-relaxed">
+                      <li>유료 서비스 이용에 따른 요금 결제</li>
+                      <li>구매 및 결제, 환불 처리</li>
+                    </ul>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">3. 개인정보의 보유 및 이용기간</h2>
+                    <p class="leading-relaxed mb-4">
+                      회사는 원칙적으로 개인정보 수집 및 이용목적이 달성된 후에는 해당 정보를 지체없이 파기합니다. 단, 다음의 정보에 대해서는 아래의 이유로 명시한 기간 동안 보존합니다.
+                    </p>
+                    
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">가. 회사 내부 방침에 의한 정보보유</h3>
+                    <ul class="list-disc pl-6 space-y-2 leading-relaxed mb-4">
+                      <li><strong>부정이용 방지:</strong> 부정 이용 기록 - 1년</li>
+                    </ul>
+                    
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">나. 관련 법령에 의한 정보보유</h3>
+                    <ul class="list-disc pl-6 space-y-2 leading-relaxed">
+                      <li><strong>계약 또는 청약철회 등에 관한 기록:</strong> 5년 (전자상거래법)</li>
+                      <li><strong>대금결제 및 재화 등의 공급에 관한 기록:</strong> 5년 (전자상거래법)</li>
+                      <li><strong>소비자 불만 또는 분쟁처리에 관한 기록:</strong> 3년 (전자상거래법)</li>
+                      <li><strong>표시/광고에 관한 기록:</strong> 6개월 (전자상거래법)</li>
+                      <li><strong>접속에 관한 기록:</strong> 3개월 (통신비밀보호법)</li>
+                    </ul>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">4. 개인정보의 파기절차 및 방법</h2>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">가. 파기절차</h3>
+                    <p class="leading-relaxed mb-4">
+                      이용자가 회원가입 등을 위해 입력한 정보는 목적이 달성된 후 별도의 DB로 옮겨져(종이의 경우 별도의 서류함) 내부 방침 및 기타 관련 법령에 의한 정보보호 사유에 따라(보유 및 이용기간 참조) 일정 기간 저장된 후 파기됩니다.
+                    </p>
+                    
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">나. 파기방법</h3>
+                    <ul class="list-disc pl-6 space-y-2 leading-relaxed">
+                      <li><strong>전자적 파일형태:</strong> 복구 불가능한 방법으로 영구 삭제</li>
+                      <li><strong>종이 문서:</strong> 분쇄기로 분쇄하거나 소각</li>
+                    </ul>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">5. 개인정보의 제3자 제공</h2>
+                    <p class="leading-relaxed mb-4">
+                      회사는 원칙적으로 이용자의 개인정보를 외부에 제공하지 않습니다. 다만, 아래의 경우에는 예외로 합니다:
+                    </p>
+                    <ul class="list-disc pl-6 space-y-2 leading-relaxed">
+                      <li>이용자가 사전에 동의한 경우</li>
+                      <li>법령의 규정에 의거하거나, 수사 목적으로 법령에 정해진 절차와 방법에 따라 수사기관의 요구가 있는 경우</li>
+                    </ul>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">6. 개인정보 처리위탁</h2>
+                    <p class="leading-relaxed mb-4">
+                      회사는 서비스 향상을 위해 아래와 같이 개인정보를 위탁하고 있으며, 관계 법령에 따라 위탁계약 시 개인정보가 안전하게 관리될 수 있도록 필요한 사항을 규정하고 있습니다.
+                    </p>
+                    <div class="overflow-x-auto">
+                      <table class="min-w-full border border-gray-300">
+                        <thead class="bg-gray-100">
+                          <tr>
+                            <th class="border border-gray-300 px-4 py-2 text-left">수탁업체</th>
+                            <th class="border border-gray-300 px-4 py-2 text-left">위탁 업무 내용</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td class="border border-gray-300 px-4 py-2">NHN KCP</td>
+                            <td class="border border-gray-300 px-4 py-2">결제 처리 및 정산</td>
+                          </tr>
+                          <tr>
+                            <td class="border border-gray-300 px-4 py-2">Cloudflare</td>
+                            <td class="border border-gray-300 px-4 py-2">서버 호스팅 및 데이터 저장</td>
+                          </tr>
+                          <tr>
+                            <td class="border border-gray-300 px-4 py-2">Google</td>
+                            <td class="border border-gray-300 px-4 py-2">소셜 로그인 처리</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">7. 이용자 및 법정대리인의 권리와 그 행사방법</h2>
+                    <ul class="list-disc pl-6 space-y-2 leading-relaxed">
+                      <li>이용자는 언제든지 등록되어 있는 자신의 개인정보를 조회하거나 수정할 수 있습니다.</li>
+                      <li>이용자는 언제든지 회원탈퇴를 통해 개인정보의 수집 및 이용 동의를 철회할 수 있습니다.</li>
+                      <li>만 14세 미만 아동의 경우, 법정대리인이 아동의 개인정보를 조회하거나 수정할 권리, 수집 및 이용 동의를 철회할 권리를 가집니다.</li>
+                    </ul>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">8. 개인정보 보호책임자</h2>
+                    <p class="leading-relaxed mb-4">
+                      회사는 개인정보 처리에 관한 업무를 총괄해서 책임지고, 개인정보 처리와 관련한 이용자의 불만처리 및 피해구제 등을 위하여 아래와 같이 개인정보 보호책임자를 지정하고 있습니다.
+                    </p>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                      <p class="font-semibold mb-2">▶ 개인정보 보호책임자</p>
+                      <ul class="space-y-1 text-sm">
+                        <li>성명: 이강돈</li>
+                        <li>직책: 대표</li>
+                        <li>이메일: support@worvox.com</li>
+                      </ul>
+                    </div>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">9. 개인정보 자동 수집 장치의 설치·운영 및 거부</h2>
+                    <p class="leading-relaxed mb-4">
+                      회사는 이용자에게 개인화되고 맞춤화된 서비스를 제공하기 위해 이용자의 정보를 저장하고 수시로 불러오는 '쿠키(cookie)'를 사용합니다.
+                    </p>
+                    <ul class="list-disc pl-6 space-y-2 leading-relaxed">
+                      <li><strong>쿠키의 사용 목적:</strong> 로그인 세션 유지, 서비스 이용 편의 제공</li>
+                      <li><strong>쿠키 설정 거부 방법:</strong> 웹브라우저 옵션 설정을 통해 쿠키 저장을 거부할 수 있습니다. 단, 쿠키 저장을 거부할 경우 일부 서비스 이용에 어려움이 있을 수 있습니다.</li>
+                    </ul>
+                  </section>
+                  
+                  <section class="pt-6 border-t border-gray-200">
+                    <p class="text-sm text-gray-600">
+                      <strong>시행일:</strong> 본 개인정보처리방침은 2026년 2월 24일부터 시행됩니다.
+                    </p>
+                  </section>
+                </div>
+              </div>
+              
+              ${this.getFooter()}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
   }
 
   // Show Refund Policy
   showRefund() {
-    alert('환불정책 페이지\n\n준비 중입니다.');
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex h-screen bg-gray-50">
+        ${this.getSidebar('home')}
+        
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- Mobile Header -->
+          <div class="md:hidden bg-white border-b border-gray-200 px-4 py-3">
+            <div class="flex items-center justify-between">
+              <button onclick="worvox.showTopicSelection()" class="text-gray-600">
+                <i class="fas fa-arrow-left text-xl"></i>
+              </button>
+              <h1 class="text-lg font-semibold text-gray-800">환불정책</h1>
+              <div class="w-6"></div>
+            </div>
+          </div>
+          
+          <!-- Desktop Top Bar -->
+          <div class="hidden md:flex bg-white border-b border-gray-200 px-6 py-3 items-center">
+            <button onclick="worvox.showTopicSelection()" class="text-gray-600 hover:text-gray-800 mr-4">
+              <i class="fas fa-arrow-left text-xl"></i>
+            </button>
+            <h2 class="text-lg font-semibold text-gray-800">환불정책</h2>
+          </div>
+          
+          <!-- Content Area -->
+          <div class="flex-1 overflow-y-auto">
+            <div class="p-4 md:p-8">
+              <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-sm p-6 md:p-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-6">환불정책</h1>
+                <p class="text-sm text-gray-500 mb-8">최종 업데이트: 2026년 2월 24일</p>
+                
+                <div class="space-y-8 text-gray-700">
+                  <section>
+                    <p class="leading-relaxed mb-4">
+                      하퍼잉글리쉬(이하 "회사")는 "전자상거래 등에서의 소비자보호에 관한 법률" 등 관련 법령을 준수하며, 공정하고 투명한 환불정책을 운영합니다.
+                    </p>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">1. Premium/Business 플랜 환불</h2>
+                    
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">가. 7일 무료 체험 기간</h3>
+                    <ul class="list-disc pl-6 space-y-2 leading-relaxed mb-4">
+                      <li>Premium 및 Business 플랜 가입 시 <strong>7일 무료 체험</strong>이 제공됩니다.</li>
+                      <li>무료 체험 기간 내 취소 시 <strong>요금이 청구되지 않습니다</strong>.</li>
+                      <li>무료 체험 기간 종료 후 자동으로 정기결제가 시작됩니다.</li>
+                    </ul>
+                    
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">나. 정기결제 중도 해지</h3>
+                    <ul class="list-disc pl-6 space-y-2 leading-relaxed mb-4">
+                      <li>언제든지 구독을 취소할 수 있습니다.</li>
+                      <li>취소 시점까지의 요금은 환불되지 않으며, 현재 결제 기간이 종료될 때까지 서비스를 계속 이용할 수 있습니다.</li>
+                      <li><strong>예시:</strong> 2월 1일에 월 구독을 시작하고 2월 15일에 취소한 경우
+                        <ul class="list-disc pl-6 mt-2 space-y-1">
+                          <li>2월 말까지 서비스 이용 가능</li>
+                          <li>3월 1일부터 Free 플랜으로 자동 전환</li>
+                          <li>이미 결제된 2월 요금은 환불 불가</li>
+                        </ul>
+                      </li>
+                    </ul>
+                    
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">다. 서비스 장애로 인한 환불</h3>
+                    <ul class="list-disc pl-6 space-y-2 leading-relaxed">
+                      <li>회사의 귀책사유로 서비스를 이용하지 못한 경우, 이용하지 못한 기간만큼 일할 계산하여 환불해드립니다.</li>
+                      <li>환불 신청은 support@worvox.com으로 연락 주시기 바랍니다.</li>
+                    </ul>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">2. Real Conversation 수업권 환불</h2>
+                    
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">가. 환불 가능 조건</h3>
+                    <ul class="list-disc pl-6 space-y-2 leading-relaxed mb-4">
+                      <li><strong>미사용 수업권:</strong> 한 번도 사용하지 않은 수업권은 구매일로부터 <strong>7일 이내</strong> 전액 환불 가능합니다.</li>
+                      <li><strong>부분 사용 수업권:</strong> 일부 수업을 사용한 경우, 남은 수업권에 대해 환불 가능합니다.
+                        <ul class="list-disc pl-6 mt-2 space-y-1">
+                          <li>환불금액 = (총 구매금액 / 전체 수업 횟수) × 남은 수업 횟수</li>
+                          <li>단, 사용한 수업은 정가 기준으로 차감됩니다.</li>
+                        </ul>
+                      </li>
+                    </ul>
+                    
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
+                      <p class="font-semibold mb-2">📌 환불 계산 예시</p>
+                      <p class="text-sm mb-2"><strong>4회 수업권 ₩180,000 구매 (회당 ₩45,000) 후 2회 사용</strong></p>
+                      <ul class="text-sm space-y-1">
+                        <li>• 사용한 수업: 2회 × ₩50,000(정가) = ₩100,000</li>
+                        <li>• 환불 금액: ₩180,000 - ₩100,000 = <strong>₩80,000</strong></li>
+                      </ul>
+                    </div>
+                    
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">나. 환불 불가 조건</h3>
+                    <ul class="list-disc pl-6 space-y-2 leading-relaxed mb-4">
+                      <li>수업 예약 후 <strong>무단 불참(No-Show)</strong>한 경우 해당 수업은 사용으로 간주됩니다.</li>
+                      <li>수업 시작 <strong>24시간 이내 취소</strong>한 경우 환불 불가합니다.</li>
+                      <li>구매일로부터 <strong>30일 경과</strong> 후에는 환불이 제한될 수 있습니다.</li>
+                    </ul>
+                    
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">다. 수업 취소 및 일정 변경</h3>
+                    <ul class="list-disc pl-6 space-y-2 leading-relaxed">
+                      <li>수업 시작 <strong>24시간 전</strong>까지 무료로 취소 또는 일정 변경 가능합니다.</li>
+                      <li>24시간 이내 취소 시 해당 수업권 1회가 차감됩니다.</li>
+                      <li>강사의 사정으로 수업이 취소된 경우 수업권이 복구됩니다.</li>
+                    </ul>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">3. 환불 처리 절차</h2>
+                    
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">가. 환불 신청 방법</h3>
+                    <ol class="list-decimal pl-6 space-y-2 leading-relaxed mb-4">
+                      <li>이메일로 환불 신청: <strong>support@worvox.com</strong></li>
+                      <li>필수 포함 정보:
+                        <ul class="list-disc pl-6 mt-2 space-y-1">
+                          <li>이름 및 이메일 주소</li>
+                          <li>구매 내역 (영수증 또는 주문번호)</li>
+                          <li>환불 사유</li>
+                          <li>환불 받을 계좌번호 (예금주, 은행명, 계좌번호)</li>
+                        </ul>
+                      </li>
+                    </ol>
+                    
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">나. 환불 처리 기간</h3>
+                    <ul class="list-disc pl-6 space-y-2 leading-relaxed mb-4">
+                      <li>환불 신청 접수 후 <strong>영업일 기준 3~5일 이내</strong> 검토 후 승인 여부를 안내해드립니다.</li>
+                      <li>승인 후 <strong>3~7영업일 이내</strong> 환불 처리됩니다.</li>
+                      <li>신용카드 결제의 경우 카드사 정책에 따라 처리 기간이 다를 수 있습니다.</li>
+                    </ul>
+                    
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">다. 환불 수단</h3>
+                    <ul class="list-disc pl-6 space-y-2 leading-relaxed">
+                      <li><strong>신용카드 결제:</strong> 결제 취소 처리 (카드사 정책에 따라 1~2개월 소요)</li>
+                      <li><strong>계좌이체/무통장입금:</strong> 고객 지정 계좌로 환불</li>
+                      <li><strong>간편결제:</strong> 각 결제수단별 정책에 따름</li>
+                    </ul>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">4. 환불 제한 사항</h2>
+                    <ul class="list-disc pl-6 space-y-2 leading-relaxed">
+                      <li>부정한 방법으로 서비스를 이용한 경우</li>
+                      <li>이용약관을 위반하여 서비스 이용이 제한된 경우</li>
+                      <li>타인 명의를 도용하거나 허위 정보로 가입한 경우</li>
+                      <li>과도한 서비스 남용으로 판단되는 경우</li>
+                    </ul>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">5. 고객 지원</h2>
+                    <p class="leading-relaxed mb-4">
+                      환불과 관련하여 궁금한 사항이 있으시면 언제든지 문의해주시기 바랍니다.
+                    </p>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                      <p class="font-semibold mb-2">▶ 고객 지원 연락처</p>
+                      <ul class="space-y-1 text-sm">
+                        <li>이메일: support@worvox.com</li>
+                        <li>운영 시간: 평일 09:00 - 18:00 (주말 및 공휴일 제외)</li>
+                        <li>응답 시간: 영업일 기준 24시간 이내</li>
+                      </ul>
+                    </div>
+                  </section>
+                  
+                  <section>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">6. 소비자 피해 보상</h2>
+                    <p class="leading-relaxed">
+                      본 환불정책에 명시되지 않은 사항에 대해서는 "전자상거래 등에서의 소비자보호에 관한 법률" 등 관련 법령 및 회사의 이용약관에 따릅니다.
+                    </p>
+                  </section>
+                  
+                  <section class="pt-6 border-t border-gray-200">
+                    <p class="text-sm text-gray-600">
+                      <strong>시행일:</strong> 본 환불정책은 2026년 2월 24일부터 시행됩니다.
+                    </p>
+                  </section>
+                </div>
+              </div>
+              
+              ${this.getFooter()}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
   }
 }
 
