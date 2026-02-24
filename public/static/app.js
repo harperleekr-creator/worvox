@@ -1423,15 +1423,17 @@ Proceed to payment?
                   class="text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all">
                   <i class="fas fa-arrow-left text-xl"></i>
                 </button>
-                <div>
+                <div class="flex-1">
                   <h2 class="text-base md:text-lg font-semibold text-gray-800">${this.currentTopic.name}</h2>
                   <span class="hidden md:inline text-sm text-gray-500">Practice your English!</span>
                 </div>
               </div>
-              <!-- End Session (Desktop only) -->
+              <!-- End Session Button -->
               <button onclick="worvox.endSession()" 
-                class="hidden md:flex items-center text-gray-600 hover:text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-100 transition-all">
-                <i class="fas fa-times mr-2"></i>End Session
+                class="flex items-center gap-2 text-white bg-red-500 hover:bg-red-600 px-3 md:px-4 py-2 rounded-lg transition-all text-sm md:text-base font-semibold shadow-sm">
+                <i class="fas fa-stop-circle"></i>
+                <span class="hidden sm:inline">End</span>
+                <span class="hidden md:inline">Session</span>
               </button>
             </div>
           </div>
