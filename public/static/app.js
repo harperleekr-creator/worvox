@@ -1070,10 +1070,10 @@ Proceed to payment?
                 
                 <!-- Daily Usage Tracker (Free Plan Only) -->
                 ${!this.isPremiumUser() ? `
-                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-6 md:mb-8">
+                <div class="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-200 mb-6 md:mb-8">
                   <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-lg font-semibold text-gray-900">오늘의 사용량</h3>
-                    <button onclick="worvox.showPlan()" class="text-emerald-600 hover:text-emerald-700 text-sm font-medium">
+                    <h3 class="text-base md:text-lg font-semibold text-gray-900">오늘의 사용량</h3>
+                    <button onclick="worvox.showPlan()" class="text-emerald-600 hover:text-emerald-700 text-xs md:text-sm font-medium">
                       Premium 보기 →
                     </button>
                   </div>
