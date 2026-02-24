@@ -2021,7 +2021,8 @@ Proceed to payment?
       this.flashcardIndex--;
       this.flashcardFlipped = false;
       // Only update the flashcard content, not the entire page
-      this.updateFlashcardContent(words);
+      const response = JSON.parse(document.getElementById('app').dataset.vocabularyData);
+      this.updateFlashcardContent(response.words);
     }
   }
 
