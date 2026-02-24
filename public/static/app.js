@@ -187,6 +187,11 @@ class WorVox {
             <i class="fas fa-gift" style="width: 20px; text-align: center;"></i>
             <span>Rewards</span>
           </a>
+          <a href="#" onclick="worvox.showPlan(); worvox.closeMobileSidebar(); return false;" 
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'plan' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
+            <i class="fas fa-crown" style="width: 20px; text-align: center;"></i>
+            <span>Plan</span>
+          </a>
         </nav>
         
         <!-- User Profile -->
@@ -985,7 +990,7 @@ Proceed to payment?
                   <i class="fas fa-bars text-xl"></i>
                 </button>
                 <h1 class="text-lg font-semibold text-gray-800">Home</h1>
-                <button onclick="worvox.showUpgrade()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-all">
+                <button onclick="worvox.showPlan()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-all">
                   <i class="fas fa-crown"></i>
                 </button>
               </div>
@@ -994,7 +999,7 @@ Proceed to payment?
             <!-- Desktop Top Bar -->
             <div class="hidden md:flex bg-white border-b border-gray-200 px-6 py-3 items-center justify-between">
               <h2 class="text-lg font-semibold text-gray-800">Choose Your Learning Path</h2>
-              <button onclick="worvox.showUpgrade()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition-all">
+              <button onclick="worvox.showPlan()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition-all">
                 <i class="fas fa-crown mr-2"></i>Upgrade
               </button>
             </div>
@@ -2545,6 +2550,271 @@ Proceed to payment?
     return div.innerHTML;
   }
 
+  // Show Plan/Pricing Page
+  showPlan() {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex h-screen bg-gray-50">
+        <!-- Sidebar -->
+        ${this.getSidebar('plan')}
+        
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto">
+          <!-- Header -->
+          <div class="bg-white border-b border-gray-200 px-4 md:px-8 py-4 md:py-6">
+            <div class="flex items-center justify-between">
+              <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">💎 요금제</h1>
+                <p class="text-gray-600 mt-1">WorVox와 함께 영어 실력을 향상시키세요</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Pricing Cards -->
+          <div class="max-w-7xl mx-auto px-4 py-8 md:py-12">
+            <!-- 7-day Free Trial Banner -->
+            <div class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-2xl p-6 mb-8 text-center">
+              <h2 class="text-2xl font-bold mb-2">🎉 7일 무료 체험</h2>
+              <p class="text-emerald-50">Premium과 Business 플랜을 7일간 무료로 체험해보세요!</p>
+            </div>
+            
+            <!-- Pricing Cards Grid -->
+            <div class="grid md:grid-cols-3 gap-6 md:gap-8">
+              <!-- Free Plan -->
+              <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border-2 border-gray-200 hover:border-gray-300 transition-all">
+                <div class="text-center mb-6">
+                  <div class="text-4xl mb-3">💚</div>
+                  <h3 class="text-2xl font-bold text-gray-800 mb-2">Free</h3>
+                  <div class="text-4xl font-bold text-gray-900 mb-2">₩0</div>
+                  <p class="text-gray-500 text-sm">영원히 무료</p>
+                </div>
+                
+                <ul class="space-y-3 mb-8">
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-green-600 mt-1"></i>
+                    <span class="text-gray-700">AI 영어 대화 <strong>하루 5회</strong></span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-green-600 mt-1"></i>
+                    <span class="text-gray-700">단어장 전체 레벨</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-green-600 mt-1"></i>
+                    <span class="text-gray-700">Flashcard & Quiz 무제한</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-green-600 mt-1"></i>
+                    <span class="text-gray-700">발음 연습 <strong>하루 10회</strong></span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-green-600 mt-1"></i>
+                    <span class="text-gray-700">XP/레벨 시스템</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-times text-gray-300 mt-1"></i>
+                    <span class="text-gray-400">학습 분석 리포트</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-times text-gray-300 mt-1"></i>
+                    <span class="text-gray-400">AI 상세 피드백</span>
+                  </li>
+                </ul>
+                
+                <button class="w-full py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-all">
+                  현재 플랜
+                </button>
+              </div>
+              
+              <!-- Premium Plan -->
+              <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-8 border-4 border-emerald-500 relative transform md:scale-105">
+                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-emerald-500 text-white px-6 py-1 rounded-full text-sm font-bold">
+                  인기
+                </div>
+                
+                <div class="text-center mb-6">
+                  <div class="text-4xl mb-3">⭐</div>
+                  <h3 class="text-2xl font-bold text-gray-800 mb-2">Premium</h3>
+                  <div class="text-4xl font-bold text-emerald-600 mb-2">₩9,900</div>
+                  <p class="text-gray-500 text-sm mb-1">/월</p>
+                  <p class="text-emerald-600 text-sm font-semibold">연간 결제 시 ₩95,040 (20% 할인)</p>
+                </div>
+                
+                <ul class="space-y-3 mb-8">
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-emerald-600 mt-1"></i>
+                    <span class="text-gray-700"><strong>AI 영어 대화 무제한</strong></span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-emerald-600 mt-1"></i>
+                    <span class="text-gray-700">단어장 전체 레벨</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-emerald-600 mt-1"></i>
+                    <span class="text-gray-700">Flashcard & Quiz 무제한</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-emerald-600 mt-1"></i>
+                    <span class="text-gray-700"><strong>발음 연습 무제한</strong></span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-emerald-600 mt-1"></i>
+                    <span class="text-gray-700">XP/레벨 시스템</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-emerald-600 mt-1"></i>
+                    <span class="text-gray-700"><strong>학습 분석 리포트 (주간/월간)</strong></span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-emerald-600 mt-1"></i>
+                    <span class="text-gray-700"><strong>AI 상세 피드백</strong></span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-emerald-600 mt-1"></i>
+                    <span class="text-gray-700">개인 맞춤 학습</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-emerald-600 mt-1"></i>
+                    <span class="text-gray-700">광고 제거</span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-emerald-600 mt-1"></i>
+                    <span class="text-gray-700"><strong>Real Conversation 20% 할인</strong></span>
+                  </li>
+                </ul>
+                
+                <button onclick="worvox.upgradePlan('premium')" class="w-full py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-all shadow-lg">
+                  7일 무료 체험 시작
+                </button>
+              </div>
+              
+              <!-- Business Plan -->
+              <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border-2 border-indigo-200 hover:border-indigo-300 transition-all">
+                <div class="text-center mb-6">
+                  <div class="text-4xl mb-3">🏢</div>
+                  <h3 class="text-2xl font-bold text-gray-800 mb-2">Business</h3>
+                  <div class="text-4xl font-bold text-indigo-600 mb-2">₩89,000</div>
+                  <p class="text-gray-500 text-sm mb-1">/월/인</p>
+                  <p class="text-indigo-600 text-sm font-semibold">연간 결제 시 ₩854,400 (20% 할인)</p>
+                </div>
+                
+                <ul class="space-y-3 mb-8">
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-indigo-600 mt-1"></i>
+                    <span class="text-gray-700"><strong>Premium 전체 기능</strong></span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-indigo-600 mt-1"></i>
+                    <span class="text-gray-700"><strong>실시간 학습 대시보드</strong></span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-indigo-600 mt-1"></i>
+                    <span class="text-gray-700"><strong>팀 관리 기능</strong></span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-indigo-600 mt-1"></i>
+                    <span class="text-gray-700"><strong>전담 매니저</strong></span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-indigo-600 mt-1"></i>
+                    <span class="text-gray-700"><strong>Real Conversation 30% 할인</strong></span>
+                  </li>
+                  <li class="flex items-start gap-2">
+                    <i class="fas fa-check text-indigo-600 mt-1"></i>
+                    <span class="text-gray-700"><strong>5인 이상 추가 20% 할인</strong></span>
+                  </li>
+                </ul>
+                
+                <button onclick="worvox.contactSales()" class="w-full py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-all">
+                  영업팀 문의하기
+                </button>
+              </div>
+            </div>
+            
+            <!-- Feature Comparison Table -->
+            <div class="mt-12 bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div class="bg-gradient-to-r from-gray-800 to-gray-900 text-white px-6 py-4">
+                <h3 class="text-xl font-bold">기능 상세 비교</h3>
+              </div>
+              
+              <div class="overflow-x-auto">
+                <table class="w-full">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">기능</th>
+                      <th class="px-6 py-4 text-center text-sm font-semibold text-gray-700">Free</th>
+                      <th class="px-6 py-4 text-center text-sm font-semibold text-emerald-700">Premium</th>
+                      <th class="px-6 py-4 text-center text-sm font-semibold text-indigo-700">Business</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-200">
+                    <tr>
+                      <td class="px-6 py-4 text-sm text-gray-700">AI 영어 대화</td>
+                      <td class="px-6 py-4 text-center text-sm">하루 5회</td>
+                      <td class="px-6 py-4 text-center text-sm text-emerald-600 font-semibold">무제한</td>
+                      <td class="px-6 py-4 text-center text-sm text-indigo-600 font-semibold">무제한</td>
+                    </tr>
+                    <tr class="bg-gray-50">
+                      <td class="px-6 py-4 text-sm text-gray-700">발음 연습</td>
+                      <td class="px-6 py-4 text-center text-sm">하루 10회</td>
+                      <td class="px-6 py-4 text-center text-sm text-emerald-600 font-semibold">무제한</td>
+                      <td class="px-6 py-4 text-center text-sm text-indigo-600 font-semibold">무제한</td>
+                    </tr>
+                    <tr>
+                      <td class="px-6 py-4 text-sm text-gray-700">학습 분석 리포트</td>
+                      <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                      <td class="px-6 py-4 text-center"><i class="fas fa-check text-emerald-600"></i></td>
+                      <td class="px-6 py-4 text-center"><i class="fas fa-check text-indigo-600"></i></td>
+                    </tr>
+                    <tr class="bg-gray-50">
+                      <td class="px-6 py-4 text-sm text-gray-700">AI 상세 피드백</td>
+                      <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                      <td class="px-6 py-4 text-center"><i class="fas fa-check text-emerald-600"></i></td>
+                      <td class="px-6 py-4 text-center"><i class="fas fa-check text-indigo-600"></i></td>
+                    </tr>
+                    <tr>
+                      <td class="px-6 py-4 text-sm text-gray-700">개인 맞춤 학습</td>
+                      <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                      <td class="px-6 py-4 text-center"><i class="fas fa-check text-emerald-600"></i></td>
+                      <td class="px-6 py-4 text-center"><i class="fas fa-check text-indigo-600"></i></td>
+                    </tr>
+                    <tr class="bg-gray-50">
+                      <td class="px-6 py-4 text-sm text-gray-700">Real Conversation 할인</td>
+                      <td class="px-6 py-4 text-center text-sm">정가</td>
+                      <td class="px-6 py-4 text-center text-sm text-emerald-600 font-semibold">20% 할인</td>
+                      <td class="px-6 py-4 text-center text-sm text-indigo-600 font-semibold">30% 할인</td>
+                    </tr>
+                    <tr>
+                      <td class="px-6 py-4 text-sm text-gray-700">팀 관리 대시보드</td>
+                      <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                      <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                      <td class="px-6 py-4 text-center"><i class="fas fa-check text-indigo-600"></i></td>
+                    </tr>
+                    <tr class="bg-gray-50">
+                      <td class="px-6 py-4 text-sm text-gray-700">전담 매니저</td>
+                      <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                      <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                      <td class="px-6 py-4 text-center"><i class="fas fa-check text-indigo-600"></i></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Upgrade to Premium
+  upgradePlan(plan) {
+    alert(\`💎 \${plan === 'premium' ? 'Premium' : 'Business'} 플랜 업그레이드\n\n결제 시스템 연동 준비 중입니다.\n\n곧 만나요! 🚀\`);
+  }
+
+  // Contact Sales for Business Plan
+  contactSales() {
+    alert('🏢 Business 플랜 문의\n\n영업팀 연락처:\n📧 business@worvox.com\n📞 02-1234-5678\n\n담당자가 곧 연락드리겠습니다!');
+  }
+
   // Word Search Feature with Hybrid Approach
   async searchWord() {
     const searchInput = document.getElementById('wordSearch');
@@ -3196,8 +3466,8 @@ Proceed to payment?
   }
 
   showUpgrade() {
-    // Placeholder for upgrade/pricing page
-    alert('💎 Upgrade to Premium\n\nPremium features coming soon!\n\n✨ Unlimited AI conversations\n📚 Premium vocabulary\n🎯 Personalized learning\n👑 Exclusive rewards\n\nStay tuned!');
+    // Redirect to Plan page
+    this.showPlan();
   }
 
   // Vocabulary Learning Feature
