@@ -1086,10 +1086,10 @@ Proceed to payment?
                           <i class="fas fa-comment text-blue-600"></i>
                           <span class="text-sm text-gray-700">AI 대화</span>
                         </div>
-                        <span class="text-sm font-medium text-gray-900">${this.getDailyUsage('ai_conversation')}/5회</span>
+                        <span class="text-sm font-medium text-gray-900" data-usage-count="ai_conversation">${this.getDailyUsage('ai_conversation')}/5회</span>
                       </div>
                       <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-blue-600 h-2 rounded-full transition-all" style="width: ${(this.getDailyUsage('ai_conversation') / 5) * 100}%"></div>
+                        <div class="bg-blue-600 h-2 rounded-full transition-all" data-usage-bar="ai_conversation" style="width: ${(this.getDailyUsage('ai_conversation') / 5) * 100}%"></div>
                       </div>
                     </div>
                     
@@ -1100,10 +1100,10 @@ Proceed to payment?
                           <i class="fas fa-microphone text-purple-600"></i>
                           <span class="text-sm text-gray-700">발음 연습</span>
                         </div>
-                        <span class="text-sm font-medium text-gray-900">${this.getDailyUsage('pronunciation')}/10회</span>
+                        <span class="text-sm font-medium text-gray-900" data-usage-count="pronunciation">${this.getDailyUsage('pronunciation')}/10회</span>
                       </div>
                       <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-purple-600 h-2 rounded-full transition-all" style="width: ${(this.getDailyUsage('pronunciation') / 10) * 100}%"></div>
+                        <div class="bg-purple-600 h-2 rounded-full transition-all" data-usage-bar="pronunciation" style="width: ${(this.getDailyUsage('pronunciation') / 10) * 100}%"></div>
                       </div>
                     </div>
                     
@@ -1114,10 +1114,10 @@ Proceed to payment?
                           <i class="fas fa-search text-emerald-600"></i>
                           <span class="text-sm text-gray-700">단어 검색</span>
                         </div>
-                        <span class="text-sm font-medium text-gray-900">${this.getDailyUsage('word_search')}/10회</span>
+                        <span class="text-sm font-medium text-gray-900" data-usage-count="word_search">${this.getDailyUsage('word_search')}/10회</span>
                       </div>
                       <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-emerald-600 h-2 rounded-full transition-all" style="width: ${(this.getDailyUsage('word_search') / 10) * 100}%"></div>
+                        <div class="bg-emerald-600 h-2 rounded-full transition-all" data-usage-bar="word_search" style="width: ${(this.getDailyUsage('word_search') / 10) * 100}%"></div>
                       </div>
                     </div>
                   </div>
@@ -3412,6 +3412,9 @@ Proceed to payment?
     this.dailyUsage[feature]++;
     this.saveUsageData();
     
+    // Update UI if usage tracker is visible
+    this.updateUsageTrackerUI();
+    
     // Show warning when approaching limit
     const limit = this.usageLimits[this.userPlan][feature];
     const current = this.dailyUsage[feature];
@@ -3419,6 +3422,33 @@ Proceed to payment?
     if (this.userPlan === 'free' && current >= limit * 0.8) {
       this.showUsageWarning(feature, current, limit);
     }
+  }
+
+  // Update usage tracker UI in real-time
+  updateUsageTrackerUI() {
+    // Map internal keys to UI feature names
+    const features = [
+      { internal: 'aiConversations', ui: 'ai_conversation', limit: 5 },
+      { internal: 'pronunciationPractice', ui: 'pronunciation', limit: 10 },
+      { internal: 'wordSearch', ui: 'word_search', limit: 10 }
+    ];
+    
+    features.forEach(({ internal, ui, limit }) => {
+      const current = this.dailyUsage[internal] || 0;
+      const percentage = (current / limit) * 100;
+      
+      // Update count text
+      const countElements = document.querySelectorAll(`[data-usage-count="${ui}"]`);
+      countElements.forEach(el => {
+        el.textContent = `${current}/${limit}회`;
+      });
+      
+      // Update progress bar
+      const barElements = document.querySelectorAll(`[data-usage-bar="${ui}"]`);
+      barElements.forEach(el => {
+        el.style.width = `${percentage}%`;
+      });
+    });
   }
 
   // Show upgrade banner when limit reached
@@ -3513,6 +3543,11 @@ Proceed to payment?
 
   // Word Search Feature with Hybrid Approach
   async searchWord() {
+    // Check usage limit for free users
+    if (!this.checkUsageLimit('wordSearch')) {
+      return; // Show upgrade banner
+    }
+    
     const searchInput = document.getElementById('wordSearch');
     const searchResult = document.getElementById('searchResult');
     const searchTerm = searchInput.value.trim();
@@ -3521,6 +3556,9 @@ Proceed to payment?
       searchResult.innerHTML = '';
       return;
     }
+    
+    // Increment usage when searching
+    this.incrementUsage('wordSearch');
     
     // Show loading state
     searchResult.innerHTML = `
@@ -4470,10 +4508,19 @@ Proceed to payment?
 
   // Get daily usage count for a feature
   getDailyUsage(featureType) {
-    if (!this.dailyUsage || !this.dailyUsage.features) {
+    // Map feature names from UI to internal storage keys
+    const featureMap = {
+      'ai_conversation': 'aiConversations',
+      'pronunciation': 'pronunciationPractice',
+      'word_search': 'wordSearch'
+    };
+    
+    const internalKey = featureMap[featureType] || featureType;
+    
+    if (!this.dailyUsage) {
       return 0;
     }
-    return this.dailyUsage.features[featureType] || 0;
+    return this.dailyUsage[internalKey] || 0;
   }
 
   // Premium user check helper
