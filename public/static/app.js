@@ -297,7 +297,7 @@ class WorVox {
             <!-- Company Info -->
             <div class="text-center md:text-left">
               <div class="flex flex-wrap items-center justify-center md:justify-start gap-1.5 md:gap-2">
-                <span class="font-medium text-gray-300">위아솔루션즈</span>
+                <span class="font-medium text-gray-300">하퍼잉글리쉬</span>
                 <span class="text-gray-600 hidden md:inline">|</span>
                 <span class="block md:inline w-full md:w-auto text-center md:text-left">대표자: 이강돈</span>
                 <span class="text-gray-600 hidden md:inline">|</span>
