@@ -263,30 +263,27 @@ class WorVox {
   // Footer with company information
   getFooter() {
     return `
-      <footer class="bg-gray-800 text-gray-300 py-8 mt-12 border-t-4 border-gray-700">
-        <div class="max-w-7xl mx-auto px-4">
-          <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+      <footer class="bg-gray-900 text-gray-400 py-4 mt-8 border-t border-gray-800">
+        <div class="max-w-full px-6">
+          <div class="flex flex-col md:flex-row justify-between items-center gap-3 text-xs">
             <!-- Company Info -->
             <div class="text-center md:text-left">
-              <div class="text-sm space-y-1">
-                <div class="flex items-center justify-center md:justify-start gap-2 flex-wrap">
-                  <span class="font-semibold text-white">위아솔루션즈</span>
-                  <span class="text-gray-500">|</span>
-                  <span>대표자: 이강돈</span>
-                  <span class="text-gray-500">|</span>
-                  <span>사업자번호: 542-07-02097</span>
-                </div>
-                <div class="text-xs text-gray-400 mt-2">
-                  © ${new Date().getFullYear()} WorVox. All rights reserved.
-                </div>
+              <div class="flex items-center justify-center md:justify-start gap-2 flex-wrap">
+                <span class="font-medium text-gray-300">위아솔루션즈</span>
+                <span class="text-gray-600">|</span>
+                <span>대표자: 이강돈</span>
+                <span class="text-gray-600">|</span>
+                <span>사업자번호: 542-07-02097</span>
               </div>
             </div>
             
-            <!-- Links -->
-            <div class="flex items-center gap-4 text-sm">
-              <a href="#" onclick="worvox.showTerms(); return false;" class="hover:text-white transition-colors">이용약관</a>
-              <a href="#" onclick="worvox.showPrivacy(); return false;" class="hover:text-white transition-colors">개인정보처리방침</a>
-              <a href="#" onclick="worvox.showRefund(); return false;" class="hover:text-white transition-colors">환불정책</a>
+            <!-- Copyright & Links -->
+            <div class="flex items-center gap-4">
+              <span class="text-gray-500">© ${new Date().getFullYear()} WorVox</span>
+              <span class="text-gray-700">|</span>
+              <a href="#" onclick="worvox.showTerms(); return false;" class="hover:text-gray-300 transition-colors">이용약관</a>
+              <a href="#" onclick="worvox.showPrivacy(); return false;" class="hover:text-gray-300 transition-colors">개인정보처리방침</a>
+              <a href="#" onclick="worvox.showRefund(); return false;" class="hover:text-gray-300 transition-colors">환불정책</a>
             </div>
           </div>
         </div>
