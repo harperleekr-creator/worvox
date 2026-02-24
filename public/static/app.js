@@ -1614,14 +1614,6 @@ Proceed to payment?
         </div>
       `;
       
-      // Initialize mode-specific features
-      if (mode === 'flashcard') {
-        this.flashcardIndex = 0;
-        this.flashcardFlipped = false;
-      } else if (mode === 'quiz') {
-        this.initializeQuiz(words, difficulty);
-      }
-      
     } catch (error) {
       console.error('Error loading vocabulary:', error);
       document.getElementById('app').innerHTML = `
