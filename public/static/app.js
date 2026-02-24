@@ -263,7 +263,7 @@ class WorVox {
   // Footer with company information
   getFooter() {
     return `
-      <footer class="w-full bg-gray-900 text-gray-400 py-4 -mx-4 md:-mx-8">
+      <footer class="w-full bg-gray-900 text-gray-400 py-4 -mx-4 md:-mx-8 mt-8 md:mt-12">
         <div class="px-4 md:px-8">
           <div class="flex flex-col md:flex-row justify-between items-center gap-2 md:gap-3 text-xs">
             <!-- Company Info -->
@@ -1206,8 +1206,9 @@ Proceed to payment?
                 </div>
               </div>
               
-              <!-- Footer (inside scrollable content) -->
+              <!-- Footer (inside padded content area) -->
               ${this.getFooter()}
+              </div>
             </div>
           </div>
         </div>
@@ -3128,8 +3129,9 @@ Proceed to payment?
               </div>
             </div>
             
-            <!-- Footer (inside scrollable content) -->
+            <!-- Footer (inside padded content area) -->
             ${this.getFooter()}
+            </div>
           </div>
         </div>
       </div>
@@ -3316,8 +3318,9 @@ Proceed to payment?
               </p>
             </div>
             
-            <!-- Footer (inside scrollable content) -->
+            <!-- Footer (inside padded content area) -->
             ${this.getFooter()}
+            </div>
           </div>
         </div>
       </div>
