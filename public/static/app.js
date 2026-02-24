@@ -1569,15 +1569,15 @@ Proceed to payment?
               <div class="flex gap-2 mb-4 overflow-x-auto">
                 <button onclick="worvox.showVocabulary('beginner', '${mode}')" 
                   class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 ${difficulty === 'beginner' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'} rounded-lg transition-all font-semibold text-sm md:text-base">
-                  <i class="fas fa-seedling mr-2"></i>초급 (Beginner)
+                  <i class="fas fa-seedling mr-2"></i>Beginner
                 </button>
                 <button onclick="worvox.showVocabulary('intermediate', '${mode}')" 
                   class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 ${difficulty === 'intermediate' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'} rounded-lg transition-all font-semibold text-sm md:text-base">
-                  <i class="fas fa-book mr-2"></i>중급 (Intermediate)
+                  <i class="fas fa-book mr-2"></i>Intermediate
                 </button>
                 <button onclick="worvox.showVocabulary('advanced', '${mode}')" 
                   class="flex-shrink-0 px-4 md:px-6 py-2 md:py-3 ${difficulty === 'advanced' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'} rounded-lg transition-all font-semibold text-sm md:text-base">
-                  <i class="fas fa-graduation-cap mr-2"></i>고급 (Advanced)
+                  <i class="fas fa-graduation-cap mr-2"></i>Advanced
                 </button>
               </div>
               
@@ -1595,24 +1595,6 @@ Proceed to payment?
                   class="flex-1 px-3 md:px-4 py-2 ${mode === 'quiz' ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'} rounded-lg transition-colors text-xs md:text-sm font-medium">
                   <i class="fas fa-graduation-cap mr-2"></i>Quiz
                 </button>
-              </div>
-              
-              <!-- Word Count & Progress -->
-              <div class="mt-4 flex items-center gap-4 text-sm">
-                <div class="flex items-center gap-2">
-                  <i class="fas fa-book text-${difficulty === 'beginner' ? 'green' : difficulty === 'intermediate' ? 'blue' : 'purple'}-600"></i>
-                  <span class="font-semibold">${words.length} words</span>
-                </div>
-                ${this.currentUser ? `
-                  <div class="flex items-center gap-2">
-                    <i class="fas fa-check-circle text-green-600"></i>
-                    <span>${Object.keys(progressData).length} learned</span>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <i class="fas fa-star text-yellow-500"></i>
-                    <span>${bookmarkedWords.length} bookmarked</span>
-                  </div>
-                ` : ''}
               </div>
             </div>
             
@@ -2101,149 +2083,7 @@ Proceed to payment?
     }
   }
 
-  // Quiz Mode
-  renderQuizMode(words, progressData) {
-    if (!words || words.length === 0) {
-      return `
-        <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
-          <div class="text-6xl mb-4">📖</div>
-          <h3 class="text-xl font-bold text-gray-800 mb-2">No Vocabulary Yet</h3>
-          <p class="text-gray-600">Vocabulary words will be added soon!</p>
-        </div>
-      `;
-    }
 
-    if (!this.quizData) {
-      // Initialize quiz with random words
-      // Shuffle all words and pick 10
-      const shuffledWords = [...words].sort(() => Math.random() - 0.5);
-      const selectedWords = shuffledWords.slice(0, Math.min(10, words.length));
-      
-      this.quizData = {
-        questions: selectedWords.map(word => ({
-          word: word,
-          options: this.generateQuizOptions(word, words),
-          userAnswer: null,
-          correct: null
-        })),
-        currentIndex: 0,
-        score: 0,
-        finished: false
-      };
-      
-      // Reset the flag
-      this.quizNeedsNewWords = false;
-    }
-
-    const quiz = this.quizData;
-    
-    if (quiz.finished) {
-      return this.renderQuizResults();
-    }
-
-    const question = quiz.questions[quiz.currentIndex];
-    const word = question.word;
-
-    return `
-      <div class="max-w-3xl mx-auto">
-        <!-- Quiz Progress -->
-        <div class="mb-6">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-gray-600">Question ${quiz.currentIndex + 1} / ${quiz.questions.length}</span>
-            <span class="text-indigo-600 font-bold">Score: ${quiz.score} / ${quiz.currentIndex}</span>
-          </div>
-          <div class="w-full bg-gray-200 rounded-full h-2">
-            <div class="bg-indigo-600 h-2 rounded-full transition-all" style="width: ${(quiz.currentIndex / quiz.questions.length) * 100}%"></div>
-          </div>
-        </div>
-
-        <!-- Question Card -->
-        <div class="bg-white rounded-2xl shadow-lg p-8 mb-6">
-          <div class="text-center mb-8">
-            <h2 class="text-4xl font-bold text-indigo-600 mb-4">${this.escapeHtml(word.word)}</h2>
-            <div class="flex items-center justify-center gap-2 mb-4">
-              <span class="inline-block px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full">
-                ${this.escapeHtml(word.part_of_speech)}
-              </span>
-              ${word.toeic_related ? `
-              <span class="inline-block px-2 py-1 bg-amber-100 text-amber-700 text-sm font-semibold rounded">
-                TOEIC
-              </span>
-              ` : ''}
-              ${word.toefl_related ? `
-              <span class="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-sm font-semibold rounded">
-                TOEFL
-              </span>
-              ` : ''}
-            </div>
-            <button onclick="worvox.pronounceFlashcardWord('${this.escapeHtml(word.word)}')" 
-              class="p-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors">
-              <i class="fas fa-volume-up"></i>
-            </button>
-          </div>
-
-          <p class="text-gray-700 text-lg mb-6 text-center">이 단어의 뜻은 무엇일까요?</p>
-
-          <!-- Options -->
-          <div class="space-y-3">
-            ${question.options.map((option, index) => {
-              const isSelected = question.userAnswer === option;
-              const isCorrect = option === word.meaning_ko;
-              let buttonClass = 'bg-white hover:bg-gray-50 border-2 border-gray-200';
-              
-              if (question.userAnswer !== null) {
-                if (isCorrect) {
-                  buttonClass = 'bg-green-100 border-2 border-green-500';
-                } else if (isSelected) {
-                  buttonClass = 'bg-red-100 border-2 border-red-500';
-                }
-              }
-              
-              return `
-                <button onclick="worvox.selectQuizAnswer('${this.escapeHtml(option)}')" 
-                  class="w-full p-4 ${buttonClass} rounded-lg text-left font-semibold transition-all ${question.userAnswer !== null ? 'cursor-not-allowed' : 'cursor-pointer'}"
-                  ${question.userAnswer !== null ? 'disabled' : ''}>
-                  <span class="text-gray-700">${index + 1}. ${this.escapeHtml(option)}</span>
-                  ${question.userAnswer !== null && isCorrect ? '<i class="fas fa-check text-green-600 float-right"></i>' : ''}
-                  ${question.userAnswer !== null && isSelected && !isCorrect ? '<i class="fas fa-times text-red-600 float-right"></i>' : ''}
-                </button>
-              `;
-            }).join('')}
-          </div>
-        </div>
-
-        <!-- Next Button -->
-        ${question.userAnswer !== null ? `
-          <div class="text-center">
-            <button onclick="worvox.nextQuizQuestion()" 
-              class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-colors">
-              ${quiz.currentIndex < quiz.questions.length - 1 ? '다음 문제' : '결과 보기'} <i class="fas fa-arrow-right ml-2"></i>
-            </button>
-          </div>
-        ` : ''}
-      </div>
-    `;
-  }
-
-  generateQuizOptions(correctWord, allWords) {
-    const options = [correctWord.meaning_ko];
-    const otherWords = allWords.filter(w => w.id !== correctWord.id);
-    
-    // Add 3 random wrong answers
-    while (options.length < 4 && otherWords.length > 0) {
-      const randomIndex = Math.floor(Math.random() * otherWords.length);
-      const randomWord = otherWords[randomIndex];
-      
-      if (!options.includes(randomWord.meaning_ko)) {
-        options.push(randomWord.meaning_ko);
-      }
-      
-      otherWords.splice(randomIndex, 1);
-    }
-    
-    // Shuffle options
-    return options.sort(() => Math.random() - 0.5);
-  }
 
   async selectQuizAnswer(answer) {
     const question = this.quizData.questions[this.quizData.currentIndex];
