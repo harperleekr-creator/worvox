@@ -2012,7 +2012,7 @@ Proceed to payment?
       this.flashcardIndex++;
       this.flashcardFlipped = false;
       // Only update the flashcard content, not the entire page
-      this.updateFlashcardContent(words);
+      this.updateFlashcardContent(response.words);
     }
   }
 
