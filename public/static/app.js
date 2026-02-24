@@ -218,14 +218,11 @@ class WorVox {
             <i class="fas fa-comments" style="width: 20px; text-align: center;"></i>
             <span>AI Conversation</span>
           </a>
-          <!-- TEMPORARY: Real Conversation disabled for NHN KCP integration -->
-          <!--
           <a href="#" onclick="worvox.showRealConversation(); worvox.closeMobileSidebar(); return false;" 
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'real-conversation' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
             <i class="fas fa-user-tie" style="width: 20px; text-align: center;"></i>
             <span>Real Conversation</span>
           </a>
-          -->
           <a href="#" onclick="worvox.startVocabulary(); worvox.closeMobileSidebar(); return false;" 
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'vocabulary' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
             <i class="fas fa-book" style="width: 20px; text-align: center;"></i>
@@ -377,233 +374,320 @@ class WorVox {
   }
 
   showRealConversation() {
-    const content = `
+    const app = document.getElementById('app');
+    app.innerHTML = `
       <div class="flex h-screen bg-gray-50">
         ${this.getSidebar('real-conversation')}
-        <div class="flex-1 flex flex-col">
         
-        <div class="flex-1 overflow-y-auto p-3 md:p-4">
-          <div class="max-w-4xl mx-auto">
-            <!-- Header -->
-            <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-lg p-4 md:p-5 text-white mb-4">
-              <div class="flex items-center gap-2 md:gap-3">
-                <button onclick="worvox.showTopicSelection()" 
-                  class="md:hidden text-white hover:bg-emerald-600 p-2 rounded-lg transition-all">
-                  <i class="fas fa-arrow-left text-xl"></i>
-                </button>
-                <div class="flex-1">
-                  <h1 class="text-2xl md:text-3xl font-bold mb-1">
-                    <i class="fas fa-user-tie mr-2"></i>
-                    Real Conversation Lessons
-                  </h1>
-                  <p class="text-emerald-100">Book 1-on-1 lessons with certified English teachers</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Booking Form -->
-            <div class="bg-white rounded-lg shadow-md p-4 md:p-6">
-              <h2 class="text-xl font-bold text-gray-800 mb-4">Select Your Lesson Plan</h2>
-
-              <!-- Sessions Per Week -->
-              <div class="mb-5">
-                <label class="block text-sm font-semibold text-gray-700 mb-3">Sessions Per Week</label>
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-                  ${[1, 2, 3, 4, 5].map(num => `
-                    <button 
-                      onclick="worvox.selectSessions(${num})"
-                      id="session-btn-${num}"
-                      class="px-4 py-3 border-2 rounded-lg font-semibold transition-all hover:border-emerald-500 hover:bg-emerald-50"
-                      data-sessions="${num}">
-                      ${num} ${num === 1 ? 'Session' : 'Sessions'}
-                    </button>
-                  `).join('')}
-                </div>
-              </div>
-
-              <!-- Session Duration -->
-              <div class="mb-5">
-                <label class="block text-sm font-semibold text-gray-700 mb-3">Session Duration</label>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <button 
-                    onclick="worvox.selectDuration(25)"
-                    id="duration-btn-25"
-                    class="px-4 py-3 border-2 rounded-lg font-semibold transition-all hover:border-emerald-500 hover:bg-emerald-50"
-                    data-duration="25">
-                    25 Minutes
-                  </button>
-                  <button 
-                    onclick="worvox.selectDuration(50)"
-                    id="duration-btn-50"
-                    class="px-4 py-3 border-2 rounded-lg font-semibold transition-all hover:border-emerald-500 hover:bg-emerald-50"
-                    data-duration="50">
-                    50 Minutes
-                  </button>
-                </div>
-              </div>
-
-              <!-- Pricing Summary -->
-              <div class="bg-gray-50 rounded-lg p-4 md:p-5 mb-5">
-                <h3 class="text-lg font-bold text-gray-800 mb-3">Pricing Summary</h3>
-                
-                <div class="space-y-2">
-                  <div class="flex justify-between items-center text-gray-600">
-                    <span>Base Price (per session)</span>
-                    <span class="font-semibold">₩16,500</span>
-                  </div>
-                  <div class="flex justify-between items-center text-gray-600">
-                    <span id="sessions-display">Sessions Selected</span>
-                    <span id="sessions-value" class="font-semibold">-</span>
-                  </div>
-                  <div class="flex justify-between items-center text-gray-600">
-                    <span id="duration-display">Duration</span>
-                    <span id="duration-value" class="font-semibold">-</span>
-                  </div>
-                  
-                  <div class="border-t border-gray-300 pt-3 mt-3">
-                    <div class="flex justify-between items-center text-gray-700">
-                      <span class="font-semibold">Per Week</span>
-                      <span id="weekly-price" class="font-bold text-lg text-emerald-600">₩0</span>
-                    </div>
-                    <div class="flex justify-between items-center text-gray-700 mt-2">
-                      <span class="font-semibold">Per Month (4 weeks)</span>
-                      <span id="monthly-price" class="font-bold text-lg text-emerald-600">₩0</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Total & Checkout -->
-              <div class="border-t border-gray-200 pt-4">
-                <div class="flex justify-between items-center mb-3">
-                  <span class="text-xl font-bold text-gray-800">Total (Monthly)</span>
-                  <span id="total-price" class="text-2xl font-bold text-emerald-600">₩0</span>
-                </div>
-                <button 
-                  id="checkout-btn"
-                  onclick="worvox.proceedToCheckout()"
-                  disabled
-                  class="w-full bg-emerald-500 text-white py-3 px-6 rounded-lg font-bold text-lg transition-all hover:bg-emerald-600 disabled:bg-gray-300 disabled:cursor-not-allowed">
-                  <i class="fas fa-credit-card mr-2"></i>
-                  Proceed to Payment
-                </button>
-                <p class="text-xs text-gray-500 text-center mt-2">
-                  Please select sessions and duration to continue
-                </p>
-              </div>
-            </div>
-
-            <!-- Features -->
-            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div class="bg-white rounded-lg p-4 shadow-sm">
-                <i class="fas fa-certificate text-emerald-500 text-2xl mb-2"></i>
-                <h3 class="font-semibold text-gray-800 mb-1">Certified Teachers</h3>
-                <p class="text-sm text-gray-600">All teachers are certified and experienced</p>
-              </div>
-              <div class="bg-white rounded-lg p-4 shadow-sm">
-                <i class="fas fa-calendar-check text-emerald-500 text-2xl mb-2"></i>
-                <h3 class="font-semibold text-gray-800 mb-1">Flexible Schedule</h3>
-                <p class="text-sm text-gray-600">Book lessons at your convenience</p>
-              </div>
-              <div class="bg-white rounded-lg p-4 shadow-sm">
-                <i class="fas fa-headset text-emerald-500 text-2xl mb-2"></i>
-                <h3 class="font-semibold text-gray-800 mb-1">One-on-One</h3>
-                <p class="text-sm text-gray-600">Personal attention for faster progress</p>
-              </div>
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- Mobile Header -->
+          <div class="md:hidden bg-white border-b border-gray-200 px-4 py-3">
+            <div class="flex items-center justify-between">
+              <button onclick="worvox.showTopicSelection()" class="text-gray-600">
+                <i class="fas fa-arrow-left text-xl"></i>
+              </button>
+              <h1 class="text-lg font-semibold text-gray-800">Real Conversation</h1>
+              <div class="w-6"></div>
             </div>
           </div>
-        </div>
+          
+          <!-- Desktop Top Bar -->
+          <div class="hidden md:flex bg-white border-b border-gray-200 px-6 py-3 items-center">
+            <h2 class="text-lg font-semibold text-gray-800">
+              <i class="fas fa-user-tie mr-2"></i>Real Conversation Lessons
+            </h2>
+          </div>
+          
+          <!-- Content Area -->
+          <div class="flex-1 overflow-y-auto">
+            <div class="p-4 md:p-8">
+              <div class="max-w-4xl mx-auto">
+                <!-- My Lesson Credits -->
+                <div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 md:p-8 text-white mb-6 md:mb-8">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <h2 class="text-xl md:text-2xl font-bold mb-2">내 수업권</h2>
+                      <p class="text-emerald-100 mb-4">1:1 원어민 영어 회화 수업</p>
+                      <div class="flex items-center gap-4">
+                        <div>
+                          <div class="text-3xl md:text-4xl font-bold">0</div>
+                          <div class="text-emerald-100 text-sm">잔여 수업</div>
+                        </div>
+                        <div class="h-12 w-px bg-emerald-300"></div>
+                        <div>
+                          <div class="text-3xl md:text-4xl font-bold">0</div>
+                          <div class="text-emerald-100 text-sm">완료한 수업</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="hidden md:block">
+                      <i class="fas fa-graduation-cap text-6xl text-white/20"></i>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Lesson Packages -->
+                <h3 class="text-2xl font-bold text-gray-900 mb-4">수업권 구매</h3>
+                <p class="text-gray-600 mb-6">원하는 수업권을 구매하고 자유롭게 예약하세요</p>
+                
+                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                  <!-- 1회 수업권 -->
+                  <div class="bg-white rounded-2xl shadow-lg p-6 border-2 border-gray-200 hover:border-emerald-500 transition-all">
+                    <div class="text-center mb-4">
+                      <div class="text-4xl mb-3">📚</div>
+                      <h4 class="text-xl font-bold text-gray-800 mb-2">1회 수업권</h4>
+                      <div class="text-3xl font-bold text-gray-900 mb-1">₩50,000</div>
+                      <p class="text-sm text-gray-600">회당 ₩50,000</p>
+                    </div>
+                    
+                    <ul class="space-y-2 mb-6">
+                      <li class="flex items-start gap-2 text-sm">
+                        <i class="fas fa-check text-emerald-600 mt-1"></i>
+                        <span class="text-gray-700">25분 또는 50분 선택</span>
+                      </li>
+                      <li class="flex items-start gap-2 text-sm">
+                        <i class="fas fa-check text-emerald-600 mt-1"></i>
+                        <span class="text-gray-700">1:1 원어민 강사</span>
+                      </li>
+                      <li class="flex items-start gap-2 text-sm">
+                        <i class="fas fa-check text-emerald-600 mt-1"></i>
+                        <span class="text-gray-700">자유로운 예약</span>
+                      </li>
+                    </ul>
+                    
+                    <button onclick="worvox.purchaseLessons(1, 50000)" 
+                      class="w-full py-3 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition-all">
+                      구매하기
+                    </button>
+                  </div>
+                  
+                  <!-- 4회 수업권 (인기) -->
+                  <div class="bg-white rounded-2xl shadow-2xl p-6 border-4 border-emerald-500 relative transform md:scale-105">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-emerald-500 text-white px-6 py-1 rounded-full text-sm font-bold">
+                      인기
+                    </div>
+                    
+                    <div class="text-center mb-4">
+                      <div class="text-4xl mb-3">🎯</div>
+                      <h4 class="text-xl font-bold text-gray-800 mb-2">4회 수업권</h4>
+                      <div class="text-3xl font-bold text-emerald-600 mb-1">₩180,000</div>
+                      <p class="text-sm text-gray-600 mb-1">회당 ₩45,000</p>
+                      <span class="inline-block bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-semibold">
+                        10% 할인
+                      </span>
+                    </div>
+                    
+                    <ul class="space-y-2 mb-6">
+                      <li class="flex items-start gap-2 text-sm">
+                        <i class="fas fa-check text-emerald-600 mt-1"></i>
+                        <span class="text-gray-700">25분 또는 50분 선택</span>
+                      </li>
+                      <li class="flex items-start gap-2 text-sm">
+                        <i class="fas fa-check text-emerald-600 mt-1"></i>
+                        <span class="text-gray-700">1:1 원어민 강사</span>
+                      </li>
+                      <li class="flex items-start gap-2 text-sm">
+                        <i class="fas fa-check text-emerald-600 mt-1"></i>
+                        <span class="text-gray-700">자유로운 예약</span>
+                      </li>
+                      <li class="flex items-start gap-2 text-sm">
+                        <i class="fas fa-star text-emerald-600 mt-1"></i>
+                        <span class="text-gray-700 font-semibold">회당 ₩5,000 할인</span>
+                      </li>
+                    </ul>
+                    
+                    <button onclick="worvox.purchaseLessons(4, 180000)" 
+                      class="w-full py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-all shadow-lg">
+                      구매하기
+                    </button>
+                  </div>
+                  
+                  <!-- 8회 수업권 (최대 할인) -->
+                  <div class="bg-white rounded-2xl shadow-lg p-6 border-2 border-indigo-200 hover:border-indigo-500 transition-all">
+                    <div class="text-center mb-4">
+                      <div class="text-4xl mb-3">🏆</div>
+                      <h4 class="text-xl font-bold text-gray-800 mb-2">8회 수업권</h4>
+                      <div class="text-3xl font-bold text-indigo-600 mb-1">₩320,000</div>
+                      <p class="text-sm text-gray-600 mb-1">회당 ₩40,000</p>
+                      <span class="inline-block bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">
+                        20% 할인
+                      </span>
+                    </div>
+                    
+                    <ul class="space-y-2 mb-6">
+                      <li class="flex items-start gap-2 text-sm">
+                        <i class="fas fa-check text-indigo-600 mt-1"></i>
+                        <span class="text-gray-700">25분 또는 50분 선택</span>
+                      </li>
+                      <li class="flex items-start gap-2 text-sm">
+                        <i class="fas fa-check text-indigo-600 mt-1"></i>
+                        <span class="text-gray-700">1:1 원어민 강사</span>
+                      </li>
+                      <li class="flex items-start gap-2 text-sm">
+                        <i class="fas fa-check text-indigo-600 mt-1"></i>
+                        <span class="text-gray-700">자유로운 예약</span>
+                      </li>
+                      <li class="flex items-start gap-2 text-sm">
+                        <i class="fas fa-star text-indigo-600 mt-1"></i>
+                        <span class="text-gray-700 font-semibold">회당 ₩10,000 할인</span>
+                      </li>
+                    </ul>
+                    
+                    <button onclick="worvox.purchaseLessons(8, 320000)" 
+                      class="w-full py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-all">
+                      구매하기
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- Features -->
+                <div class="grid md:grid-cols-3 gap-6 mb-6">
+                  <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-start gap-4">
+                      <div class="bg-emerald-100 p-3 rounded-lg">
+                        <i class="fas fa-certificate text-emerald-600 text-2xl"></i>
+                      </div>
+                      <div>
+                        <h4 class="font-bold text-gray-800 mb-1">인증된 강사진</h4>
+                        <p class="text-sm text-gray-600">TESOL/TEFL 자격증 보유 원어민 강사</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-start gap-4">
+                      <div class="bg-emerald-100 p-3 rounded-lg">
+                        <i class="fas fa-calendar-check text-emerald-600 text-2xl"></i>
+                      </div>
+                      <div>
+                        <h4 class="font-bold text-gray-800 mb-1">유연한 스케줄</h4>
+                        <p class="text-sm text-gray-600">원하는 시간에 자유롭게 예약</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+                    <div class="flex items-start gap-4">
+                      <div class="bg-emerald-100 p-3 rounded-lg">
+                        <i class="fas fa-headset text-emerald-600 text-2xl"></i>
+                      </div>
+                      <div>
+                        <h4 class="font-bold text-gray-800 mb-1">1:1 맞춤 수업</h4>
+                        <p class="text-sm text-gray-600">개인 맞춤형 학습으로 빠른 성장</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Premium Member Benefits -->
+                ${!this.isPremiumUser() ? `
+                <div class="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-xl p-6">
+                  <div class="flex items-center gap-4">
+                    <div class="bg-amber-100 p-4 rounded-full">
+                      <i class="fas fa-crown text-amber-600 text-3xl"></i>
+                    </div>
+                    <div class="flex-1">
+                      <h4 class="text-xl font-bold text-gray-900 mb-2">Premium 회원 혜택</h4>
+                      <p class="text-gray-700 mb-3">Premium 또는 Business 플랜 가입 시 추가 할인!</p>
+                      <ul class="space-y-1 text-sm text-gray-600 mb-4">
+                        <li><i class="fas fa-check text-amber-600 mr-2"></i>Premium: 모든 수업권 <strong>20% 추가 할인</strong></li>
+                        <li><i class="fas fa-check text-amber-600 mr-2"></i>Business: 모든 수업권 <strong>30% 추가 할인</strong></li>
+                        <li><i class="fas fa-check text-amber-600 mr-2"></i>우선 예약 가능</li>
+                      </ul>
+                      <button onclick="worvox.showPlan()" 
+                        class="bg-amber-500 hover:bg-amber-600 text-white px-6 py-2 rounded-lg font-semibold transition-all">
+                        플랜 보기
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                ` : ''}
+              </div>
+              
+              <!-- Footer -->
+              ${this.getFooter()}
+            </div>
+          </div>
         </div>
       </div>
     `;
     
-    document.getElementById('app').innerHTML = content;
-    
-    // Load gamification UI
+    // Load gamification stats
     setTimeout(() => this.loadGamificationStats(), 100);
   }
 
-  selectSessions(num) {
-    // Remove active class from all session buttons
-    for (let i = 1; i <= 5; i++) {
-      const btn = document.getElementById(`session-btn-${i}`);
-      btn.classList.remove('border-emerald-500', 'bg-emerald-50', 'text-emerald-700');
-      btn.classList.add('border-gray-300', 'text-gray-700');
+  // Purchase lesson packages (일반결제)
+  async purchaseLessons(lessonCount, amount) {
+    // Apply discount for Premium/Business users
+    let finalAmount = amount;
+    let discountPercent = 0;
+    
+    if (this.userPlan === 'premium') {
+      discountPercent = 20;
+      finalAmount = Math.floor(amount * 0.8);
+    } else if (this.userPlan === 'business') {
+      discountPercent = 30;
+      finalAmount = Math.floor(amount * 0.7);
     }
     
-    // Add active class to selected button
-    const selectedBtn = document.getElementById(`session-btn-${num}`);
-    selectedBtn.classList.remove('border-gray-300', 'text-gray-700');
-    selectedBtn.classList.add('border-emerald-500', 'bg-emerald-50', 'text-emerald-700');
+    const packageName = `${lessonCount}회 수업권`;
+    const pricePerLesson = Math.floor(finalAmount / lessonCount);
     
-    // Store selection
-    this.bookingData = this.bookingData || {};
-    this.bookingData.sessionsPerWeek = num;
+    // Show purchase confirmation
+    const discountText = discountPercent > 0 
+      ? `\n${this.userPlan === 'premium' ? 'Premium' : 'Business'} 회원 할인: -${discountPercent}% (₩${(amount - finalAmount).toLocaleString()} 할인)\n` 
+      : '';
     
-    // Update display
-    document.getElementById('sessions-value').textContent = `${num} ${num === 1 ? 'Session' : 'Sessions'} / week`;
+    const confirmed = confirm(`
+🎓 Real Conversation 수업권 구매
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+패키지: ${packageName}
+정가: ₩${amount.toLocaleString()}${discountText}
+최종 금액: ₩${finalAmount.toLocaleString()}
+회당 가격: ₩${pricePerLesson.toLocaleString()}
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+구매하시겠습니까?
+    `);
     
-    // Calculate price
-    this.calculateBookingPrice();
+    if (!confirmed) return;
+    
+    try {
+      // TODO: Implement NHN KCP 일반결제 integration
+      alert(`💳 결제 준비 중...\n\n${packageName}\n결제 금액: ₩${finalAmount.toLocaleString()}\n\nNHN KCP 일반결제 시스템 연동 준비 중입니다.\n곧 만나요! 🚀`);
+      
+      // Simulate purchase success (for testing)
+      // After payment success, save to DB:
+      // - lesson_purchases table
+      // - total_lessons: lessonCount
+      // - remaining_lessons: lessonCount
+      // - amount: finalAmount
+      
+    } catch (error) {
+      console.error('Lesson purchase error:', error);
+      alert('❌ 구매 처리 중 오류가 발생했습니다.\n다시 시도해주세요.');
+    }
+  }
+
+  // Legacy functions (will be removed after migration)
+  selectSessions(num) {
+    // Deprecated - kept for backward compatibility
+    console.warn('selectSessions is deprecated');
   }
 
   selectDuration(minutes) {
-    // Remove active class from all duration buttons
-    [25, 50].forEach(min => {
-      const btn = document.getElementById(`duration-btn-${min}`);
-      btn.classList.remove('border-emerald-500', 'bg-emerald-50', 'text-emerald-700');
-      btn.classList.add('border-gray-300', 'text-gray-700');
-    });
-    
-    // Add active class to selected button
-    const selectedBtn = document.getElementById(`duration-btn-${minutes}`);
-    selectedBtn.classList.remove('border-gray-300', 'text-gray-700');
-    selectedBtn.classList.add('border-emerald-500', 'bg-emerald-50', 'text-emerald-700');
-    
-    // Store selection
-    this.bookingData = this.bookingData || {};
-    this.bookingData.sessionDuration = minutes;
-    
-    // Update display
-    document.getElementById('duration-value').textContent = `${minutes} Minutes`;
-    
-    // Calculate price
-    this.calculateBookingPrice();
+    // Deprecated - kept for backward compatibility
+    console.warn('selectDuration is deprecated');
   }
 
   calculateBookingPrice() {
-    const data = this.bookingData || {};
-    
-    if (!data.sessionsPerWeek || !data.sessionDuration) {
-      return; // Not enough data yet
-    }
-    
-    // Base price: ₩16,500 per 25-minute session
-    const basePrice = 16500;
-    const sessionsPerWeek = data.sessionsPerWeek;
-    const durationMultiplier = data.sessionDuration / 25; // 25min = 1x, 50min = 2x
-    
-    // Calculate weekly and monthly prices
-    const weeklyPrice = basePrice * sessionsPerWeek * durationMultiplier;
-    const monthlyPrice = weeklyPrice * 4; // 4 weeks per month
-    
-    // Update display
-    document.getElementById('weekly-price').textContent = `₩${weeklyPrice.toLocaleString()}`;
-    document.getElementById('monthly-price').textContent = `₩${monthlyPrice.toLocaleString()}`;
-    document.getElementById('total-price').textContent = `₩${monthlyPrice.toLocaleString()}`;
-    
-    // Enable checkout button
-    const checkoutBtn = document.getElementById('checkout-btn');
-    checkoutBtn.disabled = false;
-    checkoutBtn.classList.remove('bg-gray-300');
-    checkoutBtn.classList.add('bg-emerald-500', 'hover:bg-emerald-600');
-    
-    // Store calculated prices
-    this.bookingData.weeklyPrice = weeklyPrice;
-    this.bookingData.monthlyPrice = monthlyPrice;
+    // Deprecated - kept for backward compatibility
+    console.warn('calculateBookingPrice is deprecated');
   }
 
   async proceedToCheckout() {
+    // Deprecated - kept for backward compatibility
+    console.warn('proceedToCheckout is deprecated');
     const data = this.bookingData;
     
     if (!data || !data.sessionsPerWeek || !data.sessionDuration) {
@@ -2852,13 +2936,10 @@ Proceed to payment?
                     <i class="fas fa-check text-emerald-600 mt-1"></i>
                     <span class="text-gray-700">광고 제거</span>
                   </li>
-                  <!-- TEMPORARY: Real Conversation disabled -->
-                  <!--
                   <li class="flex items-start gap-2">
                     <i class="fas fa-check text-emerald-600 mt-1"></i>
                     <span class="text-gray-700"><strong>Real Conversation 20% 할인</strong></span>
                   </li>
-                  -->
                 </ul>
                 
                 <button onclick="worvox.upgradePlan('premium')" class="w-full py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-all shadow-lg">
@@ -2892,13 +2973,10 @@ Proceed to payment?
                     <i class="fas fa-check text-indigo-600 mt-1"></i>
                     <span class="text-gray-700"><strong>전담 매니저</strong></span>
                   </li>
-                  <!-- TEMPORARY: Real Conversation disabled -->
-                  <!--
                   <li class="flex items-start gap-2">
                     <i class="fas fa-check text-indigo-600 mt-1"></i>
                     <span class="text-gray-700"><strong>Real Conversation 30% 할인</strong></span>
                   </li>
-                  -->
                   <li class="flex items-start gap-2">
                     <i class="fas fa-check text-indigo-600 mt-1"></i>
                     <span class="text-gray-700"><strong>5인 이상 추가 20% 할인</strong></span>
@@ -3064,8 +3142,7 @@ Proceed to payment?
                       <td class="px-6 py-4 text-center text-sm text-indigo-600">팀 전용</td>
                     </tr>
                     
-                    <!-- TEMPORARY: Real Conversation section disabled -->
-                    <!--
+                    <!-- Real Conversation -->
                     <tr>
                       <td class="px-6 py-4 text-sm text-gray-700 font-semibold" colspan="4">
                         <i class="fas fa-user-tie mr-2 text-red-600"></i>Real Conversation (1:1 원어민 수업)
@@ -3089,7 +3166,6 @@ Proceed to payment?
                       <td class="px-6 py-4 text-center"><i class="fas fa-check text-emerald-600"></i></td>
                       <td class="px-6 py-4 text-center"><i class="fas fa-check text-indigo-600"></i></td>
                     </tr>
-                    -->
                     
                     <!-- 기타 기능 -->
                     <tr>
