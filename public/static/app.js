@@ -1002,7 +1002,7 @@ Proceed to payment?
     try {
       // Fetch topics
       const topicsResponse = await axios.get('/api/topics');
-      const topics = topicsResponse.data.topics;
+      this.topics = topicsResponse.data.topics; // Store for later use
 
       // Fetch user statistics
       const statsResponse = await axios.get(`/api/users/${this.currentUser.id}/stats`);
@@ -1131,9 +1131,12 @@ Proceed to payment?
                 ` : ''}
                 
                 <!-- Feature Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">${topics.map(topic => `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">${this.topics.map(topic => `
                     <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-lg hover:border-emerald-400 transition-all cursor-pointer"
-                      onclick="worvox.startSession(${topic.id}, '${topic.name}', '${topic.system_prompt}', '${topic.level}')">
+                      data-topic-id="${topic.id}" 
+                      data-topic-name="${this.escapeHtml(topic.name)}" 
+                      data-topic-level="${topic.level}"
+                      onclick="worvox.startTopicById(${topic.id})">
                       <div class="w-12 h-12 bg-${topic.name === 'AI English Conversation' ? 'emerald' : 'blue'}-100 rounded-xl flex items-center justify-center mb-4">
                         <span class="text-2xl">${topic.icon}</span>
                       </div>
@@ -1176,6 +1179,14 @@ Proceed to payment?
     } catch (error) {
       console.error('Error loading topics:', error);
       alert('Failed to load topics. Please refresh the page.');
+    }
+  }
+
+  // Start topic by ID (finds topic from stored topics array)
+  startTopicById(topicId) {
+    const topic = this.topics.find(t => t.id === topicId);
+    if (topic) {
+      this.startSession(topic.id, topic.name, topic.system_prompt, topic.level);
     }
   }
 
