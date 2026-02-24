@@ -580,33 +580,16 @@ Proceed to payment?
       <div class="space-y-6">
         <div class="text-center">
           <div class="text-5xl mb-4">👋</div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome!</h2>
-          <p class="text-gray-600">Sign in to get started</p>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome to WorVox!</h2>
+          <p class="text-gray-600">Sign in with your Google account to get started</p>
         </div>
         
         <!-- Google Sign-In Button -->
         <div id="googleSignInButton" class="flex justify-center"></div>
         
-        <div class="relative">
-          <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-gray-300"></div>
-          </div>
-          <div class="relative flex justify-center text-sm">
-            <span class="px-4 bg-white text-gray-500">Or continue with name</span>
-          </div>
+        <div class="mt-6 text-center text-sm text-gray-500">
+          <p>By signing in, you agree to our Terms of Service and Privacy Policy</p>
         </div>
-        
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
-          <input type="text" id="username" value="${this.onboardingData.username}"
-            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg"
-            placeholder="Enter your name">
-        </div>
-
-        <button onclick="worvox.nextStep()" 
-          class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all btn-hover">
-          Continue
-        </button>
       </div>
     `;
   }
