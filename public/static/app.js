@@ -1752,14 +1752,55 @@ Proceed to payment?
   async endSession() {
     try {
       if (this.currentSession) {
+        // 1. 세션 종료 API 호출
         await axios.post(`/api/sessions/end/${this.currentSession}`);
+        
+        // 2. 분석 시작 (최소 3개 이상의 사용자 메시지가 있을 때)
+        const userMessages = this.messages.filter(m => m.role === 'user');
+        
+        if (userMessages.length >= 3) {
+          const sessionIdToAnalyze = this.currentSession;
+          
+          // 세션 변수 초기화 (분석 중에도 다른 작업 가능하게)
+          this.currentSession = null;
+          this.currentTopic = null;
+          this.messages = [];
+          
+          // 분석 로딩 화면 표시
+          this.showAnalysisLoading();
+          
+          try {
+            // 3. 분석 API 호출
+            const analysisResponse = await axios.post(
+              `/api/analysis/sessions/${sessionIdToAnalyze}/analyze`
+            );
+            
+            if (analysisResponse.data.success) {
+              // 4. 리포트 페이지로 이동
+              this.showSessionReport(analysisResponse.data.reportId);
+            } else {
+              throw new Error('Analysis failed');
+            }
+          } catch (error) {
+            console.error('Analysis error:', error);
+            // 분석 실패 시 대시보드로
+            this.showTopicSelection();
+          }
+        } else {
+          // 메시지가 너무 적으면 분석 없이 종료
+          this.currentSession = null;
+          this.currentTopic = null;
+          this.messages = [];
+          this.showTopicSelection();
+        }
+      } else {
+        this.showTopicSelection();
       }
+    } catch (error) {
+      console.error('Error ending session:', error);
       this.currentSession = null;
       this.currentTopic = null;
       this.messages = [];
-      this.showTopicSelection();
-    } catch (error) {
-      console.error('Error ending session:', error);
       this.showTopicSelection();
     }
   }
@@ -2608,13 +2649,13 @@ Proceed to payment?
       : 'In progress';
     
     return `
-      <div class="border-2 border-gray-200 rounded-xl p-4 cursor-pointer hover:border-indigo-500 transition-all card-hover"
-        onclick="worvox.showConversation(${session.id})">
+      <div class="border-2 border-gray-200 rounded-xl p-4 hover:border-indigo-500 transition-all">
         <div class="flex items-start justify-between">
-          <div class="flex-1">
+          <div class="flex-1 cursor-pointer" onclick="worvox.showConversation(${session.id})">
             <div class="flex items-center gap-2 mb-2">
               <span class="text-2xl">${session.topic_icon || '📚'}</span>
               <h4 class="text-lg font-bold text-gray-800">${session.topic_name || 'Conversation'}</h4>
+              ${session.has_report ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold ml-2">✓ 분석완료</span>' : ''}
             </div>
             <div class="flex items-center gap-4 text-sm text-gray-600 flex-wrap">
               <span><i class="fas fa-clock mr-1"></i>${startTime}</span>
@@ -2628,7 +2669,16 @@ Proceed to payment?
               <p class="text-gray-600 text-sm mt-2">${session.topic_description}</p>
             ` : ''}
           </div>
-          <i class="fas fa-chevron-right text-gray-400"></i>
+          <div class="flex flex-col gap-2">
+            ${session.has_report ? `
+              <button 
+                onclick="event.stopPropagation(); worvox.showSessionReportById(${session.id})"
+                class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-semibold transition-all whitespace-nowrap">
+                📊 리포트 보기
+              </button>
+            ` : ''}
+            <i class="fas fa-chevron-right text-gray-400 text-center"></i>
+          </div>
         </div>
       </div>
     `;
@@ -4697,6 +4747,253 @@ Proceed to payment?
            (this.currentUser.subscription_plan === 'premium' || 
             this.currentUser.subscription_plan === 'business');
   }
+
+  // ========================================
+  // PHASE 1: Session Analysis & Report
+  // ========================================
+  
+  showAnalysisLoading() {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex items-center justify-center h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+        <div class="text-center p-8">
+          <div class="mb-6">
+            <div class="inline-block animate-spin rounded-full h-16 w-16 border-4 border-blue-500 border-t-transparent"></div>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">🧠 AI가 대화를 분석하고 있어요</h2>
+          <p class="text-gray-600 mb-6">잠시만 기다려주세요...</p>
+          <div class="space-y-2 text-sm text-gray-500">
+            <p class="animate-pulse">✓ 문법 체크 중</p>
+            <p class="animate-pulse delay-100">✓ 어휘 분석 중</p>
+            <p class="animate-pulse delay-200">✓ 개선점 찾는 중</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  async showSessionReport(reportId) {
+    try {
+      // 리포트 데이터 가져오기
+      const response = await axios.get(`/api/analysis/reports/${reportId}`);
+      const { report, feedback } = response.data;
+      
+      // 에러와 제안 분리
+      const errors = feedback.filter(f => f.type === 'error');
+      const suggestions = feedback.filter(f => f.type === 'suggestion');
+      
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="flex h-screen bg-gray-50">
+          ${this.getSidebar('conversation')}
+          
+          <div class="flex-1 overflow-y-auto">
+            <div class="max-w-4xl mx-auto p-6 md:p-8">
+              
+              <!-- 헤더 -->
+              <div class="text-center mb-8">
+                <div class="text-6xl mb-4">🎉</div>
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">대화 분석 완료!</h1>
+                <p class="text-gray-600">AI가 당신의 대화를 분석했어요</p>
+              </div>
+              
+              <!-- 점수 카드 -->
+              <div class="grid md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white text-center">
+                  <div class="text-sm mb-1">종합 점수</div>
+                  <div class="text-4xl font-bold">${report.overall_score}</div>
+                  <div class="text-sm opacity-80">/ 100</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 text-center border-2 border-gray-200">
+                  <div class="text-sm text-gray-600 mb-1">문법</div>
+                  <div class="text-3xl font-bold text-gray-800">${report.grammar_score}</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 text-center border-2 border-gray-200">
+                  <div class="text-sm text-gray-600 mb-1">어휘</div>
+                  <div class="text-3xl font-bold text-gray-800">${report.vocabulary_score}</div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 text-center border-2 border-gray-200">
+                  <div class="text-sm text-gray-600 mb-1">유창성</div>
+                  <div class="text-3xl font-bold text-gray-800">${report.fluency_score}</div>
+                </div>
+              </div>
+              
+              <!-- 고쳐야 할 문장 -->
+              ${errors.length > 0 ? `
+              <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <span class="text-2xl">⚠️</span>
+                  고쳐야 할 문장 TOP ${errors.length}
+                </h2>
+                <div class="space-y-4">
+                  ${errors.map((err, i) => `
+                    <div class="border-l-4 border-red-500 bg-red-50 p-4 rounded-r-lg">
+                      <div class="flex items-start justify-between mb-2">
+                        <span class="text-sm font-bold text-red-700">#${i + 1} ${this.getCategoryBadge(err.category)}</span>
+                        <span class="text-xs px-2 py-1 bg-red-200 text-red-800 rounded-full">우선순위 ${err.priority}</span>
+                      </div>
+                      <div class="mb-2">
+                        <div class="text-sm text-gray-600 mb-1">❌ 당신의 문장:</div>
+                        <div class="text-gray-800 font-mono bg-white px-3 py-2 rounded">${err.original_text}</div>
+                      </div>
+                      <div class="mb-2">
+                        <div class="text-sm text-gray-600 mb-1">✅ 올바른 표현:</div>
+                        <div class="text-green-700 font-mono bg-green-50 px-3 py-2 rounded font-semibold">${err.improved_text}</div>
+                      </div>
+                      <div class="text-sm text-gray-700 bg-white px-3 py-2 rounded italic">
+                        💡 ${err.explanation}
+                      </div>
+                      <button 
+                        onclick="worvox.practiceSentence(${err.id}, '${err.improved_text.replace(/'/g, "\\'")}', ${report.session_id})"
+                        class="mt-3 w-full py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-all">
+                        🔄 이 문장 다시 연습하기
+                      </button>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+              ` : ''}
+              
+              <!-- 더 나은 표현 -->
+              ${suggestions.length > 0 ? `
+              <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                  <span class="text-2xl">💡</span>
+                  더 나은 표현
+                </h2>
+                <div class="space-y-4">
+                  ${suggestions.map((sug, i) => `
+                    <div class="border-l-4 border-blue-500 bg-blue-50 p-4 rounded-r-lg">
+                      <div class="flex items-start justify-between mb-2">
+                        <span class="text-sm font-bold text-blue-700">#${i + 1} ${this.getCategoryBadge(sug.category)}</span>
+                      </div>
+                      <div class="mb-2">
+                        <div class="text-sm text-gray-600 mb-1">😊 당신의 표현:</div>
+                        <div class="text-gray-800 font-mono bg-white px-3 py-2 rounded">${sug.original_text}</div>
+                      </div>
+                      <div class="mb-2">
+                        <div class="text-sm text-gray-600 mb-1">🌟 더 자연스러운 표현:</div>
+                        <div class="text-blue-700 font-mono bg-blue-50 px-3 py-2 rounded font-semibold">${sug.improved_text}</div>
+                      </div>
+                      <div class="text-sm text-gray-700 bg-white px-3 py-2 rounded italic">
+                        💡 ${sug.explanation}
+                      </div>
+                      <button 
+                        onclick="worvox.practiceSentence(${sug.id}, '${sug.improved_text.replace(/'/g, "\\'")}', ${report.session_id})"
+                        class="mt-3 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-all">
+                        🔄 이 표현 연습하기
+                      </button>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+              ` : ''}
+              
+              <!-- 액션 버튼 -->
+              <div class="flex gap-4">
+                <button 
+                  onclick="worvox.showTopicSelection()"
+                  class="flex-1 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-lg transition-all shadow-lg">
+                  🏠 홈으로 돌아가기
+                </button>
+                <button 
+                  onclick="worvox.showHistory()"
+                  class="flex-1 py-4 bg-gray-600 hover:bg-gray-700 text-white rounded-xl font-bold text-lg transition-all">
+                  📚 히스토리 보기
+                </button>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+      `;
+      
+    } catch (error) {
+      console.error('Show report error:', error);
+      alert('리포트를 불러오는 데 실패했습니다.');
+      this.showTopicSelection();
+    }
+  }
+
+  getCategoryBadge(category) {
+    const badges = {
+      'grammar': '<span class="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded">문법</span>',
+      'vocabulary': '<span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">어휘</span>',
+      'pronunciation': '<span class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">발음</span>',
+      'style': '<span class="text-xs px-2 py-1 bg-yellow-100 text-yellow-700 rounded">스타일</span>',
+    };
+    return badges[category] || '';
+  }
+
+  async practiceSentence(feedbackId, sentence, sessionId) {
+    // 확인 대화상자
+    const confirmed = confirm(`🎯 문장 연습하기\n\n다음 문장을 따라 말해보세요:\n\n"${sentence}"\n\n준비되셨나요?`);
+    
+    if (!confirmed) return;
+    
+    // 피드백 완료 표시
+    try {
+      await axios.post(`/api/analysis/feedback/${feedbackId}/practice`);
+    } catch (e) {
+      console.error('Failed to mark as practiced:', e);
+    }
+    
+    // 간단한 연습 UI 표시
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex items-center justify-center h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+        <div class="max-w-2xl w-full p-8">
+          <div class="bg-white rounded-3xl shadow-2xl p-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">🎯 문장 연습</h2>
+            
+            <div class="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-6 mb-6">
+              <p class="text-lg text-gray-800 font-semibold text-center leading-relaxed">
+                ${sentence}
+              </p>
+            </div>
+            
+            <div class="text-center mb-6">
+              <p class="text-gray-600 mb-4">이 문장을 3번 따라 말해보세요!</p>
+              <div class="text-4xl mb-4">🎤</div>
+              <p class="text-sm text-gray-500">연습을 완료했다면 아래 버튼을 눌러주세요</p>
+            </div>
+            
+            <button 
+              onclick="worvox.showSessionReportById(${sessionId})"
+              class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold transition-all mb-3">
+              ✅ 연습 완료! 리포트로 돌아가기
+            </button>
+            
+            <button 
+              onclick="worvox.showTopicSelection()"
+              class="w-full py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl font-semibold transition-all">
+              🏠 홈으로 돌아가기
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  async showSessionReportById(sessionId) {
+    try {
+      const response = await axios.get(`/api/analysis/sessions/${sessionId}/report`);
+      if (response.data.success && response.data.report) {
+        this.showSessionReport(response.data.report.id);
+      } else {
+        alert('이 세션의 리포트를 찾을 수 없습니다.');
+        this.showTopicSelection();
+      }
+    } catch (error) {
+      console.error('Report not found:', error);
+      alert('리포트를 불러오는 데 실패했습니다.');
+      this.showTopicSelection();
+    }
+  }
+  
+  // ========================================
+  // End of PHASE 1 Functions
+  // ========================================
 
   // Show Terms of Service
   showTerms() {
