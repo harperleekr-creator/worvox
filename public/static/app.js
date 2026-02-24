@@ -2807,7 +2807,8 @@ Proceed to payment?
 
   // Upgrade to Premium
   upgradePlan(plan) {
-    alert(\`💎 \${plan === 'premium' ? 'Premium' : 'Business'} 플랜 업그레이드\n\n결제 시스템 연동 준비 중입니다.\n\n곧 만나요! 🚀\`);
+    const planName = plan === 'premium' ? 'Premium' : 'Business';
+    alert('💎 ' + planName + ' 플랜 업그레이드\n\n결제 시스템 연동 준비 중입니다.\n\n곧 만나요! 🚀');
   }
 
   // Contact Sales for Business Plan
