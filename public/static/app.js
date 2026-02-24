@@ -3085,8 +3085,260 @@ Proceed to payment?
 
   // Upgrade to Premium
   upgradePlan(plan) {
+    this.showPaymentPage(plan);
+  }
+
+  // Show payment page with billing cycle selection
+  showPaymentPage(plan) {
     const planName = plan === 'premium' ? 'Premium' : 'Business';
-    alert('💎 ' + planName + ' 플랜 업그레이드\n\n결제 시스템 연동 준비 중입니다.\n\n곧 만나요! 🚀');
+    const monthlyPrice = plan === 'premium' ? 9900 : 89000;
+    const yearlyPrice = plan === 'premium' ? 95040 : 854400;
+    const yearlySavings = plan === 'premium' ? 23760 : 213600;
+    
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex h-screen bg-gray-50">
+        <!-- Sidebar -->
+        ${this.getSidebar('plan')}
+        
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- Mobile Header -->
+          <div class="md:hidden bg-white border-b border-gray-200 px-4 py-3">
+            <div class="flex items-center justify-between">
+              <button onclick="worvox.showPlan()" class="text-gray-600">
+                <i class="fas fa-arrow-left text-xl"></i>
+              </button>
+              <h1 class="text-lg font-semibold text-gray-800">${planName} 구독</h1>
+              <div class="w-6"></div>
+            </div>
+          </div>
+          
+          <!-- Desktop Top Bar -->
+          <div class="hidden md:flex bg-white border-b border-gray-200 px-6 py-3 items-center">
+            <button onclick="worvox.showPlan()" class="text-gray-600 hover:text-gray-800 mr-4">
+              <i class="fas fa-arrow-left text-xl"></i>
+            </button>
+            <h2 class="text-lg font-semibold text-gray-800">${planName} 플랜 구독</h2>
+          </div>
+          
+          <!-- Content Area -->
+          <div class="flex-1 overflow-y-auto p-4 md:p-8">
+            <div class="max-w-2xl mx-auto">
+              <!-- Plan Info Card -->
+              <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 md:p-8 text-white mb-6">
+                <div class="flex items-center gap-3 mb-4">
+                  <i class="fas fa-crown text-3xl"></i>
+                  <div>
+                    <h2 class="text-2xl md:text-3xl font-bold">${planName} 플랜</h2>
+                    <p class="text-emerald-100 mt-1">무제한 학습 + 고급 기능</p>
+                  </div>
+                </div>
+                
+                <div class="flex items-center gap-2 bg-white/20 rounded-lg px-4 py-2 inline-block">
+                  <i class="fas fa-check-circle"></i>
+                  <span class="font-medium">7일 무료 체험</span>
+                </div>
+              </div>
+              
+              <!-- Billing Cycle Selection -->
+              <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">결제 주기 선택</h3>
+                
+                <div class="space-y-3">
+                  <!-- Monthly Plan -->
+                  <label class="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-emerald-500 transition-all">
+                    <input type="radio" name="billingCycle" value="monthly" class="mr-4" onchange="worvox.selectBillingCycle('monthly', ${monthlyPrice})">
+                    <div class="flex-1">
+                      <div class="font-semibold text-gray-900">월간 구독</div>
+                      <div class="text-sm text-gray-600">언제든지 취소 가능</div>
+                    </div>
+                    <div class="text-right">
+                      <div class="text-2xl font-bold text-gray-900">₩${monthlyPrice.toLocaleString()}</div>
+                      <div class="text-sm text-gray-600">/월</div>
+                    </div>
+                  </label>
+                  
+                  <!-- Yearly Plan (Recommended) -->
+                  <label class="flex items-center justify-between p-4 border-2 border-emerald-500 bg-emerald-50 rounded-xl cursor-pointer relative">
+                    <input type="radio" name="billingCycle" value="yearly" class="mr-4" checked onchange="worvox.selectBillingCycle('yearly', ${yearlyPrice})">
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2 mb-1">
+                        <span class="font-semibold text-gray-900">연간 구독</span>
+                        <span class="bg-emerald-600 text-white text-xs px-2 py-0.5 rounded-full">20% 할인</span>
+                      </div>
+                      <div class="text-sm text-emerald-700 font-medium">₩${yearlySavings.toLocaleString()} 절약</div>
+                    </div>
+                    <div class="text-right">
+                      <div class="text-2xl font-bold text-emerald-700">₩${yearlyPrice.toLocaleString()}</div>
+                      <div class="text-sm text-gray-600">/년</div>
+                    </div>
+                    <div class="absolute top-2 right-2">
+                      <span class="bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded font-bold">추천</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+              
+              <!-- Payment Summary -->
+              <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">결제 정보</h3>
+                
+                <div class="space-y-3">
+                  <div class="flex items-center justify-between py-2">
+                    <span class="text-gray-700">${planName} 플랜</span>
+                    <span class="font-semibold text-gray-900" id="planPrice">₩${yearlyPrice.toLocaleString()}</span>
+                  </div>
+                  <div class="flex items-center justify-between py-2">
+                    <span class="text-gray-700">결제 주기</span>
+                    <span class="font-medium text-gray-900" id="billingCycleText">연간</span>
+                  </div>
+                  <div class="flex items-center justify-between py-2 text-emerald-600">
+                    <span class="flex items-center gap-2">
+                      <i class="fas fa-gift"></i>
+                      <span>7일 무료 체험</span>
+                    </span>
+                    <span class="font-semibold">-₩0</span>
+                  </div>
+                  
+                  <div class="border-t border-gray-200 pt-3 mt-3">
+                    <div class="flex items-center justify-between">
+                      <span class="text-lg font-bold text-gray-900">오늘 결제 금액</span>
+                      <span class="text-2xl font-bold text-emerald-600">₩0</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">
+                      * 7일 무료 체험 후 <span id="chargeDate">${this.getChargeDate()}</span>에 자동 결제됩니다
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Payment Method -->
+              <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">결제 수단</h3>
+                
+                <div class="space-y-3">
+                  <label class="flex items-center p-4 border-2 border-emerald-500 bg-emerald-50 rounded-xl cursor-pointer">
+                    <input type="radio" name="paymentMethod" value="card" class="mr-4" checked>
+                    <i class="fas fa-credit-card text-emerald-600 text-xl mr-3"></i>
+                    <span class="font-semibold text-gray-900">신용/체크카드</span>
+                  </label>
+                  
+                  <label class="flex items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-emerald-500 transition-all">
+                    <input type="radio" name="paymentMethod" value="kakaopay" class="mr-4">
+                    <i class="fas fa-comment text-yellow-500 text-xl mr-3"></i>
+                    <span class="font-semibold text-gray-900">카카오페이</span>
+                  </label>
+                  
+                  <label class="flex items-center p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-emerald-500 transition-all">
+                    <input type="radio" name="paymentMethod" value="naverpay" class="mr-4">
+                    <i class="fas fa-n text-green-600 text-xl mr-3"></i>
+                    <span class="font-semibold text-gray-900">네이버페이</span>
+                  </label>
+                </div>
+              </div>
+              
+              <!-- Terms Agreement -->
+              <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                <label class="flex items-start cursor-pointer">
+                  <input type="checkbox" id="agreeTerms" class="mt-1 mr-3">
+                  <div class="text-sm text-gray-700">
+                    <span class="font-semibold">(필수)</span> 
+                    <a href="#" class="text-emerald-600 hover:underline">서비스 이용약관</a> 및 
+                    <a href="#" class="text-emerald-600 hover:underline">개인정보 처리방침</a>, 
+                    <a href="#" class="text-emerald-600 hover:underline">자동결제 이용약관</a>에 동의합니다.
+                  </div>
+                </label>
+              </div>
+              
+              <!-- Payment Button -->
+              <button onclick="worvox.processPayment('${plan}')" 
+                class="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl text-lg font-bold hover:from-emerald-700 hover:to-teal-700 transition-all shadow-lg">
+                <i class="fas fa-lock mr-2"></i>안전하게 결제하기
+              </button>
+              
+              <p class="text-xs text-gray-500 text-center mt-4">
+                <i class="fas fa-shield-alt mr-1"></i>
+                NHN KCP 안전결제 시스템으로 보호됩니다
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    // Set default billing cycle to yearly
+    this.selectedBillingCycle = 'yearly';
+    this.selectedPlanPrice = yearlyPrice;
+  }
+
+  selectBillingCycle(cycle, price) {
+    this.selectedBillingCycle = cycle;
+    this.selectedPlanPrice = price;
+    
+    // Update UI
+    document.getElementById('planPrice').textContent = '₩' + price.toLocaleString();
+    document.getElementById('billingCycleText').textContent = cycle === 'monthly' ? '월간' : '연간';
+    document.getElementById('chargeDate').textContent = this.getChargeDate();
+  }
+
+  getChargeDate() {
+    const date = new Date();
+    date.setDate(date.getDate() + 7);
+    return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  async processPayment(plan) {
+    // Check terms agreement
+    const agreeTerms = document.getElementById('agreeTerms');
+    if (!agreeTerms || !agreeTerms.checked) {
+      alert('⚠️ 약관에 동의해주세요.');
+      return;
+    }
+    
+    // Get selected payment method
+    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'card';
+    
+    try {
+      // TODO: Implement actual NHN KCP payment integration
+      // For now, show preparation message
+      
+      const planName = plan === 'premium' ? 'Premium' : 'Business';
+      const billingCycleKo = this.selectedBillingCycle === 'monthly' ? '월간' : '연간';
+      
+      alert(`💳 결제 준비 중...\n\n${planName} 플랜 (${billingCycleKo})\n결제 금액: ₩${this.selectedPlanPrice.toLocaleString()}\n결제 수단: ${this.getPaymentMethodName(paymentMethod)}\n\nNHN KCP 결제 시스템 연동 준비 중입니다.\n곧 만나요! 🚀`);
+      
+      // Simulate payment success
+      // setTimeout(() => {
+      //   this.handlePaymentSuccess(plan, this.selectedBillingCycle);
+      // }, 2000);
+      
+    } catch (error) {
+      console.error('Payment error:', error);
+      alert('❌ 결제 처리 중 오류가 발생했습니다.\n다시 시도해주세요.');
+    }
+  }
+
+  getPaymentMethodName(method) {
+    const names = {
+      'card': '신용/체크카드',
+      'kakaopay': '카카오페이',
+      'naverpay': '네이버페이'
+    };
+    return names[method] || '신용/체크카드';
+  }
+
+  handlePaymentSuccess(plan, billingCycle) {
+    // Update user subscription status
+    this.currentUser.subscription_plan = plan;
+    this.currentUser.billing_cycle = billingCycle;
+    this.currentUser.subscription_status = 'trial'; // 7-day trial
+    this.currentUser.trial_ends_at = this.getChargeDate();
+    localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
+    
+    // Show success message and redirect
+    alert('🎉 구독이 완료되었습니다!\n\n7일 무료 체험이 시작되었습니다.\n이제 모든 프리미엄 기능을 사용하실 수 있습니다!');
+    this.showTopicSelection();
   }
 
   // Contact Sales for Business Plan
