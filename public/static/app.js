@@ -1508,6 +1508,14 @@ Proceed to payment?
     this.vocabularyDifficulty = difficulty; // 'beginner', 'intermediate', 'advanced'
     this.vocabularyMode = mode; // 'list', 'flashcard', 'quiz'
     
+    // Reset mode-specific data when switching modes or difficulty
+    if (mode === 'flashcard') {
+      this.flashcardIndex = 0;
+      this.flashcardFlipped = false;
+    } else if (mode === 'quiz') {
+      this.quizData = null; // Reset quiz data
+    }
+    
     try {
       // Fetch words by difficulty
       const response = await axios.get(`/api/vocabulary/list?difficulty=${difficulty}`);
