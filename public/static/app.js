@@ -218,11 +218,14 @@ class WorVox {
             <i class="fas fa-comments" style="width: 20px; text-align: center;"></i>
             <span>AI Conversation</span>
           </a>
+          <!-- TEMPORARY: Real Conversation disabled for NHN KCP integration -->
+          <!--
           <a href="#" onclick="worvox.showRealConversation(); worvox.closeMobileSidebar(); return false;" 
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'real-conversation' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
             <i class="fas fa-user-tie" style="width: 20px; text-align: center;"></i>
             <span>Real Conversation</span>
           </a>
+          -->
           <a href="#" onclick="worvox.startVocabulary(); worvox.closeMobileSidebar(); return false;" 
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'vocabulary' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
             <i class="fas fa-book" style="width: 20px; text-align: center;"></i>
@@ -2809,8 +2812,7 @@ Proceed to payment?
                   <div class="text-4xl mb-3">⭐</div>
                   <h3 class="text-2xl font-bold text-gray-800 mb-2">Premium</h3>
                   <div class="text-4xl font-bold text-emerald-600 mb-2">₩9,900</div>
-                  <p class="text-gray-500 text-sm mb-1">/월</p>
-                  <p class="text-emerald-600 text-sm font-semibold">연간 결제 시 ₩95,040 (20% 할인)</p>
+                  <p class="text-gray-500 text-sm">/월</p>
                 </div>
                 
                 <ul class="space-y-3 mb-8">
@@ -2850,10 +2852,13 @@ Proceed to payment?
                     <i class="fas fa-check text-emerald-600 mt-1"></i>
                     <span class="text-gray-700">광고 제거</span>
                   </li>
+                  <!-- TEMPORARY: Real Conversation disabled -->
+                  <!--
                   <li class="flex items-start gap-2">
                     <i class="fas fa-check text-emerald-600 mt-1"></i>
                     <span class="text-gray-700"><strong>Real Conversation 20% 할인</strong></span>
                   </li>
+                  -->
                 </ul>
                 
                 <button onclick="worvox.upgradePlan('premium')" class="w-full py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-all shadow-lg">
@@ -2866,9 +2871,8 @@ Proceed to payment?
                 <div class="text-center mb-6">
                   <div class="text-4xl mb-3">🏢</div>
                   <h3 class="text-2xl font-bold text-gray-800 mb-2">Business</h3>
-                  <div class="text-4xl font-bold text-indigo-600 mb-2">₩89,000</div>
-                  <p class="text-gray-500 text-sm mb-1">/월/인</p>
-                  <p class="text-indigo-600 text-sm font-semibold">연간 결제 시 ₩854,400 (20% 할인)</p>
+                  <div class="text-4xl font-bold text-indigo-600 mb-2">₩32,000</div>
+                  <p class="text-gray-500 text-sm">/월/인</p>
                 </div>
                 
                 <ul class="space-y-3 mb-8">
@@ -2888,10 +2892,13 @@ Proceed to payment?
                     <i class="fas fa-check text-indigo-600 mt-1"></i>
                     <span class="text-gray-700"><strong>전담 매니저</strong></span>
                   </li>
+                  <!-- TEMPORARY: Real Conversation disabled -->
+                  <!--
                   <li class="flex items-start gap-2">
                     <i class="fas fa-check text-indigo-600 mt-1"></i>
                     <span class="text-gray-700"><strong>Real Conversation 30% 할인</strong></span>
                   </li>
+                  -->
                   <li class="flex items-start gap-2">
                     <i class="fas fa-check text-indigo-600 mt-1"></i>
                     <span class="text-gray-700"><strong>5인 이상 추가 20% 할인</strong></span>
@@ -3057,7 +3064,8 @@ Proceed to payment?
                       <td class="px-6 py-4 text-center text-sm text-indigo-600">팀 전용</td>
                     </tr>
                     
-                    <!-- Real Conversation -->
+                    <!-- TEMPORARY: Real Conversation section disabled -->
+                    <!--
                     <tr>
                       <td class="px-6 py-4 text-sm text-gray-700 font-semibold" colspan="4">
                         <i class="fas fa-user-tie mr-2 text-red-600"></i>Real Conversation (1:1 원어민 수업)
@@ -3081,6 +3089,7 @@ Proceed to payment?
                       <td class="px-6 py-4 text-center"><i class="fas fa-check text-emerald-600"></i></td>
                       <td class="px-6 py-4 text-center"><i class="fas fa-check text-indigo-600"></i></td>
                     </tr>
+                    -->
                     
                     <!-- 기타 기능 -->
                     <tr>
@@ -3171,9 +3180,10 @@ Proceed to payment?
   // Show payment page with billing cycle selection
   showPaymentPage(plan) {
     const planName = plan === 'premium' ? 'Premium' : 'Business';
-    const monthlyPrice = plan === 'premium' ? 9900 : 89000;
-    const yearlyPrice = plan === 'premium' ? 95040 : 854400;
-    const yearlySavings = plan === 'premium' ? 23760 : 213600;
+    const monthlyPrice = plan === 'premium' ? 9900 : 32000;
+    // Yearly payment option removed temporarily
+    // const yearlyPrice = plan === 'premium' ? 95040 : 854400;
+    // const yearlySavings = plan === 'premium' ? 23760 : 213600;
     
     const app = document.getElementById('app');
     app.innerHTML = `
@@ -3221,45 +3231,7 @@ Proceed to payment?
                 </div>
               </div>
               
-              <!-- Billing Cycle Selection -->
-              <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
-                <h3 class="text-xl font-bold text-gray-900 mb-4">결제 주기 선택</h3>
-                
-                <div class="space-y-3">
-                  <!-- Monthly Plan -->
-                  <label class="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-emerald-500 transition-all">
-                    <input type="radio" name="billingCycle" value="monthly" class="mr-4" onchange="worvox.selectBillingCycle('monthly', ${monthlyPrice})">
-                    <div class="flex-1">
-                      <div class="font-semibold text-gray-900">월간 구독</div>
-                      <div class="text-sm text-gray-600">언제든지 취소 가능</div>
-                    </div>
-                    <div class="text-right">
-                      <div class="text-2xl font-bold text-gray-900">₩${monthlyPrice.toLocaleString()}</div>
-                      <div class="text-sm text-gray-600">/월</div>
-                    </div>
-                  </label>
-                  
-                  <!-- Yearly Plan (Recommended) -->
-                  <label class="flex items-center justify-between p-4 border-2 border-emerald-500 bg-emerald-50 rounded-xl cursor-pointer relative">
-                    <input type="radio" name="billingCycle" value="yearly" class="mr-4" checked onchange="worvox.selectBillingCycle('yearly', ${yearlyPrice})">
-                    <div class="flex-1">
-                      <div class="flex items-center gap-2 mb-1">
-                        <span class="font-semibold text-gray-900">연간 구독</span>
-                        <span class="bg-emerald-600 text-white text-xs px-2 py-0.5 rounded-full">20% 할인</span>
-                      </div>
-                      <div class="text-sm text-emerald-700 font-medium">₩${yearlySavings.toLocaleString()} 절약</div>
-                    </div>
-                    <div class="text-right">
-                      <div class="text-2xl font-bold text-emerald-700">₩${yearlyPrice.toLocaleString()}</div>
-                      <div class="text-sm text-gray-600">/년</div>
-                    </div>
-                    <div class="absolute top-2 right-2">
-                      <span class="bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded font-bold">추천</span>
-                    </div>
-                  </label>
-                </div>
-              </div>
-              
+              <!-- TEMPORARY: Billing cycle selection removed (monthly only) -->
               <!-- Payment Summary -->
               <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
                 <h3 class="text-xl font-bold text-gray-900 mb-4">결제 정보</h3>
@@ -3267,11 +3239,11 @@ Proceed to payment?
                 <div class="space-y-3">
                   <div class="flex items-center justify-between py-2">
                     <span class="text-gray-700">${planName} 플랜</span>
-                    <span class="font-semibold text-gray-900" id="planPrice">₩${yearlyPrice.toLocaleString()}</span>
+                    <span class="font-semibold text-gray-900" id="planPrice">₩${monthlyPrice.toLocaleString()}</span>
                   </div>
                   <div class="flex items-center justify-between py-2">
                     <span class="text-gray-700">결제 주기</span>
-                    <span class="font-medium text-gray-900" id="billingCycleText">연간</span>
+                    <span class="font-medium text-gray-900" id="billingCycleText">월간</span>
                   </div>
                   <div class="flex items-center justify-between py-2 text-emerald-600">
                     <span class="flex items-center gap-2">
@@ -3287,7 +3259,7 @@ Proceed to payment?
                       <span class="text-2xl font-bold text-emerald-600">₩0</span>
                     </div>
                     <p class="text-xs text-gray-500 mt-2">
-                      * 7일 무료 체험 후 <span id="chargeDate">${this.getChargeDate()}</span>에 자동 결제됩니다
+                      * 7일 무료 체험 후 자동 결제됩니다
                     </p>
                   </div>
                 </div>
@@ -3351,9 +3323,9 @@ Proceed to payment?
       </div>
     `;
     
-    // Set default billing cycle to yearly
-    this.selectedBillingCycle = 'yearly';
-    this.selectedPlanPrice = yearlyPrice;
+    // Set default billing cycle to monthly (yearly option removed)
+    this.selectedBillingCycle = 'monthly';
+    this.selectedPlanPrice = monthlyPrice;
   }
 
   selectBillingCycle(cycle, price) {
