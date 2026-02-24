@@ -1068,6 +1068,68 @@ Proceed to payment?
                   <div id="searchResult" class="mt-4 md:mt-6 max-w-2xl mx-auto"></div>
                 </div>
                 
+                <!-- Daily Usage Tracker (Free Plan Only) -->
+                ${!this.isPremiumUser() ? `
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-6 md:mb-8">
+                  <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">오늘의 사용량</h3>
+                    <button onclick="worvox.showPlan()" class="text-emerald-600 hover:text-emerald-700 text-sm font-medium">
+                      Premium 보기 →
+                    </button>
+                  </div>
+                  
+                  <div class="space-y-4">
+                    <!-- AI Conversation Usage -->
+                    <div>
+                      <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2">
+                          <i class="fas fa-comment text-blue-600"></i>
+                          <span class="text-sm text-gray-700">AI 대화</span>
+                        </div>
+                        <span class="text-sm font-medium text-gray-900">${this.getDailyUsage('ai_conversation')}/5회</span>
+                      </div>
+                      <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-blue-600 h-2 rounded-full transition-all" style="width: ${(this.getDailyUsage('ai_conversation') / 5) * 100}%"></div>
+                      </div>
+                    </div>
+                    
+                    <!-- Pronunciation Practice Usage -->
+                    <div>
+                      <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2">
+                          <i class="fas fa-microphone text-purple-600"></i>
+                          <span class="text-sm text-gray-700">발음 연습</span>
+                        </div>
+                        <span class="text-sm font-medium text-gray-900">${this.getDailyUsage('pronunciation')}/10회</span>
+                      </div>
+                      <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-purple-600 h-2 rounded-full transition-all" style="width: ${(this.getDailyUsage('pronunciation') / 10) * 100}%"></div>
+                      </div>
+                    </div>
+                    
+                    <!-- Word Search Usage -->
+                    <div>
+                      <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2">
+                          <i class="fas fa-search text-emerald-600"></i>
+                          <span class="text-sm text-gray-700">단어 검색</span>
+                        </div>
+                        <span class="text-sm font-medium text-gray-900">${this.getDailyUsage('word_search')}/10회</span>
+                      </div>
+                      <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-emerald-600 h-2 rounded-full transition-all" style="width: ${(this.getDailyUsage('word_search') / 10) * 100}%"></div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="mt-4 pt-4 border-t border-gray-200">
+                    <p class="text-xs text-gray-500 text-center">
+                      <i class="fas fa-clock mr-1"></i>매일 자정에 초기화됩니다
+                    </p>
+                  </div>
+                </div>
+                ` : ''}
+                
                 <!-- Feature Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">${topics.map(topic => `
                     <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-lg hover:border-emerald-400 transition-all cursor-pointer"
@@ -4141,6 +4203,15 @@ Proceed to payment?
         </div>
       </div>
     `;
+  }
+
+  // Premium user check helper
+  isPremiumUser() {
+    // TODO: Implement actual subscription check from backend
+    // For now, check if user has a premium subscription record
+    return this.currentUser && this.currentUser.subscription_plan && 
+           (this.currentUser.subscription_plan === 'premium' || 
+            this.currentUser.subscription_plan === 'business');
   }
 }
 
