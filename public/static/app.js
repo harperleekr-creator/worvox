@@ -392,7 +392,11 @@ class WorVox {
           </div>
           
           <!-- Desktop Top Bar -->
-          <div class="hidden md:flex bg-white border-b border-gray-200 px-6 py-3 items-center">
+          <div class="hidden md:flex bg-white border-b border-gray-200 px-6 py-3 items-center gap-4">
+            <button onclick="worvox.showTopicSelection()" 
+              class="text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all">
+              <i class="fas fa-arrow-left text-xl"></i>
+            </button>
             <h2 class="text-lg font-semibold text-gray-800">
               <i class="fas fa-user-tie mr-2"></i>Real Conversation Lessons
             </h2>
@@ -2504,7 +2508,7 @@ Proceed to payment?
             <div class="bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4">
               <div class="flex items-center gap-2">
                 <button onclick="worvox.showTopicSelection()" 
-                  class="md:hidden text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all">
+                  class="text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all">
                   <i class="fas fa-arrow-left text-xl"></i>
                 </button>
                 <div>
@@ -3934,10 +3938,16 @@ Proceed to payment?
           <!-- Main Content -->
           <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Header -->
-            <div class="bg-white border-b border-gray-200 px-6 py-4">
-              <div>
-                <h1 class="text-2xl font-bold text-gray-800">📊 Learning Statistics</h1>
-                <p class="text-gray-600 text-sm mt-1">Track your learning progress and insights</p>
+            <div class="bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4">
+              <div class="flex items-center gap-2">
+                <button onclick="worvox.showTopicSelection()" 
+                  class="text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all">
+                  <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <div>
+                  <h1 class="text-lg md:text-2xl font-bold text-gray-800">📊 Learning Statistics</h1>
+                  <p class="text-gray-600 text-sm mt-1">Track your learning progress and insights</p>
+                </div>
               </div>
             </div>
 
@@ -4242,7 +4252,7 @@ Proceed to payment?
             <div class="bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4">
               <div class="flex items-center gap-2 max-w-6xl mx-auto">
                 <button onclick="worvox.showTopicSelection()" 
-                  class="md:hidden text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all">
+                  class="text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all">
                   <i class="fas fa-arrow-left text-xl"></i>
                 </button>
                 <div>
