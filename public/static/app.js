@@ -263,7 +263,7 @@ class WorVox {
   // Footer with company information
   getFooter() {
     return `
-      <footer class="bg-gray-900 text-gray-400 py-3 mt-8 border-t border-gray-800 -mx-4 md:-mx-8">
+      <footer class="w-full bg-gray-900 text-gray-400 py-4 mt-0">
         <div class="px-4 md:px-8">
           <div class="flex flex-col md:flex-row justify-between items-center gap-2 md:gap-3 text-xs">
             <!-- Company Info -->
@@ -1204,13 +1204,13 @@ Proceed to payment?
                     </div>
                   </div>
                 </div>
-                
-                <!-- Footer -->
-                ${this.getFooter()}
               </div>
             </div>
           </div>
         </div>
+        
+        <!-- Footer (Full Width, Below Sidebar) -->
+        ${this.getFooter()}
       `;
       
       // Load gamification stats after rendering
@@ -3127,11 +3127,11 @@ Proceed to payment?
                 </table>
               </div>
             </div>
-            
-            <!-- Footer -->
-            ${this.getFooter()}
           </div>
         </div>
+        
+        <!-- Footer (Full Width, Below Sidebar) -->
+        ${this.getFooter()}
       </div>
     `;
   }
@@ -3314,12 +3314,12 @@ Proceed to payment?
                 <i class="fas fa-shield-alt mr-1"></i>
                 NHN KCP 안전결제 시스템으로 보호됩니다
               </p>
-              
-              <!-- Footer -->
-              ${this.getFooter()}
             </div>
           </div>
         </div>
+        
+        <!-- Footer (Full Width, Below Sidebar) -->
+        ${this.getFooter()}
       </div>
     `;
     
