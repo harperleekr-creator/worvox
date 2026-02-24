@@ -10,6 +10,32 @@ class WorVox {
     this.isRecording = false;
     this.currentAudio = null;
     
+    // User plan and usage tracking
+    this.userPlan = 'free'; // 'free', 'premium', 'business'
+    this.dailyUsage = {
+      aiConversations: 0,
+      pronunciationPractice: 0,
+      wordSearch: 0,
+      lastReset: new Date().toDateString()
+    };
+    this.usageLimits = {
+      free: {
+        aiConversations: 5,
+        pronunciationPractice: 10,
+        wordSearch: 10
+      },
+      premium: {
+        aiConversations: Infinity,
+        pronunciationPractice: Infinity,
+        wordSearch: Infinity
+      },
+      business: {
+        aiConversations: Infinity,
+        pronunciationPractice: Infinity,
+        wordSearch: Infinity
+      }
+    };
+    
     // Onboarding state
     this.onboardingData = {
       username: '',
@@ -20,6 +46,9 @@ class WorVox {
       occupation: ''
     };
     this.onboardingStep = 1;
+    
+    // Load usage from localStorage
+    this.loadUsageData();
     
     this.init();
   }
@@ -262,9 +291,16 @@ class WorVox {
   }
 
   async startConversation() {
+    // Check usage limit for free users
+    if (!this.checkUsageLimit('aiConversations')) {
+      return; // Show upgrade banner
+    }
+    
     const topics = await axios.get('/api/topics');
     const conversationTopic = topics.data.topics.find(t => t.name === 'AI English Conversation');
     if (conversationTopic) {
+      // Increment usage when starting conversation
+      this.incrementUsage('aiConversations');
       this.startSession(conversationTopic.id, conversationTopic.name, conversationTopic.system_prompt, conversationTopic.level);
     }
   }
@@ -2994,6 +3030,160 @@ Proceed to payment?
   // Contact Sales for Business Plan
   contactSales() {
     alert('🏢 Business 플랜 문의\n\n영업팀 연락처:\n📧 business@worvox.com\n📞 02-1234-5678\n\n담당자가 곧 연락드리겠습니다!');
+  }
+
+  // Load usage data from localStorage
+  loadUsageData() {
+    const savedUsage = localStorage.getItem('worvox_usage');
+    if (savedUsage) {
+      try {
+        const usage = JSON.parse(savedUsage);
+        const today = new Date().toDateString();
+        
+        // Reset if new day
+        if (usage.lastReset !== today) {
+          this.resetDailyUsage();
+        } else {
+          this.dailyUsage = usage;
+        }
+      } catch (e) {
+        console.error('Failed to load usage data:', e);
+        this.resetDailyUsage();
+      }
+    }
+  }
+
+  // Save usage data to localStorage
+  saveUsageData() {
+    localStorage.setItem('worvox_usage', JSON.stringify(this.dailyUsage));
+  }
+
+  // Reset daily usage
+  resetDailyUsage() {
+    this.dailyUsage = {
+      aiConversations: 0,
+      pronunciationPractice: 0,
+      wordSearch: 0,
+      lastReset: new Date().toDateString()
+    };
+    this.saveUsageData();
+  }
+
+  // Check usage limit
+  checkUsageLimit(feature) {
+    const limit = this.usageLimits[this.userPlan][feature];
+    const current = this.dailyUsage[feature];
+    
+    if (current >= limit) {
+      this.showUpgradeBanner(feature, current, limit);
+      return false;
+    }
+    
+    return true;
+  }
+
+  // Increment usage
+  incrementUsage(feature) {
+    this.dailyUsage[feature]++;
+    this.saveUsageData();
+    
+    // Show warning when approaching limit
+    const limit = this.usageLimits[this.userPlan][feature];
+    const current = this.dailyUsage[feature];
+    
+    if (this.userPlan === 'free' && current >= limit * 0.8) {
+      this.showUsageWarning(feature, current, limit);
+    }
+  }
+
+  // Show upgrade banner when limit reached
+  showUpgradeBanner(feature, current, limit) {
+    const featureNames = {
+      aiConversations: 'AI 영어 대화',
+      pronunciationPractice: '발음 연습',
+      wordSearch: '단어 검색'
+    };
+    
+    const banner = document.createElement('div');
+    banner.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-md w-full mx-4';
+    banner.innerHTML = `
+      <div class="bg-gradient-to-r from-red-500 to-orange-500 text-white rounded-2xl shadow-2xl p-6 animate-bounce">
+        <div class="flex items-start gap-4">
+          <div class="flex-shrink-0">
+            <i class="fas fa-exclamation-circle text-4xl"></i>
+          </div>
+          <div class="flex-1">
+            <h3 class="text-xl font-bold mb-2">오늘 ${featureNames[feature]} 횟수 초과 ⚠️</h3>
+            <p class="text-sm text-red-50 mb-4">
+              ${featureNames[feature]} 하루 ${limit}회 중 ${current}회를 모두 사용했습니다.<br>
+              Premium으로 업그레이드하고 <strong>무제한</strong>으로 사용하세요! 🚀
+            </p>
+            <div class="flex gap-2">
+              <button onclick="worvox.showPlan(); document.querySelector('.fixed.top-4').remove();" 
+                class="flex-1 bg-white text-red-600 px-4 py-2 rounded-lg font-bold hover:bg-red-50 transition-all">
+                <i class="fas fa-crown mr-2"></i>Premium 보기
+              </button>
+              <button onclick="this.closest('.fixed').remove()" 
+                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all">
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(banner);
+    
+    // Auto remove after 10 seconds
+    setTimeout(() => {
+      if (banner.parentNode) {
+        banner.remove();
+      }
+    }, 10000);
+  }
+
+  // Show usage warning when approaching limit
+  showUsageWarning(feature, current, limit) {
+    const featureNames = {
+      aiConversations: 'AI 영어 대화',
+      pronunciationPractice: '발음 연습',
+      wordSearch: '단어 검색'
+    };
+    
+    const remaining = limit - current;
+    
+    // Only show if exactly at warning threshold
+    if (current === Math.ceil(limit * 0.8)) {
+      const banner = document.createElement('div');
+      banner.className = 'fixed top-4 right-4 z-50 max-w-sm';
+      banner.innerHTML = `
+        <div class="bg-gradient-to-r from-yellow-400 to-orange-400 text-gray-900 rounded-xl shadow-lg p-4">
+          <div class="flex items-start gap-3">
+            <i class="fas fa-exclamation-triangle text-2xl"></i>
+            <div class="flex-1">
+              <h4 class="font-bold mb-1">${featureNames[feature]} 곧 소진</h4>
+              <p class="text-sm">오늘 ${remaining}회 남았습니다!</p>
+              <button onclick="worvox.showPlan(); this.closest('.fixed').remove();" 
+                class="mt-2 text-xs underline hover:no-underline">
+                Premium 보기 →
+              </button>
+            </div>
+            <button onclick="this.closest('.fixed').remove()" class="text-gray-700 hover:text-gray-900">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(banner);
+      
+      setTimeout(() => {
+        if (banner.parentNode) {
+          banner.remove();
+        }
+      }, 5000);
+    }
   }
 
   // Word Search Feature with Hybrid Approach
