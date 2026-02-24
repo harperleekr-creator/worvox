@@ -1808,13 +1808,126 @@ Proceed to payment?
   
   // Quiz Mode (will use existing quiz implementation)
   renderQuizMode(words, difficulty) {
-    // Generate quiz questions from words
-    const quizWords = words.slice(0, 10); // 10 questions per quiz
+    if (!words || words.length === 0) {
+      return `
+        <div class="max-w-3xl mx-auto">
+          <div class="bg-white rounded-2xl shadow-lg p-12 text-center">
+            <div class="text-6xl mb-4">📖</div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">No Vocabulary Yet</h3>
+            <p class="text-gray-600">Add some vocabulary words first!</p>
+          </div>
+        </div>
+      `;
+    }
+
+    // Initialize quiz if not already initialized
+    if (!this.quizData) {
+      const shuffledWords = [...words].sort(() => Math.random() - 0.5);
+      const selectedWords = shuffledWords.slice(0, Math.min(10, words.length));
+      
+      this.quizData = {
+        questions: selectedWords.map(word => {
+          // Get other words for wrong options
+          const otherWords = words.filter(w => w.id !== word.id);
+          const shuffledOthers = [...otherWords].sort(() => Math.random() - 0.5);
+          const wrongOptions = shuffledOthers.slice(0, 3).map(w => w.meaning_ko);
+          
+          // Combine correct answer with wrong options and shuffle
+          const options = [word.meaning_ko, ...wrongOptions].sort(() => Math.random() - 0.5);
+          
+          return {
+            word: word,
+            options: options,
+            userAnswer: null,
+            isCorrect: null
+          };
+        }),
+        currentIndex: 0,
+        score: 0,
+        finished: false
+      };
+    }
+
+    const quiz = this.quizData;
     
+    if (quiz.finished) {
+      return this.renderQuizResults();
+    }
+
+    const question = quiz.questions[quiz.currentIndex];
+    const word = question.word;
+
     return `
       <div class="max-w-3xl mx-auto">
-        <div id="quizContainer">
-          <!-- Quiz will be initialized by initializeQuiz() -->
+        <!-- Quiz Progress -->
+        <div class="mb-6">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-gray-600 font-semibold">Question ${quiz.currentIndex + 1} / ${quiz.questions.length}</span>
+            <span class="text-indigo-600 font-bold text-lg">Score: ${quiz.score} / ${quiz.currentIndex}</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-3">
+            <div class="bg-indigo-600 h-3 rounded-full transition-all" style="width: ${(quiz.currentIndex / quiz.questions.length) * 100}%"></div>
+          </div>
+        </div>
+
+        <!-- Question Card -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-6">
+          <div class="text-center mb-8">
+            <h2 class="text-5xl font-bold text-indigo-600 mb-4">${this.escapeHtml(word.word)}</h2>
+            <button onclick="worvox.playPronunciation('${this.escapeHtml(word.word)}')" 
+              class="p-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors">
+              <i class="fas fa-volume-up text-xl"></i>
+            </button>
+          </div>
+
+          <p class="text-gray-700 text-xl mb-8 text-center font-medium">이 단어의 뜻은 무엇일까요?</p>
+
+          <!-- Options -->
+          <div class="space-y-3">
+            ${question.options.map((option, index) => {
+              const isSelected = question.userAnswer === option;
+              const isCorrect = option === word.meaning_ko;
+              let buttonClass = 'bg-white hover:bg-gray-50 border-2 border-gray-300 hover:border-indigo-400';
+              let iconHtml = '';
+              
+              if (question.userAnswer !== null) {
+                if (isCorrect) {
+                  buttonClass = 'bg-green-50 border-2 border-green-500';
+                  iconHtml = '<i class="fas fa-check-circle text-green-600 text-2xl"></i>';
+                } else if (isSelected) {
+                  buttonClass = 'bg-red-50 border-2 border-red-500';
+                  iconHtml = '<i class="fas fa-times-circle text-red-600 text-2xl"></i>';
+                }
+              }
+              
+              return `
+                <button 
+                  onclick="worvox.selectQuizAnswer('${this.escapeHtml(option)}')"
+                  ${question.userAnswer !== null ? 'disabled' : ''}
+                  class="w-full p-5 ${buttonClass} rounded-xl transition-all text-left flex items-center justify-between group ${question.userAnswer !== null ? 'cursor-not-allowed' : 'cursor-pointer'}">
+                  <span class="text-lg font-medium text-gray-800">${this.escapeHtml(option)}</span>
+                  ${iconHtml}
+                </button>
+              `;
+            }).join('')}
+          </div>
+
+          ${question.userAnswer !== null ? `
+            <div class="mt-6 p-4 ${question.isCorrect ? 'bg-green-50 border-2 border-green-200' : 'bg-red-50 border-2 border-red-200'} rounded-xl">
+              <p class="text-lg font-semibold mb-2 ${question.isCorrect ? 'text-green-800' : 'text-red-800'}">
+                ${question.isCorrect ? '✓ 정답입니다!' : '✗ 틀렸습니다'}
+              </p>
+              ${word.example_sentence ? `
+                <p class="text-gray-700 text-sm italic">"${this.escapeHtml(word.example_sentence)}"</p>
+              ` : ''}
+            </div>
+            
+            <button 
+              onclick="worvox.nextQuizQuestion()"
+              class="w-full mt-4 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-lg transition-all">
+              ${quiz.currentIndex < quiz.questions.length - 1 ? 'Next Question →' : 'Show Results 🎉'}
+            </button>
+          ` : ''}
         </div>
       </div>
     `;
@@ -1898,7 +2011,8 @@ Proceed to payment?
     if (this.flashcardIndex < words.length - 1) {
       this.flashcardIndex++;
       this.flashcardFlipped = false;
-      await this.showVocabulary('flashcard');
+      // Only update the flashcard content, not the entire page
+      this.updateFlashcardContent(words);
     }
   }
 
@@ -1906,7 +2020,83 @@ Proceed to payment?
     if (this.flashcardIndex > 0) {
       this.flashcardIndex--;
       this.flashcardFlipped = false;
-      await this.showVocabulary('flashcard');
+      // Only update the flashcard content, not the entire page
+      this.updateFlashcardContent(words);
+    }
+  }
+
+  updateFlashcardContent(words) {
+    const response = JSON.parse(document.getElementById('app').dataset.vocabularyData);
+    const allWords = response.words || words;
+    const word = allWords[this.flashcardIndex];
+    
+    // Get user progress
+    let progressData = {};
+    let bookmarkedWords = [];
+    const isLearned = progressData[word.id]?.is_learned === 1;
+    const isBookmarked = bookmarkedWords.includes(word.id);
+    
+    // Update flashcard content only
+    const flashcardContainer = document.querySelector('.max-w-2xl.mx-auto');
+    if (flashcardContainer) {
+      flashcardContainer.innerHTML = `
+        <!-- Progress Indicator -->
+        <div class="mb-6 text-center">
+          <div class="inline-flex items-center gap-3 bg-white rounded-full px-6 py-3 shadow-sm">
+            <span class="text-gray-600 font-medium">Card ${this.flashcardIndex + 1} / ${allWords.length}</span>
+            <div class="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div class="h-full bg-indigo-600 transition-all" style="width: ${((this.flashcardIndex + 1) / allWords.length) * 100}%"></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Flashcard -->
+        <div id="flashcard" 
+          onclick="worvox.flipFlashcard()" 
+          class="relative bg-white rounded-2xl shadow-2xl p-8 md:p-12 cursor-pointer hover:shadow-3xl transition-all min-h-[400px] flex items-center justify-center border-4 border-indigo-100">
+          <div id="flashcard-front" class="text-center">
+            <div class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">${this.escapeHtml(word.word)}</div>
+            ${word.pronunciation ? `
+              <div class="text-lg text-gray-500 italic mb-6">${this.escapeHtml(word.pronunciation)}</div>
+            ` : ''}
+            <div class="text-gray-400 text-sm mt-8">
+              <i class="fas fa-sync-alt mr-2"></i>Click to flip
+            </div>
+          </div>
+        </div>
+        
+        <!-- Controls -->
+        <div class="mt-6 flex items-center justify-between">
+          <button onclick="worvox.previousFlashcard()" 
+            class="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold transition-colors ${this.flashcardIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}"
+            ${this.flashcardIndex === 0 ? 'disabled' : ''}>
+            <i class="fas fa-arrow-left mr-2"></i>Previous
+          </button>
+
+          <div class="flex items-center gap-2">
+            ${this.currentUser ? `
+              <button onclick="worvox.toggleBookmark(${word.id}, ${isBookmarked})" 
+                class="p-3 text-2xl ${isBookmarked ? 'text-yellow-500' : 'text-gray-300'} hover:text-yellow-500 transition-colors">
+                <i class="fas fa-star"></i>
+              </button>
+              <button onclick="worvox.toggleLearnedStatus(${word.id}, ${!isLearned})" 
+                class="px-4 py-2 ${isLearned ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-800'} rounded-lg font-semibold hover:opacity-80 transition-opacity">
+                ${isLearned ? '✓ Learned' : 'Mark Learned'}
+              </button>
+            ` : ''}
+            <button onclick="worvox.playPronunciation('${this.escapeHtml(word.word)}')" 
+              class="p-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors">
+              <i class="fas fa-volume-up"></i>
+            </button>
+          </div>
+
+          <button onclick="worvox.nextFlashcard()" 
+            class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition-colors ${this.flashcardIndex >= allWords.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}"
+            ${this.flashcardIndex >= allWords.length - 1 ? 'disabled' : ''}>
+            Next<i class="fas fa-arrow-right ml-2"></i>
+          </button>
+        </div>
+      `;
     }
   }
 
@@ -2060,9 +2250,9 @@ Proceed to payment?
     if (question.userAnswer !== null) return; // Already answered
     
     question.userAnswer = answer;
-    question.correct = (answer === question.word.meaning_ko);
+    question.isCorrect = (answer === question.word.meaning_ko);
     
-    if (question.correct) {
+    if (question.isCorrect) {
       this.quizData.score++;
       
       // Award XP for correct answer
@@ -2076,8 +2266,8 @@ Proceed to payment?
       }
     }
     
-    // Re-render to show result
-    await this.showVocabulary('quiz');
+    // Update only the quiz content area, not the entire page
+    this.updateQuizContent();
   }
 
   async nextQuizQuestion() {
@@ -2088,6 +2278,28 @@ Proceed to payment?
       
       // Award bonus XP for completing quiz
       if (typeof gamificationManager !== 'undefined' && this.currentUser) {
+        await gamificationManager.addXP(
+          this.currentUser.id,
+          50, // 50 XP bonus for completing quiz
+          'quiz_complete',
+          `Completed quiz with score: ${this.quizData.score}/${this.quizData.questions.length}`
+        );
+      }
+    }
+    
+    // Update only the quiz content area
+    this.updateQuizContent();
+  }
+
+  updateQuizContent() {
+    const contentArea = document.querySelector('.flex-1.overflow-y-auto.p-4.md\\:p-6');
+    if (!contentArea) return;
+    
+    const response = JSON.parse(document.getElementById('app').dataset.vocabularyData);
+    const words = response.words;
+    
+    contentArea.innerHTML = this.renderQuizMode(words, this.vocabularyDifficulty);
+  }
         await gamificationManager.addXP(
           this.currentUser.id,
           50, // 50 XP bonus for completing quiz
