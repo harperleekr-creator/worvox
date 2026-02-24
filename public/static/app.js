@@ -4457,6 +4457,14 @@ Proceed to payment?
     `;
   }
 
+  // Get daily usage count for a feature
+  getDailyUsage(featureType) {
+    if (!this.dailyUsage || !this.dailyUsage.features) {
+      return 0;
+    }
+    return this.dailyUsage.features[featureType] || 0;
+  }
+
   // Premium user check helper
   isPremiumUser() {
     // TODO: Implement actual subscription check from backend
