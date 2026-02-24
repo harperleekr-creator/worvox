@@ -54,8 +54,8 @@ app.get('/api/health', (c) => {
 
 // Main page
 app.get('/', (c) => {
-  // Cache busting version
-  const version = Date.now();
+  // Force cache busting with random version + timestamp
+  const version = `${Date.now()}.${Math.random().toString(36).substring(7)}`;
   
   return c.html(`
     <!DOCTYPE html>
@@ -64,6 +64,9 @@ app.get('/', (c) => {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>WorVox - AI English Learning</title>
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+        <meta http-equiv="Pragma" content="no-cache">
+        <meta http-equiv="Expires" content="0">
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
         <link href="/static/style.css?v=${version}" rel="stylesheet">
@@ -80,7 +83,11 @@ app.get('/', (c) => {
         <script src="/static/app.js?v=${version}"></script>
     </body>
     </html>
-  `);
+  `, 200, {
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0'
+  });
 });
 
 export default app;
