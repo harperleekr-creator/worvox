@@ -54,8 +54,9 @@ app.get('/api/health', (c) => {
 
 // Main page
 app.get('/', (c) => {
-  // Force cache busting with random version + timestamp
-  const version = `${Date.now()}.${Math.random().toString(36).substring(7)}`;
+  // Force COMPLETE cache busting - change this number to force refresh
+  const FORCE_VERSION = '20260224-v5';
+  const version = `${FORCE_VERSION}-${Date.now()}`;
   
   return c.html(`
     <!DOCTYPE html>
@@ -76,6 +77,16 @@ app.get('/', (c) => {
     </head>
     <body>
         <div id="app"></div>
+        
+        <script>
+          // Force cache clear
+          if ('caches' in window) {
+            caches.keys().then(names => {
+              names.forEach(name => caches.delete(name));
+            });
+          }
+          console.log('WorVox v${FORCE_VERSION} - Cache cleared');
+        </script>
         
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
