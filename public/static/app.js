@@ -263,7 +263,7 @@ class WorVox {
   // Footer with company information
   getFooter() {
     return `
-      <footer class="bg-gray-800 text-gray-300 py-6 mt-auto">
+      <footer class="bg-gray-800 text-gray-300 py-8 mt-12 border-t-4 border-gray-700">
         <div class="max-w-7xl mx-auto px-4">
           <div class="flex flex-col md:flex-row justify-between items-center gap-4">
             <!-- Company Info -->
@@ -1076,9 +1076,10 @@ Proceed to payment?
               </button>
             </div>
             
-            <!-- Content Area -->
-            <div class="flex-1 overflow-y-auto p-4 md:p-8">
-              <div class="max-w-4xl mx-auto">
+            <!-- Content Area with Scrolling -->
+            <div class="flex-1 overflow-y-auto">
+              <div class="p-4 md:p-8">
+                <div class="max-w-4xl mx-auto">
                 <!-- Welcome Message -->
                 <div class="text-center mb-8 md:mb-12">
                   <h1 class="text-2xl md:text-4xl font-bold text-gray-900 mb-2 md:mb-3">Welcome back, ${this.currentUser.username}!</h1>
@@ -1204,12 +1205,12 @@ Proceed to payment?
                     </div>
                   </div>
                 </div>
+                
+                <!-- Footer -->
+                ${this.getFooter()}
               </div>
             </div>
           </div>
-          
-          <!-- Footer -->
-          ${this.getFooter()}
         </div>
       `;
       
@@ -3127,11 +3128,11 @@ Proceed to payment?
                 </table>
               </div>
             </div>
+            
+            <!-- Footer -->
+            ${this.getFooter()}
           </div>
         </div>
-        
-        <!-- Footer -->
-        ${this.getFooter()}
       </div>
     `;
   }
@@ -3314,12 +3315,12 @@ Proceed to payment?
                 <i class="fas fa-shield-alt mr-1"></i>
                 NHN KCP 안전결제 시스템으로 보호됩니다
               </p>
+              
+              <!-- Footer -->
+              ${this.getFooter()}
             </div>
           </div>
         </div>
-        
-        <!-- Footer -->
-        ${this.getFooter()}
       </div>
     `;
     
