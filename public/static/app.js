@@ -260,6 +260,40 @@ class WorVox {
     `;
   }
 
+  // Footer with company information
+  getFooter() {
+    return `
+      <footer class="bg-gray-800 text-gray-300 py-6 mt-auto">
+        <div class="max-w-7xl mx-auto px-4">
+          <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+            <!-- Company Info -->
+            <div class="text-center md:text-left">
+              <div class="text-sm space-y-1">
+                <div class="flex items-center justify-center md:justify-start gap-2 flex-wrap">
+                  <span class="font-semibold text-white">위아솔루션즈</span>
+                  <span class="text-gray-500">|</span>
+                  <span>대표자: 이강돈</span>
+                  <span class="text-gray-500">|</span>
+                  <span>사업자번호: 542-07-02097</span>
+                </div>
+                <div class="text-xs text-gray-400 mt-2">
+                  © ${new Date().getFullYear()} WorVox. All rights reserved.
+                </div>
+              </div>
+            </div>
+            
+            <!-- Links -->
+            <div class="flex items-center gap-4 text-sm">
+              <a href="#" onclick="worvox.showTerms(); return false;" class="hover:text-white transition-colors">이용약관</a>
+              <a href="#" onclick="worvox.showPrivacy(); return false;" class="hover:text-white transition-colors">개인정보처리방침</a>
+              <a href="#" onclick="worvox.showRefund(); return false;" class="hover:text-white transition-colors">환불정책</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    `;
+  }
+
   toggleMobileSidebar() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
@@ -1173,6 +1207,9 @@ Proceed to payment?
               </div>
             </div>
           </div>
+          
+          <!-- Footer -->
+          ${this.getFooter()}
         </div>
       `;
       
@@ -3092,6 +3129,9 @@ Proceed to payment?
             </div>
           </div>
         </div>
+        
+        <!-- Footer -->
+        ${this.getFooter()}
       </div>
     `;
   }
@@ -3277,6 +3317,9 @@ Proceed to payment?
             </div>
           </div>
         </div>
+        
+        <!-- Footer -->
+        ${this.getFooter()}
       </div>
     `;
     
@@ -4567,6 +4610,21 @@ Proceed to payment?
     return this.currentUser && this.currentUser.subscription_plan && 
            (this.currentUser.subscription_plan === 'premium' || 
             this.currentUser.subscription_plan === 'business');
+  }
+
+  // Show Terms of Service
+  showTerms() {
+    alert('이용약관 페이지\n\n준비 중입니다.');
+  }
+
+  // Show Privacy Policy
+  showPrivacy() {
+    alert('개인정보처리방침 페이지\n\n준비 중입니다.');
+  }
+
+  // Show Refund Policy
+  showRefund() {
+    alert('환불정책 페이지\n\n준비 중입니다.');
   }
 }
 
