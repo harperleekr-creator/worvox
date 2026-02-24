@@ -61,6 +61,8 @@ class WorVox {
     const savedUser = localStorage.getItem('worvox_user');
     if (savedUser) {
       this.currentUser = JSON.parse(savedUser);
+      // Load usage data from server
+      await this.loadUsageFromServer();
       await this.loadGamificationStats();
       this.showTopicSelection();
     } else {
@@ -3378,9 +3380,41 @@ Proceed to payment?
     }
   }
 
+  // Load usage data from server
+  async loadUsageFromServer() {
+    if (!this.currentUser) return;
+    
+    try {
+      const response = await axios.get(`/api/usage/${this.currentUser.id}`);
+      if (response.data.success && response.data.usage) {
+        this.dailyUsage = response.data.usage;
+        // Also save to localStorage as backup
+        this.saveUsageData();
+      }
+    } catch (error) {
+      console.error('Failed to load usage from server:', error);
+      // Fallback to localStorage
+      this.loadUsageData();
+    }
+  }
+
   // Save usage data to localStorage
   saveUsageData() {
     localStorage.setItem('worvox_usage', JSON.stringify(this.dailyUsage));
+  }
+
+  // Save usage data to server
+  async saveUsageToServer(featureType) {
+    if (!this.currentUser) return;
+    
+    try {
+      await axios.post(`/api/usage/${this.currentUser.id}`, {
+        featureType: featureType,
+        increment: 1
+      });
+    } catch (error) {
+      console.error('Failed to save usage to server:', error);
+    }
   }
 
   // Reset daily usage
@@ -3411,6 +3445,9 @@ Proceed to payment?
   incrementUsage(feature) {
     this.dailyUsage[feature]++;
     this.saveUsageData();
+    
+    // Save to server
+    this.saveUsageToServer(feature);
     
     // Update UI if usage tracker is visible
     this.updateUsageTrackerUI();

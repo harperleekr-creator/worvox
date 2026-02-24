@@ -14,6 +14,7 @@ import history from './routes/history';
 import vocabulary from './routes/vocabulary';
 import preview from './routes/preview';
 import gamification from './routes/gamification';
+import usage from './routes/usage';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -40,6 +41,7 @@ app.route('/api/topics', topics);
 app.route('/api/history', history);
 app.route('/api/vocabulary', vocabulary);
 app.route('/api/gamification', gamification);
+app.route('/api/usage', usage);
 
 // Preview routes
 app.route('/preview', preview);

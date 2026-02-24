@@ -1,0 +1,85 @@
+import { Hono } from 'hono';
+
+const app = new Hono<{ Bindings: { DB: D1Database } }>();
+
+// Get user's daily usage
+app.get('/:userId', async (c) => {
+  try {
+    const userId = c.req.param('userId');
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
+    const result = await c.env.DB.prepare(`
+      SELECT feature_type, usage_count, usage_date
+      FROM usage_tracking
+      WHERE user_id = ? AND usage_date = ?
+    `).bind(userId, today).all();
+
+    // Convert to frontend format
+    const usage = {
+      aiConversations: 0,
+      pronunciationPractice: 0,
+      wordSearch: 0,
+      lastReset: new Date().toDateString()
+    };
+
+    if (result.results) {
+      result.results.forEach((row: any) => {
+        if (row.feature_type === 'ai_conversation') {
+          usage.aiConversations = row.usage_count;
+        } else if (row.feature_type === 'pronunciation') {
+          usage.pronunciationPractice = row.usage_count;
+        } else if (row.feature_type === 'word_search') {
+          usage.wordSearch = row.usage_count;
+        }
+      });
+    }
+
+    return c.json({ success: true, usage });
+  } catch (error) {
+    console.error('Error getting usage:', error);
+    return c.json({ success: false, error: 'Failed to get usage' }, 500);
+  }
+});
+
+// Update user's daily usage
+app.post('/:userId', async (c) => {
+  try {
+    const userId = c.req.param('userId');
+    const { featureType, increment = 1 } = await c.req.json();
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
+    // Map frontend feature names to DB feature names
+    const featureMap: { [key: string]: string } = {
+      'aiConversations': 'ai_conversation',
+      'pronunciationPractice': 'pronunciation',
+      'wordSearch': 'word_search'
+    };
+
+    const dbFeatureType = featureMap[featureType] || featureType;
+
+    // Upsert usage count
+    await c.env.DB.prepare(`
+      INSERT INTO usage_tracking (user_id, feature_type, usage_date, usage_count)
+      VALUES (?, ?, ?, ?)
+      ON CONFLICT (user_id, feature_type, usage_date)
+      DO UPDATE SET usage_count = usage_count + ?, updated_at = CURRENT_TIMESTAMP
+    `).bind(userId, dbFeatureType, today, increment, increment).run();
+
+    // Get updated count
+    const result = await c.env.DB.prepare(`
+      SELECT usage_count
+      FROM usage_tracking
+      WHERE user_id = ? AND feature_type = ? AND usage_date = ?
+    `).bind(userId, dbFeatureType, today).first();
+
+    return c.json({ 
+      success: true, 
+      usage_count: result?.usage_count || increment 
+    });
+  } catch (error) {
+    console.error('Error updating usage:', error);
+    return c.json({ success: false, error: 'Failed to update usage' }, 500);
+  }
+});
+
+export default app;
