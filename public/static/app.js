@@ -218,11 +218,6 @@ class WorVox {
             <i class="fas fa-comments" style="width: 20px; text-align: center;"></i>
             <span>AI Conversation</span>
           </a>
-          <a href="#" onclick="worvox.showRealConversation(); worvox.closeMobileSidebar(); return false;" 
-            class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'real-conversation' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
-            <i class="fas fa-user-tie" style="width: 20px; text-align: center;"></i>
-            <span>Real Conversation</span>
-          </a>
           <a href="#" onclick="worvox.startVocabulary(); worvox.closeMobileSidebar(); return false;" 
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'vocabulary' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
             <i class="fas fa-book" style="width: 20px; text-align: center;"></i>
@@ -247,6 +242,11 @@ class WorVox {
             class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'plan' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
             <i class="fas fa-crown" style="width: 20px; text-align: center;"></i>
             <span>Plan</span>
+          </a>
+          <a href="#" onclick="worvox.showRealConversation(); worvox.closeMobileSidebar(); return false;" 
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'live-speaking' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
+            <i class="fas fa-phone-volume" style="width: 20px; text-align: center;"></i>
+            <span class="text-sm">1:1 Live Speaking</span>
           </a>
         </nav>
         
@@ -377,7 +377,7 @@ class WorVox {
     const app = document.getElementById('app');
     app.innerHTML = `
       <div class="flex h-screen bg-gray-50">
-        ${this.getSidebar('real-conversation')}
+        ${this.getSidebar('live-speaking')}
         
         <div class="flex-1 flex flex-col overflow-hidden">
           <!-- Mobile Header -->
@@ -386,7 +386,7 @@ class WorVox {
               <button onclick="worvox.showTopicSelection()" class="text-gray-600">
                 <i class="fas fa-arrow-left text-xl"></i>
               </button>
-              <h1 class="text-lg font-semibold text-gray-800">Real Conversation</h1>
+              <h1 class="text-lg font-semibold text-gray-800">1:1 Live Speaking Session</h1>
               <div class="w-6"></div>
             </div>
           </div>
@@ -398,7 +398,7 @@ class WorVox {
               <i class="fas fa-arrow-left text-xl"></i>
             </button>
             <h2 class="text-lg font-semibold text-gray-800">
-              <i class="fas fa-user-tie mr-2"></i>Real Conversation Lessons
+              <i class="fas fa-phone-volume mr-2"></i>1:1 Live Speaking Sessions
             </h2>
           </div>
           
