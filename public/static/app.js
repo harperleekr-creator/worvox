@@ -4623,6 +4623,274 @@ Proceed to payment?
 
                 </div>
 
+                <!-- 카테고리별 상세 비교 -->
+                <div class="mt-12 mb-8">
+                  <h2 class="text-3xl font-bold text-gray-800 mb-2 text-center">📊 상세 기능 비교</h2>
+                  <p class="text-gray-600 text-center mb-8">플랜별 제공 기능을 카테고리별로 확인하세요</p>
+                  
+                  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    
+                    <!-- 기본 기능 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-gray-100">
+                      <div class="bg-gradient-to-r from-yellow-400 to-orange-400 p-4 text-white">
+                        <h3 class="text-xl font-bold flex items-center">
+                          <i class="fas fa-star mr-2"></i>
+                          기본 기능
+                        </h3>
+                      </div>
+                      <div class="p-6">
+                        <table class="w-full text-sm">
+                          <tbody class="divide-y divide-gray-100">
+                            <tr>
+                              <td class="py-3 text-gray-700">일일 AI 대화</td>
+                              <td class="py-3 text-right">
+                                <span class="text-gray-600">Free: 5분</span><br>
+                                <span class="text-blue-600 font-semibold">Core+: 무제한</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">AI 대화 주제</td>
+                              <td class="py-3 text-right">
+                                <span class="text-gray-600">Free: 3개</span><br>
+                                <span class="text-blue-600 font-semibold">Core+: 20개</span><br>
+                                <span class="text-yellow-600 font-semibold">B2B: 커스텀</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">대화 히스토리</td>
+                              <td class="py-3 text-right">
+                                <span class="text-gray-600">Free: 7일</span><br>
+                                <span class="text-blue-600">Core: 30일</span><br>
+                                <span class="text-purple-600 font-semibold">Premium+: 무제한</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">음성 인식/답변</td>
+                              <td class="py-3 text-right">
+                                <span class="text-green-600 font-semibold">모든 플랜 제공</span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <!-- 단어 학습 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-gray-100">
+                      <div class="bg-gradient-to-r from-blue-500 to-indigo-500 p-4 text-white">
+                        <h3 class="text-xl font-bold flex items-center">
+                          <i class="fas fa-book mr-2"></i>
+                          단어 학습
+                        </h3>
+                      </div>
+                      <div class="p-6">
+                        <table class="w-full text-sm">
+                          <tbody class="divide-y divide-gray-100">
+                            <tr>
+                              <td class="py-3 text-gray-700">단어 검색</td>
+                              <td class="py-3 text-right">
+                                <span class="text-gray-600">Free: 일 10개</span><br>
+                                <span class="text-blue-600 font-semibold">Core+: 무제한</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">개인 단어장</td>
+                              <td class="py-3 text-right">
+                                <span class="text-blue-600">Core: 500개</span><br>
+                                <span class="text-purple-600 font-semibold">Premium+: 무제한</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">단어 퀴즈</td>
+                              <td class="py-3 text-right">
+                                <span class="text-blue-600 font-semibold">Core 이상</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">플래시카드</td>
+                              <td class="py-3 text-right">
+                                <span class="text-blue-600 font-semibold">Core 이상</span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <!-- AI 분석 & 피드백 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-gray-100">
+                      <div class="bg-gradient-to-r from-purple-500 to-pink-500 p-4 text-white">
+                        <h3 class="text-xl font-bold flex items-center">
+                          <i class="fas fa-brain mr-2"></i>
+                          AI 분석 & 피드백
+                        </h3>
+                      </div>
+                      <div class="p-6">
+                        <table class="w-full text-sm">
+                          <tbody class="divide-y divide-gray-100">
+                            <tr>
+                              <td class="py-3 text-gray-700">발음 분석 AI</td>
+                              <td class="py-3 text-right">
+                                <span class="text-purple-600 font-semibold">Premium 이상</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">문법 첨삭</td>
+                              <td class="py-3 text-right">
+                                <span class="text-purple-600 font-semibold">Premium 이상</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">표현 제안</td>
+                              <td class="py-3 text-right">
+                                <span class="text-purple-600 font-semibold">Premium 이상</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">학습 리포트</td>
+                              <td class="py-3 text-right">
+                                <span class="text-purple-600 font-semibold">Premium 이상</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">약점 분석</td>
+                              <td class="py-3 text-right">
+                                <span class="text-purple-600">Premium: 주간</span><br>
+                                <span class="text-yellow-600 font-semibold">B2B: 실시간</span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <!-- 게임화 & 동기부여 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-gray-100">
+                      <div class="bg-gradient-to-r from-green-500 to-emerald-500 p-4 text-white">
+                        <h3 class="text-xl font-bold flex items-center">
+                          <i class="fas fa-trophy mr-2"></i>
+                          게임화 & 동기부여
+                        </h3>
+                      </div>
+                      <div class="p-6">
+                        <table class="w-full text-sm">
+                          <tbody class="divide-y divide-gray-100">
+                            <tr>
+                              <td class="py-3 text-gray-700">레벨 & XP</td>
+                              <td class="py-3 text-right">
+                                <span class="text-green-600 font-semibold">모든 플랜</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">학습 스트릭</td>
+                              <td class="py-3 text-right">
+                                <span class="text-green-600 font-semibold">모든 플랜</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">배지 & 업적</td>
+                              <td class="py-3 text-right">
+                                <span class="text-gray-600">Free: 기본</span><br>
+                                <span class="text-blue-600">Core: 고급</span><br>
+                                <span class="text-purple-600">Premium: 프리미엄</span><br>
+                                <span class="text-yellow-600 font-semibold">B2B: 전체</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">리워드</td>
+                              <td class="py-3 text-right">
+                                <span class="text-blue-600 font-semibold">Core 이상</span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <!-- 팀 & 관리 (B2B 전용) -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-yellow-200">
+                      <div class="bg-gradient-to-r from-yellow-500 to-orange-500 p-4 text-white">
+                        <h3 class="text-xl font-bold flex items-center">
+                          <i class="fas fa-users mr-2"></i>
+                          팀 & 관리 기능
+                        </h3>
+                      </div>
+                      <div class="p-6">
+                        <table class="w-full text-sm">
+                          <tbody class="divide-y divide-gray-100">
+                            <tr>
+                              <td class="py-3 text-gray-700">관리자 대시보드</td>
+                              <td class="py-3 text-right">
+                                <span class="text-yellow-600 font-semibold">B2B 전용</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">팀원 진도 추적</td>
+                              <td class="py-3 text-right">
+                                <span class="text-yellow-600 font-semibold">B2B 전용</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">팀 분석 리포트</td>
+                              <td class="py-3 text-right">
+                                <span class="text-yellow-600 font-semibold">B2B: 주간/월간</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">사용자 수</td>
+                              <td class="py-3 text-right">
+                                <span class="text-gray-600">Free-Premium: 1명</span><br>
+                                <span class="text-yellow-600 font-semibold">B2B: 무제한</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">전담 매니저</td>
+                              <td class="py-3 text-right">
+                                <span class="text-yellow-600 font-semibold">B2B 전용</span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <!-- 고객 지원 -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-gray-100">
+                      <div class="bg-gradient-to-r from-teal-500 to-cyan-500 p-4 text-white">
+                        <h3 class="text-xl font-bold flex items-center">
+                          <i class="fas fa-headset mr-2"></i>
+                          고객 지원
+                        </h3>
+                      </div>
+                      <div class="p-6">
+                        <table class="w-full text-sm">
+                          <tbody class="divide-y divide-gray-100">
+                            <tr>
+                              <td class="py-3 text-gray-700">우선 지원</td>
+                              <td class="py-3 text-right">
+                                <span class="text-purple-600 font-semibold">Premium 이상</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">맞춤형 교육 자료</td>
+                              <td class="py-3 text-right">
+                                <span class="text-yellow-600 font-semibold">B2B 전용</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">이메일 지원</td>
+                              <td class="py-3 text-right">
+                                <span class="text-green-600 font-semibold">모든 플랜</span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+
                 <!-- Feature Comparison Table -->
                 <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
                   <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-center">
@@ -4835,13 +5103,6 @@ Proceed to payment?
                           <td colspan="5" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase">
                             <i class="fas fa-headset text-green-500 mr-2"></i>고객 지원
                           </td>
-                        </tr>
-                        <tr class="hover:bg-gray-50">
-                          <td class="px-6 py-4 text-sm text-gray-700">이메일 지원</td>
-                          <td class="px-6 py-4 text-center text-sm text-gray-600">48시간</td>
-                          <td class="px-6 py-4 text-center text-sm font-semibold text-blue-600">24시간</td>
-                          <td class="px-6 py-4 text-center text-sm font-semibold text-purple-600">12시간</td>
-                          <td class="px-6 py-4 text-center text-sm font-semibold text-yellow-600">6시간</td>
                         </tr>
                         <tr class="hover:bg-gray-50">
                           <td class="px-6 py-4 text-sm text-gray-700">전담 매니저</td>
