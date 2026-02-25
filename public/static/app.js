@@ -20,9 +20,9 @@ class WorVox {
     };
     this.usageLimits = {
       free: {
-        aiConversations: 5,
-        pronunciationPractice: 10,
-        wordSearch: 10
+        aiConversations: 100,
+        pronunciationPractice: 100,
+        wordSearch: 100
       },
       premium: {
         aiConversations: Infinity,
