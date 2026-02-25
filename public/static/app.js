@@ -59,7 +59,7 @@ class WorVox {
     
     // Create temporary test user
     this.currentUser = {
-      id: 'temp_user_001',
+      id: 1,  // INTEGER ID for database compatibility
       email: 'test@worvox.com',
       username: 'Test User',
       profilePicture: null,

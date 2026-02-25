@@ -17,6 +17,19 @@ analysis.post('/sessions/:sessionId/analyze', async (c) => {
       return c.json({ error: 'Session not found' }, 404);
     }
     
+    // 1.5. 유저 존재 확인 (FOREIGN KEY 에러 방지)
+    const user = await c.env.DB.prepare(
+      'SELECT id FROM users WHERE id = ?'
+    ).bind(session.user_id).first();
+    
+    if (!user) {
+      console.error('User not found for session:', sessionId, 'user_id:', session.user_id);
+      return c.json({ 
+        error: 'User not found',
+        details: `User ID ${session.user_id} does not exist. Please log in again.`
+      }, 404);
+    }
+    
     // 2. 이미 분석된 세션인지 확인
     const existingReport = await c.env.DB.prepare(
       'SELECT id FROM session_reports WHERE session_id = ?'
