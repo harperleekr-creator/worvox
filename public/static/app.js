@@ -1393,44 +1393,44 @@ Proceed to payment?
         }
         
         reportContainer.innerHTML = `
-          <div class="border ${borderColor} ${bgColor} rounded-xl p-4">
-            <div class="flex items-center justify-between mb-3">
-              <div class="flex items-center gap-2">
-                <div class="w-10 h-10 ${bgColor} rounded-full flex items-center justify-center">
-                  <span class="text-2xl ${scoreColor} font-bold">${avgScore}</span>
+          <div class="border ${borderColor} ${bgColor} rounded-xl p-5 md:p-6">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-3">
+                <div class="w-16 h-16 md:w-20 md:h-20 ${bgColor} rounded-full flex items-center justify-center border-2 ${borderColor}">
+                  <span class="text-3xl md:text-4xl ${scoreColor} font-bold">${avgScore}</span>
                 </div>
                 <div>
-                  <div class="text-sm font-semibold text-gray-900">평균 점수</div>
-                  <div class="text-xs text-gray-500">${new Date(report.analyzed_at).toLocaleDateString('ko-KR')}</div>
+                  <div class="text-base md:text-lg font-bold text-gray-900">평균 점수</div>
+                  <div class="text-xs md:text-sm text-gray-500">${new Date(report.analyzed_at).toLocaleDateString('ko-KR')}</div>
                 </div>
               </div>
               <button onclick="worvox.showSessionReportById(${report.session_id})" 
-                class="text-purple-600 hover:text-purple-700 text-sm font-medium">
+                class="text-purple-600 hover:text-purple-700 text-sm md:text-base font-semibold whitespace-nowrap">
                 상세보기 →
               </button>
             </div>
             
-            <div class="grid grid-cols-3 gap-2">
-              <div class="text-center p-2 bg-white rounded-lg">
-                <div class="text-xs text-gray-500 mb-1">문법</div>
-                <div class="text-base font-bold text-blue-600">${report.grammar_score}</div>
+            <div class="grid grid-cols-3 gap-3 md:gap-4 mb-4">
+              <div class="text-center p-3 md:p-4 bg-white rounded-lg shadow-sm border border-blue-100">
+                <div class="text-xs md:text-sm text-gray-500 mb-1 font-medium">문법</div>
+                <div class="text-xl md:text-2xl font-bold text-blue-600">${report.grammar_score}</div>
               </div>
-              <div class="text-center p-2 bg-white rounded-lg">
-                <div class="text-xs text-gray-500 mb-1">어휘</div>
-                <div class="text-base font-bold text-purple-600">${report.vocabulary_score}</div>
+              <div class="text-center p-3 md:p-4 bg-white rounded-lg shadow-sm border border-purple-100">
+                <div class="text-xs md:text-sm text-gray-500 mb-1 font-medium">어휘</div>
+                <div class="text-xl md:text-2xl font-bold text-purple-600">${report.vocabulary_score}</div>
               </div>
-              <div class="text-center p-2 bg-white rounded-lg">
-                <div class="text-xs text-gray-500 mb-1">유창성</div>
-                <div class="text-base font-bold text-green-600">${report.fluency_score}</div>
+              <div class="text-center p-3 md:p-4 bg-white rounded-lg shadow-sm border border-green-100">
+                <div class="text-xs md:text-sm text-gray-500 mb-1 font-medium">유창성</div>
+                <div class="text-xl md:text-2xl font-bold text-green-600">${report.fluency_score}</div>
               </div>
             </div>
             
             ${report.total_messages ? `
-              <div class="mt-3 pt-3 border-t border-gray-200">
-                <div class="flex items-center justify-between text-xs text-gray-600">
-                  <span><i class="fas fa-comments mr-1"></i>${report.total_messages}개 대화</span>
-                  <span><i class="fas fa-font mr-1"></i>${report.total_words}단어</span>
-                  <span><i class="fas fa-clock mr-1"></i>${Math.ceil(report.total_messages * 0.5)}분</span>
+              <div class="pt-3 border-t border-gray-200">
+                <div class="flex items-center justify-between text-xs md:text-sm text-gray-600">
+                  <span class="flex items-center gap-1"><i class="fas fa-comments"></i>${report.total_messages}개 대화</span>
+                  <span class="flex items-center gap-1"><i class="fas fa-font"></i>${report.total_words}단어</span>
+                  <span class="flex items-center gap-1"><i class="fas fa-clock"></i>${Math.ceil(report.total_messages * 0.5)}분</span>
                 </div>
               </div>
             ` : ''}
