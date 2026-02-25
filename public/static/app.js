@@ -1753,14 +1753,21 @@ Proceed to payment?
 
   async endSession() {
     try {
+      console.log('🛑 End Session clicked!');
       if (this.currentSession) {
+        console.log('✅ Current session ID:', this.currentSession);
+        console.log('📝 Total messages:', this.messages.length);
+        
         // 1. 세션 종료 API 호출
         await axios.post(`/api/sessions/end/${this.currentSession}`);
+        console.log('✅ Session ended successfully');
         
         // 2. 분석 시작 (최소 3개 이상의 사용자 메시지가 있을 때)
         const userMessages = this.messages.filter(m => m.role === 'user');
+        console.log('👤 User messages count:', userMessages.length);
         
         if (userMessages.length >= 3) {
+          console.log('✅ Starting analysis (>=3 messages)...');
           const sessionIdToAnalyze = this.currentSession;
           
           // 세션 변수 초기화 (분석 중에도 다른 작업 가능하게)
@@ -1795,12 +1802,15 @@ Proceed to payment?
           }
         } else {
           // 메시지가 너무 적으면 분석 없이 종료
+          console.log('⚠️ Not enough messages for analysis (need 3+, got ' + userMessages.length + ')');
+          alert('분석을 위해서는 최소 3번 이상 대화해야 합니다.\n현재 메시지: ' + userMessages.length + '개');
           this.currentSession = null;
           this.currentTopic = null;
           this.messages = [];
           this.showTopicSelection();
         }
       } else {
+        console.log('❌ No current session');
         this.showTopicSelection();
       }
     } catch (error) {
