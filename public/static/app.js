@@ -296,7 +296,7 @@ class WorVox {
             <!-- Company Info -->
             <div class="text-center md:text-left">
               <div class="flex flex-wrap items-center justify-center md:justify-start gap-1.5 md:gap-2">
-                <span class="font-medium text-gray-300">하퍼잉글리쉬</span>
+                <span class="font-medium text-gray-300">위아솔루션즈</span>
                 <span class="text-gray-600 hidden md:inline">|</span>
                 <span class="block md:inline w-full md:w-auto text-center md:text-left">대표자: 이강돈</span>
                 <span class="text-gray-600 hidden md:inline">|</span>
@@ -5926,7 +5926,7 @@ Proceed to payment?
                   <section>
                     <h2 class="text-2xl font-bold text-gray-900 mb-4">제1조 (목적)</h2>
                     <p class="leading-relaxed">
-                      본 약관은 하퍼잉글리쉬(이하 "회사")가 제공하는 WorVox 서비스(이하 "서비스")의 이용과 관련하여 회사와 이용자 간의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.
+                      본 약관은 위아솔루션즈(이하 "회사")가 제공하는 WorVox 서비스(이하 "서비스")의 이용과 관련하여 회사와 이용자 간의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.
                     </p>
                   </section>
                   
@@ -6090,7 +6090,7 @@ Proceed to payment?
                 <div class="space-y-8 text-gray-700">
                   <section>
                     <p class="leading-relaxed mb-4">
-                      하퍼잉글리쉬(이하 "회사")는 이용자의 개인정보를 중요시하며, "정보통신망 이용촉진 및 정보보호에 관한 법률", "개인정보보호법" 등 관련 법령을 준수하고 있습니다.
+                      위아솔루션즈(이하 "회사")는 이용자의 개인정보를 중요시하며, "정보통신망 이용촉진 및 정보보호에 관한 법률", "개인정보보호법" 등 관련 법령을 준수하고 있습니다.
                     </p>
                     <p class="leading-relaxed">
                       회사는 개인정보처리방침을 통하여 이용자가 제공하는 개인정보가 어떠한 용도와 방식으로 이용되고 있으며, 개인정보보호를 위해 어떠한 조치가 취해지고 있는지 알려드립니다.
@@ -6305,7 +6305,7 @@ Proceed to payment?
                 <div class="space-y-8 text-gray-700">
                   <section>
                     <p class="leading-relaxed mb-4">
-                      하퍼잉글리쉬(이하 "회사")는 "전자상거래 등에서의 소비자보호에 관한 법률" 등 관련 법령을 준수하며, 공정하고 투명한 환불정책을 운영합니다.
+                      위아솔루션즈(이하 "회사")는 "전자상거래 등에서의 소비자보호에 관한 법률" 등 관련 법령을 준수하며, 공정하고 투명한 환불정책을 운영합니다.
                     </p>
                   </section>
                   
