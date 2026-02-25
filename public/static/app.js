@@ -5258,6 +5258,9 @@ Proceed to payment?
                 </div>
 
               </div>
+              
+              <!-- Footer -->
+              ${this.getFooter()}
             </div>
           </div>
         </div>
