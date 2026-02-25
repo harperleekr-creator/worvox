@@ -432,7 +432,7 @@ class WorVox {
                 
                 <!-- Lesson Packages -->
                 <h3 class="text-2xl font-bold text-gray-900 mb-4">수업권 구매</h3>
-                <p class="text-gray-600 mb-6">원하는 수업권을 구매하고 자유롭게 예약하세요</p>
+                <p class="text-gray-600 mb-6">월정기 구독으로 꾸준히 학습하세요 (Core 플랜 10% 할인, Premium 플랜 20% 할인)</p>
                 
                 <div class="grid md:grid-cols-3 gap-6 mb-8">
                   <!-- 1회 체험권 (무료) -->
@@ -447,11 +447,11 @@ class WorVox {
                     <ul class="space-y-2 mb-6">
                       <li class="flex items-start gap-2 text-sm">
                         <i class="fas fa-check text-emerald-600 mt-1"></i>
-                        <span class="text-gray-700">25분 또는 50분 선택</span>
+                        <span class="text-gray-700">25분 수업 1회</span>
                       </li>
                       <li class="flex items-start gap-2 text-sm">
                         <i class="fas fa-check text-emerald-600 mt-1"></i>
-                        <span class="text-gray-700">1:1 프리미엄 전화영어</span>
+                        <span class="text-gray-700">1:1 라이브 전화영어</span>
                       </li>
                       <li class="flex items-start gap-2 text-sm">
                         <i class="fas fa-check text-emerald-600 mt-1"></i>
@@ -459,13 +459,13 @@ class WorVox {
                       </li>
                     </ul>
                     
-                    <button onclick="worvox.purchaseLessons(1, 0)" 
+                    <button onclick="worvox.purchaseLessons(1, 0, 'free')" 
                       class="w-full py-3 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-all">
                       무료 체험하기
                     </button>
                   </div>
                   
-                  <!-- 10회권 (인기) -->
+                  <!-- 월정기 10회권 -->
                   <div class="bg-white rounded-2xl shadow-2xl p-6 border-4 border-blue-500 relative transform md:scale-105">
                     <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-6 py-1 rounded-full text-sm font-bold">
                       인기
@@ -473,22 +473,27 @@ class WorVox {
                     
                     <div class="text-center mb-4">
                       <div class="text-4xl mb-3">🎯</div>
-                      <h4 class="text-xl font-bold text-gray-800 mb-2">Pro 10회권</h4>
+                      <h4 class="text-xl font-bold text-gray-800 mb-2">월정기 10회</h4>
                       <div class="text-3xl font-bold text-blue-600 mb-1">₩165,000</div>
                       <p class="text-sm text-gray-600 mb-1">회당 ₩16,500</p>
-                      <span class="inline-block bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">
-                        25분 기준
-                      </span>
+                      <div class="flex items-center justify-center gap-2 mt-2">
+                        <span class="inline-block bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">
+                          25분 기준
+                        </span>
+                        <span class="inline-block bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold">
+                          매월 자동결제
+                        </span>
+                      </div>
                     </div>
                     
                     <ul class="space-y-2 mb-6">
                       <li class="flex items-start gap-2 text-sm">
                         <i class="fas fa-check text-blue-600 mt-1"></i>
-                        <span class="text-gray-700">25분 또는 50분 선택</span>
+                        <span class="text-gray-700">매월 10회 수업</span>
                       </li>
                       <li class="flex items-start gap-2 text-sm">
                         <i class="fas fa-check text-blue-600 mt-1"></i>
-                        <span class="text-gray-700">1:1 프리미엄 전화영어</span>
+                        <span class="text-gray-700">1:1 라이브 전화영어</span>
                       </li>
                       <li class="flex items-start gap-2 text-sm">
                         <i class="fas fa-check text-blue-600 mt-1"></i>
@@ -498,48 +503,69 @@ class WorVox {
                         <i class="fas fa-star text-blue-600 mt-1"></i>
                         <span class="text-gray-700 font-semibold">해외 10년 거주 한국인 강사</span>
                       </li>
+                      <li class="flex items-start gap-2 text-sm">
+                        <i class="fas fa-gift text-blue-600 mt-1"></i>
+                        <span class="text-gray-700"><strong>Core:</strong> 10% 할인 (₩148,500)</span>
+                      </li>
+                      <li class="flex items-start gap-2 text-sm">
+                        <i class="fas fa-crown text-blue-600 mt-1"></i>
+                        <span class="text-gray-700"><strong>Premium:</strong> 20% 할인 (₩132,000)</span>
+                      </li>
                     </ul>
                     
-                    <button onclick="worvox.purchaseLessons(10, 165000)" 
+                    <button onclick="worvox.purchaseLessons(10, 165000, 'monthly')" 
                       class="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-all shadow-lg">
-                      구매하기
+                      월정기 구독하기
                     </button>
                   </div>
                   
-                  <!-- 30회권 (최대 할인) -->
-                  <div class="bg-white rounded-2xl shadow-lg p-6 border-2 border-indigo-200 hover:border-indigo-500 transition-all">
+                  <!-- 월정기 20회권 -->
+                  <div class="bg-white rounded-2xl shadow-lg p-6 border-2 border-purple-200 hover:border-purple-500 transition-all">
                     <div class="text-center mb-4">
                       <div class="text-4xl mb-3">🏆</div>
-                      <h4 class="text-xl font-bold text-gray-800 mb-2">Pro 30회권</h4>
-                      <div class="text-3xl font-bold text-indigo-600 mb-1">₩495,000</div>
+                      <h4 class="text-xl font-bold text-gray-800 mb-2">월정기 20회</h4>
+                      <div class="text-3xl font-bold text-purple-600 mb-1">₩330,000</div>
                       <p class="text-sm text-gray-600 mb-1">회당 ₩16,500</p>
-                      <span class="inline-block bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">
-                        25분 기준
-                      </span>
+                      <div class="flex items-center justify-center gap-2 mt-2">
+                        <span class="inline-block bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold">
+                          25분 기준
+                        </span>
+                        <span class="inline-block bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-semibold">
+                          매월 자동결제
+                        </span>
+                      </div>
                     </div>
                     
                     <ul class="space-y-2 mb-6">
                       <li class="flex items-start gap-2 text-sm">
-                        <i class="fas fa-check text-indigo-600 mt-1"></i>
-                        <span class="text-gray-700">25분 또는 50분 선택</span>
+                        <i class="fas fa-check text-purple-600 mt-1"></i>
+                        <span class="text-gray-700">매월 20회 수업</span>
                       </li>
                       <li class="flex items-start gap-2 text-sm">
-                        <i class="fas fa-check text-indigo-600 mt-1"></i>
-                        <span class="text-gray-700">1:1 프리미엄 전화영어</span>
+                        <i class="fas fa-check text-purple-600 mt-1"></i>
+                        <span class="text-gray-700">1:1 라이브 전화영어</span>
                       </li>
                       <li class="flex items-start gap-2 text-sm">
-                        <i class="fas fa-check text-indigo-600 mt-1"></i>
+                        <i class="fas fa-check text-purple-600 mt-1"></i>
                         <span class="text-gray-700">자유로운 예약</span>
                       </li>
                       <li class="flex items-start gap-2 text-sm">
-                        <i class="fas fa-star text-indigo-600 mt-1"></i>
+                        <i class="fas fa-star text-purple-600 mt-1"></i>
                         <span class="text-gray-700 font-semibold">해외 10년 거주 한국인 강사</span>
+                      </li>
+                      <li class="flex items-start gap-2 text-sm">
+                        <i class="fas fa-gift text-purple-600 mt-1"></i>
+                        <span class="text-gray-700"><strong>Core:</strong> 10% 할인 (₩297,000)</span>
+                      </li>
+                      <li class="flex items-start gap-2 text-sm">
+                        <i class="fas fa-crown text-purple-600 mt-1"></i>
+                        <span class="text-gray-700"><strong>Premium:</strong> 20% 할인 (₩264,000)</span>
                       </li>
                     </ul>
                     
-                    <button onclick="worvox.purchaseLessons(30, 495000)" 
-                      class="w-full py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-all">
-                      구매하기
+                    <button onclick="worvox.purchaseLessons(20, 330000, 'monthly')" 
+                      class="w-full py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-all">
+                      월정기 구독하기
                     </button>
                   </div>
                 </div>
@@ -591,11 +617,11 @@ class WorVox {
                       <i class="fas fa-crown text-amber-600 text-3xl"></i>
                     </div>
                     <div class="flex-1">
-                      <h4 class="text-xl font-bold text-gray-900 mb-2">Premium 회원 혜택</h4>
-                      <p class="text-gray-700 mb-3">Premium 또는 Business 플랜 가입 시 추가 할인!</p>
+                      <h4 class="text-xl font-bold text-gray-900 mb-2">플랜 가입자 혜택</h4>
+                      <p class="text-gray-700 mb-3">Core 또는 Premium 플랜 가입 시 추가 할인!</p>
                       <ul class="space-y-1 text-sm text-gray-600 mb-4">
-                        <li><i class="fas fa-check text-amber-600 mr-2"></i>Premium: 모든 수업권 <strong>15% 추가 할인</strong></li>
-                        <li><i class="fas fa-check text-amber-600 mr-2"></i>Business: 모든 수업권 <strong>25% 추가 할인</strong></li>
+                        <li><i class="fas fa-check text-amber-600 mr-2"></i>Core: 모든 수업권 <strong>10% 추가 할인</strong></li>
+                        <li><i class="fas fa-check text-amber-600 mr-2"></i>Premium: 모든 수업권 <strong>20% 추가 할인</strong></li>
                         <li><i class="fas fa-check text-amber-600 mr-2"></i>우선 예약 가능</li>
                       </ul>
                       <button onclick="worvox.showPlan()" 
@@ -621,44 +647,54 @@ class WorVox {
   }
 
   // Purchase lesson packages (일반결제)
-  async purchaseLessons(lessonCount, amount) {
-    // Apply discount for Premium/Business users
+  async purchaseLessons(lessonCount, amount, packageType = 'one-time') {
+    // Apply discount for Core/Premium users
     let finalAmount = amount;
     let discountPercent = 0;
     
-    if (this.userPlan === 'premium') {
-      discountPercent = 15;
-      finalAmount = Math.floor(amount * 0.85);
-    } else if (this.userPlan === 'business') {
-      discountPercent = 25;
-      finalAmount = Math.floor(amount * 0.75);
+    if (this.userPlan === 'core') {
+      discountPercent = 10;
+      finalAmount = Math.floor(amount * 0.90);
+    } else if (this.userPlan === 'premium') {
+      discountPercent = 20;
+      finalAmount = Math.floor(amount * 0.80);
     }
     
     const packageName = `${lessonCount}회 수업권`;
     const pricePerLesson = Math.floor(finalAmount / lessonCount);
     
     // Show purchase confirmation
+    const planName = this.userPlan === 'core' ? 'Core' : this.userPlan === 'premium' ? 'Premium' : '';
     const discountText = discountPercent > 0 
-      ? `\n${this.userPlan === 'premium' ? 'Premium' : 'Business'} 회원 할인: -${discountPercent}% (₩${(amount - finalAmount).toLocaleString()} 할인)\n` 
+      ? `\n${planName} 회원 할인: -${discountPercent}% (₩${(amount - finalAmount).toLocaleString()} 할인)\n` 
       : '';
     
+    const packageTypeText = packageType === 'monthly' ? '월정기 구독' : packageType === 'free' ? '무료 체험' : '일반결제';
+    
     const confirmed = confirm(`
-🎓 Real Conversation 수업권 구매
+🎓 1:1 Live Speaking Session 수업권 ${packageType === 'free' ? '체험' : '구매'}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 패키지: ${packageName}
-정가: ₩${amount.toLocaleString()}${discountText}
-최종 금액: ₩${finalAmount.toLocaleString()}
-회당 가격: ₩${pricePerLesson.toLocaleString()}
+구매 방식: ${packageTypeText}
+${amount > 0 ? `정가: ₩${amount.toLocaleString()}${discountText}` : ''}
+최종 금액: ${amount > 0 ? `₩${finalAmount.toLocaleString()}` : '무료'}
+${amount > 0 ? `회당 가격: ₩${pricePerLesson.toLocaleString()}` : ''}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-구매하시겠습니까?
+${packageType === 'free' ? '무료 체험을 신청하시겠습니까?' : '구매하시겠습니까?'}
     `);
     
     if (!confirmed) return;
     
     try {
       // TODO: Implement NHN KCP 일반결제 integration
-      alert(`💳 결제 준비 중...\n\n${packageName}\n결제 금액: ₩${finalAmount.toLocaleString()}\n\nNHN KCP 일반결제 시스템 연동 준비 중입니다.\n곧 만나요! 🚀`);
+      if (packageType === 'free') {
+        alert(`🎁 무료 체험 신청 완료!\n\n${packageName}\n\n강사 배정 및 일정 조율을 위해\n곧 연락드리겠습니다! 🚀`);
+      } else if (packageType === 'monthly') {
+        alert(`💳 월정기 구독 준비 중...\n\n${packageName}\n구독 금액: ₩${finalAmount.toLocaleString()} / 월\n\nNHN KCP 정기결제 시스템 연동 준비 중입니다.\n곧 만나요! 🚀`);
+      } else {
+        alert(`💳 결제 준비 중...\n\n${packageName}\n결제 금액: ₩${finalAmount.toLocaleString()}\n\nNHN KCP 일반결제 시스템 연동 준비 중입니다.\n곧 만나요! 🚀`);
+      }
       
       // Simulate purchase success (for testing)
       // After payment success, save to DB:
