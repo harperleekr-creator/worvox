@@ -1280,6 +1280,25 @@ Proceed to payment?
                     </p>
                   </div>
                 </div>
+
+                <!-- Latest Report Card -->
+                <div id="latestReportCard" class="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-200 mb-6 md:mb-8">
+                  <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-base md:text-lg font-semibold text-gray-900">
+                      <i class="fas fa-chart-line text-purple-600 mr-2"></i>최근 학습 리포트
+                    </h3>
+                    <button onclick="worvox.showHistory()" class="text-purple-600 hover:text-purple-700 text-xs md:text-sm font-medium">
+                      전체 보기 →
+                    </button>
+                  </div>
+                  <div id="latestReportContent">
+                    <div class="text-center py-8 text-gray-400">
+                      <i class="fas fa-chart-pie text-4xl mb-3"></i>
+                      <p class="text-sm">아직 분석된 리포트가 없습니다</p>
+                      <p class="text-xs mt-1">AI 대화를 시작하고 리포트를 받아보세요!</p>
+                    </div>
+                  </div>
+                </div>
                 ` : ''}
                 
                 <!-- Feature Cards -->
@@ -1332,9 +1351,95 @@ Proceed to payment?
       
       // Load gamification stats after rendering
       await this.loadGamificationStats();
+      
+      // Load latest report
+      await this.loadLatestReport();
     } catch (error) {
       console.error('Error loading topics:', error);
       alert('Failed to load topics. Please refresh the page.');
+    }
+  }
+
+  // Load latest report for dashboard
+  async loadLatestReport() {
+    try {
+      if (!this.currentUser || !this.currentUser.id) {
+        return;
+      }
+
+      const response = await axios.get(`/api/analysis/users/${this.currentUser.id}/latest-report`);
+      
+      if (response.data.success && response.data.report) {
+        const report = response.data.report;
+        const reportContainer = document.getElementById('latestReportContent');
+        
+        if (!reportContainer) return;
+        
+        // Calculate average score
+        const avgScore = Math.round((report.grammar_score + report.vocabulary_score + report.fluency_score) / 3);
+        
+        // Determine color based on score
+        let scoreColor = 'text-red-600';
+        let bgColor = 'bg-red-50';
+        let borderColor = 'border-red-200';
+        if (avgScore >= 80) {
+          scoreColor = 'text-green-600';
+          bgColor = 'bg-green-50';
+          borderColor = 'border-green-200';
+        } else if (avgScore >= 60) {
+          scoreColor = 'text-yellow-600';
+          bgColor = 'bg-yellow-50';
+          borderColor = 'border-yellow-200';
+        }
+        
+        reportContainer.innerHTML = `
+          <div class="border ${borderColor} ${bgColor} rounded-xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <div class="w-10 h-10 ${bgColor} rounded-full flex items-center justify-center">
+                  <span class="text-2xl ${scoreColor} font-bold">${avgScore}</span>
+                </div>
+                <div>
+                  <div class="text-sm font-semibold text-gray-900">평균 점수</div>
+                  <div class="text-xs text-gray-500">${new Date(report.analyzed_at).toLocaleDateString('ko-KR')}</div>
+                </div>
+              </div>
+              <button onclick="worvox.showSessionReportById(${report.session_id})" 
+                class="text-purple-600 hover:text-purple-700 text-sm font-medium">
+                상세보기 →
+              </button>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-2">
+              <div class="text-center p-2 bg-white rounded-lg">
+                <div class="text-xs text-gray-500 mb-1">문법</div>
+                <div class="text-base font-bold text-blue-600">${report.grammar_score}</div>
+              </div>
+              <div class="text-center p-2 bg-white rounded-lg">
+                <div class="text-xs text-gray-500 mb-1">어휘</div>
+                <div class="text-base font-bold text-purple-600">${report.vocabulary_score}</div>
+              </div>
+              <div class="text-center p-2 bg-white rounded-lg">
+                <div class="text-xs text-gray-500 mb-1">유창성</div>
+                <div class="text-base font-bold text-green-600">${report.fluency_score}</div>
+              </div>
+            </div>
+            
+            ${report.total_messages ? `
+              <div class="mt-3 pt-3 border-t border-gray-200">
+                <div class="flex items-center justify-between text-xs text-gray-600">
+                  <span><i class="fas fa-comments mr-1"></i>${report.total_messages}개 대화</span>
+                  <span><i class="fas fa-font mr-1"></i>${report.total_words}단어</span>
+                  <span><i class="fas fa-clock mr-1"></i>${Math.ceil(report.total_messages * 0.5)}분</span>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error('Error loading latest report:', error);
+      // Silent fail - just keep the empty state
     }
   }
 

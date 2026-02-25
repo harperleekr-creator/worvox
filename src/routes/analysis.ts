@@ -312,4 +312,50 @@ analysis.post('/feedback/:feedbackId/practice', async (c) => {
   }
 });
 
+// Get latest report for user (for dashboard)
+analysis.get('/users/:userId/latest-report', async (c) => {
+  try {
+    const userId = c.req.param('userId');
+    
+    // Get the latest report for this user
+    const report = await c.env.DB.prepare(`
+      SELECT 
+        sr.id,
+        sr.session_id,
+        sr.overall_score,
+        sr.grammar_score,
+        sr.vocabulary_score,
+        sr.fluency_score,
+        sr.total_messages,
+        sr.total_words,
+        sr.avg_sentence_length,
+        sr.analyzed_at
+      FROM session_reports sr
+      JOIN sessions s ON sr.session_id = s.id
+      WHERE s.user_id = ?
+      ORDER BY sr.analyzed_at DESC
+      LIMIT 1
+    `).bind(userId).first();
+    
+    if (!report) {
+      return c.json({ 
+        success: false,
+        message: 'No reports found'
+      });
+    }
+    
+    return c.json({ 
+      success: true,
+      report: report
+    });
+    
+  } catch (error) {
+    console.error('Latest report error:', error);
+    return c.json({ 
+      error: 'Failed to fetch latest report',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
 export default analysis;
