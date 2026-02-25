@@ -200,8 +200,8 @@ class WorVox {
       <div id="sidebar" class="fixed md:static inset-y-0 left-0 w-64 bg-gray-900 text-white flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
         <!-- Logo -->
         <div class="p-4 border-b border-gray-700 flex items-center justify-between">
-          <a href="#" onclick="worvox.showTopicSelection(); worvox.closeMobileSidebar(); return false;" class="flex items-center cursor-pointer hover:opacity-90 transition-opacity">
-            <img src="/static/logo.png" alt="WorVox Logo" class="h-7 w-auto object-contain" style="max-width: 160px;">
+          <a href="#" onclick="worvox.showTopicSelection(); worvox.closeMobileSidebar(); return false;" class="text-xl font-bold cursor-pointer hover:opacity-90 transition-opacity">
+            WorVox
           </a>
           <button onclick="worvox.toggleMobileSidebar()" class="md:hidden text-white">
             <i class="fas fa-times text-xl"></i>
