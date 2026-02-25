@@ -4486,19 +4486,19 @@ Proceed to payment?
                       <ul class="space-y-3 mb-6">
                         <li class="flex items-start">
                           <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
-                          <span class="text-gray-700">일일 대화 5분</span>
+                          <span class="text-gray-700">일일 대화 <strong>5분</strong></span>
                         </li>
                         <li class="flex items-start">
                           <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
-                          <span class="text-gray-700">단어 검색 제한</span>
+                          <span class="text-gray-700">단어 검색 <strong>제한</strong></span>
+                        </li>
+                        <li class="flex items-start">
+                          <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                          <span class="text-gray-700">기본 학습 기능</span>
                         </li>
                         <li class="flex items-start">
                           <i class="fas fa-times text-gray-300 mr-2 mt-1"></i>
-                          <span class="text-gray-400">AI 대화 무제한</span>
-                        </li>
-                        <li class="flex items-start">
-                          <i class="fas fa-times text-gray-300 mr-2 mt-1"></i>
-                          <span class="text-gray-400">발음 분석</span>
+                          <span class="text-gray-400">리포트 & 분석</span>
                         </li>
                       </ul>
                       <button class="w-full py-3 bg-gray-100 text-gray-600 rounded-lg font-semibold cursor-default">
@@ -4522,19 +4522,19 @@ Proceed to payment?
                       <ul class="space-y-3 mb-6">
                         <li class="flex items-start">
                           <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
-                          <span class="text-gray-700 font-semibold">AI 대화 무제한</span>
+                          <span class="text-gray-700 font-semibold">AI 대화 <strong>무제한</strong></span>
                         </li>
                         <li class="flex items-start">
                           <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
-                          <span class="text-gray-700 font-semibold">단어장 기능</span>
+                          <span class="text-gray-700 font-semibold">개인 단어장</span>
                         </li>
                         <li class="flex items-start">
                           <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
-                          <span class="text-gray-700">단어 검색 무제한</span>
+                          <span class="text-gray-700">단어 퀴즈 & 학습</span>
                         </li>
                         <li class="flex items-start">
                           <i class="fas fa-times text-gray-300 mr-2 mt-1"></i>
-                          <span class="text-gray-400">발음 분석</span>
+                          <span class="text-gray-400">리포트 & 분석</span>
                         </li>
                       </ul>
                       <button onclick="alert('결제 기능은 준비 중입니다!')" 
@@ -4563,19 +4563,19 @@ Proceed to payment?
                       <ul class="space-y-3 mb-6">
                         <li class="flex items-start">
                           <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
-                          <span class="text-gray-700 font-semibold">AI 대화 무제한</span>
+                          <span class="text-gray-700 font-semibold">발음 <strong>분석</strong></span>
                         </li>
                         <li class="flex items-start">
                           <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
-                          <span class="text-gray-700 font-semibold">발음 분석 AI</span>
+                          <span class="text-gray-700 font-semibold">문장 <strong>첨삭</strong></span>
                         </li>
                         <li class="flex items-start">
                           <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
-                          <span class="text-gray-700 font-semibold">문장 첨삭</span>
+                          <span class="text-gray-700 font-semibold">학습 <strong>리포트</strong></span>
                         </li>
                         <li class="flex items-start">
                           <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
-                          <span class="text-gray-700 font-semibold">학습 리포트</span>
+                          <span class="text-gray-700">+ Core 모든 기능</span>
                         </li>
                       </ul>
                       <button onclick="alert('결제 기능은 준비 중입니다!')" 
