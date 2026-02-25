@@ -4641,6 +4641,12 @@ Proceed to payment?
                         </tr>
                       </thead>
                       <tbody class="divide-y divide-gray-200">
+                        <!-- 기본 기능 섹션 -->
+                        <tr class="bg-gray-100">
+                          <td colspan="5" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase">
+                            <i class="fas fa-star text-yellow-500 mr-2"></i>기본 기능
+                          </td>
+                        </tr>
                         <tr class="hover:bg-gray-50">
                           <td class="px-6 py-4 text-sm text-gray-700">일일 AI 대화 시간</td>
                           <td class="px-6 py-4 text-center text-sm text-gray-600">5분</td>
@@ -4649,8 +4655,43 @@ Proceed to payment?
                           <td class="px-6 py-4 text-center text-sm font-semibold text-yellow-600">무제한</td>
                         </tr>
                         <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">AI 대화 주제</td>
+                          <td class="px-6 py-4 text-center text-sm text-gray-600">기본 3개</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-blue-600">전체 20개</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-purple-600">전체 20개</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-yellow-600">전체 + 커스텀</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">음성 인식 (STT)</td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">음성 답변 (TTS)</td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">대화 히스토리</td>
+                          <td class="px-6 py-4 text-center text-sm text-gray-600">7일</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-blue-600">30일</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-purple-600">무제한</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-yellow-600">무제한</td>
+                        </tr>
+
+                        <!-- 단어 학습 섹션 -->
+                        <tr class="bg-gray-100">
+                          <td colspan="5" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase">
+                            <i class="fas fa-book text-blue-500 mr-2"></i>단어 학습
+                          </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
                           <td class="px-6 py-4 text-sm text-gray-700">단어 검색</td>
-                          <td class="px-6 py-4 text-center text-sm text-gray-600">제한적</td>
+                          <td class="px-6 py-4 text-center text-sm text-gray-600">일 10개</td>
                           <td class="px-6 py-4 text-center text-sm font-semibold text-blue-600">무제한</td>
                           <td class="px-6 py-4 text-center text-sm font-semibold text-purple-600">무제한</td>
                           <td class="px-6 py-4 text-center text-sm font-semibold text-yellow-600">무제한</td>
@@ -4658,47 +4699,166 @@ Proceed to payment?
                         <tr class="hover:bg-gray-50">
                           <td class="px-6 py-4 text-sm text-gray-700">개인 단어장</td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-blue-600">최대 500개</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-purple-600">무제한</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-yellow-600">무제한</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">단어 퀴즈</td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">플래시카드</td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        </tr>
+
+                        <!-- AI 분석 & 피드백 섹션 -->
+                        <tr class="bg-gray-100">
+                          <td colspan="5" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase">
+                            <i class="fas fa-brain text-purple-500 mr-2"></i>AI 분석 & 피드백
+                          </td>
                         </tr>
                         <tr class="hover:bg-gray-50">
                           <td class="px-6 py-4 text-sm text-gray-700">발음 분석 AI</td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
-                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
-                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-purple-600">실시간 분석</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-yellow-600">실시간 분석</td>
                         </tr>
                         <tr class="hover:bg-gray-50">
-                          <td class="px-6 py-4 text-sm text-gray-700">문장 첨삭</td>
+                          <td class="px-6 py-4 text-sm text-gray-700">문법 첨삭</td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
-                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
-                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-purple-600">자동 교정</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-yellow-600">자동 교정</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">더 나은 표현 제안</td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-purple-600">문장별 제안</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-yellow-600">문장별 제안</td>
                         </tr>
                         <tr class="hover:bg-gray-50">
                           <td class="px-6 py-4 text-sm text-gray-700">학습 리포트</td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-purple-600">세션별 생성</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-yellow-600">세션별 생성</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">약점 분석</td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-purple-600">주간 리포트</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-yellow-600">실시간 추적</td>
+                        </tr>
+
+                        <!-- 게임화 & 동기부여 섹션 -->
+                        <tr class="bg-gray-100">
+                          <td colspan="5" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase">
+                            <i class="fas fa-trophy text-yellow-500 mr-2"></i>게임화 & 동기부여
+                          </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">레벨 & XP 시스템</td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">학습 스트릭</td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">배지 & 업적</td>
+                          <td class="px-6 py-4 text-center text-sm text-gray-600">기본</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-blue-600">고급</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-purple-600">프리미엄</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-yellow-600">전체</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">리워드 시스템</td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        </tr>
+
+                        <!-- 팀 & 관리 기능 섹션 -->
+                        <tr class="bg-gray-100">
+                          <td colspan="5" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase">
+                            <i class="fas fa-users text-indigo-500 mr-2"></i>팀 & 관리 기능
+                          </td>
                         </tr>
                         <tr class="hover:bg-gray-50">
                           <td class="px-6 py-4 text-sm text-gray-700">관리자 대시보드</td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
-                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-yellow-600">전체 기능</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">팀원 진도 추적</td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-yellow-600">실시간</td>
                         </tr>
                         <tr class="hover:bg-gray-50">
                           <td class="px-6 py-4 text-sm text-gray-700">팀 분석 리포트</td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-yellow-600">주간/월간</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">사용자 수</td>
+                          <td class="px-6 py-4 text-center text-sm text-gray-600">1명</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-blue-600">1명</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-purple-600">1명</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-yellow-600">무제한</td>
+                        </tr>
+
+                        <!-- 고객 지원 섹션 -->
+                        <tr class="bg-gray-100">
+                          <td colspan="5" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase">
+                            <i class="fas fa-headset text-green-500 mr-2"></i>고객 지원
+                          </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">이메일 지원</td>
+                          <td class="px-6 py-4 text-center text-sm text-gray-600">48시간</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-blue-600">24시간</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-purple-600">12시간</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-yellow-600">6시간</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">전담 매니저</td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
                         </tr>
                         <tr class="hover:bg-gray-50">
-                          <td class="px-6 py-4 text-sm text-gray-700">전담 지원팀</td>
+                          <td class="px-6 py-4 text-sm text-gray-700">우선 지원</td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">맞춤형 교육 자료</td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
                           <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
