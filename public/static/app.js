@@ -1777,14 +1777,19 @@ Proceed to payment?
               `/api/analysis/sessions/${sessionIdToAnalyze}/analyze`
             );
             
+            console.log('✅ Analysis response:', analysisResponse.data);
+            
             if (analysisResponse.data.success) {
+              console.log('✅ Showing report with ID:', analysisResponse.data.reportId);
               // 4. 리포트 페이지로 이동
-              this.showSessionReport(analysisResponse.data.reportId);
+              await this.showSessionReport(analysisResponse.data.reportId);
+              console.log('✅ Report displayed successfully');
             } else {
-              throw new Error('Analysis failed');
+              throw new Error('Analysis failed: ' + JSON.stringify(analysisResponse.data));
             }
           } catch (error) {
             console.error('Analysis error:', error);
+            alert('분석 중 오류가 발생했습니다:\n' + (error.response?.data?.error || error.message));
             // 분석 실패 시 대시보드로
             this.showTopicSelection();
           }
@@ -4776,8 +4781,10 @@ Proceed to payment?
 
   async showSessionReport(reportId) {
     try {
+      console.log('🔍 Fetching report with ID:', reportId);
       // 리포트 데이터 가져오기
       const response = await axios.get(`/api/analysis/reports/${reportId}`);
+      console.log('📊 Report data received:', response.data);
       const { report, feedback } = response.data;
       
       // 에러와 제안 분리
@@ -4910,9 +4917,11 @@ Proceed to payment?
         </div>
       `;
       
+      console.log('✅ Report HTML rendered successfully');
+      
     } catch (error) {
-      console.error('Show report error:', error);
-      alert('리포트를 불러오는 데 실패했습니다.');
+      console.error('❌ Show report error:', error);
+      alert('리포트를 불러오는 데 실패했습니다:\n' + error.message);
       this.showTopicSelection();
     }
   }
