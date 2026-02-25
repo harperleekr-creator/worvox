@@ -201,7 +201,7 @@ class WorVox {
         <!-- Logo -->
         <div class="p-4 border-b border-gray-700 flex items-center justify-between">
           <a href="#" onclick="worvox.showTopicSelection(); worvox.closeMobileSidebar(); return false;" class="flex items-center cursor-pointer hover:opacity-80 transition-opacity">
-            <img src="/logo.png" alt="WorVox Logo" class="h-10 w-auto object-contain bg-white rounded-lg px-2 py-1">
+            <img src="/static/logo.png" alt="WorVox Logo" class="h-10 w-auto object-contain bg-white rounded-lg px-2 py-1">
           </a>
           <button onclick="worvox.toggleMobileSidebar()" class="md:hidden text-white">
             <i class="fas fa-times text-xl"></i>
