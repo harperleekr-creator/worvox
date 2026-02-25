@@ -4537,7 +4537,7 @@ Proceed to payment?
                           <span class="text-gray-400">리포트 & 분석</span>
                         </li>
                       </ul>
-                      <button onclick="alert('결제 기능은 준비 중입니다!')" 
+                      <button onclick="worvox.showPaymentStayTuned('Core', '₩9,900')" 
                         class="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transition-all">
                         선택하기
                       </button>
@@ -4578,7 +4578,7 @@ Proceed to payment?
                           <span class="text-gray-700">+ Core 모든 기능</span>
                         </li>
                       </ul>
-                      <button onclick="alert('결제 기능은 준비 중입니다!')" 
+                      <button onclick="worvox.showPaymentStayTuned('Premium', '₩19,000')" 
                         class="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg">
                         선택하기
                       </button>
@@ -4614,7 +4614,7 @@ Proceed to payment?
                           <span class="text-gray-700">전담 지원팀</span>
                         </li>
                       </ul>
-                      <button onclick="alert('B2B 문의는 contact@worvox.com으로 연락주세요!')" 
+                      <button onclick="worvox.showPaymentStayTuned('B2B', 'Custom Pricing')" 
                         class="w-full py-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white rounded-lg font-semibold hover:from-yellow-500 hover:to-orange-500 transition-all">
                         문의하기
                       </button>
@@ -6582,6 +6582,112 @@ Proceed to payment?
         </div>
       </div>
     `;
+  }
+
+  // Payment Stay Tuned Modal
+  showPaymentStayTuned(plan, price) {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      backdrop-filter: blur(4px);
+    `;
+    
+    modal.innerHTML = `
+      <div style="
+        background: white;
+        border-radius: 24px;
+        padding: 48px 40px;
+        max-width: 480px;
+        width: 90%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        animation: slideUp 0.3s ease-out;
+      ">
+        <div style="font-size: 64px; margin-bottom: 24px;">🚀</div>
+        <h2 style="
+          font-size: 32px;
+          font-weight: bold;
+          color: #1f2937;
+          margin-bottom: 16px;
+        ">Stay Tuned!</h2>
+        <p style="
+          font-size: 18px;
+          color: #6b7280;
+          margin-bottom: 24px;
+          line-height: 1.6;
+        ">
+          Payment feature is coming soon.<br>
+          We're working hard to bring you the best experience!
+        </p>
+        <div style="
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          padding: 20px;
+          border-radius: 16px;
+          margin-bottom: 32px;
+        ">
+          <div style="color: rgba(255, 255, 255, 0.9); font-size: 14px; margin-bottom: 8px;">
+            Selected Plan
+          </div>
+          <div style="color: white; font-size: 28px; font-weight: bold; margin-bottom: 4px;">
+            ${plan}
+          </div>
+          <div style="color: rgba(255, 255, 255, 0.95); font-size: 20px; font-weight: 600;">
+            ${price}/month
+          </div>
+        </div>
+        <button onclick="this.closest('div[style*=\"position: fixed\"]').remove()" style="
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border: none;
+          padding: 16px 48px;
+          border-radius: 12px;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s;
+          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(102, 126, 234, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(102, 126, 234, 0.4)';">
+          Got it!
+        </button>
+      </div>
+    `;
+    
+    // Add animation keyframes
+    if (!document.getElementById('stayTunedAnimation')) {
+      const style = document.createElement('style');
+      style.id = 'stayTunedAnimation';
+      style.textContent = `
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(modal);
+    
+    // Close on outside click
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    });
   }
 }
 
