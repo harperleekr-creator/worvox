@@ -32,6 +32,12 @@ app.use('/static/*.js', async (c, next) => {
 
 app.use('/static/*', serveStatic({ root: './public' }));
 
+// Serve favicon files directly (no path prefix)
+app.use('/favicon.ico', serveStatic({ root: './' }));
+app.use('/favicon-*', serveStatic({ root: './' }));
+app.use('/apple-touch-icon.png', serveStatic({ root: './' }));
+app.use('/android-chrome-*', serveStatic({ root: './' }));
+
 // API routes
 app.route('/api/stt', stt);
 app.route('/api/tts', tts);
