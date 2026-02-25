@@ -4440,6 +4440,308 @@ Proceed to payment?
     this.showPlan();
   }
 
+  // Plan Page (요금제 비교)
+  async showPlan() {
+    try {
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="flex h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-yellow-50">
+          <!-- Sidebar -->
+          ${this.getSidebar('plan')}
+          
+          <!-- Main Content -->
+          <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <div class="bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4">
+              <div class="flex items-center gap-2 max-w-6xl mx-auto">
+                <button onclick="worvox.showTopicSelection()" 
+                  class="text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all">
+                  <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <div>
+                  <h1 class="text-lg md:text-2xl font-bold text-gray-800 mb-1">👑 요금제</h1>
+                  <p class="hidden md:block text-gray-600">당신에게 맞는 플랜을 선택하세요</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Content -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-8">
+              <div class="max-w-7xl mx-auto">
+                
+                <!-- Pricing Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                  
+                  <!-- Free Plan -->
+                  <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-gray-200 transition-all hover:shadow-2xl">
+                    <div class="bg-gradient-to-br from-gray-50 to-gray-100 p-6 text-center">
+                      <div class="text-4xl mb-3">🆓</div>
+                      <h3 class="text-2xl font-bold text-gray-800 mb-2">Free</h3>
+                      <div class="text-gray-600 mb-4">
+                        <span class="text-3xl font-bold">무료</span>
+                      </div>
+                      <p class="text-sm text-gray-500">기본 기능 체험</p>
+                    </div>
+                    <div class="p-6">
+                      <ul class="space-y-3 mb-6">
+                        <li class="flex items-start">
+                          <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                          <span class="text-gray-700">일일 대화 5분</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                          <span class="text-gray-700">단어 검색 제한</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i class="fas fa-times text-gray-300 mr-2 mt-1"></i>
+                          <span class="text-gray-400">AI 대화 무제한</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i class="fas fa-times text-gray-300 mr-2 mt-1"></i>
+                          <span class="text-gray-400">발음 분석</span>
+                        </li>
+                      </ul>
+                      <button class="w-full py-3 bg-gray-100 text-gray-600 rounded-lg font-semibold cursor-default">
+                        현재 플랜
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Core Plan -->
+                  <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-blue-200 transition-all hover:shadow-2xl transform hover:-translate-y-1">
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-6 text-center text-white">
+                      <div class="text-4xl mb-3">💙</div>
+                      <h3 class="text-2xl font-bold mb-2">Core</h3>
+                      <div class="mb-4">
+                        <span class="text-3xl font-bold">₩9,900</span>
+                        <span class="text-blue-100 text-sm">/월</span>
+                      </div>
+                      <p class="text-sm text-blue-100">무제한 대화</p>
+                    </div>
+                    <div class="p-6">
+                      <ul class="space-y-3 mb-6">
+                        <li class="flex items-start">
+                          <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                          <span class="text-gray-700 font-semibold">AI 대화 무제한</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                          <span class="text-gray-700 font-semibold">단어장 기능</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                          <span class="text-gray-700">단어 검색 무제한</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i class="fas fa-times text-gray-300 mr-2 mt-1"></i>
+                          <span class="text-gray-400">발음 분석</span>
+                        </li>
+                      </ul>
+                      <button onclick="alert('결제 기능은 준비 중입니다!')" 
+                        class="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transition-all">
+                        선택하기
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Premium Plan (Most Popular) -->
+                  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-purple-400 relative transition-all hover:shadow-2xl transform hover:-translate-y-2">
+                    <!-- Popular Badge -->
+                    <div class="absolute top-4 right-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                      🔥 POPULAR
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-500 to-pink-500 p-6 text-center text-white">
+                      <div class="text-4xl mb-3">✨</div>
+                      <h3 class="text-2xl font-bold mb-2">Premium</h3>
+                      <div class="mb-4">
+                        <span class="text-3xl font-bold">₩19,000</span>
+                        <span class="text-purple-100 text-sm">/월</span>
+                      </div>
+                      <p class="text-sm text-purple-100">완벽한 학습 경험</p>
+                    </div>
+                    <div class="p-6">
+                      <ul class="space-y-3 mb-6">
+                        <li class="flex items-start">
+                          <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                          <span class="text-gray-700 font-semibold">AI 대화 무제한</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                          <span class="text-gray-700 font-semibold">발음 분석 AI</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                          <span class="text-gray-700 font-semibold">문장 첨삭</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                          <span class="text-gray-700 font-semibold">학습 리포트</span>
+                        </li>
+                      </ul>
+                      <button onclick="alert('결제 기능은 준비 중입니다!')" 
+                        class="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg">
+                        선택하기
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- B2B Plan -->
+                  <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-yellow-200 transition-all hover:shadow-2xl transform hover:-translate-y-1">
+                    <div class="bg-gradient-to-br from-yellow-400 to-orange-400 p-6 text-center text-white">
+                      <div class="text-4xl mb-3">🏢</div>
+                      <h3 class="text-2xl font-bold mb-2">B2B</h3>
+                      <div class="mb-4">
+                        <span class="text-2xl font-bold">협의</span>
+                      </div>
+                      <p class="text-sm text-yellow-100">기업 맞춤 솔루션</p>
+                    </div>
+                    <div class="p-6">
+                      <ul class="space-y-3 mb-6">
+                        <li class="flex items-start">
+                          <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                          <span class="text-gray-700 font-semibold">관리자 대시보드</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                          <span class="text-gray-700 font-semibold">팀 분석 리포트</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                          <span class="text-gray-700">모든 Premium 기능</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                          <span class="text-gray-700">전담 지원팀</span>
+                        </li>
+                      </ul>
+                      <button onclick="alert('B2B 문의는 contact@worvox.com으로 연락주세요!')" 
+                        class="w-full py-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white rounded-lg font-semibold hover:from-yellow-500 hover:to-orange-500 transition-all">
+                        문의하기
+                      </button>
+                    </div>
+                  </div>
+
+                </div>
+
+                <!-- Feature Comparison Table -->
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+                  <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-center">
+                    <h2 class="text-2xl font-bold text-white">📊 기능 비교</h2>
+                    <p class="text-indigo-100 mt-2">모든 플랜의 기능을 한눈에 비교해보세요</p>
+                  </div>
+                  <div class="overflow-x-auto">
+                    <table class="w-full">
+                      <thead class="bg-gray-50">
+                        <tr>
+                          <th class="px-6 py-4 text-left text-sm font-bold text-gray-700">기능</th>
+                          <th class="px-6 py-4 text-center text-sm font-bold text-gray-700">Free</th>
+                          <th class="px-6 py-4 text-center text-sm font-bold text-blue-700">Core</th>
+                          <th class="px-6 py-4 text-center text-sm font-bold text-purple-700">Premium</th>
+                          <th class="px-6 py-4 text-center text-sm font-bold text-yellow-700">B2B</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-gray-200">
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">일일 AI 대화 시간</td>
+                          <td class="px-6 py-4 text-center text-sm text-gray-600">5분</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-blue-600">무제한</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-purple-600">무제한</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-yellow-600">무제한</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">단어 검색</td>
+                          <td class="px-6 py-4 text-center text-sm text-gray-600">제한적</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-blue-600">무제한</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-purple-600">무제한</td>
+                          <td class="px-6 py-4 text-center text-sm font-semibold text-yellow-600">무제한</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">개인 단어장</td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">발음 분석 AI</td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">문장 첨삭</td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">학습 리포트</td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">관리자 대시보드</td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">팀 분석 리포트</td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                          <td class="px-6 py-4 text-sm text-gray-700">전담 지원팀</td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                          <td class="px-6 py-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- FAQ Section -->
+                <div class="mt-8 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 md:p-8">
+                  <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-question-circle text-blue-500 mr-2"></i>
+                    자주 묻는 질문
+                  </h3>
+                  <div class="space-y-4">
+                    <div class="bg-white rounded-lg p-4 shadow-sm">
+                      <h4 class="font-semibold text-gray-800 mb-2">❓ 플랜은 언제든지 변경할 수 있나요?</h4>
+                      <p class="text-sm text-gray-600">네, 언제든지 플랜을 업그레이드하거나 다운그레이드할 수 있습니다. 변경된 플랜은 즉시 적용됩니다.</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-4 shadow-sm">
+                      <h4 class="font-semibold text-gray-800 mb-2">❓ 환불 정책은 어떻게 되나요?</h4>
+                      <p class="text-sm text-gray-600">7일 이내 서비스 이용이 1회 미만인 경우 전액 환불 가능합니다. 자세한 내용은 이용약관을 참조해주세요.</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-4 shadow-sm">
+                      <h4 class="font-semibold text-gray-800 mb-2">❓ B2B 플랜은 어떻게 신청하나요?</h4>
+                      <p class="text-sm text-gray-600">contact@worvox.com으로 문의주시면 전담팀이 맞춤 견적을 제공해드립니다.</p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    } catch (error) {
+      console.error('Error loading plan page:', error);
+      alert('Failed to load plan page. Please try again.');
+    }
+  }
+
   // Vocabulary Learning Feature
   async showVocabularyLearning() {
     try {
@@ -5580,6 +5882,280 @@ Proceed to payment?
               </div>
               
               ${this.getFooter()}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  async showPlan() {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+        <!-- Sidebar -->
+        ${this.getSidebar('plan')}
+        
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- Header -->
+          <div class="bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4">
+            <div class="flex items-center gap-2">
+              <button onclick="worvox.showTopicSelection()" 
+                class="text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all">
+                <i class="fas fa-arrow-left text-xl"></i>
+              </button>
+              <div>
+                <h1 class="text-lg md:text-2xl font-bold text-gray-800">👑 요금제</h1>
+                <p class="hidden md:block text-gray-600 text-sm mt-1">나에게 맞는 플랜을 선택하세요</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Content Area -->
+          <div class="flex-1 overflow-y-auto p-4 md:p-8">
+            <div class="max-w-7xl mx-auto">
+              
+              <!-- Pricing Cards -->
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                
+                <!-- Free Plan -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 border-2 border-gray-200 hover:border-gray-300 transition-all">
+                  <div class="text-center mb-6">
+                    <div class="text-4xl mb-3">🆓</div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Free</h3>
+                    <div class="text-3xl font-bold text-gray-900 mb-1">₩0</div>
+                    <p class="text-sm text-gray-500">무료</p>
+                  </div>
+                  <ul class="space-y-3 mb-6">
+                    <li class="flex items-start gap-2">
+                      <i class="fas fa-check text-green-500 mt-1"></i>
+                      <span class="text-sm text-gray-700">일일 대화 5분</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <i class="fas fa-check text-green-500 mt-1"></i>
+                      <span class="text-sm text-gray-700">단어 검색 제한</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <i class="fas fa-times text-gray-300 mt-1"></i>
+                      <span class="text-sm text-gray-400">AI 대화 무제한</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <i class="fas fa-times text-gray-300 mt-1"></i>
+                      <span class="text-sm text-gray-400">발음 분석</span>
+                    </li>
+                  </ul>
+                  <button class="w-full py-3 bg-gray-200 text-gray-600 rounded-lg font-semibold cursor-default">
+                    현재 플랜
+                  </button>
+                </div>
+
+                <!-- Core Plan -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 border-2 border-blue-400 hover:border-blue-500 transition-all relative">
+                  <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <span class="px-4 py-1 bg-blue-500 text-white text-xs font-bold rounded-full">인기</span>
+                  </div>
+                  <div class="text-center mb-6">
+                    <div class="text-4xl mb-3">⭐</div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">Core</h3>
+                    <div class="text-3xl font-bold text-blue-600 mb-1">₩9,900</div>
+                    <p class="text-sm text-gray-500">월 정기결제</p>
+                  </div>
+                  <ul class="space-y-3 mb-6">
+                    <li class="flex items-start gap-2">
+                      <i class="fas fa-check text-green-500 mt-1"></i>
+                      <span class="text-sm text-gray-700 font-semibold">AI 대화 무제한</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <i class="fas fa-check text-green-500 mt-1"></i>
+                      <span class="text-sm text-gray-700 font-semibold">단어장 기능</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <i class="fas fa-check text-green-500 mt-1"></i>
+                      <span class="text-sm text-gray-700">무제한 단어 검색</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <i class="fas fa-times text-gray-300 mt-1"></i>
+                      <span class="text-sm text-gray-400">발음 분석</span>
+                    </li>
+                  </ul>
+                  <button class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-all">
+                    선택하기
+                  </button>
+                </div>
+
+                <!-- Premium Plan -->
+                <div class="bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl shadow-xl p-6 text-white transform hover:scale-105 transition-all relative">
+                  <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                    <span class="px-4 py-1 bg-yellow-400 text-purple-900 text-xs font-bold rounded-full">추천</span>
+                  </div>
+                  <div class="text-center mb-6">
+                    <div class="text-4xl mb-3">💎</div>
+                    <h3 class="text-2xl font-bold mb-2">Premium</h3>
+                    <div class="text-3xl font-bold mb-1">₩19,000</div>
+                    <p class="text-sm text-purple-200">월 정기결제</p>
+                  </div>
+                  <ul class="space-y-3 mb-6">
+                    <li class="flex items-start gap-2">
+                      <i class="fas fa-check text-yellow-300 mt-1"></i>
+                      <span class="text-sm font-semibold">Core 모든 기능</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <i class="fas fa-check text-yellow-300 mt-1"></i>
+                      <span class="text-sm font-semibold">발음 분석 AI</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <i class="fas fa-check text-yellow-300 mt-1"></i>
+                      <span class="text-sm font-semibold">문장 첨삭 서비스</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <i class="fas fa-check text-yellow-300 mt-1"></i>
+                      <span class="text-sm font-semibold">학습 리포트 제공</span>
+                    </li>
+                  </ul>
+                  <button class="w-full py-3 bg-white text-purple-600 hover:bg-gray-100 rounded-lg font-semibold transition-all">
+                    선택하기
+                  </button>
+                </div>
+
+                <!-- B2B Plan -->
+                <div class="bg-white rounded-2xl shadow-lg p-6 border-2 border-gray-800 hover:border-gray-900 transition-all">
+                  <div class="text-center mb-6">
+                    <div class="text-4xl mb-3">🏢</div>
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">B2B</h3>
+                    <div class="text-2xl font-bold text-gray-900 mb-1">협의</div>
+                    <p class="text-sm text-gray-500">기업/단체</p>
+                  </div>
+                  <ul class="space-y-3 mb-6">
+                    <li class="flex items-start gap-2">
+                      <i class="fas fa-check text-green-500 mt-1"></i>
+                      <span class="text-sm text-gray-700 font-semibold">Premium 모든 기능</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <i class="fas fa-check text-green-500 mt-1"></i>
+                      <span class="text-sm text-gray-700 font-semibold">관리자 대시보드</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <i class="fas fa-check text-green-500 mt-1"></i>
+                      <span class="text-sm text-gray-700 font-semibold">팀 분석 리포트</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                      <i class="fas fa-check text-green-500 mt-1"></i>
+                      <span class="text-sm text-gray-700">전담 고객지원</span>
+                    </li>
+                  </ul>
+                  <button class="w-full py-3 bg-gray-800 hover:bg-gray-900 text-white rounded-lg font-semibold transition-all">
+                    문의하기
+                  </button>
+                </div>
+              </div>
+
+              <!-- Feature Comparison Table -->
+              <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">상세 기능 비교</h2>
+                <div class="overflow-x-auto">
+                  <table class="w-full">
+                    <thead>
+                      <tr class="border-b-2 border-gray-200">
+                        <th class="text-left py-4 px-4 font-semibold text-gray-700">기능</th>
+                        <th class="text-center py-4 px-4 font-semibold text-gray-700">Free</th>
+                        <th class="text-center py-4 px-4 font-semibold text-blue-600">Core</th>
+                        <th class="text-center py-4 px-4 font-semibold text-purple-600">Premium</th>
+                        <th class="text-center py-4 px-4 font-semibold text-gray-800">B2B</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                      <tr class="hover:bg-gray-50">
+                        <td class="py-4 px-4 text-gray-700">AI 대화</td>
+                        <td class="py-4 px-4 text-center text-gray-600">일 5분</td>
+                        <td class="py-4 px-4 text-center text-blue-600 font-semibold">무제한</td>
+                        <td class="py-4 px-4 text-center text-purple-600 font-semibold">무제한</td>
+                        <td class="py-4 px-4 text-center text-gray-800 font-semibold">무제한</td>
+                      </tr>
+                      <tr class="hover:bg-gray-50">
+                        <td class="py-4 px-4 text-gray-700">단어 검색</td>
+                        <td class="py-4 px-4 text-center text-gray-600">제한적</td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                      </tr>
+                      <tr class="hover:bg-gray-50">
+                        <td class="py-4 px-4 text-gray-700">단어장 기능</td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                      </tr>
+                      <tr class="hover:bg-gray-50">
+                        <td class="py-4 px-4 text-gray-700">발음 분석</td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                      </tr>
+                      <tr class="hover:bg-gray-50">
+                        <td class="py-4 px-4 text-gray-700">문장 첨삭</td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                      </tr>
+                      <tr class="hover:bg-gray-50">
+                        <td class="py-4 px-4 text-gray-700">학습 리포트</td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                      </tr>
+                      <tr class="hover:bg-gray-50">
+                        <td class="py-4 px-4 text-gray-700">관리자 대시보드</td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                      </tr>
+                      <tr class="hover:bg-gray-50">
+                        <td class="py-4 px-4 text-gray-700">팀 분석</td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                      </tr>
+                      <tr class="hover:bg-gray-50">
+                        <td class="py-4 px-4 text-gray-700">전담 고객지원</td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-times text-gray-300"></i></td>
+                        <td class="py-4 px-4 text-center"><i class="fas fa-check text-green-500"></i></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- FAQ Section -->
+              <div class="mt-8 bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">자주 묻는 질문</h2>
+                <div class="space-y-4">
+                  <div class="border-b border-gray-200 pb-4">
+                    <h3 class="font-semibold text-gray-800 mb-2">💳 결제 방법은 무엇인가요?</h3>
+                    <p class="text-gray-600 text-sm">신용카드, 체크카드, 간편결제(NHN KCP)를 지원합니다.</p>
+                  </div>
+                  <div class="border-b border-gray-200 pb-4">
+                    <h3 class="font-semibold text-gray-800 mb-2">🔄 플랜 변경이 가능한가요?</h3>
+                    <p class="text-gray-600 text-sm">언제든지 플랜 업그레이드가 가능하며, 남은 기간은 일할 계산됩니다.</p>
+                  </div>
+                  <div class="border-b border-gray-200 pb-4">
+                    <h3 class="font-semibold text-gray-800 mb-2">❌ 환불 정책은 어떻게 되나요?</h3>
+                    <p class="text-gray-600 text-sm">결제 후 7일 이내 미사용 시 전액 환불이 가능합니다.</p>
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-gray-800 mb-2">🏢 B2B 플랜은 어떻게 신청하나요?</h3>
+                    <p class="text-gray-600 text-sm">contact@worvox.com으로 문의주시면 상담 도와드립니다.</p>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
