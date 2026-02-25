@@ -1238,10 +1238,10 @@ Proceed to payment?
                           <i class="fas fa-comment text-blue-600"></i>
                           <span class="text-sm text-gray-700">AI 대화</span>
                         </div>
-                        <span class="text-sm font-medium text-gray-900" data-usage-count="ai_conversation">${this.getDailyUsage('ai_conversation')}/5회</span>
+                        <span class="text-sm font-medium text-gray-900" data-usage-count="ai_conversation">${this.getDailyUsage('ai_conversation')}/100회</span>
                       </div>
                       <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-blue-600 h-2 rounded-full transition-all" data-usage-bar="ai_conversation" style="width: ${(this.getDailyUsage('ai_conversation') / 5) * 100}%"></div>
+                        <div class="bg-blue-600 h-2 rounded-full transition-all" data-usage-bar="ai_conversation" style="width: ${(this.getDailyUsage('ai_conversation') / 100) * 100}%"></div>
                       </div>
                     </div>
                     
@@ -1252,10 +1252,10 @@ Proceed to payment?
                           <i class="fas fa-microphone text-purple-600"></i>
                           <span class="text-sm text-gray-700">발음 연습</span>
                         </div>
-                        <span class="text-sm font-medium text-gray-900" data-usage-count="pronunciation">${this.getDailyUsage('pronunciation')}/10회</span>
+                        <span class="text-sm font-medium text-gray-900" data-usage-count="pronunciation">${this.getDailyUsage('pronunciation')}/100회</span>
                       </div>
                       <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-purple-600 h-2 rounded-full transition-all" data-usage-bar="pronunciation" style="width: ${(this.getDailyUsage('pronunciation') / 10) * 100}%"></div>
+                        <div class="bg-purple-600 h-2 rounded-full transition-all" data-usage-bar="pronunciation" style="width: ${(this.getDailyUsage('pronunciation') / 100) * 100}%"></div>
                       </div>
                     </div>
                     
@@ -1266,10 +1266,10 @@ Proceed to payment?
                           <i class="fas fa-search text-emerald-600"></i>
                           <span class="text-sm text-gray-700">단어 검색</span>
                         </div>
-                        <span class="text-sm font-medium text-gray-900" data-usage-count="word_search">${this.getDailyUsage('word_search')}/10회</span>
+                        <span class="text-sm font-medium text-gray-900" data-usage-count="word_search">${this.getDailyUsage('word_search')}/100회</span>
                       </div>
                       <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-emerald-600 h-2 rounded-full transition-all" data-usage-bar="word_search" style="width: ${(this.getDailyUsage('word_search') / 10) * 100}%"></div>
+                        <div class="bg-emerald-600 h-2 rounded-full transition-all" data-usage-bar="word_search" style="width: ${(this.getDailyUsage('word_search') / 100) * 100}%"></div>
                       </div>
                     </div>
                   </div>
@@ -1795,8 +1795,11 @@ Proceed to payment?
               throw new Error('Analysis failed: ' + JSON.stringify(analysisResponse.data));
             }
           } catch (error) {
-            console.error('Analysis error:', error);
-            alert('분석 중 오류가 발생했습니다:\n' + (error.response?.data?.error || error.message));
+            console.error('❌ Analysis error:', error);
+            console.error('Error details:', error.response?.data);
+            const errorMsg = error.response?.data?.error || error.message || '알 수 없는 오류';
+            const errorDetails = error.response?.data?.details || '';
+            alert('분석 중 오류가 발생했습니다:\n\n' + errorMsg + (errorDetails ? '\n\n상세: ' + errorDetails : '') + '\n\n콘솔(F12)에서 자세한 내용을 확인하세요.');
             // 분석 실패 시 대시보드로
             this.showTopicSelection();
           }
