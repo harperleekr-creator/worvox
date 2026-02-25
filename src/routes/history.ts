@@ -27,10 +27,12 @@ history.get('/sessions/:userId', async (c: Context<{ Bindings: Bindings }>) => {
         t.name as topic_name,
         t.icon as topic_icon,
         t.description as topic_description,
-        COUNT(m.id) as message_count
+        COUNT(m.id) as message_count,
+        CASE WHEN sr.id IS NOT NULL THEN 1 ELSE 0 END as has_report
       FROM sessions s
       LEFT JOIN topics t ON s.topic_id = t.id
       LEFT JOIN messages m ON s.id = m.session_id
+      LEFT JOIN session_reports sr ON s.id = sr.session_id
       WHERE s.user_id = ?
       GROUP BY s.id
       ORDER BY s.started_at DESC
