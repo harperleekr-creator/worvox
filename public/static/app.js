@@ -1039,6 +1039,19 @@ class WorVox {
       // Continue anyway
     }
     
+    // Create session for timer mode
+    try {
+      const sessionResponse = await axios.post('/api/sessions/create', {
+        userId: this.currentUser.id,
+        topicId: 999, // Special ID for timer mode
+        level: this.currentUser.level || 'intermediate'
+      });
+      this.timerChallenge.sessionId = sessionResponse.data.sessionId;
+      console.log('✅ Timer session created:', this.timerChallenge.sessionId);
+    } catch (error) {
+      console.warn('⚠️ Failed to create timer session:', error);
+    }
+    
     const countdownEl = document.getElementById('timerCountdown');
     const instructionEl = document.getElementById('instructionText');
     const statusEl = document.getElementById('statusText');
@@ -1239,9 +1252,33 @@ class WorVox {
   }
 
   // Show Timer Results
-  showTimerResults(transcription) {
+  async showTimerResults(transcription) {
     const originalSentence = this.timerChallenge.sentence;
     const timeLimit = this.timerChallenge.seconds;
+    
+    // End timer session if exists
+    if (this.timerChallenge.sessionId) {
+      try {
+        // Save result as messages
+        await axios.post('/api/messages/create', {
+          sessionId: this.timerChallenge.sessionId,
+          role: 'system',
+          content: `타이머 모드 ${timeLimit}초: ${originalSentence}`
+        });
+        
+        await axios.post('/api/messages/create', {
+          sessionId: this.timerChallenge.sessionId,
+          role: 'user',
+          content: transcription || '(인식되지 않음)'
+        });
+        
+        // End session
+        await axios.post(`/api/sessions/end/${this.timerChallenge.sessionId}`);
+        console.log('✅ Timer session ended');
+      } catch (error) {
+        console.warn('⚠️ Failed to save timer session:', error);
+      }
+    }
     
     // Simple similarity check (word count comparison)
     const originalWords = originalSentence.toLowerCase().split(' ').length;
@@ -1553,16 +1590,41 @@ class WorVox {
     // Increment usage
     this.incrementDailyUsage('scenarioMode');
     
-    // Initialize scenario practice state
-    this.currentScenarioPractice = {
-      scenario: scenario,
-      currentSentenceIndex: 0,
-      results: [],
-      isPlaying: false,
-      isRecording: false,
-      mediaRecorder: null,
-      audioChunks: []
-    };
+    // Create session for scenario mode
+    try {
+      const sessionResponse = await axios.post('/api/sessions/create', {
+        userId: this.currentUser.id,
+        topicId: 998, // Special ID for scenario mode
+        level: this.currentUser.level || 'intermediate'
+      });
+      
+      // Initialize scenario practice state
+      this.currentScenarioPractice = {
+        scenario: scenario,
+        sessionId: sessionResponse.data.sessionId,
+        currentSentenceIndex: 0,
+        results: [],
+        isPlaying: false,
+        isRecording: false,
+        mediaRecorder: null,
+        audioChunks: []
+      };
+      
+      console.log('✅ Scenario session created:', this.currentScenarioPractice.sessionId);
+    } catch (error) {
+      console.warn('⚠️ Failed to create scenario session:', error);
+      
+      // Initialize without session
+      this.currentScenarioPractice = {
+        scenario: scenario,
+        currentSentenceIndex: 0,
+        results: [],
+        isPlaying: false,
+        isRecording: false,
+        mediaRecorder: null,
+        audioChunks: []
+      };
+    }
     
     // Show scenario practice screen
     this.showScenarioPractice();
@@ -2225,8 +2287,35 @@ class WorVox {
   }
   
   // Show scenario results
-  showScenarioResults() {
-    const { scenario, results } = this.currentScenarioPractice;
+  async showScenarioResults() {
+    const { scenario, results, sessionId } = this.currentScenarioPractice;
+    
+    // End scenario session if exists
+    if (sessionId) {
+      try {
+        // Save all results as messages
+        for (const result of results) {
+          await axios.post('/api/messages/create', {
+            sessionId: sessionId,
+            role: 'system',
+            content: `시나리오: ${scenario.title} - ${result.original}`
+          });
+          
+          await axios.post('/api/messages/create', {
+            sessionId: sessionId,
+            role: 'user',
+            content: result.transcription || '(인식되지 않음)'
+          });
+        }
+        
+        // End session
+        await axios.post(`/api/sessions/end/${sessionId}`);
+        console.log('✅ Scenario session ended');
+      } catch (error) {
+        console.warn('⚠️ Failed to save scenario session:', error);
+      }
+    }
+    
     const averageAccuracy = Math.round(results.reduce((sum, r) => sum + r.accuracy, 0) / results.length);
     
     let rating, ratingColor, ratingIcon;
@@ -5115,18 +5204,16 @@ Proceed to payment?
       const response = await axios.get(`/api/history/sessions/${this.currentUser.id}`);
       const sessions = response.data.sessions;
       
-      // Group sessions by type (handle null topic_name)
+      // Group sessions by type
+      // Special topic IDs: 998 = Scenario Mode, 999 = Timer Mode
       const aiConversations = sessions.filter(s => {
-        const topicName = s.topic_name || '';
-        return !topicName.includes('타이머') && !topicName.includes('시나리오');
+        return s.topic_id !== 998 && s.topic_id !== 999;
       });
       const timerSessions = sessions.filter(s => {
-        const topicName = s.topic_name || '';
-        return topicName.includes('타이머');
+        return s.topic_id === 999;
       });
       const scenarioSessions = sessions.filter(s => {
-        const topicName = s.topic_name || '';
-        return topicName.includes('시나리오');
+        return s.topic_id === 998;
       });
 
       const app = document.getElementById('app');
