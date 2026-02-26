@@ -1424,30 +1424,54 @@ class WorVox {
       playBtn.disabled = true;
       playBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>재생 중...';
       
-      // Call TTS API
-      const response = await axios.post('/api/tts', { text }, { responseType: 'arraybuffer' });
+      console.log('TTS: Requesting audio for:', text);
       
-      // Play audio
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const audioBuffer = await audioContext.decodeAudioData(response.data);
-      const source = audioContext.createBufferSource();
-      source.buffer = audioBuffer;
-      source.connect(audioContext.destination);
+      // Call TTS API with correct endpoint
+      const response = await axios.post('/api/tts/speak', { text }, { 
+        responseType: 'arraybuffer',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
       
-      source.onended = () => {
+      console.log('TTS: Received audio response, size:', response.data.byteLength);
+      
+      // Create audio element and play (simpler approach)
+      const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      
+      audio.onended = () => {
         this.currentScenarioPractice.isPlaying = false;
         playBtn.disabled = false;
         playBtn.innerHTML = '<i class="fas fa-volume-up mr-2"></i>듣기';
+        URL.revokeObjectURL(audioUrl);
       };
       
-      source.start(0);
+      audio.onerror = (e) => {
+        console.error('Audio playback error:', e);
+        this.currentScenarioPractice.isPlaying = false;
+        playBtn.disabled = false;
+        playBtn.innerHTML = '<i class="fas fa-volume-up mr-2"></i>듣기';
+        URL.revokeObjectURL(audioUrl);
+        alert('오디오 재생 중 오류가 발생했습니다.');
+      };
+      
+      await audio.play();
+      console.log('TTS: Audio playback started');
       
     } catch (error) {
       console.error('TTS error:', error);
+      console.error('TTS error response:', error.response?.data);
       this.currentScenarioPractice.isPlaying = false;
       playBtn.disabled = false;
       playBtn.innerHTML = '<i class="fas fa-volume-up mr-2"></i>듣기';
-      alert('오디오 재생 중 오류가 발생했습니다.');
+      
+      let errorMsg = '오디오 재생 중 오류가 발생했습니다.';
+      if (error.response?.status === 500) {
+        errorMsg += '\nTTS API 설정을 확인해주세요.';
+      }
+      alert(errorMsg);
     }
   }
   
