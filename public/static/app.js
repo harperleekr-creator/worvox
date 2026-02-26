@@ -1551,7 +1551,7 @@ class WorVox {
     }
     
     // Increment usage
-    this.incrementUsage('scenarioMode');
+    this.incrementDailyUsage('scenarioMode');
     
     // Initialize scenario practice state
     this.currentScenarioPractice = {
@@ -6251,6 +6251,10 @@ Proceed to payment?
         featureType: featureType,
         increment: 1
       });
+      
+      // Update UI after successful save
+      this.updateUsageTrackerUI();
+      
     } catch (error) {
       console.error('Failed to save usage to server:', error);
     }
@@ -6307,29 +6311,50 @@ Proceed to payment?
 
   // Update usage tracker UI in real-time
   updateUsageTrackerUI() {
-    // Map internal keys to UI feature names
-    const features = [
-      { internal: 'aiConversations', ui: 'ai_conversation', limit: 5 },
-      { internal: 'pronunciationPractice', ui: 'pronunciation', limit: 10 },
-      { internal: 'wordSearch', ui: 'word_search', limit: 10 }
-    ];
+    // Get current user plan
+    const userPlan = this.currentUser?.plan || 'free';
     
-    features.forEach(({ internal, ui, limit }) => {
-      const current = this.dailyUsage[internal] || 0;
-      const percentage = (current / limit) * 100;
-      
-      // Update count text
-      const countElements = document.querySelectorAll(`[data-usage-count="${ui}"]`);
-      countElements.forEach(el => {
+    // Update AI Conversation
+    const aiConvCurrent = this.getDailyUsage('ai_conversation');
+    const aiConvLimit = this.usageLimits[userPlan]?.aiConversations || 0;
+    this.updateUsageElement('ai_conversation', aiConvCurrent, aiConvLimit);
+    
+    // Update Timer Mode
+    const timerCurrent = this.getDailyUsage('timer_mode');
+    const timerLimit = this.usageLimits[userPlan]?.timerMode || 0;
+    this.updateUsageElement('timer_mode', timerCurrent, timerLimit);
+    
+    // Update Scenario Mode
+    const scenarioCurrent = this.getDailyUsage('scenario_mode');
+    const scenarioLimit = this.usageLimits[userPlan]?.scenarioMode || 0;
+    this.updateUsageElement('scenario_mode', scenarioCurrent, scenarioLimit);
+    
+    // Update Word Search
+    const wordCurrent = this.getDailyUsage('word_search');
+    const wordLimit = this.usageLimits[userPlan]?.wordSearch || 0;
+    this.updateUsageElement('word_search', wordCurrent, wordLimit);
+  }
+  
+  // Update individual usage element
+  updateUsageElement(featureName, current, limit) {
+    // Update count text
+    const countElements = document.querySelectorAll(`[data-usage-count="${featureName}"]`);
+    countElements.forEach(el => {
+      if (limit === Infinity || limit === 999999) {
+        el.textContent = `${current}회`;
+      } else {
         el.textContent = `${current}/${limit}회`;
-      });
-      
-      // Update progress bar
-      const barElements = document.querySelectorAll(`[data-usage-bar="${ui}"]`);
+      }
+    });
+    
+    // Update progress bar (only if not unlimited)
+    if (limit !== Infinity && limit !== 999999 && limit > 0) {
+      const percentage = Math.min(100, (current / limit) * 100);
+      const barElements = document.querySelectorAll(`[data-usage-bar="${featureName}"]`);
       barElements.forEach(el => {
         el.style.width = `${percentage}%`;
       });
-    });
+    }
   }
 
   // Show upgrade banner when limit reached
@@ -8212,7 +8237,9 @@ Proceed to payment?
     const featureMap = {
       'ai_conversation': 'aiConversations',
       'pronunciation': 'pronunciationPractice',
-      'word_search': 'wordSearch'
+      'word_search': 'wordSearch',
+      'timer_mode': 'timerMode',
+      'scenario_mode': 'scenarioMode'
     };
     
     const internalKey = featureMap[featureType] || featureType;

@@ -15,10 +15,12 @@ app.get('/:userId', async (c) => {
     `).bind(userId, today).all();
 
     // Convert to frontend format
-    const usage = {
+    const usage: any = {
       aiConversations: 0,
       pronunciationPractice: 0,
       wordSearch: 0,
+      timerMode: 0,
+      scenarioMode: 0,
       lastReset: new Date().toDateString()
     };
 
@@ -30,6 +32,10 @@ app.get('/:userId', async (c) => {
           usage.pronunciationPractice = row.usage_count;
         } else if (row.feature_type === 'word_search') {
           usage.wordSearch = row.usage_count;
+        } else if (row.feature_type === 'timer_mode') {
+          usage.timerMode = row.usage_count;
+        } else if (row.feature_type === 'scenario_mode') {
+          usage.scenarioMode = row.usage_count;
         }
       });
     }
@@ -52,7 +58,9 @@ app.post('/:userId', async (c) => {
     const featureMap: { [key: string]: string } = {
       'aiConversations': 'ai_conversation',
       'pronunciationPractice': 'pronunciation',
-      'wordSearch': 'word_search'
+      'wordSearch': 'word_search',
+      'scenarioMode': 'scenario_mode',
+      'timerMode': 'timer_mode'
     };
 
     const dbFeatureType = featureMap[featureType] || featureType;
