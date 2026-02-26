@@ -23,21 +23,65 @@ class WorVox {
         aiConversations: 5,
         pronunciationPractice: 10,
         wordSearch: 10,
-        timerMode: 3  // Free users: 3 timer challenges per day
+        timerMode: 0,  // Free users: no access
+        scenarioMode: 0  // Free users: no access
+      },
+      core: {
+        aiConversations: Infinity,  // Core: unlimited
+        pronunciationPractice: Infinity,
+        wordSearch: Infinity,  // Core: unlimited
+        timerMode: 30,  // Core: 30 per day
+        scenarioMode: 30  // Core: 30 per day
       },
       premium: {
         aiConversations: Infinity,
         pronunciationPractice: Infinity,
         wordSearch: Infinity,
-        timerMode: Infinity
+        timerMode: Infinity,
+        scenarioMode: Infinity
       },
       business: {
         aiConversations: Infinity,
         pronunciationPractice: Infinity,
         wordSearch: Infinity,
-        timerMode: Infinity
+        timerMode: Infinity,
+        scenarioMode: Infinity
       }
     };
+    
+    // Scenario Mode Data (30 real-life scenarios)
+    this.scenarios = [
+      { id: 1, title: "공항 체크인", category: "여행", difficulty: "beginner", icon: "✈️", description: "항공편 체크인과 수하물 처리" },
+      { id: 2, title: "호텔 예약", category: "여행", difficulty: "beginner", icon: "🏨", description: "호텔 룸 예약 및 체크인" },
+      { id: 3, title: "레스토랑 주문", category: "일상", difficulty: "beginner", icon: "🍽️", description: "레스토랑에서 음식 주문하기" },
+      { id: 4, title: "길 묻기", category: "일상", difficulty: "beginner", icon: "🗺️", description: "길을 잃었을 때 방향 묻기" },
+      { id: 5, title: "카페 주문", category: "일상", difficulty: "beginner", icon: "☕", description: "커피숍에서 음료 주문" },
+      { id: 6, title: "택시 타기", category: "교통", difficulty: "beginner", icon: "🚕", description: "택시 타고 목적지 가기" },
+      { id: 7, title: "쇼핑하기", category: "일상", difficulty: "beginner", icon: "🛍️", description: "매장에서 물건 구매하기" },
+      { id: 8, title: "은행 업무", category: "비즈니스", difficulty: "intermediate", icon: "🏦", description: "계좌 개설 및 은행 업무" },
+      { id: 9, title: "병원 예약", category: "일상", difficulty: "intermediate", icon: "🏥", description: "의사 진료 예약하기" },
+      { id: 10, title: "전화 예약", category: "일상", difficulty: "intermediate", icon: "📞", description: "전화로 레스토랑 예약" },
+      { id: 11, title: "면접 대비", category: "비즈니스", difficulty: "advanced", icon: "💼", description: "영어 취업 면접 준비" },
+      { id: 12, title: "회의 진행", category: "비즈니스", difficulty: "advanced", icon: "👥", description: "영어 비즈니스 미팅" },
+      { id: 13, title: "프레젠테이션", category: "비즈니스", difficulty: "advanced", icon: "📊", description: "영어 발표 연습" },
+      { id: 14, title: "고객 응대", category: "비즈니스", difficulty: "intermediate", icon: "🤝", description: "고객 서비스 상황" },
+      { id: 15, title: "클레임 처리", category: "비즈니스", difficulty: "intermediate", icon: "⚠️", description: "불만 사항 처리하기" },
+      { id: 16, title: "헬스장 등록", category: "일상", difficulty: "beginner", icon: "💪", description: "체육관 회원 가입" },
+      { id: 17, title: "영화관 예매", category: "여가", difficulty: "beginner", icon: "🎬", description: "영화표 예매하기" },
+      { id: 18, title: "우체국 업무", category: "일상", difficulty: "intermediate", icon: "📮", description: "소포 발송하기" },
+      { id: 19, title: "렌터카 빌리기", category: "여행", difficulty: "intermediate", icon: "🚗", description: "렌터카 대여 절차" },
+      { id: 20, title: "부동산 문의", category: "비즈니스", difficulty: "advanced", icon: "🏠", description: "집 구하기 및 계약" },
+      { id: 21, title: "전화 영어", category: "비즈니스", difficulty: "intermediate", icon: "☎️", description: "업무 전화 통화" },
+      { id: 22, title: "이메일 작성", category: "비즈니스", difficulty: "intermediate", icon: "✉️", description: "비즈니스 이메일 상황" },
+      { id: 23, title: "네트워킹", category: "비즈니스", difficulty: "advanced", icon: "🌐", description: "네트워킹 이벤트 대화" },
+      { id: 24, title: "협상하기", category: "비즈니스", difficulty: "advanced", icon: "🤝", description: "비즈니스 협상 연습" },
+      { id: 25, title: "미용실 가기", category: "일상", difficulty: "beginner", icon: "💇", description: "헤어 스타일 주문" },
+      { id: 26, title: "약국 방문", category: "일상", difficulty: "intermediate", icon: "💊", description: "약국에서 약 구매" },
+      { id: 27, title: "스몰톡", category: "일상", difficulty: "beginner", icon: "💬", description: "일상적인 가벼운 대화" },
+      { id: 28, title: "날씨 이야기", category: "일상", difficulty: "beginner", icon: "🌤️", description: "날씨에 관한 대화" },
+      { id: 29, title: "취미 이야기", category: "일상", difficulty: "intermediate", icon: "🎨", description: "취미와 관심사 공유" },
+      { id: 30, title: "여행 경험", category: "여가", difficulty: "intermediate", icon: "🌍", description: "여행 경험 나누기" }
+    ];
     
     // Onboarding state
     this.onboardingData = {
@@ -380,9 +424,9 @@ class WorVox {
 
   // Timer Mode - Premium Feature
   showTimerMode() {
-    // Check if premium user
-    if (!this.isPremiumUser()) {
-      alert('⏱️ 타이머 모드는 Premium 전용 기능입니다!\n\n지금 Premium으로 업그레이드하고 압박 훈련을 시작하세요.');
+    // Check if core or premium user
+    if (!this.isCoreOrPremiumUser()) {
+      alert('⏱️ 타이머 모드는 Core/Premium 전용 기능입니다!\n\n지금 업그레이드하고 압박 훈련을 시작하세요.');
       this.showPlan();
       return;
     }
@@ -863,6 +907,234 @@ class WorVox {
         </div>
       </div>
     `;
+  }
+
+  // ========================================
+  // Scenario Mode (Core/Premium Feature)
+  // ========================================
+  
+  showScenarioMode() {
+    // Check if core or premium user
+    if (!this.isCoreOrPremiumUser()) {
+      alert('🎬 시나리오 모드는 Core/Premium 전용 기능입니다!\n\n실제 상황 기반 30가지 대화를 연습하고 실력을 향상하세요.');
+      this.showPlan();
+      return;
+    }
+    
+    // Check usage limit
+    if (!this.checkUsageLimit('scenarioMode')) {
+      return;
+    }
+
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+        ${this.getSidebar('scenario-mode')}
+        
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- Mobile Header -->
+          <div class="md:hidden bg-white border-b border-blue-200 px-4 py-3">
+            <div class="flex items-center justify-between">
+              <button onclick="worvox.showTopicSelection()" class="text-gray-600">
+                <i class="fas fa-arrow-left text-xl"></i>
+              </button>
+              <h1 class="text-lg font-semibold text-gray-800">시나리오 모드</h1>
+              <div class="w-6"></div>
+            </div>
+          </div>
+          
+          <!-- Desktop Top Bar -->
+          <div class="hidden md:flex bg-white border-b border-blue-200 px-6 py-3 items-center gap-4">
+            <button onclick="worvox.showTopicSelection()" 
+              class="text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all">
+              <i class="fas fa-arrow-left text-xl"></i>
+            </button>
+            <h2 class="text-lg font-semibold text-gray-800">
+              <i class="fas fa-film mr-2 text-blue-600"></i>시나리오 모드
+            </h2>
+          </div>
+          
+          <!-- Content Area -->
+          <div class="flex-1 overflow-y-auto">
+            <div class="p-4 md:p-8">
+              <div class="max-w-6xl mx-auto">
+                <!-- Intro Card -->
+                <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl p-6 md:p-8 text-white mb-6 md:mb-8">
+                  <div class="flex items-center gap-4 mb-4">
+                    <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
+                      <span class="text-4xl">🎬</span>
+                    </div>
+                    <div class="flex-1">
+                      <h2 class="text-2xl md:text-3xl font-bold mb-2">실전 상황 대화 연습</h2>
+                      <p class="text-blue-100 text-sm md:text-base">30가지 실제 상황에서 영어로 자신있게 대화하세요</p>
+                    </div>
+                    <div class="hidden md:block bg-blue-100 text-blue-700 px-4 py-2 rounded-full font-bold">
+                      CORE+
+                    </div>
+                  </div>
+                  
+                  <div class="grid grid-cols-3 gap-4 pt-4 border-t border-white/20">
+                    <div class="text-center">
+                      <div class="text-2xl font-bold">30</div>
+                      <div class="text-blue-100 text-sm">시나리오</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-2xl font-bold">3</div>
+                      <div class="text-blue-100 text-sm">난이도</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-2xl font-bold">실전</div>
+                      <div class="text-blue-100 text-sm">상황 대화</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Filter Buttons -->
+                <div class="flex flex-wrap gap-2 mb-6">
+                  <button onclick="worvox.filterScenarios('all')" 
+                    class="scenario-filter-btn active px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-all">
+                    전체 (30)
+                  </button>
+                  <button onclick="worvox.filterScenarios('beginner')" 
+                    class="scenario-filter-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-all">
+                    초급
+                  </button>
+                  <button onclick="worvox.filterScenarios('intermediate')" 
+                    class="scenario-filter-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-all">
+                    중급
+                  </button>
+                  <button onclick="worvox.filterScenarios('advanced')" 
+                    class="scenario-filter-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-all">
+                    고급
+                  </button>
+                  <button onclick="worvox.filterScenarios('여행')" 
+                    class="scenario-filter-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-all">
+                    여행
+                  </button>
+                  <button onclick="worvox.filterScenarios('일상')" 
+                    class="scenario-filter-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-all">
+                    일상
+                  </button>
+                  <button onclick="worvox.filterScenarios('비즈니스')" 
+                    class="scenario-filter-btn px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-all">
+                    비즈니스
+                  </button>
+                </div>
+                
+                <!-- Scenario Grid -->
+                <div id="scenarioGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                  ${this.scenarios.map(scenario => `
+                    <div class="scenario-card bg-white rounded-xl p-5 shadow-sm border border-gray-200 hover:shadow-lg hover:border-blue-400 transition-all cursor-pointer"
+                      data-difficulty="${scenario.difficulty}"
+                      data-category="${scenario.category}"
+                      onclick="worvox.startScenario(${scenario.id})">
+                      <div class="flex items-start gap-3 mb-3">
+                        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <span class="text-2xl">${scenario.icon}</span>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                          <h3 class="font-bold text-gray-900 mb-1">${scenario.title}</h3>
+                          <p class="text-xs text-gray-600">${scenario.description}</p>
+                        </div>
+                      </div>
+                      <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                        <span class="text-xs px-2 py-1 rounded ${
+                          scenario.difficulty === 'beginner' ? 'bg-green-100 text-green-700' :
+                          scenario.difficulty === 'intermediate' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-red-100 text-red-700'
+                        }">
+                          ${scenario.difficulty === 'beginner' ? '초급' : scenario.difficulty === 'intermediate' ? '중급' : '고급'}
+                        </span>
+                        <span class="text-xs text-blue-600 font-medium">시작하기 →</span>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+              
+              ${this.getFooter()}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  // Filter scenarios by difficulty or category
+  filterScenarios(filter) {
+    const cards = document.querySelectorAll('.scenario-card');
+    const buttons = document.querySelectorAll('.scenario-filter-btn');
+    
+    // Update button styles
+    buttons.forEach(btn => {
+      btn.classList.remove('active', 'bg-blue-600', 'text-white');
+      btn.classList.add('bg-gray-100', 'text-gray-700');
+    });
+    event.target.classList.remove('bg-gray-100', 'text-gray-700');
+    event.target.classList.add('active', 'bg-blue-600', 'text-white');
+    
+    // Filter cards
+    cards.forEach(card => {
+      if (filter === 'all') {
+        card.style.display = 'block';
+      } else {
+        const difficulty = card.getAttribute('data-difficulty');
+        const category = card.getAttribute('data-category');
+        if (difficulty === filter || category === filter) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      }
+    });
+  }
+  
+  // Start a scenario conversation
+  async startScenario(scenarioId) {
+    const scenario = this.scenarios.find(s => s.id === scenarioId);
+    if (!scenario) return;
+    
+    // Increment usage
+    this.incrementUsage('scenarioMode');
+    
+    // Generate system prompt for this scenario
+    const systemPrompt = `You are an AI role-playing partner for an English conversation scenario: "${scenario.title}".
+
+Scenario Details:
+- Title: ${scenario.title}
+- Category: ${scenario.category}
+- Description: ${scenario.description}
+- Difficulty: ${scenario.difficulty}
+
+Your role:
+1. Play the appropriate character in this scenario (e.g., waiter, hotel staff, interviewer, etc.)
+2. Speak naturally and guide the conversation realistically
+3. Adjust your language complexity to match the ${scenario.difficulty} level
+4. Provide helpful corrections and suggestions when needed
+5. Keep the conversation focused on this specific scenario
+6. Use common phrases and vocabulary relevant to this situation
+
+Start the conversation with a natural opening line for this scenario.`;
+
+    // Find or create a topic for scenario mode
+    const topics = await axios.get('/api/topics');
+    let scenarioTopic = topics.data.topics.find(t => t.name === 'Scenario Mode');
+    
+    if (!scenarioTopic) {
+      // Create scenario mode topic if it doesn't exist
+      const response = await axios.post('/api/topics', {
+        name: 'Scenario Mode',
+        system_prompt: systemPrompt,
+        description: 'Real-life scenario practice',
+        level: scenario.difficulty,
+        icon: '🎬'
+      });
+      scenarioTopic = response.data.topic;
+    }
+    
+    // Start session with custom system prompt
+    this.currentScenario = scenario;
+    this.startSession(scenarioTopic.id, `${scenario.icon} ${scenario.title}`, systemPrompt, scenario.difficulty);
   }
 
   showRealConversation() {
@@ -1983,10 +2255,14 @@ Proceed to payment?
                     <h3 class="text-base md:text-lg font-semibold text-gray-900">
                       <i class="fas fa-chart-bar mr-2"></i>오늘의 사용량
                     </h3>
-                    ${!this.isPremiumUser() ? `
+                    ${this.currentUser?.plan === 'free' ? `
                     <button onclick="worvox.showPlan()" class="text-emerald-600 hover:text-emerald-700 text-xs md:text-sm font-medium">
-                      Premium 보기 →
+                      Core/Premium 보기 →
                     </button>
+                    ` : this.currentUser?.plan === 'core' ? `
+                    <span class="bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-xs px-3 py-1 rounded-full font-bold">
+                      CORE
+                    </span>
                     ` : `
                     <span class="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs px-3 py-1 rounded-full font-bold">
                       PREMIUM
@@ -1994,8 +2270,8 @@ Proceed to payment?
                     `}
                   </div>
                   
-                  ${!this.isPremiumUser() ? `
-                  <!-- Free Plan: Progress Bars -->
+                  ${this.currentUser?.plan === 'free' ? `
+                  <!-- Free Plan: Progress Bars with Limits -->
                   <div class="space-y-4">
                     <!-- AI Conversation Usage -->
                     <div>
@@ -2011,17 +2287,27 @@ Proceed to payment?
                       </div>
                     </div>
                     
-                    <!-- Timer Mode Usage -->
+                    <!-- Timer Mode Usage (Free: 0) -->
                     <div>
                       <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center gap-2">
                           <i class="fas fa-stopwatch text-purple-600"></i>
                           <span class="text-sm text-gray-700">타이머 모드</span>
+                          <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Core+</span>
                         </div>
-                        <span class="text-sm font-medium text-gray-900" data-usage-count="timer_mode">${this.getDailyUsage('timer_mode')}/${this.usageLimits.free.timerMode}회</span>
+                        <span class="text-sm font-medium text-gray-400">이용 불가</span>
                       </div>
-                      <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-purple-600 h-2 rounded-full transition-all" data-usage-bar="timer_mode" style="width: ${(this.getDailyUsage('timer_mode') / this.usageLimits.free.timerMode) * 100}%"></div>
+                    </div>
+                    
+                    <!-- Scenario Mode Usage (Free: 0) -->
+                    <div>
+                      <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2">
+                          <i class="fas fa-film text-indigo-600"></i>
+                          <span class="text-sm text-gray-700">시나리오 모드</span>
+                          <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Core+</span>
+                        </div>
+                        <span class="text-sm font-medium text-gray-400">이용 불가</span>
                       </div>
                     </div>
                     
@@ -2039,14 +2325,66 @@ Proceed to payment?
                       </div>
                     </div>
                   </div>
+                  ` : this.currentUser?.plan === 'core' ? `
+                  <!-- Core Plan: Mixed (Unlimited + Limited) -->
+                  <div class="space-y-3">
+                    <!-- AI Conversation Usage (Unlimited) -->
+                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                      <div class="flex items-center gap-3">
+                        <i class="fas fa-comment text-blue-600 text-lg"></i>
+                        <span class="text-sm font-medium text-gray-700">AI 대화</span>
+                        <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">무제한</span>
+                      </div>
+                      <span class="text-lg font-bold text-blue-600" data-usage-count="ai_conversation">${this.getDailyUsage('ai_conversation')}회</span>
+                    </div>
+                    
+                    <!-- Timer Mode Usage (Limited: 30) -->
+                    <div class="p-3 bg-purple-50 rounded-lg">
+                      <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-3">
+                          <i class="fas fa-stopwatch text-purple-600 text-lg"></i>
+                          <span class="text-sm font-medium text-gray-700">타이머 모드</span>
+                        </div>
+                        <span class="text-sm font-medium text-gray-900" data-usage-count="timer_mode">${this.getDailyUsage('timer_mode')}/${this.usageLimits.core.timerMode}회</span>
+                      </div>
+                      <div class="w-full bg-purple-200 rounded-full h-2">
+                        <div class="bg-purple-600 h-2 rounded-full transition-all" data-usage-bar="timer_mode" style="width: ${(this.getDailyUsage('timer_mode') / this.usageLimits.core.timerMode) * 100}%"></div>
+                      </div>
+                    </div>
+                    
+                    <!-- Scenario Mode Usage (Limited: 30) -->
+                    <div class="p-3 bg-indigo-50 rounded-lg">
+                      <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-3">
+                          <i class="fas fa-film text-indigo-600 text-lg"></i>
+                          <span class="text-sm font-medium text-gray-700">시나리오 모드</span>
+                        </div>
+                        <span class="text-sm font-medium text-gray-900" data-usage-count="scenario_mode">${this.getDailyUsage('scenario_mode')}/${this.usageLimits.core.scenarioMode}회</span>
+                      </div>
+                      <div class="w-full bg-indigo-200 rounded-full h-2">
+                        <div class="bg-indigo-600 h-2 rounded-full transition-all" data-usage-bar="scenario_mode" style="width: ${(this.getDailyUsage('scenario_mode') / this.usageLimits.core.scenarioMode) * 100}%"></div>
+                      </div>
+                    </div>
+                    
+                    <!-- Word Search Usage (Unlimited) -->
+                    <div class="flex items-center justify-between p-3 bg-emerald-50 rounded-lg">
+                      <div class="flex items-center gap-3">
+                        <i class="fas fa-search text-emerald-600 text-lg"></i>
+                        <span class="text-sm font-medium text-gray-700">단어 검색</span>
+                        <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">무제한</span>
+                      </div>
+                      <span class="text-lg font-bold text-emerald-600" data-usage-count="word_search">${this.getDailyUsage('word_search')}회</span>
+                    </div>
+                  </div>
                   ` : `
-                  <!-- Premium Plan: Count Only -->
+                  <!-- Premium Plan: Count Only (All Unlimited) -->
                   <div class="space-y-3">
                     <!-- AI Conversation Usage -->
                     <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                       <div class="flex items-center gap-3">
                         <i class="fas fa-comment text-blue-600 text-lg"></i>
                         <span class="text-sm font-medium text-gray-700">AI 대화</span>
+                        <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">무제한</span>
                       </div>
                       <span class="text-lg font-bold text-blue-600" data-usage-count="ai_conversation">${this.getDailyUsage('ai_conversation')}회</span>
                     </div>
@@ -2056,8 +2394,19 @@ Proceed to payment?
                       <div class="flex items-center gap-3">
                         <i class="fas fa-stopwatch text-purple-600 text-lg"></i>
                         <span class="text-sm font-medium text-gray-700">타이머 모드</span>
+                        <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">무제한</span>
                       </div>
                       <span class="text-lg font-bold text-purple-600" data-usage-count="timer_mode">${this.getDailyUsage('timer_mode')}회</span>
+                    </div>
+                    
+                    <!-- Scenario Mode Usage -->
+                    <div class="flex items-center justify-between p-3 bg-indigo-50 rounded-lg">
+                      <div class="flex items-center gap-3">
+                        <i class="fas fa-film text-indigo-600 text-lg"></i>
+                        <span class="text-sm font-medium text-gray-700">시나리오 모드</span>
+                        <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">무제한</span>
+                      </div>
+                      <span class="text-lg font-bold text-indigo-600" data-usage-count="scenario_mode">${this.getDailyUsage('scenario_mode')}회</span>
                     </div>
                     
                     <!-- Word Search Usage -->
@@ -2065,6 +2414,7 @@ Proceed to payment?
                       <div class="flex items-center gap-3">
                         <i class="fas fa-search text-emerald-600 text-lg"></i>
                         <span class="text-sm font-medium text-gray-700">단어 검색</span>
+                        <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">무제한</span>
                       </div>
                       <span class="text-lg font-bold text-emerald-600" data-usage-count="word_search">${this.getDailyUsage('word_search')}회</span>
                     </div>
@@ -2106,8 +2456,9 @@ Proceed to payment?
                       data-topic-name="${this.escapeHtml(topic.name)}" 
                       data-topic-level="${topic.level}"
                       onclick="worvox.startTopicById(${topic.id})">
-                      <div class="absolute top-3 right-3 flex gap-2">
+                      <div class="absolute top-3 right-3 flex gap-1">
                         <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">FREE</span>
+                        <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-bold">CORE</span>
                         <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-bold">PREMIUM</span>
                       </div>
                       <div class="w-12 h-12 bg-${topic.name === 'AI English Conversation' ? 'emerald' : 'blue'}-100 rounded-xl flex items-center justify-center mb-4">
@@ -2122,11 +2473,12 @@ Proceed to payment?
                     </div>
                   `).join('')}
                   
-                  <!-- Timer Mode Card (Premium Feature) -->
+                  <!-- Timer Mode Card (Core/Premium Feature) -->
                   <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 shadow-sm border-2 border-purple-200 hover:shadow-lg hover:border-purple-400 transition-all cursor-pointer relative"
                     onclick="worvox.showTimerMode()">
-                    <div class="absolute top-3 right-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs px-2 py-1 rounded-full font-bold">
-                      PREMIUM
+                    <div class="absolute top-3 right-3 flex gap-1">
+                      <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-bold">CORE</span>
+                      <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-bold">PREMIUM</span>
                     </div>
                     <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
                       <span class="text-2xl">⏱️</span>
@@ -2135,7 +2487,25 @@ Proceed to payment?
                     <p class="text-gray-600 mb-4">5초/10초 제한 안에 문장을 완성하는 압박 훈련</p>
                     <div class="flex items-center justify-between">
                       <span class="text-sm text-purple-600 font-medium">시작하기 →</span>
-                      <span class="text-xs bg-purple-100 px-2 py-1 rounded">Premium</span>
+                      <span class="text-xs bg-purple-100 px-2 py-1 rounded">Core+</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Scenario Mode Card (Core/Premium Feature) -->
+                  <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 shadow-sm border-2 border-blue-200 hover:shadow-lg hover:border-blue-400 transition-all cursor-pointer relative"
+                    onclick="worvox.showScenarioMode()">
+                    <div class="absolute top-3 right-3 flex gap-1">
+                      <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-bold">CORE</span>
+                      <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-bold">PREMIUM</span>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+                      <span class="text-2xl">🎬</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">시나리오 모드</h3>
+                    <p class="text-gray-600 mb-4">실제 상황 기반 30가지 실전 대화 연습</p>
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm text-blue-600 font-medium">시작하기 →</span>
+                      <span class="text-xs bg-blue-100 px-2 py-1 rounded">Core+</span>
                     </div>
                   </div>
                 </div>
@@ -5589,15 +5959,15 @@ Proceed to payment?
                             <tr>
                               <td class="py-3 text-gray-700">일일 AI 대화</td>
                               <td class="py-3 text-right">
-                                <span class="text-gray-600">Free: 5분</span><br>
+                                <span class="text-gray-600">Free: 5회</span><br>
                                 <span class="text-blue-600 font-semibold">Core+: 무제한</span>
                               </td>
                             </tr>
                             <tr>
                               <td class="py-3 text-gray-700">AI 대화 주제</td>
                               <td class="py-3 text-right">
-                                <span class="text-gray-600">Free: 3개</span><br>
-                                <span class="text-blue-600 font-semibold">Core+: 20개</span><br>
+                                <span class="text-gray-600">Free: 기본 3개</span><br>
+                                <span class="text-blue-600 font-semibold">Core+: 전체 20개</span><br>
                                 <span class="text-yellow-600 font-semibold">B2B: 커스텀</span>
                               </td>
                             </tr>
@@ -5743,6 +6113,48 @@ Proceed to payment?
                             </tr>
                             <tr>
                               <td class="py-3 text-gray-700">리워드</td>
+                              <td class="py-3 text-right">
+                                <span class="text-blue-600 font-semibold">Core 이상</span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <!-- 특별 훈련 모드 (Core/Premium) -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-purple-200">
+                      <div class="bg-gradient-to-r from-purple-500 to-indigo-500 p-4 text-white">
+                        <h3 class="text-xl font-bold flex items-center">
+                          <i class="fas fa-bolt mr-2"></i>
+                          특별 훈련 모드
+                        </h3>
+                      </div>
+                      <div class="p-6">
+                        <table class="w-full text-sm">
+                          <tbody class="divide-y divide-gray-100">
+                            <tr>
+                              <td class="py-3 text-gray-700">타이머 모드</td>
+                              <td class="py-3 text-right">
+                                <span class="text-blue-600">Core: 30회/일</span><br>
+                                <span class="text-purple-600 font-semibold">Premium: 무제한</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">시나리오 모드</td>
+                              <td class="py-3 text-right">
+                                <span class="text-blue-600">Core: 30회/일</span><br>
+                                <span class="text-purple-600 font-semibold">Premium: 무제한</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">시나리오 개수</td>
+                              <td class="py-3 text-right">
+                                <span class="text-blue-600 font-semibold">Core+: 30개</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">실전 압박 훈련</td>
                               <td class="py-3 text-right">
                                 <span class="text-blue-600 font-semibold">Core 이상</span>
                               </td>
@@ -6436,6 +6848,12 @@ Proceed to payment?
     // Check both currentUser.plan and userPlan for reliability
     const userPlan = this.currentUser?.plan || this.userPlan || 'free';
     return userPlan === 'premium' || userPlan === 'core' || userPlan === 'business';
+  }
+
+  // Check if user has Core or Premium (excludes Free)
+  isCoreOrPremiumUser() {
+    const userPlan = this.currentUser?.plan || this.userPlan || 'free';
+    return userPlan === 'core' || userPlan === 'premium' || userPlan === 'business';
   }
 
   // ========================================
