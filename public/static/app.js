@@ -4612,6 +4612,21 @@ Proceed to payment?
             <div class="flex-1 overflow-y-auto p-4 md:p-8">
               <div class="max-w-7xl mx-auto">
                 
+                <!-- Billing Period Toggle -->
+                <div class="flex justify-center mb-8">
+                  <div class="bg-white rounded-full p-1.5 shadow-lg inline-flex items-center">
+                    <button id="monthlyToggle" onclick="worvox.toggleBillingPeriod('monthly')" 
+                      class="px-6 py-2.5 rounded-full font-semibold transition-all bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                      월별 결제
+                    </button>
+                    <button id="yearlyToggle" onclick="worvox.toggleBillingPeriod('yearly')" 
+                      class="px-6 py-2.5 rounded-full font-semibold transition-all text-gray-600">
+                      연별 결제
+                      <span class="ml-2 text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">15% 할인</span>
+                    </button>
+                  </div>
+                </div>
+                
                 <!-- Pricing Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                   
@@ -4656,8 +4671,11 @@ Proceed to payment?
                       <div class="text-4xl mb-3">💙</div>
                       <h3 class="text-2xl font-bold mb-2">Core</h3>
                       <div class="mb-4">
-                        <span class="text-3xl font-bold">₩9,900</span>
-                        <span class="text-blue-100 text-sm">/월</span>
+                        <span id="corePrice" class="text-3xl font-bold">₩9,900</span>
+                        <span id="corePeriod" class="text-blue-100 text-sm">/월</span>
+                        <div id="coreYearlySavings" class="hidden text-xs text-green-300 mt-1">
+                          월 ₩9,900 × 12개월 = ₩118,800 → 15% 할인
+                        </div>
                       </div>
                       <p class="text-sm text-blue-100">무제한 대화</p>
                     </div>
@@ -4680,7 +4698,7 @@ Proceed to payment?
                           <span class="text-gray-400">리포트 & 분석</span>
                         </li>
                       </ul>
-                      <button onclick="worvox.showPaymentStayTuned('Core', '₩9,900')" 
+                      <button onclick="worvox.selectPlan('Core')" 
                         class="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transition-all">
                         선택하기
                       </button>
@@ -4697,8 +4715,11 @@ Proceed to payment?
                       <div class="text-4xl mb-3">✨</div>
                       <h3 class="text-2xl font-bold mb-2">Premium</h3>
                       <div class="mb-4">
-                        <span class="text-3xl font-bold">₩19,000</span>
-                        <span class="text-purple-100 text-sm">/월</span>
+                        <span id="premiumPrice" class="text-3xl font-bold">₩19,000</span>
+                        <span id="premiumPeriod" class="text-purple-100 text-sm">/월</span>
+                        <div id="premiumYearlySavings" class="hidden text-xs text-green-300 mt-1">
+                          월 ₩19,000 × 12개월 = ₩228,000 → 15% 할인
+                        </div>
                       </div>
                       <p class="text-sm text-purple-100">완벽한 학습 경험</p>
                     </div>
@@ -4721,7 +4742,7 @@ Proceed to payment?
                           <span class="text-gray-700">+ Core 모든 기능</span>
                         </li>
                       </ul>
-                      <button onclick="worvox.showPaymentStayTuned('Premium', '₩19,000')" 
+                      <button onclick="worvox.selectPlan('Premium')" 
                         class="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg">
                         선택하기
                       </button>
@@ -6728,6 +6749,70 @@ Proceed to payment?
         </div>
       </div>
     `;
+  }
+
+  // Toggle between monthly and yearly billing
+  toggleBillingPeriod(period) {
+    const monthlyBtn = document.getElementById('monthlyToggle');
+    const yearlyBtn = document.getElementById('yearlyToggle');
+    
+    const corePrice = document.getElementById('corePrice');
+    const corePeriod = document.getElementById('corePeriod');
+    const coreYearlySavings = document.getElementById('coreYearlySavings');
+    
+    const premiumPrice = document.getElementById('premiumPrice');
+    const premiumPeriod = document.getElementById('premiumPeriod');
+    const premiumYearlySavings = document.getElementById('premiumYearlySavings');
+    
+    if (period === 'monthly') {
+      // Monthly prices
+      monthlyBtn.classList.add('bg-gradient-to-r', 'from-purple-500', 'to-pink-500', 'text-white');
+      monthlyBtn.classList.remove('text-gray-600');
+      yearlyBtn.classList.remove('bg-gradient-to-r', 'from-purple-500', 'to-pink-500', 'text-white');
+      yearlyBtn.classList.add('text-gray-600');
+      
+      corePrice.textContent = '₩9,900';
+      corePeriod.textContent = '/월';
+      coreYearlySavings.classList.add('hidden');
+      
+      premiumPrice.textContent = '₩19,000';
+      premiumPeriod.textContent = '/월';
+      premiumYearlySavings.classList.add('hidden');
+      
+      this.currentBillingPeriod = 'monthly';
+    } else {
+      // Yearly prices (15% discount)
+      yearlyBtn.classList.add('bg-gradient-to-r', 'from-purple-500', 'to-pink-500', 'text-white');
+      yearlyBtn.classList.remove('text-gray-600');
+      monthlyBtn.classList.remove('bg-gradient-to-r', 'from-purple-500', 'to-pink-500', 'text-white');
+      monthlyBtn.classList.add('text-gray-600');
+      
+      // Core: 9,900 × 12 = 118,800 → 15% discount = 100,980
+      corePrice.textContent = '₩100,980';
+      corePeriod.textContent = '/년';
+      coreYearlySavings.classList.remove('hidden');
+      
+      // Premium: 19,000 × 12 = 228,000 → 15% discount = 193,800
+      premiumPrice.textContent = '₩193,800';
+      premiumPeriod.textContent = '/년';
+      premiumYearlySavings.classList.remove('hidden');
+      
+      this.currentBillingPeriod = 'yearly';
+    }
+  }
+  
+  // Select plan based on current billing period
+  selectPlan(planName) {
+    const period = this.currentBillingPeriod || 'monthly';
+    let price;
+    
+    if (planName === 'Core') {
+      price = period === 'monthly' ? '₩9,900/월' : '₩100,980/년';
+    } else if (planName === 'Premium') {
+      price = period === 'monthly' ? '₩19,000/월' : '₩193,800/년';
+    }
+    
+    this.showPaymentStayTuned(planName, price);
   }
 
   // Payment Stay Tuned Modal
