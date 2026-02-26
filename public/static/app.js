@@ -1458,9 +1458,17 @@ Proceed to payment?
       // Store user data
       localStorage.setItem('worvox_user', JSON.stringify(response.data.user));
       this.currentUser = response.data.user;
+      
+      // Update user plan from database
+      this.userPlan = response.data.user.plan || 'free';
+      console.log('User plan updated to:', this.userPlan);
 
-      // Move to next step
-      this.nextStep();
+      // Load usage data and gamification stats
+      await this.loadUsageFromServer();
+      await this.loadGamificationStats();
+      
+      // Go to dashboard
+      this.showTopicSelection();
 
     } catch (error) {
       console.error('Login error:', error);
@@ -1514,8 +1522,12 @@ Proceed to payment?
       // Store user data
       localStorage.setItem('worvox_user', JSON.stringify(response.data.user));
       this.currentUser = response.data.user;
+      
+      // Update user plan from database
+      this.userPlan = response.data.user.plan || 'free';
+      console.log('User plan updated to:', this.userPlan);
 
-      // Move to next step
+      // Move to next step (level selection)
       alert(`환영합니다, ${name}님! 이제 영어 레벨을 선택해주세요.`);
       this.nextStep();
 

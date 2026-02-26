@@ -323,6 +323,118 @@ users.post('/auth', async (c) => {
   }
 });
 
+// Email/Password Signup
+users.post('/signup', async (c) => {
+  try {
+    const { name, email, password } = await c.req.json();
+
+    console.log('📧 Signup attempt:', { name, email });
+
+    // Validation
+    if (!name || !email || !password) {
+      return c.json({ error: 'Name, email, and password are required' }, 400);
+    }
+
+    if (password.length < 8) {
+      return c.json({ error: 'Password must be at least 8 characters' }, 400);
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return c.json({ error: 'Invalid email format' }, 400);
+    }
+
+    // Check if user already exists
+    const existingUser = await c.env.DB.prepare(
+      'SELECT id FROM users WHERE email = ?'
+    ).bind(email).first();
+
+    if (existingUser) {
+      console.log('❌ Email already exists:', email);
+      return c.json({ error: 'Email already registered' }, 409);
+    }
+
+    // Hash password (simple encoding for demo - use proper hashing in production)
+    const passwordHash = btoa(password); // Base64 encoding (NOT secure for production!)
+
+    // Create new user
+    const result = await c.env.DB.prepare(
+      `INSERT INTO users (username, email, password_hash, auth_provider, level, plan) 
+       VALUES (?, ?, ?, 'email', 'beginner', 'free')`
+    ).bind(name, email, passwordHash).run();
+
+    const userId = result.meta.last_row_id;
+    console.log('✅ User created with ID:', userId);
+
+    // Get created user
+    const newUser = await c.env.DB.prepare(
+      'SELECT id, username, email, level, auth_provider, plan, user_level, xp, total_xp, coins, current_streak, longest_streak, created_at FROM users WHERE id = ?'
+    ).bind(userId).first();
+
+    return c.json({
+      user: newUser,
+      success: true,
+      isNew: true,
+    });
+
+  } catch (error) {
+    console.error('❌ Signup error:', error);
+    return c.json({ 
+      error: 'Failed to create account',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
+// Email/Password Login
+users.post('/login', async (c) => {
+  try {
+    const { email, password } = await c.req.json();
+
+    console.log('🔐 Login attempt:', { email });
+
+    // Validation
+    if (!email || !password) {
+      return c.json({ error: 'Email and password are required' }, 400);
+    }
+
+    // Find user by email
+    const user = await c.env.DB.prepare(
+      'SELECT id, username, email, password_hash, level, auth_provider, plan, user_level, xp, total_xp, coins, current_streak, longest_streak, created_at FROM users WHERE email = ?'
+    ).bind(email).first();
+
+    if (!user) {
+      console.log('❌ User not found:', email);
+      return c.json({ error: 'Invalid email or password' }, 401);
+    }
+
+    // Verify password
+    const passwordHash = btoa(password); // Base64 encoding (match signup)
+    if (user.password_hash !== passwordHash) {
+      console.log('❌ Invalid password for:', email);
+      return c.json({ error: 'Invalid email or password' }, 401);
+    }
+
+    console.log('✅ Login successful:', email);
+
+    // Return user without password_hash
+    const { password_hash, ...userWithoutPassword } = user;
+
+    return c.json({
+      user: userWithoutPassword,
+      success: true,
+    });
+
+  } catch (error) {
+    console.error('❌ Login error:', error);
+    return c.json({ 
+      error: 'Failed to login',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
 // Get user profile
 users.get('/:userId', async (c) => {
   try {
