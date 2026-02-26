@@ -231,6 +231,30 @@ class WorVox {
         
         <!-- User Profile -->
         <div class="p-4 border-t border-gray-700">
+          <!-- Plan Badge -->
+          <div class="mb-3">
+            ${this.isPremiumUser() ? `
+              <div class="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg p-3 text-center">
+                <div class="flex items-center justify-center gap-2 mb-1">
+                  <i class="fas fa-crown text-yellow-300"></i>
+                  <span class="text-white font-bold text-sm">PREMIUM</span>
+                </div>
+                <div class="text-xs text-purple-100">무제한 학습</div>
+              </div>
+            ` : `
+              <div class="bg-gray-800 rounded-lg p-3 text-center border border-gray-700">
+                <div class="flex items-center justify-center gap-2 mb-1">
+                  <i class="fas fa-user text-gray-400"></i>
+                  <span class="text-gray-300 font-bold text-sm">FREE</span>
+                </div>
+                <div class="text-xs text-gray-400">일일 제한</div>
+                <button onclick="worvox.showPlan(); worvox.closeMobileSidebar();" class="mt-2 w-full bg-emerald-500 hover:bg-emerald-600 text-white text-xs py-1.5 rounded transition-all">
+                  <i class="fas fa-arrow-up mr-1"></i>업그레이드
+                </button>
+              </div>
+            `}
+          </div>
+          
           <!-- Level & XP Info -->
           <div class="mb-3 bg-gray-800 rounded-lg p-3">
             <div class="flex items-center justify-between mb-2">
