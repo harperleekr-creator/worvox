@@ -364,29 +364,23 @@ class WorVox {
         ${this.getSidebar('timer-mode')}
         
         <div class="flex-1 flex flex-col overflow-hidden">
-          <!-- Mobile Header -->
-          <div class="md:hidden bg-white border-b border-purple-200 px-4 py-3">
-            <div class="flex items-center justify-between">
-              <button onclick="worvox.showTopicSelection()" class="text-gray-600">
+          <!-- Mobile & Desktop Header with Back Button -->
+          <div class="bg-white border-b border-purple-200 px-4 md:px-6 py-3">
+            <div class="flex items-center gap-2 md:gap-4">
+              <button onclick="worvox.showTopicSelection()" 
+                class="text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all">
                 <i class="fas fa-arrow-left text-xl"></i>
               </button>
-              <h1 class="text-lg font-semibold text-gray-800">⏱️ 타이머 모드</h1>
-              <div class="w-6"></div>
+              <div class="flex-1">
+                <h1 class="text-lg md:text-2xl font-bold text-gray-800">
+                  <i class="fas fa-stopwatch mr-2 text-purple-600"></i>타이머 모드
+                </h1>
+                <p class="hidden md:block text-gray-600 text-sm mt-1">압박 훈련으로 빠른 반응력 향상</p>
+              </div>
+              <span class="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-bold">
+                PREMIUM
+              </span>
             </div>
-          </div>
-          
-          <!-- Desktop Top Bar -->
-          <div class="hidden md:flex bg-white border-b border-purple-200 px-6 py-3 items-center gap-4">
-            <button onclick="worvox.showTopicSelection()" 
-              class="text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all">
-              <i class="fas fa-arrow-left text-xl"></i>
-            </button>
-            <h2 class="text-lg font-semibold text-gray-800">
-              <i class="fas fa-stopwatch mr-2 text-purple-600"></i>타이머 모드 - 압박 훈련
-            </h2>
-            <span class="ml-auto bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm px-4 py-1 rounded-full font-bold">
-              PREMIUM
-            </span>
           </div>
           
           <!-- Content Area -->
@@ -417,7 +411,7 @@ class WorVox {
                       </li>
                       <li class="flex items-start gap-2">
                         <span class="font-bold text-purple-600">3.</span>
-                        <span><kbd class="px-2 py-1 bg-white rounded border text-sm font-mono">Tab</kbd> 키를 누르면 타이머가 시작됩니다</span>
+                        <span><i class="fas fa-microphone text-emerald-500"></i> <strong>녹음 버튼</strong>을 누르면 타이머가 시작됩니다</span>
                       </li>
                       <li class="flex items-start gap-2">
                         <span class="font-bold text-purple-600">4.</span>
@@ -498,6 +492,12 @@ class WorVox {
     app.innerHTML = `
       <div class="flex h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-pink-900">
         <div class="flex-1 flex flex-col items-center justify-center p-4">
+          <!-- Back Button -->
+          <button onclick="worvox.showTimerMode()" 
+            class="absolute top-4 left-4 md:top-6 md:left-6 text-white/70 hover:text-white transition-all p-2 hover:bg-white/10 rounded-lg">
+            <i class="fas fa-arrow-left text-xl mr-2"></i><span class="hidden md:inline">뒤로가기</span>
+          </button>
+          
           <!-- Timer Display -->
           <div id="timerDisplay" class="text-center mb-8">
             <div class="text-8xl md:text-9xl font-bold text-white mb-4" id="timerCountdown">${seconds}</div>
@@ -516,16 +516,18 @@ class WorVox {
             </p>
           </div>
           
-          <!-- Instructions -->
-          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 max-w-2xl w-full">
-            <div class="text-center">
-              <div class="text-white text-lg mb-3" id="instructionText">
-                <i class="fas fa-keyboard text-2xl mb-2"></i>
-                <p><kbd class="px-3 py-2 bg-white/20 rounded-lg text-xl font-mono font-bold">Tab</kbd> 키를 눌러 시작하세요</p>
-              </div>
-              <div class="text-purple-200 text-sm" id="statusText">
-                문장을 읽고 준비가 되면 Tab 키를 누르세요
-              </div>
+          <!-- Recording Button -->
+          <div class="text-center mb-4">
+            <button id="timerRecordBtn" 
+              onclick="worvox.startTimerCountdown()" 
+              class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-emerald-500 text-white flex items-center justify-center hover:bg-emerald-600 transition-all shadow-2xl mx-auto transform hover:scale-105">
+              <i class="fas fa-microphone text-3xl md:text-4xl"></i>
+            </button>
+            <div class="text-white text-lg mt-4" id="instructionText">
+              준비되면 녹음 버튼을 눌러 시작하세요
+            </div>
+            <div class="text-purple-200 text-sm mt-2" id="statusText">
+              문장을 읽고 준비되면 버튼을 누르세요
             </div>
           </div>
           
@@ -536,12 +538,6 @@ class WorVox {
               <span class="font-bold">녹음 중...</span>
             </div>
           </div>
-          
-          <!-- Exit Button -->
-          <button onclick="worvox.showTimerMode()" 
-            class="mt-8 text-white/70 hover:text-white transition-all">
-            <i class="fas fa-times mr-2"></i>나가기
-          </button>
         </div>
       </div>
     `;
@@ -553,37 +549,35 @@ class WorVox {
       started: false,
       recording: false
     };
-    
-    // Add keyboard event listener for Tab key
-    document.addEventListener('keydown', this.handleTimerKeyPress.bind(this));
-  }
-
-  // Handle Timer Key Press
-  handleTimerKeyPress(e) {
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      
-      if (!this.timerChallenge.started) {
-        this.startTimerCountdown();
-      }
-    }
   }
 
   // Start Timer Countdown
   async startTimerCountdown() {
+    // Prevent multiple starts
+    if (this.timerChallenge.started) {
+      return;
+    }
+    
     this.timerChallenge.started = true;
     
     const countdownEl = document.getElementById('timerCountdown');
     const instructionEl = document.getElementById('instructionText');
     const statusEl = document.getElementById('statusText');
     const recordingIndicator = document.getElementById('recordingIndicator');
+    const recordBtn = document.getElementById('timerRecordBtn');
     
     // Update UI
-    instructionEl.innerHTML = '<p class="text-2xl">🎤 지금 말하세요!</p>';
+    instructionEl.innerHTML = '🎤 지금 말하세요!';
     statusEl.textContent = '타이머가 시작되었습니다. 문장을 말하세요!';
     recordingIndicator.classList.remove('hidden');
     
-    // Start recording
+    // Disable record button
+    recordBtn.disabled = true;
+    recordBtn.classList.remove('bg-emerald-500', 'hover:bg-emerald-600');
+    recordBtn.classList.add('bg-red-600', 'cursor-not-allowed');
+    recordBtn.innerHTML = '<i class="fas fa-microphone text-3xl md:text-4xl animate-pulse"></i>';
+    
+    // Start recording with proper audio configuration
     await this.startTimerRecording();
     
     // Countdown
@@ -609,33 +603,61 @@ class WorVox {
   async startTimerRecording() {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      this.mediaRecorder = new MediaRecorder(stream);
+      
+      // Try to use audio/webm with opus codec, fallback to default
+      let options = { mimeType: 'audio/webm;codecs=opus' };
+      if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+        console.log('audio/webm;codecs=opus not supported, trying audio/webm');
+        options = { mimeType: 'audio/webm' };
+        if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+          console.log('audio/webm not supported, using default');
+          options = {};
+        }
+      }
+      
+      this.mediaRecorder = new MediaRecorder(stream, options);
       this.audioChunks = [];
       
+      console.log('Timer Mode: MediaRecorder created with mimeType:', this.mediaRecorder.mimeType);
+      
       this.mediaRecorder.ondataavailable = (event) => {
-        this.audioChunks.push(event.data);
+        if (event.data.size > 0) {
+          this.audioChunks.push(event.data);
+          console.log('Timer Mode: Audio chunk received, size:', event.data.size);
+        }
       };
       
       this.mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
+        const mimeType = this.mediaRecorder.mimeType || 'audio/webm';
+        const audioBlob = new Blob(this.audioChunks, { type: mimeType });
+        console.log('Timer Mode: Recording stopped. Blob size:', audioBlob.size, 'type:', audioBlob.type);
+        
+        // Stop all tracks
+        stream.getTracks().forEach(track => track.stop());
+        
         await this.analyzeTimerPerformance(audioBlob);
       };
       
       this.mediaRecorder.start();
       this.timerChallenge.recording = true;
+      console.log('Timer Mode: Recording started');
     } catch (error) {
-      console.error('Recording error:', error);
-      alert('마이크 접근 권한이 필요합니다.');
+      console.error('Timer Mode: Recording error:', error);
+      if (error.name === 'NotAllowedError') {
+        alert('마이크 접근 권한이 필요합니다. 브라우저 설정에서 마이크 권한을 허용해주세요.');
+      } else {
+        alert('마이크에 접근할 수 없습니다: ' + error.message);
+      }
     }
   }
 
   // End Timer Challenge
   async endTimerChallenge() {
-    // Remove keyboard listener
-    document.removeEventListener('keydown', this.handleTimerKeyPress);
+    console.log('Timer Mode: Ending challenge');
     
     // Stop recording
     if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+      console.log('Timer Mode: Stopping recorder');
       this.mediaRecorder.stop();
     }
     
@@ -660,22 +682,47 @@ class WorVox {
   // Analyze Timer Performance
   async analyzeTimerPerformance(audioBlob) {
     try {
+      console.log('Timer Mode: Analyzing performance...');
+      console.log('Timer Mode: Audio blob size:', audioBlob.size, 'type:', audioBlob.type);
+      
+      if (audioBlob.size === 0) {
+        console.error('Timer Mode: Audio blob is empty');
+        this.showTimerResults('(녹음된 오디오가 없습니다)');
+        return;
+      }
+      
       // Convert audio to text using STT
       const formData = new FormData();
-      formData.append('audio', audioBlob);
+      // Determine file extension based on mime type
+      const fileExt = audioBlob.type.includes('webm') ? 'webm' : 
+                     audioBlob.type.includes('mp4') ? 'm4a' : 
+                     audioBlob.type.includes('mpeg') ? 'mp3' : 'webm';
+      formData.append('audio', audioBlob, `timer-recording.${fileExt}`);
       
+      console.log('Timer Mode: Sending audio to STT API...');
       const sttResponse = await axios.post('/api/stt', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       
+      console.log('Timer Mode: STT response:', sttResponse.data);
       const transcription = sttResponse.data.text || '';
+      console.log('Timer Mode: Transcription:', transcription);
       
       // Show results
       this.showTimerResults(transcription);
       
     } catch (error) {
-      console.error('Analysis error:', error);
-      this.showTimerResults('(분석 실패)');
+      console.error('Timer Mode: Analysis error:', error);
+      console.error('Timer Mode: Error response:', error.response?.data);
+      
+      let errorMsg = '(분석 실패)';
+      if (error.response?.data?.error) {
+        errorMsg = `(${error.response.data.error})`;
+      } else if (error.message) {
+        errorMsg = `(${error.message})`;
+      }
+      
+      this.showTimerResults(errorMsg);
     }
   }
 
