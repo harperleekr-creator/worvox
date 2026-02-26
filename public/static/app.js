@@ -452,6 +452,16 @@ class WorVox {
             <i class="fas fa-phone-volume" style="width: 20px; text-align: center;"></i>
             <span class="text-sm">1:1 Live Speaking</span>
           </a>
+          
+          ${this.currentUser && this.currentUser.is_admin ? `
+          <div class="border-t border-gray-700 my-2 pt-2">
+            <a href="#" onclick="worvox.showAdmin(); worvox.closeMobileSidebar(); return false;" 
+              class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'admin' ? 'bg-red-900' : 'hover:bg-red-900'} transition-all text-red-400 hover:text-red-300">
+              <i class="fas fa-shield-alt" style="width: 20px; text-align: center;"></i>
+              <span class="font-semibold">Admin</span>
+            </a>
+          </div>
+          ` : ''}
         </nav>
         
         <!-- User Profile -->
@@ -8901,6 +8911,457 @@ Proceed to payment?
         modal.remove();
       }
     });
+  }
+
+  // Admin Dashboard
+  async showAdmin() {
+    if (!this.currentUser || !this.currentUser.is_admin) {
+      alert('관리자 권한이 필요합니다.');
+      return;
+    }
+
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      ${this.getSidebar('admin')}
+      
+      <div class="flex-1 flex flex-col min-h-screen">
+        ${this.getHeader()}
+        
+        <main class="flex-1 p-4 md:p-8 bg-gray-50">
+          <div class="max-w-7xl mx-auto">
+            <div class="flex items-center justify-between mb-6">
+              <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 flex items-center gap-3">
+                  <i class="fas fa-shield-alt text-red-600"></i>
+                  Admin Dashboard
+                </h1>
+                <p class="text-gray-600 mt-1">시스템 관리 및 사용자 통계</p>
+              </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="admin-loading" class="text-center py-12">
+              <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              <p class="mt-4 text-gray-600">데이터 로딩 중...</p>
+            </div>
+
+            <!-- Admin Content -->
+            <div id="admin-content" class="hidden">
+              <!-- Statistics Cards -->
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <p class="text-gray-500 text-sm">총 사용자</p>
+                      <p id="stat-total-users" class="text-2xl font-bold text-gray-900">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <i class="fas fa-users text-blue-600 text-xl"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-6">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <p class="text-gray-500 text-sm">활성 사용자</p>
+                      <p id="stat-active-users" class="text-2xl font-bold text-gray-900">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                      <i class="fas fa-user-check text-green-600 text-xl"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-6">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <p class="text-gray-500 text-sm">총 세션</p>
+                      <p id="stat-total-sessions" class="text-2xl font-bold text-gray-900">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <i class="fas fa-comments text-purple-600 text-xl"></i>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-6">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <p class="text-gray-500 text-sm">총 매출</p>
+                      <p id="stat-total-revenue" class="text-2xl font-bold text-gray-900">₩0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                      <i class="fas fa-won-sign text-yellow-600 text-xl"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Charts Row -->
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                  <h3 class="text-lg font-semibold mb-4">플랜 분포</h3>
+                  <canvas id="plan-chart" height="200"></canvas>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6">
+                  <h3 class="text-lg font-semibold mb-4">최근 결제</h3>
+                  <div id="recent-payments" class="space-y-2 max-h-64 overflow-y-auto">
+                    <!-- Payments will be loaded here -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Users Table -->
+              <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b border-gray-200">
+                  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <h3 class="text-lg font-semibold">사용자 관리</h3>
+                    <input type="text" id="user-search" placeholder="사용자 검색..." 
+                      class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  </div>
+                </div>
+                <div class="overflow-x-auto">
+                  <table class="w-full">
+                    <thead class="bg-gray-50">
+                      <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">사용자</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이메일</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">플랜</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">세션</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학습시간</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">가입일</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">액션</th>
+                      </tr>
+                    </thead>
+                    <tbody id="users-table-body" class="bg-white divide-y divide-gray-200">
+                      <!-- Users will be loaded here -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+        
+        ${this.getFooter()}
+      </div>
+    `;
+
+    // Load admin data
+    this.loadAdminData();
+
+    // Setup search
+    const searchInput = document.getElementById('user-search');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        this.filterUsers(e.target.value);
+      });
+    }
+  }
+
+  async loadAdminData() {
+    try {
+      // Load statistics
+      const statsResponse = await axios.get('/api/admin/stats', {
+        headers: { 'X-User-Id': this.currentUser.id }
+      });
+
+      if (statsResponse.data.success) {
+        const { stats, recentPayments } = statsResponse.data;
+        
+        // Update stat cards
+        document.getElementById('stat-total-users').textContent = stats.totalUsers || 0;
+        document.getElementById('stat-active-users').textContent = stats.activeUsers || 0;
+        document.getElementById('stat-total-sessions').textContent = stats.totalSessions || 0;
+        document.getElementById('stat-total-revenue').textContent = '₩' + (stats.totalRevenue || 0).toLocaleString();
+
+        // Draw plan distribution chart
+        this.drawPlanChart(stats.planDistribution || []);
+
+        // Display recent payments
+        this.displayRecentPayments(recentPayments || []);
+      }
+
+      // Load users
+      const usersResponse = await axios.get('/api/admin/users', {
+        headers: { 'X-User-Id': this.currentUser.id }
+      });
+
+      if (usersResponse.data.success) {
+        this.allUsers = usersResponse.data.users || [];
+        this.displayUsers(this.allUsers);
+      }
+
+      // Hide loading, show content
+      document.getElementById('admin-loading').classList.add('hidden');
+      document.getElementById('admin-content').classList.remove('hidden');
+
+    } catch (error) {
+      console.error('Load admin data error:', error);
+      document.getElementById('admin-loading').innerHTML = `
+        <div class="text-center">
+          <i class="fas fa-exclamation-circle text-red-500 text-4xl mb-4"></i>
+          <p class="text-red-600 font-semibold">데이터 로딩 실패</p>
+          <p class="text-gray-600 mt-2">${error.response?.data?.error || error.message}</p>
+          <button onclick="worvox.loadAdminData()" class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            다시 시도
+          </button>
+        </div>
+      `;
+    }
+  }
+
+  drawPlanChart(planDistribution) {
+    const ctx = document.getElementById('plan-chart');
+    if (!ctx) return;
+
+    const planColors = {
+      free: '#9CA3AF',
+      core: '#3B82F6',
+      premium: '#8B5CF6',
+      business: '#EF4444'
+    };
+
+    const labels = planDistribution.map(p => p.plan.toUpperCase());
+    const data = planDistribution.map(p => p.count);
+    const colors = planDistribution.map(p => planColors[p.plan] || '#6B7280');
+
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: colors,
+          borderWidth: 2,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+  }
+
+  displayRecentPayments(payments) {
+    const container = document.getElementById('recent-payments');
+    if (!container) return;
+
+    if (payments.length === 0) {
+      container.innerHTML = '<p class="text-gray-500 text-center py-4">결제 내역이 없습니다.</p>';
+      return;
+    }
+
+    container.innerHTML = payments.map(payment => `
+      <div class="flex items-center justify-between py-2 border-b border-gray-100">
+        <div class="flex-1">
+          <p class="font-medium text-sm">${payment.username || payment.email}</p>
+          <p class="text-xs text-gray-500">${payment.plan_name}</p>
+        </div>
+        <div class="text-right">
+          <p class="font-semibold text-sm">₩${payment.amount.toLocaleString()}</p>
+          <p class="text-xs text-gray-500">${new Date(payment.confirmed_at).toLocaleDateString()}</p>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  displayUsers(users) {
+    const tbody = document.getElementById('users-table-body');
+    if (!tbody) return;
+
+    if (users.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" class="px-6 py-4 text-center text-gray-500">사용자가 없습니다.</td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = users.map(user => {
+      const planBadge = this.getPlanBadge(user.plan || 'free');
+      const studyHours = Math.floor((user.total_study_minutes || 0) / 60);
+      const studyMinutes = (user.total_study_minutes || 0) % 60;
+      
+      return `
+        <tr class="hover:bg-gray-50">
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center">
+              <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                ${user.username.charAt(0).toUpperCase()}
+              </div>
+              <div class="ml-3">
+                <p class="text-sm font-medium text-gray-900">${user.username}</p>
+                ${user.is_admin ? '<span class="text-xs text-red-600">👑 Admin</span>' : ''}
+              </div>
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${user.email || '-'}</td>
+          <td class="px-6 py-4 whitespace-nowrap">${planBadge}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${user.total_sessions || 0}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${studyHours}h ${studyMinutes}m</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(user.created_at).toLocaleDateString()}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm">
+            <button onclick="worvox.viewUserDetail(${user.id})" class="text-blue-600 hover:text-blue-900 mr-3">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button onclick="worvox.changeUserPlan(${user.id}, '${user.plan || 'free'}')" class="text-green-600 hover:text-green-900">
+              <i class="fas fa-edit"></i>
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  getPlanBadge(plan) {
+    const badges = {
+      free: '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">FREE</span>',
+      core: '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">CORE</span>',
+      premium: '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">PREMIUM</span>',
+      business: '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">BUSINESS</span>'
+    };
+    return badges[plan] || badges.free;
+  }
+
+  filterUsers(searchTerm) {
+    if (!this.allUsers) return;
+    
+    const filtered = this.allUsers.filter(user => 
+      user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+    
+    this.displayUsers(filtered);
+  }
+
+  async changeUserPlan(userId, currentPlan) {
+    const plans = ['free', 'core', 'premium', 'business'];
+    const planNames = { free: 'Free', core: 'Core', premium: 'Premium', business: 'Business' };
+    
+    const options = plans.map(p => `<option value="${p}" ${p === currentPlan ? 'selected' : ''}>${planNames[p]}</option>`).join('');
+    
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    modal.innerHTML = `
+      <div class="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+        <h3 class="text-lg font-semibold mb-4">플랜 변경</h3>
+        <select id="new-plan-select" class="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4">
+          ${options}
+        </select>
+        <div class="flex gap-2">
+          <button onclick="this.closest('.fixed').remove()" class="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">
+            취소
+          </button>
+          <button onclick="worvox.confirmPlanChange(${userId}, document.getElementById('new-plan-select').value); this.closest('.fixed').remove();" 
+            class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            변경
+          </button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+
+  async confirmPlanChange(userId, newPlan) {
+    try {
+      const response = await axios.post(`/api/admin/users/${userId}/plan`, 
+        { plan: newPlan },
+        { headers: { 'X-User-Id': this.currentUser.id } }
+      );
+
+      if (response.data.success) {
+        alert('플랜이 변경되었습니다.');
+        this.loadAdminData();
+      }
+    } catch (error) {
+      console.error('Change plan error:', error);
+      alert('플랜 변경에 실패했습니다: ' + (error.response?.data?.error || error.message));
+    }
+  }
+
+  async viewUserDetail(userId) {
+    try {
+      const response = await axios.get(`/api/admin/users/${userId}`, {
+        headers: { 'X-User-Id': this.currentUser.id }
+      });
+
+      if (response.data.success) {
+        const { user, sessions, payments, loginSessions } = response.data;
+        
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto';
+        modal.innerHTML = `
+          <div class="bg-white rounded-lg p-6 max-w-4xl w-full my-8">
+            <div class="flex justify-between items-start mb-6">
+              <h3 class="text-2xl font-semibold">${user.username} 상세 정보</h3>
+              <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times text-xl"></i>
+              </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <h4 class="font-semibold mb-2">기본 정보</h4>
+                <p><strong>이메일:</strong> ${user.email || '-'}</p>
+                <p><strong>레벨:</strong> ${user.level}</p>
+                <p><strong>플랜:</strong> ${this.getPlanBadge(user.plan || 'free')}</p>
+                <p><strong>가입일:</strong> ${new Date(user.created_at).toLocaleString()}</p>
+              </div>
+              <div>
+                <h4 class="font-semibold mb-2">통계</h4>
+                <p><strong>총 세션:</strong> ${sessions.length}</p>
+                <p><strong>총 메시지:</strong> ${sessions.reduce((sum, s) => sum + (s.message_count || 0), 0)}</p>
+                <p><strong>결제 횟수:</strong> ${payments.filter(p => p.status === 'completed').length}</p>
+                <p><strong>로그인 횟수:</strong> ${loginSessions.length}</p>
+              </div>
+            </div>
+
+            <div class="mb-6">
+              <h4 class="font-semibold mb-2">최근 세션 (최대 10개)</h4>
+              <div class="max-h-64 overflow-y-auto">
+                ${sessions.slice(0, 10).map(s => `
+                  <div class="border-b py-2">
+                    <p class="text-sm"><strong>${s.topic_name || 'Unknown'}</strong></p>
+                    <p class="text-xs text-gray-500">${new Date(s.started_at).toLocaleString()} - 메시지: ${s.message_count || 0}</p>
+                  </div>
+                `).join('') || '<p class="text-gray-500">세션 없음</p>'}
+              </div>
+            </div>
+
+            <div>
+              <h4 class="font-semibold mb-2">결제 내역</h4>
+              <div class="max-h-48 overflow-y-auto">
+                ${payments.map(p => `
+                  <div class="border-b py-2 flex justify-between">
+                    <div>
+                      <p class="text-sm font-medium">${p.plan_name}</p>
+                      <p class="text-xs text-gray-500">${new Date(p.created_at).toLocaleString()}</p>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-sm font-semibold">₩${p.amount.toLocaleString()}</p>
+                      <p class="text-xs ${p.status === 'completed' ? 'text-green-600' : p.status === 'failed' ? 'text-red-600' : 'text-yellow-600'}">${p.status}</p>
+                    </div>
+                  </div>
+                `).join('') || '<p class="text-gray-500">결제 없음</p>'}
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      }
+    } catch (error) {
+      console.error('View user detail error:', error);
+      alert('사용자 정보 로딩 실패: ' + (error.response?.data?.error || error.message));
+    }
   }
 }
 
