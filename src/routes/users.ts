@@ -529,4 +529,66 @@ users.get('/:userId/stats', async (c) => {
   }
 });
 
+// Change user password
+users.patch('/:userId/password', async (c) => {
+  try {
+    const userId = c.req.param('userId');
+    const { currentPassword, newPassword } = await c.req.json();
+
+    console.log('🔐 Password change attempt for user:', userId);
+
+    // Validation
+    if (!currentPassword || !newPassword) {
+      return c.json({ error: 'Current password and new password are required' }, 400);
+    }
+
+    if (newPassword.length < 8) {
+      return c.json({ error: 'New password must be at least 8 characters' }, 400);
+    }
+
+    // Get user with password_hash
+    const user = await c.env.DB.prepare(
+      'SELECT id, password_hash, auth_provider FROM users WHERE id = ?'
+    ).bind(userId).first();
+
+    if (!user) {
+      return c.json({ error: 'User not found' }, 404);
+    }
+
+    // Check if user is using email authentication
+    if (user.auth_provider !== 'email') {
+      return c.json({ error: 'Password change is only available for email accounts' }, 400);
+    }
+
+    // Verify current password
+    const currentPasswordHash = btoa(currentPassword);
+    if (user.password_hash !== currentPasswordHash) {
+      console.log('❌ Invalid current password');
+      return c.json({ error: 'Current password is incorrect' }, 401);
+    }
+
+    // Hash new password
+    const newPasswordHash = btoa(newPassword);
+
+    // Update password
+    await c.env.DB.prepare(
+      'UPDATE users SET password_hash = ? WHERE id = ?'
+    ).bind(newPasswordHash, userId).run();
+
+    console.log('✅ Password changed successfully for user:', userId);
+
+    return c.json({
+      success: true,
+      message: 'Password changed successfully'
+    });
+
+  } catch (error) {
+    console.error('❌ Password change error:', error);
+    return c.json({ 
+      error: 'Failed to change password',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
 export default users;

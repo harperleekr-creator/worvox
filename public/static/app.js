@@ -272,14 +272,16 @@ class WorVox {
           
           <!-- User Info -->
           <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-white font-semibold">
-              ${this.currentUser.username.charAt(0).toUpperCase()}
-            </div>
-            <div class="flex-1">
-              <div class="font-medium text-sm">${this.currentUser.username}</div>
-              <div class="text-xs text-gray-400">${this.currentUser.level}</div>
-            </div>
-            <button onclick="worvox.logout()" class="text-gray-400 hover:text-white" title="Logout">
+            <button onclick="worvox.showProfile(); worvox.closeMobileSidebar();" class="flex items-center gap-3 flex-1 hover:bg-gray-800 p-2 rounded-lg transition-all">
+              <div class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-white font-semibold">
+                ${this.currentUser.username.charAt(0).toUpperCase()}
+              </div>
+              <div class="flex-1 text-left">
+                <div class="font-medium text-sm">${this.currentUser.username}</div>
+                <div class="text-xs text-gray-400">${this.currentUser.level}</div>
+              </div>
+            </button>
+            <button onclick="worvox.logout()" class="text-gray-400 hover:text-white p-2" title="Logout">
               <i class="fas fa-sign-out-alt"></i>
             </button>
           </div>
@@ -7253,6 +7255,281 @@ Proceed to payment?
         </div>
       </div>
     `;
+  }
+
+  // Show user profile/settings page
+  async showProfile() {
+    const app = document.getElementById('app');
+    
+    // Determine auth provider for display
+    const authProvider = this.currentUser.auth_provider || 'email';
+    const isGoogleAuth = authProvider === 'google';
+    const isEmailAuth = authProvider === 'email';
+    
+    app.innerHTML = `
+      <div class="flex h-screen bg-gray-50">
+        <!-- Sidebar -->
+        ${this.getSidebar('profile')}
+        
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- Header -->
+          <div class="bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4">
+            <div class="flex items-center gap-2">
+              <button onclick="worvox.showTopicSelection()" 
+                class="text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all">
+                <i class="fas fa-arrow-left text-xl"></i>
+              </button>
+              <div>
+                <h1 class="text-lg md:text-2xl font-bold text-gray-800">
+                  <i class="fas fa-user-circle mr-2 text-emerald-600"></i>내 정보
+                </h1>
+                <p class="hidden md:block text-gray-600 text-sm mt-1">프로필 및 계정 설정</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Content Area -->
+          <div class="flex-1 overflow-y-auto">
+            <div class="p-4 md:p-8">
+              <div class="max-w-4xl mx-auto space-y-6">
+                
+                <!-- Profile Card -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                  <div class="flex items-center gap-4 mb-6">
+                    <div class="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                      ${this.currentUser.username.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <h2 class="text-xl font-bold text-gray-900">${this.currentUser.username}</h2>
+                      <p class="text-gray-600">${this.currentUser.email || '이메일 없음'}</p>
+                      <div class="flex items-center gap-2 mt-1">
+                        ${isGoogleAuth ? `
+                          <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                            <i class="fab fa-google mr-1"></i>Google 계정
+                          </span>
+                        ` : `
+                          <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
+                            <i class="fas fa-envelope mr-1"></i>이메일 계정
+                          </span>
+                        `}
+                        ${this.isPremiumUser() ? `
+                          <span class="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full font-bold">
+                            <i class="fas fa-crown mr-1"></i>PREMIUM
+                          </span>
+                        ` : `
+                          <span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
+                            FREE
+                          </span>
+                        `}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Account Information -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                  <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-info-circle text-emerald-600 mr-2"></i>계정 정보
+                  </h3>
+                  
+                  <div class="space-y-4">
+                    <!-- Username -->
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">이름</label>
+                      <input type="text" id="profileUsername" value="${this.currentUser.username}" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    </div>
+                    
+                    <!-- Email (read-only) -->
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
+                      <input type="email" value="${this.currentUser.email || '이메일 없음'}" disabled
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed">
+                      <p class="text-xs text-gray-500 mt-1">이메일은 변경할 수 없습니다</p>
+                    </div>
+                    
+                    <!-- English Level -->
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">영어 레벨</label>
+                      <select id="profileLevel" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <option value="beginner" ${this.currentUser.level === 'beginner' ? 'selected' : ''}>🌱 Beginner - 초급</option>
+                        <option value="intermediate" ${this.currentUser.level === 'intermediate' ? 'selected' : ''}>🌿 Intermediate - 중급</option>
+                        <option value="advanced" ${this.currentUser.level === 'advanced' ? 'selected' : ''}>🌳 Advanced - 고급</option>
+                      </select>
+                    </div>
+                    
+                    <!-- Save Button -->
+                    <button onclick="worvox.updateProfile()" 
+                      class="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-all">
+                      <i class="fas fa-save mr-2"></i>프로필 저장
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Change Password (Email accounts only) -->
+                ${isEmailAuth ? `
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                  <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-lock text-emerald-600 mr-2"></i>비밀번호 변경
+                  </h3>
+                  
+                  <div class="space-y-4">
+                    <!-- Current Password -->
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">현재 비밀번호</label>
+                      <input type="password" id="currentPassword" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        placeholder="현재 비밀번호 입력">
+                    </div>
+                    
+                    <!-- New Password -->
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">새 비밀번호</label>
+                      <input type="password" id="newPassword" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        placeholder="8자 이상">
+                    </div>
+                    
+                    <!-- Confirm New Password -->
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">새 비밀번호 확인</label>
+                      <input type="password" id="confirmPassword" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        placeholder="새 비밀번호 재입력">
+                    </div>
+                    
+                    <!-- Change Password Button -->
+                    <button onclick="worvox.changePassword()" 
+                      class="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition-all">
+                      <i class="fas fa-key mr-2"></i>비밀번호 변경
+                    </button>
+                  </div>
+                </div>
+                ` : `
+                <div class="bg-blue-50 rounded-2xl p-6 border border-blue-200">
+                  <div class="flex items-start gap-3">
+                    <i class="fas fa-info-circle text-blue-600 text-xl mt-1"></i>
+                    <div>
+                      <h4 class="font-semibold text-blue-900 mb-1">Google 계정</h4>
+                      <p class="text-sm text-blue-700">Google 계정으로 로그인하셨습니다. 비밀번호는 Google에서 관리됩니다.</p>
+                    </div>
+                  </div>
+                </div>
+                `}
+
+                <!-- Account Actions -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                  <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-cog text-emerald-600 mr-2"></i>계정 관리
+                  </h3>
+                  
+                  <div class="space-y-3">
+                    <button onclick="worvox.showPlan()" 
+                      class="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2">
+                      <i class="fas fa-crown"></i>
+                      <span>${this.isPremiumUser() ? '플랜 관리' : 'Premium으로 업그레이드'}</span>
+                    </button>
+                    
+                    <button onclick="worvox.logout()" 
+                      class="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-semibold transition-all">
+                      <i class="fas fa-sign-out-alt mr-2"></i>로그아웃
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+              
+              ${this.getFooter()}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Update user profile
+  async updateProfile() {
+    const username = document.getElementById('profileUsername').value.trim();
+    const level = document.getElementById('profileLevel').value;
+
+    if (!username) {
+      alert('이름을 입력해주세요.');
+      return;
+    }
+
+    try {
+      console.log('Updating profile:', { username, level });
+
+      const response = await axios.patch(`/api/users/${this.currentUser.id}/level`, {
+        level
+      });
+
+      // Update username separately if needed
+      if (username !== this.currentUser.username) {
+        // For now, just update locally
+        // TODO: Add backend endpoint for username update
+        this.currentUser.username = username;
+      }
+
+      this.currentUser.level = level;
+      localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
+
+      alert('프로필이 업데이트되었습니다!');
+      this.showProfile(); // Refresh page
+
+    } catch (error) {
+      console.error('Profile update error:', error);
+      alert('프로필 업데이트에 실패했습니다. 다시 시도해주세요.');
+    }
+  }
+
+  // Change password (email accounts only)
+  async changePassword() {
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    // Validation
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      alert('모든 필드를 입력해주세요.');
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      alert('새 비밀번호는 8자 이상이어야 합니다.');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      alert('새 비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
+    try {
+      console.log('Changing password...');
+
+      const response = await axios.patch(`/api/users/${this.currentUser.id}/password`, {
+        currentPassword,
+        newPassword
+      });
+
+      alert('비밀번호가 변경되었습니다!');
+      
+      // Clear password fields
+      document.getElementById('currentPassword').value = '';
+      document.getElementById('newPassword').value = '';
+      document.getElementById('confirmPassword').value = '';
+
+    } catch (error) {
+      console.error('Password change error:', error);
+      if (error.response?.status === 401) {
+        alert('현재 비밀번호가 올바르지 않습니다.');
+      } else {
+        alert('비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
+      }
+    }
   }
 
   async showPlan() {
