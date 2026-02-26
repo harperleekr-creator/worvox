@@ -4469,15 +4469,15 @@ Proceed to payment?
             <!-- Tabs -->
             <div class="bg-white border-b border-gray-200 px-4 md:px-6">
               <div class="flex gap-2 md:gap-4 overflow-x-auto">
-                <button onclick="worvox.showHistoryTab('ai')" 
+                <button onclick="worvox.showHistoryTab('ai', event)" 
                   class="history-tab active px-4 py-3 font-semibold border-b-2 border-blue-600 text-blue-600 whitespace-nowrap">
                   <i class="fas fa-comment mr-2"></i>AI 대화 (${aiConversations.length})
                 </button>
-                <button onclick="worvox.showHistoryTab('timer')" 
+                <button onclick="worvox.showHistoryTab('timer', event)" 
                   class="history-tab px-4 py-3 font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap">
                   <i class="fas fa-stopwatch mr-2"></i>타이머 모드 (${timerSessions.length})
                 </button>
-                <button onclick="worvox.showHistoryTab('scenario')" 
+                <button onclick="worvox.showHistoryTab('scenario', event)" 
                   class="history-tab px-4 py-3 font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap">
                   <i class="fas fa-film mr-2"></i>시나리오 모드 (${scenarioSessions.length})
                 </button>
@@ -4566,20 +4566,28 @@ Proceed to payment?
   }
   
   // Show specific history tab
-  showHistoryTab(tabName) {
+  showHistoryTab(tabName, event) {
     // Update tab buttons
     const tabs = document.querySelectorAll('.history-tab');
     tabs.forEach(tab => {
       tab.classList.remove('active', 'border-blue-600', 'text-blue-600');
       tab.classList.add('border-transparent', 'text-gray-600');
     });
-    event.target.closest('.history-tab').classList.add('active', 'border-blue-600', 'text-blue-600');
-    event.target.closest('.history-tab').classList.remove('border-transparent', 'text-gray-600');
+    
+    // Get the clicked button
+    const clickedTab = event ? event.target.closest('.history-tab') : document.querySelector('.history-tab.active');
+    if (clickedTab) {
+      clickedTab.classList.add('active', 'border-blue-600', 'text-blue-600');
+      clickedTab.classList.remove('border-transparent', 'text-gray-600');
+    }
     
     // Update content
     const contents = document.querySelectorAll('.history-tab-content');
     contents.forEach(content => content.classList.add('hidden'));
-    document.getElementById(`historyTab-${tabName}`).classList.remove('hidden');
+    const targetContent = document.getElementById(`historyTab-${tabName}`);
+    if (targetContent) {
+      targetContent.classList.remove('hidden');
+    }
   }
 
   groupSessionsByDate(sessions) {
