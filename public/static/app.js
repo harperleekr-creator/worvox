@@ -518,22 +518,30 @@ class WorVox {
   // Footer with company information
   getFooter() {
     return `
-      <footer class="w-full bg-gray-900 text-gray-400 py-4 -mx-4 md:-mx-8 mt-8 md:mt-12">
+      <footer class="w-full bg-gray-900 text-gray-400 py-6 -mx-4 md:-mx-8 mt-8 md:mt-12">
         <div class="px-4 md:px-8">
-          <div class="flex flex-col md:flex-row justify-between items-center gap-2 md:gap-3 text-xs">
+          <div class="flex flex-col gap-3 text-xs">
             <!-- Company Info -->
             <div class="text-center md:text-left">
-              <div class="flex flex-wrap items-center justify-center md:justify-start gap-1.5 md:gap-2">
+              <div class="flex flex-wrap items-center justify-center md:justify-start gap-1.5 md:gap-2 mb-2">
                 <span class="font-medium text-gray-300">위아솔루션즈</span>
                 <span class="text-gray-600 hidden md:inline">|</span>
                 <span class="block md:inline w-full md:w-auto text-center md:text-left">대표자: 이강돈</span>
                 <span class="text-gray-600 hidden md:inline">|</span>
                 <span class="block md:inline w-full md:w-auto text-center md:text-left">사업자번호: 542-07-02097</span>
               </div>
+              <div class="flex flex-wrap items-center justify-center md:justify-start gap-1.5 md:gap-2 mb-2">
+                <span class="block md:inline w-full md:w-auto text-center md:text-left">주소: 대전광역시 서구 대덕대로241번길 20, 5층 548-2호</span>
+              </div>
+              <div class="flex flex-wrap items-center justify-center md:justify-start gap-1.5 md:gap-2">
+                <span class="block md:inline w-full md:w-auto text-center md:text-left">통신판매: 제 2021-대전동구-0501호</span>
+                <span class="text-gray-600 hidden md:inline">|</span>
+                <span class="block md:inline w-full md:w-auto text-center md:text-left">문의전화: 070-8064-0485</span>
+              </div>
             </div>
             
             <!-- Copyright & Links -->
-            <div class="flex flex-wrap items-center justify-center md:justify-end gap-2 md:gap-3 mt-2 md:mt-0">
+            <div class="flex flex-wrap items-center justify-center md:justify-start gap-2 md:gap-3 pt-3 border-t border-gray-800">
               <span class="text-gray-500">© ${new Date().getFullYear()} WorVox</span>
               <span class="text-gray-700 hidden md:inline">|</span>
               <a href="#" onclick="worvox.showTerms(); return false;" class="hover:text-gray-300 transition-colors whitespace-nowrap">이용약관</a>
