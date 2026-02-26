@@ -20,9 +20,9 @@ class WorVox {
     };
     this.usageLimits = {
       free: {
-        aiConversations: 100,
-        pronunciationPractice: 100,
-        wordSearch: 100
+        aiConversations: 5,
+        pronunciationPractice: 10,
+        wordSearch: 10
       },
       premium: {
         aiConversations: Infinity,
@@ -1465,10 +1465,10 @@ Proceed to payment?
                           <i class="fas fa-comment text-blue-600"></i>
                           <span class="text-sm text-gray-700">AI 대화</span>
                         </div>
-                        <span class="text-sm font-medium text-gray-900" data-usage-count="ai_conversation">${this.getDailyUsage('ai_conversation')}/100회</span>
+                        <span class="text-sm font-medium text-gray-900" data-usage-count="ai_conversation">${this.getDailyUsage('ai_conversation')}/${this.usageLimits.free.aiConversations}회</span>
                       </div>
                       <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-blue-600 h-2 rounded-full transition-all" data-usage-bar="ai_conversation" style="width: ${(this.getDailyUsage('ai_conversation') / 100) * 100}%"></div>
+                        <div class="bg-blue-600 h-2 rounded-full transition-all" data-usage-bar="ai_conversation" style="width: ${(this.getDailyUsage('ai_conversation') / this.usageLimits.free.aiConversations) * 100}%"></div>
                       </div>
                     </div>
                     
@@ -1479,10 +1479,10 @@ Proceed to payment?
                           <i class="fas fa-microphone text-purple-600"></i>
                           <span class="text-sm text-gray-700">발음 연습</span>
                         </div>
-                        <span class="text-sm font-medium text-gray-900" data-usage-count="pronunciation">${this.getDailyUsage('pronunciation')}/100회</span>
+                        <span class="text-sm font-medium text-gray-900" data-usage-count="pronunciation">${this.getDailyUsage('pronunciation')}/${this.usageLimits.free.pronunciationPractice}회</span>
                       </div>
                       <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-purple-600 h-2 rounded-full transition-all" data-usage-bar="pronunciation" style="width: ${(this.getDailyUsage('pronunciation') / 100) * 100}%"></div>
+                        <div class="bg-purple-600 h-2 rounded-full transition-all" data-usage-bar="pronunciation" style="width: ${(this.getDailyUsage('pronunciation') / this.usageLimits.free.pronunciationPractice) * 100}%"></div>
                       </div>
                     </div>
                     
@@ -1493,10 +1493,10 @@ Proceed to payment?
                           <i class="fas fa-search text-emerald-600"></i>
                           <span class="text-sm text-gray-700">단어 검색</span>
                         </div>
-                        <span class="text-sm font-medium text-gray-900" data-usage-count="word_search">${this.getDailyUsage('word_search')}/100회</span>
+                        <span class="text-sm font-medium text-gray-900" data-usage-count="word_search">${this.getDailyUsage('word_search')}/${this.usageLimits.free.wordSearch}회</span>
                       </div>
                       <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-emerald-600 h-2 rounded-full transition-all" data-usage-bar="word_search" style="width: ${(this.getDailyUsage('word_search') / 100) * 100}%"></div>
+                        <div class="bg-emerald-600 h-2 rounded-full transition-all" data-usage-bar="word_search" style="width: ${(this.getDailyUsage('word_search') / this.usageLimits.free.wordSearch) * 100}%"></div>
                       </div>
                     </div>
                   </div>
