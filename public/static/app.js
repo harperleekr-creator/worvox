@@ -8918,10 +8918,24 @@ Proceed to payment?
       <div class="flex h-screen bg-gray-50">
         ${this.getSidebar('admin')}
         
-        <div class="flex-1 flex flex-col min-h-screen">
-          ${this.getHeader()}
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- Header -->
+          <div class="bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4">
+            <div class="flex items-center gap-2">
+              <button onclick="worvox.showProfile()" 
+                class="text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all">
+                <i class="fas fa-arrow-left text-xl"></i>
+              </button>
+              <div>
+                <h1 class="text-lg md:text-2xl font-bold text-gray-800">
+                  <i class="fas fa-shield-alt mr-2 text-red-600"></i>Admin Dashboard
+                </h1>
+                <p class="hidden md:block text-gray-600 text-sm mt-1">시스템 관리 및 사용자 통계</p>
+              </div>
+            </div>
+          </div>
         
-        <main class="flex-1 p-4 md:p-8 bg-gray-50">
+        <main class="flex-1 overflow-y-auto p-4 md:p-8">
           <div class="max-w-7xl mx-auto">
             <div class="flex items-center justify-between mb-6">
               <div>
@@ -9037,10 +9051,8 @@ Proceed to payment?
             </div>
           </div>
         </main>
-        
-        ${this.getFooter()}
+        </div>
       </div>
-    </div>
     `;
 
     // Load admin data
