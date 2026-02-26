@@ -5420,15 +5420,16 @@ Proceed to payment?
       : 'In progress';
     
     return `
-      <div class="border-2 border-gray-200 rounded-xl p-4 hover:border-indigo-500 transition-all">
-        <div class="flex items-start justify-between">
+      <div class="border-2 border-gray-200 rounded-xl p-3 md:p-4 hover:border-indigo-500 transition-all">
+        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+          <!-- Main content area -->
           <div class="flex-1 cursor-pointer" onclick="worvox.showConversation(${session.id})">
-            <div class="flex items-center gap-2 mb-2">
+            <div class="flex items-center gap-2 mb-2 flex-wrap">
               <span class="text-2xl">${session.topic_icon || '📚'}</span>
-              <h4 class="text-lg font-bold text-gray-800">${session.topic_name || 'Conversation'}</h4>
-              ${session.has_report ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold ml-2">✓ 분석완료</span>' : ''}
+              <h4 class="text-base md:text-lg font-bold text-gray-800">${session.topic_name || 'Conversation'}</h4>
+              ${session.has_report ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">✓ 분석완료</span>' : ''}
             </div>
-            <div class="flex items-center gap-4 text-sm text-gray-600 flex-wrap">
+            <div class="flex items-center gap-2 md:gap-4 text-xs md:text-sm text-gray-600 flex-wrap">
               <span><i class="fas fa-clock mr-1"></i>${startTime}</span>
               <span><i class="fas fa-hourglass-half mr-1"></i>${duration}${typeof duration === 'number' ? ' min' : ''}</span>
               <span><i class="fas fa-comment mr-1"></i>${session.message_count} messages</span>
@@ -5437,18 +5438,20 @@ Proceed to payment?
               </span>
             </div>
             ${session.topic_description ? `
-              <p class="text-gray-600 text-sm mt-2">${session.topic_description}</p>
+              <p class="text-gray-600 text-xs md:text-sm mt-2">${session.topic_description}</p>
             ` : ''}
           </div>
-          <div class="flex flex-col gap-2">
+          
+          <!-- Button area - full width on mobile, right side on desktop -->
+          <div class="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-start gap-2 w-full md:w-auto">
             ${session.has_report ? `
               <button 
                 onclick="event.stopPropagation(); worvox.showSessionReportById(${session.id})"
-                class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-semibold transition-all whitespace-nowrap">
+                class="flex-1 md:flex-none px-3 md:px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs md:text-sm font-semibold transition-all whitespace-nowrap">
                 📊 리포트 보기
               </button>
             ` : ''}
-            <i class="fas fa-chevron-right text-gray-400 text-center"></i>
+            <i class="fas fa-chevron-right text-gray-400 md:mt-2"></i>
           </div>
         </div>
       </div>
