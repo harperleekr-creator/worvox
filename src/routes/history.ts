@@ -220,7 +220,8 @@ history.get('/stats/:userId', async (c: Context<{ Bindings: Bindings }>) => {
     // Calculate current streak
     let currentStreak = 0
     if (streakData && streakData.length > 0) {
-      const today = new Date()
+      // Get today's date in Korea timezone (UTC+9)
+      const today = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' }))
       today.setHours(0, 0, 0, 0)
       
       for (let i = 0; i < streakData.length; i++) {

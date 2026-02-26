@@ -400,7 +400,9 @@ payments.post('/billing/execute', async (c) => {
     console.log('🤖 Running billing cron job...');
 
     // Find users whose trial ends today and have auto billing enabled
-    const today = new Date().toISOString().split('T')[0];
+    // Get today's date in Korea timezone (UTC+9)
+    const koreaDate = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
+    const today = koreaDate.toISOString().split('T')[0];
     const { results: usersToCharge } = await c.env.DB.prepare(`
       SELECT id, username, email, plan, billing_key, trial_end_date
       FROM users

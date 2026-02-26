@@ -6,7 +6,9 @@ const app = new Hono<{ Bindings: { DB: D1Database } }>();
 app.get('/:userId', async (c) => {
   try {
     const userId = c.req.param('userId');
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    // Get today's date in Korea timezone (UTC+9)
+    const koreaDate = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
+    const today = koreaDate.toISOString().split('T')[0]; // YYYY-MM-DD
 
     const result = await c.env.DB.prepare(`
       SELECT feature_type, usage_count, usage_date
@@ -52,7 +54,9 @@ app.post('/:userId', async (c) => {
   try {
     const userId = c.req.param('userId');
     const { featureType, increment = 1 } = await c.req.json();
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    // Get today's date in Korea timezone (UTC+9)
+    const koreaDate = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
+    const today = koreaDate.toISOString().split('T')[0]; // YYYY-MM-DD
 
     // Map frontend feature names to DB feature names
     const featureMap: { [key: string]: string } = {
