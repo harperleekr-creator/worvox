@@ -452,11 +452,6 @@ class WorVox {
             <i class="fas fa-phone-volume" style="width: 20px; text-align: center;"></i>
             <span class="text-sm">1:1 Live Speaking</span>
           </a>
-          <a href="#" onclick="worvox.showAdmin(); worvox.closeMobileSidebar(); return false;" 
-            class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'admin' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
-            <i class="fas fa-shield-alt" style="width: 20px; text-align: center;"></i>
-            <span>Admin</span>
-          </a>
         </nav>
         
         <!-- User Profile -->
@@ -8582,6 +8577,14 @@ Proceed to payment?
                   </h3>
                   
                   <div class="space-y-3">
+                    ${this.currentUser.email === 'harperleekr@gmail.com' ? `
+                    <button onclick="worvox.showAdmin()" 
+                      class="w-full py-3 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2">
+                      <i class="fas fa-shield-alt"></i>
+                      <span>Admin Dashboard</span>
+                    </button>
+                    ` : ''}
+                    
                     <button onclick="worvox.showPlan()" 
                       class="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg font-semibold transition-all flex items-center justify-center gap-2">
                       <i class="fas fa-crown"></i>
