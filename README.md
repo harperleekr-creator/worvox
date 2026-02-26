@@ -202,9 +202,17 @@ GOOGLE_CLIENT_ID=your_google_client_id
 # 로컬 D1 데이터베이스에 마이그레이션 적용
 npm run db:migrate:local
 
+# 프로덕션 D1 데이터베이스에 마이그레이션 적용
+npm run db:migrate:prod
+
 # 테스트 데이터 추가 (선택사항)
 npm run db:seed
+
+# 특정 마이그레이션 파일만 실행 (필요시)
+npx wrangler d1 execute worvox-production --remote --file=./migrations/0022_add_billing_trial_columns.sql
 ```
+
+**중요**: 프로덕션 배포 전에 반드시 마이그레이션을 실행해야 합니다!
 
 ### 4. 로컬 개발 서버 실행
 ```bash
@@ -241,11 +249,23 @@ fuser -k 3000/tcp
 2. API 키는 [Cloudflare Dashboard](https://dash.cloudflare.com/profile/api-tokens)에서 생성
 3. 필요한 권한: `Cloudflare Pages - Edit`
 
-#### 2. 프로덕션 데이터베이스 마이그레이션 (최초 1회)
+#### 2. 프로덕션 데이터베이스 마이그레이션
 ```bash
 # Cloudflare API 키가 설정된 후 실행
 npm run db:migrate:prod
+
+# ⚠️ 주의: 마이그레이션 실패 시 (이미 컬럼이 존재하는 경우)
+# 특정 마이그레이션만 선택적으로 실행 가능
+npx wrangler d1 execute worvox-production --remote --file=./migrations/[MIGRATION_FILE].sql
+
+# 예시: 결제/체험 관련 컬럼 추가
+npx wrangler d1 execute worvox-production --remote --file=./migrations/0022_add_billing_trial_columns.sql
 ```
+
+**중요 사항**:
+- 프로덕션 배포 전 **반드시 마이그레이션 실행 필수**
+- 마이그레이션 실패 시 특정 파일만 선택적으로 실행
+- 데이터베이스 스키마 변경 시 다운타임 발생 가능 (수초~수분)
 
 #### 3. 빌드 및 배포
 ```bash
