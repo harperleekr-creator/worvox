@@ -31,7 +31,106 @@ users.post('/check-username', async (c) => {
   }
 });
 
-// Google OAuth login
+// Google Sign-In with JWT credential
+users.post('/google-login', async (c) => {
+  try {
+    const { credential } = await c.req.json();
+
+    if (!credential) {
+      return c.json({ error: 'Google credential is required' }, 400);
+    }
+
+    // Decode JWT token (payload is base64 encoded)
+    const parts = credential.split('.');
+    if (parts.length !== 3) {
+      return c.json({ error: 'Invalid JWT token format' }, 400);
+    }
+
+    const payload = JSON.parse(atob(parts[1]));
+    
+    const googleId = payload.sub;
+    const email = payload.email;
+    const name = payload.name || email.split('@')[0];
+    const picture = payload.picture || null;
+
+    if (!googleId || !email) {
+      return c.json({ error: 'Invalid Google token data' }, 400);
+    }
+
+    // Check if user exists with this Google ID
+    const existingUser = await c.env.DB.prepare(
+      'SELECT * FROM users WHERE google_id = ?'
+    ).bind(googleId).first();
+
+    if (existingUser) {
+      // Update profile picture if changed
+      if (picture && existingUser.google_picture !== picture) {
+        await c.env.DB.prepare(
+          'UPDATE users SET google_picture = ? WHERE id = ?'
+        ).bind(picture, existingUser.id).run();
+      }
+
+      return c.json({
+        user: { ...existingUser, google_picture: picture },
+        success: true,
+        isNew: false,
+      });
+    }
+
+    // Check if user exists with this email
+    const emailUser = await c.env.DB.prepare(
+      'SELECT * FROM users WHERE email = ? OR google_email = ?'
+    ).bind(email, email).first();
+
+    if (emailUser) {
+      // Link Google account to existing user
+      await c.env.DB.prepare(
+        `UPDATE users SET google_id = ?, google_email = ?, google_picture = ?, auth_provider = 'google' 
+         WHERE id = ?`
+      ).bind(googleId, email, picture, emailUser.id).run();
+
+      const updatedUser = await c.env.DB.prepare(
+        'SELECT * FROM users WHERE id = ?'
+      ).bind(emailUser.id).first();
+
+      return c.json({
+        user: updatedUser,
+        success: true,
+        isNew: false,
+        linked: true,
+      });
+    }
+
+    // Create new user with Google account
+    const username = name;
+    
+    const result = await c.env.DB.prepare(
+      `INSERT INTO users (username, email, google_id, google_email, google_picture, auth_provider, level) 
+       VALUES (?, ?, ?, ?, ?, 'google', 'beginner')`
+    ).bind(username, email, googleId, email, picture).run();
+
+    const userId = result.meta.last_row_id;
+
+    const newUser = await c.env.DB.prepare(
+      'SELECT * FROM users WHERE id = ?'
+    ).bind(userId).first();
+
+    return c.json({
+      user: newUser,
+      success: true,
+      isNew: true,
+    });
+
+  } catch (error) {
+    console.error('Google login error:', error);
+    return c.json({ 
+      error: 'Failed to login with Google',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
+// Google OAuth login (legacy)
 users.post('/auth/google', async (c) => {
   try {
     const { credential, profileObj } = await c.req.json();

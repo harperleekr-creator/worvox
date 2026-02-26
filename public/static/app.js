@@ -7128,22 +7128,27 @@ window.handleGoogleLogin = async (response) => {
     
     console.log('Login successful:', result.data);
     
-    // Store user data
-    localStorage.setItem('user', JSON.stringify(result.data.user));
-    localStorage.setItem('isLoggedIn', 'true');
+    // Store user data with correct key
+    localStorage.setItem('worvox_user', JSON.stringify(result.data.user));
     
     // Update app state
     worvox.currentUser = result.data.user;
     
-    // Redirect to home
-    worvox.showTopicSelection();
-    
-    // Show welcome message
-    alert(`환영합니다, ${result.data.user.name}님!`);
+    // If new user, show onboarding steps
+    if (result.data.isNew) {
+      worvox.onboardingStep = 2; // Start from step 2 (level selection)
+      worvox.showOnboardingStep();
+    } else {
+      // Load user data and show home
+      await worvox.loadUsageFromServer();
+      await worvox.loadGamificationStats();
+      worvox.showTopicSelection();
+    }
     
   } catch (error) {
     console.error('Google login error:', error);
-    alert('로그인에 실패했습니다. 다시 시도해주세요.');
+    const errorMsg = error.response?.data?.error || '로그인에 실패했습니다. 다시 시도해주세요.';
+    alert(errorMsg);
   }
 };
 
