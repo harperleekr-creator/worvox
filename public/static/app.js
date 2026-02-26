@@ -6926,3 +6926,64 @@ Proceed to payment?
 const worvox = new WorVox();
 // Backward compatibility alias
 const heyspeak = worvox;
+
+// Google Sign-In callback
+window.handleGoogleLogin = async (response) => {
+  try {
+    console.log('Google Sign-In response:', response);
+    
+    // Send credential to backend
+    const result = await axios.post('/api/users/google-login', {
+      credential: response.credential
+    });
+    
+    console.log('Login successful:', result.data);
+    
+    // Store user data
+    localStorage.setItem('user', JSON.stringify(result.data.user));
+    localStorage.setItem('isLoggedIn', 'true');
+    
+    // Update app state
+    worvox.currentUser = result.data.user;
+    
+    // Redirect to home
+    worvox.showTopicSelection();
+    
+    // Show welcome message
+    alert(`환영합니다, ${result.data.user.name}님!`);
+    
+  } catch (error) {
+    console.error('Google login error:', error);
+    alert('로그인에 실패했습니다. 다시 시도해주세요.');
+  }
+};
+
+// Initialize Google Sign-In on page load
+window.addEventListener('load', () => {
+  if (window.google) {
+    google.accounts.id.initialize({
+      client_id: '506018364729-ichplnfnqlk2hmh1bhblepm0un44ltdr.apps.googleusercontent.com',
+      callback: handleGoogleLogin,
+      auto_select: false,
+      cancel_on_tap_outside: true
+    });
+    
+    // Render button if it exists
+    const googleButtonDiv = document.getElementById('googleSignInButton');
+    if (googleButtonDiv) {
+      google.accounts.id.renderButton(
+        googleButtonDiv,
+        {
+          theme: 'outline',
+          size: 'large',
+          width: 280,
+          text: 'signin_with'
+        }
+      );
+    }
+    
+    console.log('Google Sign-In initialized');
+  } else {
+    console.warn('Google Sign-In library not loaded');
+  }
+});
