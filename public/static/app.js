@@ -7179,7 +7179,7 @@ Proceed to payment?
                 </div>
                 
                 <!-- Pricing Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-6 mb-8 pt-4">
                   
                   <!-- Free Plan -->
                   <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-gray-200 transition-all hover:shadow-2xl">
@@ -7217,12 +7217,12 @@ Proceed to payment?
                   </div>
 
                   <!-- Core Plan -->
-                  <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-blue-200 transition-all hover:shadow-2xl transform hover:-translate-y-1">
+                  <div class="bg-white rounded-2xl shadow-lg overflow-visible border-2 border-blue-200 transition-all hover:shadow-2xl transform hover:-translate-y-1 relative">
                     <!-- Free Trial Badge -->
-                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg z-10">
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-3 md:px-4 py-1 md:py-1.5 rounded-full text-xs font-bold shadow-lg z-10 whitespace-nowrap">
                       🎁 2주 무료 체험
                     </div>
-                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-6 text-center text-white pt-8">
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-4 md:p-6 text-center text-white pt-6 md:pt-8">
                       <div class="text-4xl mb-3">💙</div>
                       <h3 class="text-2xl font-bold mb-2">Core</h3>
                       <div class="mb-4">
@@ -7256,8 +7256,8 @@ Proceed to payment?
                       
                       <!-- Free Trial Button -->
                       <button onclick="worvox.startFreeTrial('core')" 
-                        class="w-full py-3 mb-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg font-semibold hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg">
-                        <i class="fas fa-gift mr-2"></i>2주 무료로 시작하기
+                        class="w-full py-3 mb-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg font-semibold hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg text-sm md:text-base">
+                        <i class="fas fa-gift mr-1 md:mr-2"></i><span class="inline md:hidden">2주 무료 체험</span><span class="hidden md:inline">2주 무료로 시작하기</span>
                       </button>
                       
                       <!-- Regular Purchase Button -->
@@ -7269,16 +7269,16 @@ Proceed to payment?
                   </div>
 
                   <!-- Premium Plan (Most Popular) -->
-                  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-purple-400 relative transition-all hover:shadow-2xl transform hover:-translate-y-2">
+                  <div class="bg-white rounded-2xl shadow-2xl overflow-visible border-2 border-purple-400 relative transition-all hover:shadow-2xl transform hover:-translate-y-2">
                     <!-- Popular Badge -->
-                    <div class="absolute top-4 right-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                    <div class="absolute top-4 right-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs font-bold shadow-lg z-10">
                       🔥 POPULAR
                     </div>
                     <!-- Free Trial Badge -->
-                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg z-10">
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-3 md:px-4 py-1 md:py-1.5 rounded-full text-xs font-bold shadow-lg z-10 whitespace-nowrap">
                       🎁 2주 무료 체험
                     </div>
-                    <div class="bg-gradient-to-br from-purple-500 to-pink-500 p-6 text-center text-white pt-8">
+                    <div class="bg-gradient-to-br from-purple-500 to-pink-500 p-4 md:p-6 text-center text-white pt-6 md:pt-8">
                       <div class="text-4xl mb-3">✨</div>
                       <h3 class="text-2xl font-bold mb-2">Premium</h3>
                       <div class="mb-4">
@@ -7312,8 +7312,8 @@ Proceed to payment?
                       
                       <!-- Free Trial Button -->
                       <button onclick="worvox.startFreeTrial('premium')" 
-                        class="w-full py-3 mb-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg font-semibold hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg">
-                        <i class="fas fa-gift mr-2"></i>2주 무료로 시작하기
+                        class="w-full py-3 mb-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg font-semibold hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg text-sm md:text-base">
+                        <i class="fas fa-gift mr-1 md:mr-2"></i><span class="inline md:hidden">2주 무료 체험</span><span class="hidden md:inline">2주 무료로 시작하기</span>
                       </button>
                       
                       <!-- Regular Purchase Button -->
