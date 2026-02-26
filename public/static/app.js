@@ -2066,7 +2066,10 @@ class WorVox {
       // 2. Initialize Toss Payments
       const clientKey = 'test_ck_d26DlbXAaV0eR7QxP00rqY50Q9RB';
       const tossPayments = TossPayments(clientKey);
-      const payment = tossPayments.payment({ customerKey: this.currentUser.id.toString() });
+      
+      // customerKey must include letters/special chars, not just numbers
+      const customerKey = `customer_${this.currentUser.id}`;
+      const payment = tossPayments.payment({ customerKey });
 
       // 3. Request payment
       await payment.requestPayment({
@@ -8757,7 +8760,10 @@ Proceed to payment?
       // 2. Initialize Toss Payments
       const clientKey = 'test_ck_d26DlbXAaV0eR7QxP00rqY50Q9RB';
       const tossPayments = TossPayments(clientKey);
-      const payment = tossPayments.payment({ customerKey: this.currentUser.id.toString() });
+      
+      // customerKey must include letters/special chars, not just numbers
+      const customerKey = `customer_${this.currentUser.id}`;
+      const payment = tossPayments.payment({ customerKey });
 
       // 3. Request payment
       await payment.requestPayment({
