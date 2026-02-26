@@ -783,17 +783,204 @@ Proceed to payment?
         <div class="text-center">
           <div class="text-5xl mb-4">👋</div>
           <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome to WorVox!</h2>
-          <p class="text-gray-600">Sign in with your Google account to get started</p>
+          <p class="text-gray-600">로그인하거나 회원가입하여 시작하세요</p>
         </div>
         
         <!-- Google Sign-In Button -->
         <div id="googleSignInButton" class="flex justify-center"></div>
         
-        <div class="mt-6 text-center text-sm text-gray-500">
-          <p>By signing in, you agree to our Terms of Service and Privacy Policy</p>
+        <!-- Divider -->
+        <div class="relative">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-300"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-white text-gray-500">또는</span>
+          </div>
+        </div>
+        
+        <!-- Email/Password Login Form -->
+        <div id="loginForm">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
+              <input type="email" id="loginEmail" 
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="example@email.com">
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">비밀번호</label>
+              <input type="password" id="loginPassword" 
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="••••••••">
+            </div>
+            
+            <button onclick="worvox.handleEmailLogin()" 
+              class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all">
+              로그인
+            </button>
+            
+            <div class="text-center">
+              <button onclick="worvox.showSignupForm()" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                계정이 없으신가요? <span class="underline">회원가입</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Signup Form (Hidden by default) -->
+        <div id="signupForm" class="hidden">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">이름</label>
+              <input type="text" id="signupName" 
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="홍길동">
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
+              <input type="email" id="signupEmail" 
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="example@email.com">
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">비밀번호</label>
+              <input type="password" id="signupPassword" 
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="8자 이상">
+            </div>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">비밀번호 확인</label>
+              <input type="password" id="signupPasswordConfirm" 
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="비밀번호 재입력">
+            </div>
+            
+            <button onclick="worvox.handleEmailSignup()" 
+              class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all">
+              회원가입
+            </button>
+            
+            <div class="text-center">
+              <button onclick="worvox.showLoginForm()" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                이미 계정이 있으신가요? <span class="underline">로그인</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-6 text-center text-xs text-gray-500">
+          <p>가입하면 <a href="#" onclick="worvox.showTerms(); return false;" class="text-indigo-600 hover:underline">이용약관</a> 및 <a href="#" onclick="worvox.showPrivacy(); return false;" class="text-indigo-600 hover:underline">개인정보처리방침</a>에 동의하는 것으로 간주됩니다</p>
         </div>
       </div>
     `;
+  }
+
+  // Toggle between login and signup forms
+  showSignupForm() {
+    document.getElementById('loginForm').classList.add('hidden');
+    document.getElementById('signupForm').classList.remove('hidden');
+  }
+
+  showLoginForm() {
+    document.getElementById('signupForm').classList.add('hidden');
+    document.getElementById('loginForm').classList.remove('hidden');
+  }
+
+  // Handle email login
+  async handleEmailLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+
+    if (!email || !password) {
+      alert('이메일과 비밀번호를 입력해주세요.');
+      return;
+    }
+
+    try {
+      const response = await axios.post('/api/users/login', {
+        email,
+        password
+      });
+
+      console.log('Login successful:', response.data);
+
+      // Store user data
+      localStorage.setItem('worvox_user', JSON.stringify(response.data.user));
+      this.currentUser = response.data.user;
+
+      // Move to next step
+      this.nextStep();
+
+    } catch (error) {
+      console.error('Login error:', error);
+      if (error.response?.status === 401) {
+        alert('이메일 또는 비밀번호가 올바르지 않습니다.');
+      } else {
+        alert('로그인에 실패했습니다. 다시 시도해주세요.');
+      }
+    }
+  }
+
+  // Handle email signup
+  async handleEmailSignup() {
+    const name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    const passwordConfirm = document.getElementById('signupPasswordConfirm').value;
+
+    // Validation
+    if (!name || !email || !password || !passwordConfirm) {
+      alert('모든 필드를 입력해주세요.');
+      return;
+    }
+
+    if (password.length < 8) {
+      alert('비밀번호는 8자 이상이어야 합니다.');
+      return;
+    }
+
+    if (password !== passwordConfirm) {
+      alert('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert('올바른 이메일 형식이 아닙니다.');
+      return;
+    }
+
+    try {
+      const response = await axios.post('/api/users/signup', {
+        name,
+        email,
+        password
+      });
+
+      console.log('Signup successful:', response.data);
+
+      // Store user data
+      localStorage.setItem('worvox_user', JSON.stringify(response.data.user));
+      this.currentUser = response.data.user;
+
+      // Move to next step
+      alert(`환영합니다, ${name}님! 이제 영어 레벨을 선택해주세요.`);
+      this.nextStep();
+
+    } catch (error) {
+      console.error('Signup error:', error);
+      if (error.response?.status === 409) {
+        alert('이미 등록된 이메일입니다. 로그인해주세요.');
+      } else {
+        alert('회원가입에 실패했습니다. 다시 시도해주세요.');
+      }
+    }
   }
 
   getStep2HTML() {
