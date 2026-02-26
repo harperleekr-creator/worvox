@@ -22,17 +22,20 @@ class WorVox {
       free: {
         aiConversations: 5,
         pronunciationPractice: 10,
-        wordSearch: 10
+        wordSearch: 10,
+        timerMode: 3  // Free users: 3 timer challenges per day
       },
       premium: {
         aiConversations: Infinity,
         pronunciationPractice: Infinity,
-        wordSearch: Infinity
+        wordSearch: Infinity,
+        timerMode: Infinity
       },
       business: {
         aiConversations: Infinity,
         pronunciationPractice: Infinity,
-        wordSearch: Infinity
+        wordSearch: Infinity,
+        timerMode: Infinity
       }
     };
     
@@ -559,6 +562,9 @@ class WorVox {
     }
     
     this.timerChallenge.started = true;
+    
+    // Track timer mode usage
+    this.incrementDailyUsage('timer_mode');
     
     const countdownEl = document.getElementById('timerCountdown');
     const instructionEl = document.getElementById('instructionText');
@@ -1933,16 +1939,25 @@ Proceed to payment?
                   <div id="searchResult" class="mt-4 md:mt-6 max-w-2xl mx-auto"></div>
                 </div>
                 
-                <!-- Daily Usage Tracker (Free Plan Only) -->
-                ${!this.isPremiumUser() ? `
+                <!-- Daily Usage Tracker (All Users) -->
                 <div class="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-200 mb-6 md:mb-8">
                   <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-base md:text-lg font-semibold text-gray-900">오늘의 사용량</h3>
+                    <h3 class="text-base md:text-lg font-semibold text-gray-900">
+                      <i class="fas fa-chart-bar mr-2"></i>오늘의 사용량
+                    </h3>
+                    ${!this.isPremiumUser() ? `
                     <button onclick="worvox.showPlan()" class="text-emerald-600 hover:text-emerald-700 text-xs md:text-sm font-medium">
                       Premium 보기 →
                     </button>
+                    ` : `
+                    <span class="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs px-3 py-1 rounded-full font-bold">
+                      PREMIUM
+                    </span>
+                    `}
                   </div>
                   
+                  ${!this.isPremiumUser() ? `
+                  <!-- Free Plan: Progress Bars -->
                   <div class="space-y-4">
                     <!-- AI Conversation Usage -->
                     <div>
@@ -1958,17 +1973,17 @@ Proceed to payment?
                       </div>
                     </div>
                     
-                    <!-- Pronunciation Practice Usage -->
+                    <!-- Timer Mode Usage -->
                     <div>
                       <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center gap-2">
-                          <i class="fas fa-microphone text-purple-600"></i>
-                          <span class="text-sm text-gray-700">발음 연습</span>
+                          <i class="fas fa-stopwatch text-purple-600"></i>
+                          <span class="text-sm text-gray-700">타이머 모드</span>
                         </div>
-                        <span class="text-sm font-medium text-gray-900" data-usage-count="pronunciation">${this.getDailyUsage('pronunciation')}/${this.usageLimits.free.pronunciationPractice}회</span>
+                        <span class="text-sm font-medium text-gray-900" data-usage-count="timer_mode">${this.getDailyUsage('timer_mode')}/${this.usageLimits.free.timerMode}회</span>
                       </div>
                       <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-purple-600 h-2 rounded-full transition-all" data-usage-bar="pronunciation" style="width: ${(this.getDailyUsage('pronunciation') / this.usageLimits.free.pronunciationPractice) * 100}%"></div>
+                        <div class="bg-purple-600 h-2 rounded-full transition-all" data-usage-bar="timer_mode" style="width: ${(this.getDailyUsage('timer_mode') / this.usageLimits.free.timerMode) * 100}%"></div>
                       </div>
                     </div>
                     
@@ -1986,6 +2001,37 @@ Proceed to payment?
                       </div>
                     </div>
                   </div>
+                  ` : `
+                  <!-- Premium Plan: Count Only -->
+                  <div class="space-y-3">
+                    <!-- AI Conversation Usage -->
+                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                      <div class="flex items-center gap-3">
+                        <i class="fas fa-comment text-blue-600 text-lg"></i>
+                        <span class="text-sm font-medium text-gray-700">AI 대화</span>
+                      </div>
+                      <span class="text-lg font-bold text-blue-600" data-usage-count="ai_conversation">${this.getDailyUsage('ai_conversation')}회</span>
+                    </div>
+                    
+                    <!-- Timer Mode Usage -->
+                    <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                      <div class="flex items-center gap-3">
+                        <i class="fas fa-stopwatch text-purple-600 text-lg"></i>
+                        <span class="text-sm font-medium text-gray-700">타이머 모드</span>
+                      </div>
+                      <span class="text-lg font-bold text-purple-600" data-usage-count="timer_mode">${this.getDailyUsage('timer_mode')}회</span>
+                    </div>
+                    
+                    <!-- Word Search Usage -->
+                    <div class="flex items-center justify-between p-3 bg-emerald-50 rounded-lg">
+                      <div class="flex items-center gap-3">
+                        <i class="fas fa-search text-emerald-600 text-lg"></i>
+                        <span class="text-sm font-medium text-gray-700">단어 검색</span>
+                      </div>
+                      <span class="text-lg font-bold text-emerald-600" data-usage-count="word_search">${this.getDailyUsage('word_search')}회</span>
+                    </div>
+                  </div>
+                  `}
                   
                   <div class="mt-4 pt-4 border-t border-gray-200">
                     <p class="text-xs text-gray-500 text-center">
@@ -2006,24 +2052,26 @@ Proceed to payment?
                   </div>
                   <div id="latestReportContent">
                     <div class="text-center py-8 text-gray-400">
-                      <i class="fas fa-chart-pie text-4xl mb-3"></i>
-                      <p class="text-sm">아직 분석된 리포트가 없습니다</p>
-                      <p class="text-xs mt-1">AI 대화를 시작하고 리포트를 받아보세요!</p>
+                      <i class="fas fa-spinner fa-spin text-4xl mb-3"></i>
+                      <p class="text-sm">리포트를 불러오는 중...</p>
                     </div>
                   </div>
                 </div>
-                ` : ''}
                 
                 <!-- Feature Cards -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
                   ${this.topics.filter(topic => 
                     topic.name === 'Vocabulary' || topic.name === 'AI English Conversation'
                   ).map(topic => `
-                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-lg hover:border-emerald-400 transition-all cursor-pointer"
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-lg hover:border-emerald-400 transition-all cursor-pointer relative"
                       data-topic-id="${topic.id}" 
                       data-topic-name="${this.escapeHtml(topic.name)}" 
                       data-topic-level="${topic.level}"
                       onclick="worvox.startTopicById(${topic.id})">
+                      <div class="absolute top-3 right-3 flex gap-2">
+                        <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">FREE</span>
+                        <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-bold">PREMIUM</span>
+                      </div>
                       <div class="w-12 h-12 bg-${topic.name === 'AI English Conversation' ? 'emerald' : 'blue'}-100 rounded-xl flex items-center justify-center mb-4">
                         <span class="text-2xl">${topic.icon}</span>
                       </div>
