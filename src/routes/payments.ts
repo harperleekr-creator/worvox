@@ -85,13 +85,53 @@ payments.post('/confirm', async (c) => {
     // Update order status in database
     try {
       const db = c.env.DB;
-      await db.prepare(`
-        UPDATE payment_orders 
-        SET status = 'completed', 
-            payment_key = ?,
-            confirmed_at = datetime('now')
-        WHERE order_id = ?
-      `).bind(paymentKey, orderId).run();
+      
+      // Get order details
+      const order = await db.prepare(
+        'SELECT * FROM payment_orders WHERE order_id = ?'
+      ).bind(orderId).first();
+
+      if (order) {
+        // Update order status
+        await db.prepare(`
+          UPDATE payment_orders 
+          SET status = 'completed', 
+              payment_key = ?,
+              confirmed_at = datetime('now')
+          WHERE order_id = ?
+        `).bind(paymentKey, orderId).run();
+
+        // Update user subscription
+        const planName = order.plan_name.toLowerCase();
+        const billingPeriod = planName.includes('년') || planName.includes('연간') ? 'yearly' : 'monthly';
+        const months = billingPeriod === 'yearly' ? 12 : 1;
+        
+        // Extract plan type (Core or Premium)
+        let planType = 'free';
+        if (planName.includes('core')) {
+          planType = 'core';
+        } else if (planName.includes('premium')) {
+          planType = 'premium';
+        }
+
+        console.log('Updating user subscription:', {
+          userId: order.user_id,
+          planType,
+          billingPeriod,
+          months
+        });
+
+        await db.prepare(`
+          UPDATE users 
+          SET plan = ?,
+              billing_period = ?,
+              subscription_start_date = datetime('now'),
+              subscription_end_date = datetime('now', '+' || ? || ' months')
+          WHERE id = ?
+        `).bind(planType, billingPeriod, months, order.user_id).run();
+
+        console.log('User subscription updated successfully');
+      }
     } catch (dbError) {
       console.log('DB update failed:', dbError);
     }

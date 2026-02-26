@@ -8570,6 +8570,70 @@ Proceed to payment?
                 </div>
                 `}
 
+                <!-- Subscription Info -->
+                ${this.currentUser.plan && this.currentUser.plan !== 'free' ? `
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                  <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-credit-card text-emerald-600 mr-2"></i>구독 정보
+                  </h3>
+                  
+                  <div class="space-y-4">
+                    <!-- Current Plan -->
+                    <div class="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg">
+                      <div>
+                        <p class="text-sm text-gray-600 mb-1">현재 플랜</p>
+                        <p class="text-xl font-bold text-gray-900">${this.currentUser.plan.toUpperCase()} 플랜</p>
+                        <p class="text-sm text-gray-500">${this.currentUser.billing_period === 'monthly' ? '월간 구독' : '연간 구독'}</p>
+                      </div>
+                      <div class="text-right">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                          <i class="fas fa-check-circle mr-1"></i>활성
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <!-- Subscription Period -->
+                    <div class="grid grid-cols-2 gap-4">
+                      <div class="p-4 bg-gray-50 rounded-lg">
+                        <p class="text-xs text-gray-500 mb-1">구독 시작일</p>
+                        <p class="text-sm font-semibold text-gray-900">
+                          ${this.currentUser.subscription_start_date ? new Date(this.currentUser.subscription_start_date).toLocaleDateString('ko-KR') : '-'}
+                        </p>
+                      </div>
+                      <div class="p-4 bg-gray-50 rounded-lg">
+                        <p class="text-xs text-gray-500 mb-1">구독 종료일</p>
+                        <p class="text-sm font-semibold text-gray-900">
+                          ${this.currentUser.subscription_end_date ? new Date(this.currentUser.subscription_end_date).toLocaleDateString('ko-KR') : '-'}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <!-- Remaining Days -->
+                    ${this.currentUser.subscription_end_date ? `
+                    <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                      <div class="flex items-center justify-between">
+                        <div>
+                          <p class="text-sm text-blue-900 font-medium">남은 기간</p>
+                          <p class="text-xs text-blue-600 mt-1">구독이 자동으로 갱신됩니다</p>
+                        </div>
+                        <div class="text-right">
+                          <p class="text-2xl font-bold text-blue-600">
+                            ${Math.max(0, Math.ceil((new Date(this.currentUser.subscription_end_date) - new Date()) / (1000 * 60 * 60 * 24)))}일
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    ` : ''}
+                    
+                    <!-- Cancel Subscription -->
+                    <button onclick="worvox.cancelSubscription()" 
+                      class="w-full py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg font-semibold transition-all border border-red-200">
+                      <i class="fas fa-times-circle mr-2"></i>구독 취소
+                    </button>
+                  </div>
+                </div>
+                ` : ''}
+
                 <!-- Account Actions -->
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
                   <h3 class="text-lg font-bold text-gray-900 mb-4">
@@ -8688,6 +8752,46 @@ Proceed to payment?
       } else {
         alert('비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
       }
+    }
+  }
+
+  // Cancel subscription
+  async cancelSubscription() {
+    // Confirmation dialog
+    const confirmed = confirm(
+      '구독을 취소하시겠습니까?\n\n' +
+      '구독을 취소하면:\n' +
+      '• 현재 구독 기간이 종료될 때까지 플랜 혜택을 계속 사용할 수 있습니다\n' +
+      '• 구독 종료일 이후 자동으로 Free 플랜으로 전환됩니다\n' +
+      '• 언제든지 다시 구독할 수 있습니다'
+    );
+
+    if (!confirmed) return;
+
+    try {
+      console.log('Canceling subscription for user:', this.currentUser.id);
+
+      const response = await axios.post(`/api/users/${this.currentUser.id}/cancel-subscription`);
+
+      if (response.data.success) {
+        alert('구독이 취소되었습니다.\n현재 구독 기간이 종료될 때까지 플랜 혜택을 계속 사용하실 수 있습니다.');
+        
+        // Update local user data
+        this.currentUser.plan = 'free';
+        this.currentUser.billing_period = null;
+        this.currentUser.subscription_start_date = null;
+        this.currentUser.subscription_end_date = null;
+        localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
+        
+        // Refresh profile page
+        this.showProfile();
+      } else {
+        alert('구독 취소에 실패했습니다. 다시 시도해주세요.');
+      }
+
+    } catch (error) {
+      console.error('Cancel subscription error:', error);
+      alert('구독 취소에 실패했습니다. 다시 시도해주세요.\n' + (error.response?.data?.error || error.message));
     }
   }
 

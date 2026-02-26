@@ -591,4 +591,54 @@ users.patch('/:userId/password', async (c) => {
   }
 });
 
+// Cancel subscription
+users.post('/:id/cancel-subscription', async (c) => {
+  try {
+    const userId = parseInt(c.req.param('id'));
+    console.log('🚫 Canceling subscription for user:', userId);
+
+    // Get current user
+    const user = await c.env.DB.prepare(
+      'SELECT * FROM users WHERE id = ?'
+    ).bind(userId).first();
+
+    if (!user) {
+      console.log('❌ User not found:', userId);
+      return c.json({ error: 'User not found' }, 404);
+    }
+
+    // Check if user has an active subscription
+    if (!user.plan || user.plan === 'free') {
+      console.log('❌ No active subscription for user:', userId);
+      return c.json({ error: 'No active subscription found' }, 400);
+    }
+
+    console.log('✅ Current plan:', user.plan, 'Period:', user.billing_period);
+
+    // Reset subscription fields
+    await c.env.DB.prepare(`
+      UPDATE users 
+      SET plan = 'free',
+          billing_period = NULL,
+          subscription_start_date = NULL,
+          subscription_end_date = NULL
+      WHERE id = ?
+    `).bind(userId).run();
+
+    console.log('✅ Subscription canceled successfully for user:', userId);
+
+    return c.json({
+      success: true,
+      message: 'Subscription canceled successfully'
+    });
+
+  } catch (error) {
+    console.error('❌ Cancel subscription error:', error);
+    return c.json({ 
+      error: 'Failed to cancel subscription',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
 export default users;
