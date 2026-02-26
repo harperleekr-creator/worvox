@@ -8915,10 +8915,11 @@ Proceed to payment?
   async showAdmin() {
     const app = document.getElementById('app');
     app.innerHTML = `
-      ${this.getSidebar('admin')}
-      
-      <div class="flex-1 flex flex-col min-h-screen">
-        ${this.getHeader()}
+      <div class="flex h-screen bg-gray-50">
+        ${this.getSidebar('admin')}
+        
+        <div class="flex-1 flex flex-col min-h-screen">
+          ${this.getHeader()}
         
         <main class="flex-1 p-4 md:p-8 bg-gray-50">
           <div class="max-w-7xl mx-auto">
@@ -9039,6 +9040,7 @@ Proceed to payment?
         
         ${this.getFooter()}
       </div>
+    </div>
     `;
 
     // Load admin data
