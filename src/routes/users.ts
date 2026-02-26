@@ -83,11 +83,12 @@ users.post('/google-login', async (c) => {
 
     // Check if user exists with this Google ID
     const existingUser = await c.env.DB.prepare(
-      'SELECT * FROM users WHERE google_id = ?'
+      'SELECT id, username, email, google_id, google_email, google_picture, level, auth_provider, plan, user_level, xp, total_xp, coins, current_streak, longest_streak, created_at FROM users WHERE google_id = ?'
     ).bind(googleId).first();
 
     if (existingUser) {
       console.log('✅ Existing user found:', existingUser.id);
+      console.log('📊 User plan:', existingUser.plan || 'free');
       
       // Update profile picture if changed
       if (picture && existingUser.google_picture !== picture) {
@@ -98,7 +99,7 @@ users.post('/google-login', async (c) => {
       }
 
       return c.json({
-        user: { ...existingUser, google_picture: picture },
+        user: { ...existingUser, google_picture: picture, plan: existingUser.plan || 'free' },
         success: true,
         isNew: false,
       });
@@ -108,7 +109,7 @@ users.post('/google-login', async (c) => {
 
     // Check if user exists with this email
     const emailUser = await c.env.DB.prepare(
-      'SELECT * FROM users WHERE email = ? OR google_email = ?'
+      'SELECT id, username, email, google_id, google_email, google_picture, level, auth_provider, plan, user_level, xp, total_xp, coins, current_streak, longest_streak, created_at FROM users WHERE email = ? OR google_email = ?'
     ).bind(email, email).first();
 
     if (emailUser) {
@@ -121,13 +122,14 @@ users.post('/google-login', async (c) => {
       ).bind(googleId, email, picture, emailUser.id).run();
 
       const updatedUser = await c.env.DB.prepare(
-        'SELECT * FROM users WHERE id = ?'
+        'SELECT id, username, email, google_id, google_email, google_picture, level, auth_provider, plan, user_level, xp, total_xp, coins, current_streak, longest_streak, created_at FROM users WHERE id = ?'
       ).bind(emailUser.id).first();
 
       console.log('✅ Google account linked successfully');
+      console.log('📊 User plan:', updatedUser.plan || 'free');
 
       return c.json({
-        user: updatedUser,
+        user: { ...updatedUser, plan: updatedUser.plan || 'free' },
         success: true,
         isNew: false,
         linked: true,
@@ -136,25 +138,26 @@ users.post('/google-login', async (c) => {
 
     console.log('🆕 Creating new user...');
 
-    // Create new user with Google account
+    // Create new user with Google account (plan defaults to 'free' via DB schema)
     const username = name;
     
     const result = await c.env.DB.prepare(
-      `INSERT INTO users (username, email, google_id, google_email, google_picture, auth_provider, level) 
-       VALUES (?, ?, ?, ?, ?, 'google', 'beginner')`
+      `INSERT INTO users (username, email, google_id, google_email, google_picture, auth_provider, level, plan) 
+       VALUES (?, ?, ?, ?, ?, 'google', 'beginner', 'free')`
     ).bind(username, email, googleId, email, picture).run();
 
     const userId = result.meta.last_row_id;
     console.log('✅ New user created with ID:', userId);
 
     const newUser = await c.env.DB.prepare(
-      'SELECT * FROM users WHERE id = ?'
+      'SELECT id, username, email, google_id, google_email, google_picture, level, auth_provider, plan, user_level, xp, total_xp, coins, current_streak, longest_streak, created_at FROM users WHERE id = ?'
     ).bind(userId).first();
 
     console.log('🎉 Google login successful!');
+    console.log('📊 New user plan:', newUser.plan || 'free');
 
     return c.json({
-      user: newUser,
+      user: { ...newUser, plan: newUser.plan || 'free' },
       success: true,
       isNew: true,
     });

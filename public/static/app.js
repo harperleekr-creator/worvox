@@ -58,6 +58,8 @@ class WorVox {
     const savedUser = localStorage.getItem('worvox_user');
     if (savedUser) {
       this.currentUser = JSON.parse(savedUser);
+      // Set user plan from currentUser
+      this.userPlan = this.currentUser.plan || 'free';
       // Load usage data from server
       await this.loadUsageFromServer();
       await this.loadGamificationStats();
@@ -6297,11 +6299,10 @@ Proceed to payment?
 
   // Premium user check helper
   isPremiumUser() {
-    // TODO: Implement actual subscription check from backend
-    // For now, check if user has a premium subscription record
-    return this.currentUser && this.currentUser.subscription_plan && 
-           (this.currentUser.subscription_plan === 'premium' || 
-            this.currentUser.subscription_plan === 'business');
+    // Check if user has premium, core, or business plan
+    // Check both currentUser.plan and userPlan for reliability
+    const userPlan = this.currentUser?.plan || this.userPlan || 'free';
+    return userPlan === 'premium' || userPlan === 'core' || userPlan === 'business';
   }
 
   // ========================================
@@ -7593,6 +7594,10 @@ window.handleGoogleLogin = async (response) => {
     
     // Update app state
     worvox.currentUser = result.data.user;
+    
+    // Update user plan from database
+    worvox.userPlan = result.data.user.plan || 'free';
+    console.log('📊 User plan updated to:', worvox.userPlan);
     
     // If new user, show onboarding steps
     if (result.data.isNew) {
