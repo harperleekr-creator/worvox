@@ -4,8 +4,7 @@
 -- Add admin flag to users table
 ALTER TABLE users ADD COLUMN is_admin INTEGER DEFAULT 0;
 
--- Add plan and subscription tracking to users
-ALTER TABLE users ADD COLUMN plan TEXT DEFAULT 'free';
+-- Add subscription tracking to users (plan already exists in 0018_add_user_plan.sql)
 ALTER TABLE users ADD COLUMN billing_period TEXT DEFAULT 'monthly';
 ALTER TABLE users ADD COLUMN subscription_start_date DATETIME;
 ALTER TABLE users ADD COLUMN subscription_end_date DATETIME;

@@ -920,15 +920,27 @@ class WorVox {
     console.log('🎬 startTimerCountdown called');
     
     // Prevent multiple starts
-    if (this.timerChallenge.started) {
+    if (this.timerChallenge && this.timerChallenge.started) {
       console.log('⚠️ Timer already started');
       return;
     }
     
-    this.timerChallenge.started = true;
+    if (!this.timerChallenge) {
+      console.error('❌ timerChallenge is not initialized');
+      return;
+    }
     
-    // Track timer mode usage
-    this.incrementDailyUsage('timer_mode');
+    this.timerChallenge.started = true;
+    console.log('✅ Timer challenge started flag set');
+    
+    // Track timer mode usage (non-blocking)
+    try {
+      this.incrementDailyUsage('timer_mode');
+      console.log('✅ Usage tracked');
+    } catch (error) {
+      console.warn('⚠️ Failed to track usage:', error);
+      // Continue anyway
+    }
     
     const countdownEl = document.getElementById('timerCountdown');
     const instructionEl = document.getElementById('instructionText');
@@ -936,18 +948,31 @@ class WorVox {
     const recordingIndicator = document.getElementById('recordingIndicator');
     const recordBtn = document.getElementById('timerRecordBtn');
     
+    console.log('📝 UI elements found:', {
+      countdownEl: !!countdownEl,
+      instructionEl: !!instructionEl,
+      statusEl: !!statusEl,
+      recordingIndicator: !!recordingIndicator,
+      recordBtn: !!recordBtn
+    });
+    
     // Update UI
-    instructionEl.innerHTML = '🎤 지금 말하세요!';
-    statusEl.textContent = '타이머가 시작되었습니다. 문장을 말하세요!';
-    recordingIndicator.classList.remove('hidden');
+    if (instructionEl) instructionEl.innerHTML = '🎤 지금 말하세요!';
+    if (statusEl) statusEl.textContent = '타이머가 시작되었습니다. 문장을 말하세요!';
+    if (recordingIndicator) recordingIndicator.classList.remove('hidden');
     
     // Disable record button
-    recordBtn.disabled = true;
-    recordBtn.classList.remove('bg-emerald-500', 'hover:bg-emerald-600');
-    recordBtn.classList.add('bg-red-600', 'cursor-not-allowed');
-    recordBtn.innerHTML = '<i class="fas fa-microphone text-3xl md:text-4xl animate-pulse"></i>';
+    if (recordBtn) {
+      recordBtn.disabled = true;
+      recordBtn.classList.remove('bg-emerald-500', 'hover:bg-emerald-600');
+      recordBtn.classList.add('bg-red-600', 'cursor-not-allowed');
+      recordBtn.innerHTML = '<i class="fas fa-microphone text-3xl md:text-4xl animate-pulse"></i>';
+    }
+    
+    console.log('✅ UI updated');
     
     // Start recording with proper audio configuration
+    console.log('🎤 Starting recording...');
     try {
       await this.startTimerRecording();
       console.log('✅ Recording started successfully');
@@ -961,21 +986,28 @@ class WorVox {
     
     // Countdown
     let timeLeft = this.timerChallenge.seconds;
+    console.log('⏱️ Starting countdown from:', timeLeft);
     
     const interval = setInterval(() => {
       timeLeft--;
-      countdownEl.textContent = timeLeft;
+      if (countdownEl) {
+        countdownEl.textContent = timeLeft;
+      }
+      console.log('⏱️ Time left:', timeLeft);
       
       // Color change as time runs out
-      if (timeLeft <= 3) {
+      if (timeLeft <= 3 && countdownEl) {
         countdownEl.classList.add('text-red-400');
       }
       
       if (timeLeft <= 0) {
+        console.log('⏱️ Time\'s up! Ending challenge...');
         clearInterval(interval);
         this.endTimerChallenge();
       }
     }, 1000);
+    
+    console.log('✅ Countdown started, interval ID:', interval);
   }
 
   // Start Timer Recording
