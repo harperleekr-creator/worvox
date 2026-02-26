@@ -737,6 +737,36 @@ Proceed to payment?
     }
   }
 
+  // Logout and clear all authentication data
+  logout() {
+    // Clear all user data
+    this.currentUser = null;
+    this.currentSession = null;
+    this.currentTopic = null;
+    this.messages = [];
+    this.userPlan = 'free';
+    
+    // Clear localStorage
+    localStorage.removeItem('worvox_user');
+    localStorage.removeItem('worvox_usage');
+    localStorage.removeItem('worvox_gamification');
+    localStorage.removeItem('worvox_sessions');
+    localStorage.removeItem('worvox_topics');
+    
+    // Clear sessionStorage
+    sessionStorage.clear();
+    
+    // Reset Google Sign-In if available
+    if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+      google.accounts.id.disableAutoSelect();
+    }
+    
+    // Show login screen
+    this.showLogin();
+    
+    console.log('✅ All login data cleared');
+  }
+
   showLogin() {
     this.onboardingStep = 1;
     this.showOnboardingStep();
