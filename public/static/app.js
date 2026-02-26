@@ -12,6 +12,7 @@ class WorVox {
     
     // User plan and usage tracking
     this.userPlan = 'free'; // 'free', 'premium', 'business'
+    this.currentBillingPeriod = 'monthly'; // 'monthly' or 'yearly'
     this.dailyUsage = {
       aiConversations: 0,
       pronunciationPractice: 0,
@@ -49,38 +50,218 @@ class WorVox {
       }
     };
     
-    // Scenario Mode Data (30 real-life scenarios)
+    // Scenario Mode Data (30 real-life scenarios with practice sentences)
     this.scenarios = [
-      { id: 1, title: "공항 체크인", category: "여행", difficulty: "beginner", icon: "✈️", description: "항공편 체크인과 수하물 처리" },
-      { id: 2, title: "호텔 예약", category: "여행", difficulty: "beginner", icon: "🏨", description: "호텔 룸 예약 및 체크인" },
-      { id: 3, title: "레스토랑 주문", category: "일상", difficulty: "beginner", icon: "🍽️", description: "레스토랑에서 음식 주문하기" },
-      { id: 4, title: "길 묻기", category: "일상", difficulty: "beginner", icon: "🗺️", description: "길을 잃었을 때 방향 묻기" },
-      { id: 5, title: "카페 주문", category: "일상", difficulty: "beginner", icon: "☕", description: "커피숍에서 음료 주문" },
-      { id: 6, title: "택시 타기", category: "교통", difficulty: "beginner", icon: "🚕", description: "택시 타고 목적지 가기" },
-      { id: 7, title: "쇼핑하기", category: "일상", difficulty: "beginner", icon: "🛍️", description: "매장에서 물건 구매하기" },
-      { id: 8, title: "은행 업무", category: "비즈니스", difficulty: "intermediate", icon: "🏦", description: "계좌 개설 및 은행 업무" },
-      { id: 9, title: "병원 예약", category: "일상", difficulty: "intermediate", icon: "🏥", description: "의사 진료 예약하기" },
-      { id: 10, title: "전화 예약", category: "일상", difficulty: "intermediate", icon: "📞", description: "전화로 레스토랑 예약" },
-      { id: 11, title: "면접 대비", category: "비즈니스", difficulty: "advanced", icon: "💼", description: "영어 취업 면접 준비" },
-      { id: 12, title: "회의 진행", category: "비즈니스", difficulty: "advanced", icon: "👥", description: "영어 비즈니스 미팅" },
-      { id: 13, title: "프레젠테이션", category: "비즈니스", difficulty: "advanced", icon: "📊", description: "영어 발표 연습" },
-      { id: 14, title: "고객 응대", category: "비즈니스", difficulty: "intermediate", icon: "🤝", description: "고객 서비스 상황" },
-      { id: 15, title: "클레임 처리", category: "비즈니스", difficulty: "intermediate", icon: "⚠️", description: "불만 사항 처리하기" },
-      { id: 16, title: "헬스장 등록", category: "일상", difficulty: "beginner", icon: "💪", description: "체육관 회원 가입" },
-      { id: 17, title: "영화관 예매", category: "여가", difficulty: "beginner", icon: "🎬", description: "영화표 예매하기" },
-      { id: 18, title: "우체국 업무", category: "일상", difficulty: "intermediate", icon: "📮", description: "소포 발송하기" },
-      { id: 19, title: "렌터카 빌리기", category: "여행", difficulty: "intermediate", icon: "🚗", description: "렌터카 대여 절차" },
-      { id: 20, title: "부동산 문의", category: "비즈니스", difficulty: "advanced", icon: "🏠", description: "집 구하기 및 계약" },
-      { id: 21, title: "전화 영어", category: "비즈니스", difficulty: "intermediate", icon: "☎️", description: "업무 전화 통화" },
-      { id: 22, title: "이메일 작성", category: "비즈니스", difficulty: "intermediate", icon: "✉️", description: "비즈니스 이메일 상황" },
-      { id: 23, title: "네트워킹", category: "비즈니스", difficulty: "advanced", icon: "🌐", description: "네트워킹 이벤트 대화" },
-      { id: 24, title: "협상하기", category: "비즈니스", difficulty: "advanced", icon: "🤝", description: "비즈니스 협상 연습" },
-      { id: 25, title: "미용실 가기", category: "일상", difficulty: "beginner", icon: "💇", description: "헤어 스타일 주문" },
-      { id: 26, title: "약국 방문", category: "일상", difficulty: "intermediate", icon: "💊", description: "약국에서 약 구매" },
-      { id: 27, title: "스몰톡", category: "일상", difficulty: "beginner", icon: "💬", description: "일상적인 가벼운 대화" },
-      { id: 28, title: "날씨 이야기", category: "일상", difficulty: "beginner", icon: "🌤️", description: "날씨에 관한 대화" },
-      { id: 29, title: "취미 이야기", category: "일상", difficulty: "intermediate", icon: "🎨", description: "취미와 관심사 공유" },
-      { id: 30, title: "여행 경험", category: "여가", difficulty: "intermediate", icon: "🌍", description: "여행 경험 나누기" }
+      { id: 1, title: "공항 체크인", category: "여행", difficulty: "beginner", icon: "✈️", description: "항공편 체크인과 수하물 처리",
+        sentences: [
+          "I'd like to check in for flight KE123 to New York.",
+          "Can I have a window seat, please?",
+          "I have two bags to check in."
+        ]
+      },
+      { id: 2, title: "호텔 예약", category: "여행", difficulty: "beginner", icon: "🏨", description: "호텔 룸 예약 및 체크인",
+        sentences: [
+          "I have a reservation under the name Smith.",
+          "What time is checkout?",
+          "Could you call a taxi for me, please?"
+        ]
+      },
+      { id: 3, title: "레스토랑 주문", category: "일상", difficulty: "beginner", icon: "🍽️", description: "레스토랑에서 음식 주문하기",
+        sentences: [
+          "Can I see the menu, please?",
+          "I'll have the grilled salmon with vegetables.",
+          "Could I get the bill, please?"
+        ]
+      },
+      { id: 4, title: "길 묻기", category: "일상", difficulty: "beginner", icon: "🗺️", description: "길을 잃었을 때 방향 묻기",
+        sentences: [
+          "Excuse me, how do I get to the train station?",
+          "Is it within walking distance?",
+          "Thank you for your help."
+        ]
+      },
+      { id: 5, title: "카페 주문", category: "일상", difficulty: "beginner", icon: "☕", description: "커피숍에서 음료 주문",
+        sentences: [
+          "I'd like a large cappuccino to go, please.",
+          "Do you have any sugar-free options?",
+          "Can I pay with a credit card?"
+        ]
+      },
+      { id: 6, title: "택시 타기", category: "교통", difficulty: "beginner", icon: "🚕", description: "택시 타고 목적지 가기",
+        sentences: [
+          "Could you take me to the airport, please?",
+          "How long will it take to get there?",
+          "Keep the change, thank you."
+        ]
+      },
+      { id: 7, title: "쇼핑하기", category: "일상", difficulty: "beginner", icon: "🛍️", description: "매장에서 물건 구매하기",
+        sentences: [
+          "Do you have this in a smaller size?",
+          "How much does this cost?",
+          "I'll take it. Can I pay by card?"
+        ]
+      },
+      { id: 8, title: "은행 업무", category: "비즈니스", difficulty: "intermediate", icon: "🏦", description: "계좌 개설 및 은행 업무",
+        sentences: [
+          "I'd like to open a checking account.",
+          "What documents do I need to bring?",
+          "What's the minimum balance requirement?"
+        ]
+      },
+      { id: 9, title: "병원 예약", category: "일상", difficulty: "intermediate", icon: "🏥", description: "의사 진료 예약하기",
+        sentences: [
+          "I'd like to make an appointment with Doctor Johnson.",
+          "I've been having headaches for the past week.",
+          "Do you accept my insurance?"
+        ]
+      },
+      { id: 10, title: "전화 예약", category: "일상", difficulty: "intermediate", icon: "📞", description: "전화로 레스토랑 예약",
+        sentences: [
+          "I'd like to make a reservation for four people at seven PM.",
+          "Do you have any tables available by the window?",
+          "Could you please confirm my reservation?"
+        ]
+      },
+      { id: 11, title: "면접 대비", category: "비즈니스", difficulty: "advanced", icon: "💼", description: "영어 취업 면접 준비",
+        sentences: [
+          "I have five years of experience in digital marketing.",
+          "I believe my skills align perfectly with this position.",
+          "What opportunities are there for professional development?"
+        ]
+      },
+      { id: 12, title: "회의 진행", category: "비즈니스", difficulty: "advanced", icon: "👥", description: "영어 비즈니스 미팅",
+        sentences: [
+          "Let's move on to the next item on the agenda.",
+          "I'd like to propose an alternative approach.",
+          "Could we schedule a follow-up meeting next week?"
+        ]
+      },
+      { id: 13, title: "프레젠테이션", category: "비즈니스", difficulty: "advanced", icon: "📊", description: "영어 발표 연습",
+        sentences: [
+          "Today, I'll be presenting our quarterly sales results.",
+          "As you can see from this chart, sales increased by fifteen percent.",
+          "Are there any questions before we proceed?"
+        ]
+      },
+      { id: 14, title: "고객 응대", category: "비즈니스", difficulty: "intermediate", icon: "🤝", description: "고객 서비스 상황",
+        sentences: [
+          "How may I assist you today?",
+          "I apologize for any inconvenience this may have caused.",
+          "Is there anything else I can help you with?"
+        ]
+      },
+      { id: 15, title: "클레임 처리", category: "비즈니스", difficulty: "intermediate", icon: "⚠️", description: "불만 사항 처리하기",
+        sentences: [
+          "I understand your frustration, and I'm here to help.",
+          "Let me check what options are available for you.",
+          "We'll process your refund within three business days."
+        ]
+      },
+      { id: 16, title: "헬스장 등록", category: "일상", difficulty: "beginner", icon: "💪", description: "체육관 회원 가입",
+        sentences: [
+          "I'm interested in signing up for a gym membership.",
+          "What are your membership options?",
+          "Do you offer personal training sessions?"
+        ]
+      },
+      { id: 17, title: "영화관 예매", category: "여가", difficulty: "beginner", icon: "🎬", description: "영화표 예매하기",
+        sentences: [
+          "Two tickets for the seven o'clock showing, please.",
+          "Are there any seats available in the middle section?",
+          "Can I get a large popcorn and two drinks?"
+        ]
+      },
+      { id: 18, title: "우체국 업무", category: "일상", difficulty: "intermediate", icon: "📮", description: "소포 발송하기",
+        sentences: [
+          "I'd like to send this package to Los Angeles.",
+          "How long will it take to arrive?",
+          "I'd like to insure it for one hundred dollars."
+        ]
+      },
+      { id: 19, title: "렌터카 빌리기", category: "여행", difficulty: "intermediate", icon: "🚗", description: "렌터카 대여 절차",
+        sentences: [
+          "I have a reservation for a compact car.",
+          "Is insurance included in the price?",
+          "What time should I return the car?"
+        ]
+      },
+      { id: 20, title: "부동산 문의", category: "비즈니스", difficulty: "advanced", icon: "🏠", description: "집 구하기 및 계약",
+        sentences: [
+          "I'm looking for a two-bedroom apartment in the downtown area.",
+          "What's included in the monthly rent?",
+          "When would be the earliest move-in date?"
+        ]
+      },
+      { id: 21, title: "전화 영어", category: "비즈니스", difficulty: "intermediate", icon: "☎️", description: "업무 전화 통화",
+        sentences: [
+          "This is John Smith calling from ABC Company.",
+          "Could I speak with Mr. Johnson, please?",
+          "I'll send you an email with the details shortly."
+        ]
+      },
+      { id: 22, title: "이메일 작성", category: "비즈니스", difficulty: "intermediate", icon: "✉️", description: "비즈니스 이메일 상황",
+        sentences: [
+          "I'm writing to inquire about the product specifications.",
+          "Could you please provide more information?",
+          "I look forward to hearing from you soon."
+        ]
+      },
+      { id: 23, title: "네트워킹", category: "비즈니스", difficulty: "advanced", icon: "🌐", description: "네트워킹 이벤트 대화",
+        sentences: [
+          "It's a pleasure to meet you. I work in software development.",
+          "What brings you to this conference?",
+          "Here's my business card. Let's keep in touch."
+        ]
+      },
+      { id: 24, title: "협상하기", category: "비즈니스", difficulty: "advanced", icon: "🤝", description: "비즈니스 협상 연습",
+        sentences: [
+          "I believe we can reach a mutually beneficial agreement.",
+          "Would you be open to discussing a volume discount?",
+          "Let's review the terms one more time before finalizing."
+        ]
+      },
+      { id: 25, title: "미용실 가기", category: "일상", difficulty: "beginner", icon: "💇", description: "헤어 스타일 주문",
+        sentences: [
+          "I'd like a haircut and a blow-dry, please.",
+          "Could you take about two inches off the length?",
+          "That looks great, thank you."
+        ]
+      },
+      { id: 26, title: "약국 방문", category: "일상", difficulty: "intermediate", icon: "💊", description: "약국에서 약 구매",
+        sentences: [
+          "I need something for a headache.",
+          "Do I need a prescription for this medication?",
+          "How often should I take this?"
+        ]
+      },
+      { id: 27, title: "스몰톡", category: "일상", difficulty: "beginner", icon: "💬", description: "일상적인 가벼운 대화",
+        sentences: [
+          "How's your day going so far?",
+          "The weather is beautiful today, isn't it?",
+          "Have a great weekend!"
+        ]
+      },
+      { id: 28, title: "날씨 이야기", category: "일상", difficulty: "beginner", icon: "🌤️", description: "날씨에 관한 대화",
+        sentences: [
+          "It looks like it's going to rain later.",
+          "I hope the weather stays nice for the weekend.",
+          "It's been unusually warm this year."
+        ]
+      },
+      { id: 29, title: "취미 이야기", category: "일상", difficulty: "intermediate", icon: "🎨", description: "취미와 관심사 공유",
+        sentences: [
+          "I enjoy hiking on the weekends.",
+          "Have you tried any new restaurants lately?",
+          "I've been learning to play the guitar recently."
+        ]
+      },
+      { id: 30, title: "여행 경험", category: "여가", difficulty: "intermediate", icon: "🌍", description: "여행 경험 나누기",
+        sentences: [
+          "I visited Paris last summer, and it was amazing.",
+          "The local food was absolutely delicious.",
+          "I'd love to go back someday."
+        ]
+      }
     ];
     
     // Onboarding state
@@ -1089,53 +1270,436 @@ class WorVox {
     });
   }
   
-  // Start a scenario conversation
+  // Start a scenario practice
   async startScenario(scenarioId) {
     const scenario = this.scenarios.find(s => s.id === scenarioId);
     if (!scenario) return;
     
+    // Check usage limit
+    if (!this.checkUsageLimit('scenarioMode')) {
+      return;
+    }
+    
     // Increment usage
     this.incrementUsage('scenarioMode');
     
-    // Generate system prompt for this scenario
-    const systemPrompt = `You are an AI role-playing partner for an English conversation scenario: "${scenario.title}".
-
-Scenario Details:
-- Title: ${scenario.title}
-- Category: ${scenario.category}
-- Description: ${scenario.description}
-- Difficulty: ${scenario.difficulty}
-
-Your role:
-1. Play the appropriate character in this scenario (e.g., waiter, hotel staff, interviewer, etc.)
-2. Speak naturally and guide the conversation realistically
-3. Adjust your language complexity to match the ${scenario.difficulty} level
-4. Provide helpful corrections and suggestions when needed
-5. Keep the conversation focused on this specific scenario
-6. Use common phrases and vocabulary relevant to this situation
-
-Start the conversation with a natural opening line for this scenario.`;
-
-    // Find or create a topic for scenario mode
-    const topics = await axios.get('/api/topics');
-    let scenarioTopic = topics.data.topics.find(t => t.name === 'Scenario Mode');
+    // Initialize scenario practice state
+    this.currentScenarioPractice = {
+      scenario: scenario,
+      currentSentenceIndex: 0,
+      results: [],
+      isPlaying: false,
+      isRecording: false,
+      mediaRecorder: null,
+      audioChunks: []
+    };
     
-    if (!scenarioTopic) {
-      // Create scenario mode topic if it doesn't exist
-      const response = await axios.post('/api/topics', {
-        name: 'Scenario Mode',
-        system_prompt: systemPrompt,
-        description: 'Real-life scenario practice',
-        level: scenario.difficulty,
-        icon: '🎬'
-      });
-      scenarioTopic = response.data.topic;
+    // Show scenario practice screen
+    this.showScenarioPractice();
+  }
+  
+  // Show scenario practice screen
+  showScenarioPractice() {
+    const { scenario, currentSentenceIndex, results } = this.currentScenarioPractice;
+    const currentSentence = scenario.sentences[currentSentenceIndex];
+    const progress = Math.round(((currentSentenceIndex) / scenario.sentences.length) * 100);
+    
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+        ${this.getSidebar('scenario-mode')}
+        
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- Mobile Header -->
+          <div class="md:hidden bg-white border-b border-blue-200 px-4 py-3">
+            <div class="flex items-center justify-between">
+              <button onclick="worvox.showScenarioMode()" class="text-gray-600">
+                <i class="fas fa-arrow-left text-xl"></i>
+              </button>
+              <h1 class="text-lg font-semibold text-gray-800">${scenario.icon} ${scenario.title}</h1>
+              <div class="w-6"></div>
+            </div>
+          </div>
+          
+          <!-- Desktop Top Bar -->
+          <div class="hidden md:flex bg-white border-b border-blue-200 px-6 py-3 items-center gap-4">
+            <button onclick="worvox.showScenarioMode()" 
+              class="text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all">
+              <i class="fas fa-arrow-left text-xl"></i>
+            </button>
+            <h2 class="text-lg font-semibold text-gray-800">
+              <i class="fas fa-film mr-2 text-blue-600"></i>${scenario.icon} ${scenario.title}
+            </h2>
+          </div>
+          
+          <!-- Content Area -->
+          <div class="flex-1 overflow-y-auto">
+            <div class="p-4 md:p-8">
+              <div class="max-w-4xl mx-auto">
+                <!-- Progress Bar -->
+                <div class="mb-6">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-700">진행률</span>
+                    <span class="text-sm font-medium text-blue-600">${currentSentenceIndex}/${scenario.sentences.length}</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-blue-600 h-2 rounded-full transition-all" style="width: ${progress}%"></div>
+                  </div>
+                </div>
+                
+                <!-- Current Sentence Card -->
+                <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-blue-200 mb-6">
+                  <div class="text-center mb-6">
+                    <div class="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-4">
+                      문장 ${currentSentenceIndex + 1}
+                    </div>
+                    <div class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-relaxed" id="currentSentence">
+                      ${currentSentence}
+                    </div>
+                    
+                    <!-- Play Audio Button -->
+                    <button id="playAudioBtn" onclick="worvox.playScenarioAudio('${currentSentence.replace(/'/g, "\\'")}')" 
+                      class="mb-4 px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl font-bold text-lg hover:from-blue-600 hover:to-indigo-600 transition-all shadow-lg">
+                      <i class="fas fa-volume-up mr-2"></i>듣기
+                    </button>
+                    
+                    <p class="text-gray-600 text-sm mb-6">
+                      <i class="fas fa-info-circle mr-1"></i>먼저 문장을 듣고 발음을 익히세요
+                    </p>
+                  </div>
+                  
+                  <!-- Record Section -->
+                  <div class="border-t pt-6">
+                    <div class="text-center">
+                      <p class="text-gray-700 font-medium mb-4">이제 따라 말해보세요</p>
+                      
+                      <!-- Record Button -->
+                      <button id="recordBtn" onclick="worvox.toggleScenarioRecording()" 
+                        class="w-20 h-20 rounded-full bg-red-500 text-white hover:bg-red-600 transition-all shadow-lg flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-microphone text-3xl"></i>
+                      </button>
+                      
+                      <p id="recordStatus" class="text-gray-600 text-sm">
+                        <i class="fas fa-hand-point-up mr-1"></i>버튼을 눌러 녹음 시작
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Instructions -->
+                <div class="bg-gradient-to-r from-blue-100 to-indigo-100 rounded-xl p-4 mb-6">
+                  <h4 class="font-semibold text-gray-900 mb-2">
+                    <i class="fas fa-lightbulb text-yellow-500 mr-2"></i>학습 방법
+                  </h4>
+                  <ol class="text-sm text-gray-700 space-y-1 list-decimal list-inside">
+                    <li><strong>듣기 버튼</strong>을 눌러 원어민 발음을 들어보세요</li>
+                    <li><strong>녹음 버튼</strong>을 눌러 문장을 따라 말해보세요</li>
+                    <li>AI가 자동으로 발음을 분석하고 다음 문장으로 넘어갑니다</li>
+                    <li>모든 문장을 완료하면 전체 결과를 확인할 수 있습니다</li>
+                  </ol>
+                </div>
+                
+                <!-- Exit Button -->
+                <button onclick="worvox.showScenarioMode()" 
+                  class="w-full py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all">
+                  <i class="fas fa-times mr-2"></i>종료하기
+                </button>
+              </div>
+              
+              ${this.getFooter()}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  // Play scenario audio using TTS
+  async playScenarioAudio(text) {
+    const playBtn = document.getElementById('playAudioBtn');
+    if (this.currentScenarioPractice.isPlaying) return;
+    
+    try {
+      this.currentScenarioPractice.isPlaying = true;
+      playBtn.disabled = true;
+      playBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>재생 중...';
+      
+      // Call TTS API
+      const response = await axios.post('/api/tts', { text }, { responseType: 'arraybuffer' });
+      
+      // Play audio
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const audioBuffer = await audioContext.decodeAudioData(response.data);
+      const source = audioContext.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(audioContext.destination);
+      
+      source.onended = () => {
+        this.currentScenarioPractice.isPlaying = false;
+        playBtn.disabled = false;
+        playBtn.innerHTML = '<i class="fas fa-volume-up mr-2"></i>듣기';
+      };
+      
+      source.start(0);
+      
+    } catch (error) {
+      console.error('TTS error:', error);
+      this.currentScenarioPractice.isPlaying = false;
+      playBtn.disabled = false;
+      playBtn.innerHTML = '<i class="fas fa-volume-up mr-2"></i>듣기';
+      alert('오디오 재생 중 오류가 발생했습니다.');
+    }
+  }
+  
+  // Toggle recording for scenario practice
+  async toggleScenarioRecording() {
+    if (this.currentScenarioPractice.isRecording) {
+      // Stop recording
+      this.stopScenarioRecording();
+    } else {
+      // Start recording
+      this.startScenarioRecording();
+    }
+  }
+  
+  // Start recording
+  async startScenarioRecording() {
+    const recordBtn = document.getElementById('recordBtn');
+    const recordStatus = document.getElementById('recordStatus');
+    
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      // Try different MIME types
+      let mimeType = 'audio/webm;codecs=opus';
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'audio/webm';
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = 'audio/mp4';
+          if (!MediaRecorder.isTypeSupported(mimeType)) {
+            mimeType = 'audio/mpeg';
+          }
+        }
+      }
+      
+      const mediaRecorder = new MediaRecorder(stream, { mimeType });
+      this.currentScenarioPractice.mediaRecorder = mediaRecorder;
+      this.currentScenarioPractice.audioChunks = [];
+      
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          this.currentScenarioPractice.audioChunks.push(event.data);
+        }
+      };
+      
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(this.currentScenarioPractice.audioChunks, { type: mimeType });
+        await this.analyzeScenarioRecording(audioBlob);
+      };
+      
+      mediaRecorder.start();
+      this.currentScenarioPractice.isRecording = true;
+      
+      // Update UI
+      recordBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+      recordBtn.classList.add('bg-green-500', 'hover:bg-green-600', 'animate-pulse');
+      recordBtn.innerHTML = '<i class="fas fa-stop text-3xl"></i>';
+      recordStatus.innerHTML = '<i class="fas fa-circle text-red-500 mr-1 animate-pulse"></i>녹음 중... 버튼을 눌러 중지';
+      
+    } catch (error) {
+      console.error('Recording error:', error);
+      alert('마이크 접근 권한이 필요합니다.');
+    }
+  }
+  
+  // Stop recording
+  stopScenarioRecording() {
+    if (this.currentScenarioPractice.mediaRecorder && this.currentScenarioPractice.mediaRecorder.state !== 'inactive') {
+      this.currentScenarioPractice.mediaRecorder.stop();
+      this.currentScenarioPractice.mediaRecorder.stream.getTracks().forEach(track => track.stop());
     }
     
-    // Start session with custom system prompt
-    this.currentScenario = scenario;
-    this.startSession(scenarioTopic.id, `${scenario.icon} ${scenario.title}`, systemPrompt, scenario.difficulty);
+    this.currentScenarioPractice.isRecording = false;
+    
+    // Update UI
+    const recordBtn = document.getElementById('recordBtn');
+    const recordStatus = document.getElementById('recordStatus');
+    
+    if (recordBtn) {
+      recordBtn.classList.remove('bg-green-500', 'hover:bg-green-600', 'animate-pulse');
+      recordBtn.classList.add('bg-gray-400');
+      recordBtn.disabled = true;
+      recordBtn.innerHTML = '<i class="fas fa-spinner fa-spin text-3xl"></i>';
+    }
+    
+    if (recordStatus) {
+      recordStatus.innerHTML = '<i class="fas fa-brain mr-1"></i>AI가 발음을 분석 중...';
+    }
   }
+  
+  // Analyze recorded audio
+  async analyzeScenarioRecording(audioBlob) {
+    try {
+      // Convert audio to text using STT
+      const formData = new FormData();
+      const fileExt = audioBlob.type.includes('webm') ? 'webm' : 
+                     audioBlob.type.includes('mp4') ? 'm4a' : 
+                     audioBlob.type.includes('mpeg') ? 'mp3' : 'webm';
+      formData.append('audio', audioBlob, `scenario-recording.${fileExt}`);
+      
+      const sttResponse = await axios.post('/api/stt/transcribe', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      const transcription = sttResponse.data.transcription || sttResponse.data.text || '';
+      const originalSentence = this.currentScenarioPractice.scenario.sentences[this.currentScenarioPractice.currentSentenceIndex];
+      
+      // Calculate accuracy
+      const accuracy = this.calculateSentenceAccuracy(originalSentence, transcription);
+      
+      // Save result
+      this.currentScenarioPractice.results.push({
+        original: originalSentence,
+        transcription: transcription,
+        accuracy: accuracy
+      });
+      
+      // Move to next sentence or show results
+      this.currentScenarioPractice.currentSentenceIndex++;
+      
+      if (this.currentScenarioPractice.currentSentenceIndex < this.currentScenarioPractice.scenario.sentences.length) {
+        // Show next sentence
+        setTimeout(() => {
+          this.showScenarioPractice();
+        }, 500);
+      } else {
+        // Show final results
+        this.showScenarioResults();
+      }
+      
+    } catch (error) {
+      console.error('Analysis error:', error);
+      alert('분석 중 오류가 발생했습니다. 다시 시도해주세요.');
+      this.showScenarioPractice();
+    }
+  }
+  
+  // Calculate sentence accuracy (simple word matching)
+  calculateSentenceAccuracy(original, transcription) {
+    const originalWords = original.toLowerCase().replace(/[.,!?]/g, '').split(' ').filter(w => w.length > 0);
+    const transcribedWords = transcription.toLowerCase().replace(/[.,!?]/g, '').split(' ').filter(w => w.length > 0);
+    
+    let matches = 0;
+    originalWords.forEach(word => {
+      if (transcribedWords.includes(word)) {
+        matches++;
+      }
+    });
+    
+    return Math.round((matches / originalWords.length) * 100);
+  }
+  
+  // Show scenario results
+  showScenarioResults() {
+    const { scenario, results } = this.currentScenarioPractice;
+    const averageAccuracy = Math.round(results.reduce((sum, r) => sum + r.accuracy, 0) / results.length);
+    
+    let rating, ratingColor, ratingIcon;
+    if (averageAccuracy >= 80) {
+      rating = '훌륭해요!';
+      ratingColor = 'text-green-600';
+      ratingIcon = '🌟';
+    } else if (averageAccuracy >= 60) {
+      rating = '좋아요!';
+      ratingColor = 'text-blue-600';
+      ratingIcon = '👍';
+    } else if (averageAccuracy >= 40) {
+      rating = '괜찮아요';
+      ratingColor = 'text-yellow-600';
+      ratingIcon = '😊';
+    } else {
+      rating = '다시 도전!';
+      ratingColor = 'text-red-600';
+      ratingIcon = '💪';
+    }
+    
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+        ${this.getSidebar('scenario-mode')}
+        
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- Header -->
+          <div class="bg-white border-b border-blue-200 px-4 md:px-6 py-3">
+            <h2 class="text-lg font-semibold text-gray-800">
+              <i class="fas fa-chart-bar mr-2 text-blue-600"></i>${scenario.icon} ${scenario.title} - 결과
+            </h2>
+          </div>
+          
+          <!-- Content -->
+          <div class="flex-1 overflow-y-auto">
+            <div class="p-4 md:p-8">
+              <div class="max-w-4xl mx-auto">
+                <!-- Rating Card -->
+                <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-blue-200 mb-6 text-center">
+                  <div class="text-6xl mb-4">${ratingIcon}</div>
+                  <h2 class="text-3xl font-bold ${ratingColor} mb-2">${rating}</h2>
+                  <div class="text-5xl font-bold text-blue-600 mb-2">${averageAccuracy}%</div>
+                  <p class="text-gray-600">평균 정확도</p>
+                </div>
+                
+                <!-- Detailed Results -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+                  <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <i class="fas fa-list-check text-blue-600"></i>
+                    상세 결과
+                  </h3>
+                  
+                  <div class="space-y-4">
+                    ${results.map((result, index) => `
+                      <div class="border border-gray-200 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-2">
+                          <span class="text-sm font-semibold text-gray-700">문장 ${index + 1}</span>
+                          <span class="text-sm font-bold ${
+                            result.accuracy >= 80 ? 'text-green-600' :
+                            result.accuracy >= 60 ? 'text-blue-600' :
+                            result.accuracy >= 40 ? 'text-yellow-600' : 'text-red-600'
+                          }">${result.accuracy}%</span>
+                        </div>
+                        <div class="mb-2">
+                          <div class="text-xs text-gray-600 mb-1">원본 문장</div>
+                          <div class="bg-gray-50 rounded p-2 text-sm text-gray-900">${result.original}</div>
+                        </div>
+                        <div>
+                          <div class="text-xs text-gray-600 mb-1">당신이 말한 내용</div>
+                          <div class="bg-blue-50 rounded p-2 text-sm text-gray-900">${result.transcription || '(인식되지 않음)'}</div>
+                        </div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="grid md:grid-cols-2 gap-4">
+                  <button onclick="worvox.startScenario(${scenario.id})" 
+                    class="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-xl p-4 font-bold transition-all">
+                    <i class="fas fa-redo mr-2"></i>다시 연습하기
+                  </button>
+                  <button onclick="worvox.showScenarioMode()" 
+                    class="bg-white hover:bg-gray-50 border-2 border-blue-200 text-blue-600 rounded-xl p-4 font-bold transition-all">
+                    <i class="fas fa-home mr-2"></i>시나리오 선택
+                  </button>
+                </div>
+              </div>
+              
+              ${this.getFooter()}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
 
   showRealConversation() {
     const app = document.getElementById('app');
@@ -3850,6 +4414,11 @@ Proceed to payment?
     try {
       const response = await axios.get(`/api/history/sessions/${this.currentUser.id}`);
       const sessions = response.data.sessions;
+      
+      // Group sessions by type
+      const aiConversations = sessions.filter(s => !s.topic_name.includes('타이머') && !s.topic_name.includes('시나리오'));
+      const timerSessions = sessions.filter(s => s.topic_name.includes('타이머'));
+      const scenarioSessions = sessions.filter(s => s.topic_name.includes('시나리오'));
 
       const app = document.getElementById('app');
       app.innerHTML = `
@@ -3867,33 +4436,100 @@ Proceed to payment?
                   <i class="fas fa-arrow-left text-xl"></i>
                 </button>
                 <div>
-                  <h1 class="text-lg md:text-2xl font-bold text-gray-800">📚 Learning History</h1>
-                  <p class="hidden md:block text-gray-600 text-sm mt-1">Review your past conversations and track your progress</p>
+                  <h1 class="text-lg md:text-2xl font-bold text-gray-800">📚 학습 기록</h1>
+                  <p class="hidden md:block text-gray-600 text-sm mt-1">AI 대화, 타이머 모드, 시나리오 모드 기록을 확인하세요</p>
                 </div>
               </div>
             </div>
 
+            <!-- Tabs -->
+            <div class="bg-white border-b border-gray-200 px-4 md:px-6">
+              <div class="flex gap-2 md:gap-4 overflow-x-auto">
+                <button onclick="worvox.showHistoryTab('ai')" 
+                  class="history-tab active px-4 py-3 font-semibold border-b-2 border-blue-600 text-blue-600 whitespace-nowrap">
+                  <i class="fas fa-comment mr-2"></i>AI 대화 (${aiConversations.length})
+                </button>
+                <button onclick="worvox.showHistoryTab('timer')" 
+                  class="history-tab px-4 py-3 font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap">
+                  <i class="fas fa-stopwatch mr-2"></i>타이머 모드 (${timerSessions.length})
+                </button>
+                <button onclick="worvox.showHistoryTab('scenario')" 
+                  class="history-tab px-4 py-3 font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap">
+                  <i class="fas fa-film mr-2"></i>시나리오 모드 (${scenarioSessions.length})
+                </button>
+              </div>
+            </div>
+
             <!-- Content Area -->
-            <div class="flex-1 overflow-y-auto p-6">
+            <div class="flex-1 overflow-y-auto p-4 md:p-6">
               <div class="max-w-4xl mx-auto">
-                ${sessions.length === 0 ? `
-                  <div class="bg-white rounded-2xl shadow-sm p-12 text-center">
-                    <div class="text-6xl mb-4">📝</div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">No Learning History Yet</h3>
-                    <p class="text-gray-600 mb-6">Start a conversation to see your learning history here!</p>
-                    <button onclick="worvox.showTopicSelection()" 
-                      class="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-all">
-                      Start Learning
-                    </button>
-                  </div>
-                ` : `
-                  <div class="bg-white rounded-2xl shadow-sm p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Your Sessions (${sessions.length})</h2>
-                    <div class="space-y-4">
-                      ${this.groupSessionsByDate(sessions)}
+                
+                <!-- AI Conversation Tab -->
+                <div id="historyTab-ai" class="history-tab-content">
+                  ${aiConversations.length === 0 ? `
+                    <div class="bg-white rounded-2xl shadow-sm p-12 text-center">
+                      <div class="text-6xl mb-4">💬</div>
+                      <h3 class="text-xl font-bold text-gray-800 mb-2">AI 대화 기록이 없습니다</h3>
+                      <p class="text-gray-600 mb-6">AI와 대화를 시작하고 학습 기록을 만들어보세요!</p>
+                      <button onclick="worvox.startConversation()" 
+                        class="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-all">
+                        AI 대화 시작하기
+                      </button>
                     </div>
-                  </div>
-                `}
+                  ` : `
+                    <div class="bg-white rounded-2xl shadow-sm p-6">
+                      <h2 class="text-xl font-bold text-gray-800 mb-4">AI 대화 기록 (${aiConversations.length})</h2>
+                      <div class="space-y-4">
+                        ${this.groupSessionsByDate(aiConversations)}
+                      </div>
+                    </div>
+                  `}
+                </div>
+                
+                <!-- Timer Mode Tab -->
+                <div id="historyTab-timer" class="history-tab-content hidden">
+                  ${timerSessions.length === 0 ? `
+                    <div class="bg-white rounded-2xl shadow-sm p-12 text-center">
+                      <div class="text-6xl mb-4">⏱️</div>
+                      <h3 class="text-xl font-bold text-gray-800 mb-2">타이머 모드 기록이 없습니다</h3>
+                      <p class="text-gray-600 mb-6">타이머 모드로 압박 훈련을 시작해보세요!</p>
+                      <button onclick="worvox.showTimerMode()" 
+                        class="px-6 py-3 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-semibold transition-all">
+                        타이머 모드 시작하기
+                      </button>
+                    </div>
+                  ` : `
+                    <div class="bg-white rounded-2xl shadow-sm p-6">
+                      <h2 class="text-xl font-bold text-gray-800 mb-4">타이머 모드 기록 (${timerSessions.length})</h2>
+                      <div class="space-y-4">
+                        ${this.groupSessionsByDate(timerSessions)}
+                      </div>
+                    </div>
+                  `}
+                </div>
+                
+                <!-- Scenario Mode Tab -->
+                <div id="historyTab-scenario" class="history-tab-content hidden">
+                  ${scenarioSessions.length === 0 ? `
+                    <div class="bg-white rounded-2xl shadow-sm p-12 text-center">
+                      <div class="text-6xl mb-4">🎬</div>
+                      <h3 class="text-xl font-bold text-gray-800 mb-2">시나리오 모드 기록이 없습니다</h3>
+                      <p class="text-gray-600 mb-6">30가지 실전 상황 대화를 연습해보세요!</p>
+                      <button onclick="worvox.showScenarioMode()" 
+                        class="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition-all">
+                        시나리오 모드 시작하기
+                      </button>
+                    </div>
+                  ` : `
+                    <div class="bg-white rounded-2xl shadow-sm p-6">
+                      <h2 class="text-xl font-bold text-gray-800 mb-4">시나리오 모드 기록 (${scenarioSessions.length})</h2>
+                      <div class="space-y-4">
+                        ${this.groupSessionsByDate(scenarioSessions)}
+                      </div>
+                    </div>
+                  `}
+                </div>
+                
               </div>
             </div>
           </div>
@@ -3903,6 +4539,23 @@ Proceed to payment?
       console.error('Error loading history:', error);
       alert('Failed to load history. Please try again.');
     }
+  }
+  
+  // Show specific history tab
+  showHistoryTab(tabName) {
+    // Update tab buttons
+    const tabs = document.querySelectorAll('.history-tab');
+    tabs.forEach(tab => {
+      tab.classList.remove('active', 'border-blue-600', 'text-blue-600');
+      tab.classList.add('border-transparent', 'text-gray-600');
+    });
+    event.target.closest('.history-tab').classList.add('active', 'border-blue-600', 'text-blue-600');
+    event.target.closest('.history-tab').classList.remove('border-transparent', 'text-gray-600');
+    
+    // Update content
+    const contents = document.querySelectorAll('.history-tab-content');
+    contents.forEach(content => content.classList.add('hidden'));
+    document.getElementById(`historyTab-${tabName}`).classList.remove('hidden');
   }
 
   groupSessionsByDate(sessions) {
