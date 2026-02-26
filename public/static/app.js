@@ -794,7 +794,7 @@ class WorVox {
 
   // Start Timer Challenge
   startTimerChallenge(seconds) {
-    // Sample sentences for timer challenge
+    // Sample sentences for timer challenge (50 intermediate-advanced level sentences)
     const sentences = [
       "I believe that consistent practice is the key to mastering any skill.",
       "The weather forecast predicts heavy rain throughout the weekend.",
@@ -805,7 +805,47 @@ class WorVox {
       "The company announced plans to expand its operations into international markets.",
       "Reading books helps improve vocabulary and critical thinking skills.",
       "He graduated from university with honors in computer science.",
-      "Environmental protection should be a priority for all governments worldwide."
+      "Environmental protection should be a priority for all governments worldwide.",
+      "The research team discovered a breakthrough in renewable energy technology.",
+      "Many successful entrepreneurs attribute their achievements to persistent effort and adaptability.",
+      "Climate change poses significant challenges to agricultural production in many regions.",
+      "The museum's collection includes masterpieces from various historical periods.",
+      "Effective communication requires both active listening and clear expression of ideas.",
+      "The financial advisor recommended diversifying investments to minimize potential risks.",
+      "Scientists have made remarkable progress in understanding the human brain's complexity.",
+      "The conference brought together experts from diverse fields to discuss innovation.",
+      "Public transportation systems play a crucial role in reducing urban traffic congestion.",
+      "Cultural exchange programs help students develop a broader worldview and understanding.",
+      "The architect designed a building that seamlessly blends modern and traditional elements.",
+      "Online education platforms have revolutionized access to quality learning resources.",
+      "The negotiation process requires patience, strategic thinking, and mutual respect.",
+      "Artificial intelligence is transforming industries ranging from healthcare to manufacturing.",
+      "The documentary explored the fascinating relationship between humans and wildlife.",
+      "Collaboration among team members is essential for achieving ambitious project goals.",
+      "The pharmaceutical company invested heavily in developing new treatment methods.",
+      "Historical events continue to shape contemporary political and social landscapes.",
+      "The artist's work challenges conventional perspectives and encourages critical reflection.",
+      "Economic policies must balance growth objectives with social welfare considerations.",
+      "Remote work arrangements offer flexibility but require strong self-discipline and time management.",
+      "The chef combines traditional recipes with innovative cooking techniques.",
+      "Understanding different perspectives is fundamental to resolving conflicts effectively.",
+      "The startup secured substantial funding from venture capital investors.",
+      "Archaeological discoveries provide valuable insights into ancient civilizations and cultures.",
+      "Professional development opportunities help employees enhance their skills and career prospects.",
+      "The novel examines complex themes of identity, belonging, and personal transformation.",
+      "Sustainable business practices benefit both the environment and long-term profitability.",
+      "The legal framework establishes clear guidelines for protecting intellectual property rights.",
+      "Community engagement initiatives strengthen social bonds and collective problem-solving capacity.",
+      "The presentation outlined strategic priorities for the organization's future development.",
+      "Consumer preferences have shifted significantly toward environmentally conscious products.",
+      "The medical breakthrough offers hope for patients with previously untreatable conditions.",
+      "Leadership requires the ability to inspire others while making difficult decisions.",
+      "The software update introduces enhanced security features and improved user experience.",
+      "International cooperation is essential for addressing global challenges effectively.",
+      "The performance showcased extraordinary talent and years of dedicated training.",
+      "Data analytics provides companies with actionable insights for informed decision-making.",
+      "The policy aims to promote equal opportunities and reduce systemic inequalities.",
+      "Innovation thrives in environments that encourage experimentation and embrace calculated risks."
     ];
     
     const randomSentence = sentences[Math.floor(Math.random() * sentences.length)];
