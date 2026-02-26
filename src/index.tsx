@@ -190,6 +190,136 @@ app.get('/payment/fail', (c) => {
   `);
 });
 
+// Trial Success - Billing key registered
+app.get('/trial-success', (c) => {
+  const authKey = c.req.query('authKey');
+  const customerKey = c.req.query('customerKey');
+  const plan = c.req.query('plan');
+  const userId = c.req.query('userId');
+  
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>무료 체험 시작 - WorVox</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-gradient-to-br from-green-50 to-emerald-50">
+        <div id="content" class="min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+                <p class="text-gray-600">무료 체험을 활성화하는 중...</p>
+            </div>
+        </div>
+        
+        <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+        <script>
+          async function activateTrial() {
+            try {
+              const response = await axios.post('/api/payments/trial/confirm', {
+                userId: '${userId}',
+                plan: '${plan}',
+                billingKey: '${authKey}',
+                customerKey: '${customerKey}'
+              });
+              
+              if (response.data.success) {
+                document.getElementById('content').innerHTML = \`
+                  <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+                    <div class="text-6xl mb-4">🎉</div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-3">무료 체험 시작!</h1>
+                    <p class="text-gray-600 mb-4">
+                      <strong class="text-green-600">${plan === 'core' ? 'Core' : 'Premium'}</strong> 플랜을 2주간 무료로 사용하실 수 있습니다!
+                    </p>
+                    
+                    <div class="bg-blue-50 rounded-lg p-4 mb-6 text-left">
+                      <p class="text-sm text-gray-700 mb-2">
+                        <i class="fas fa-calendar-check text-blue-600 mr-2"></i>
+                        체험 종료일: <strong>\${new Date(response.data.trialEndDate).toLocaleDateString('ko-KR')}</strong>
+                      </p>
+                      <p class="text-sm text-gray-700">
+                        <i class="fas fa-credit-card text-blue-600 mr-2"></i>
+                        자동 결제 금액: <strong>${plan === 'core' ? '₩9,900' : '₩19,000'}</strong>/월
+                      </p>
+                    </div>
+                    
+                    <p class="text-xs text-gray-500 mb-6">
+                      💡 체험 종료 3일 전에 이메일로 알려드립니다.<br/>
+                      언제든 내 정보 > 구독 관리에서 해지하실 수 있습니다.
+                    </p>
+                    
+                    <button 
+                      onclick="window.location.href='/'"
+                      class="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-3 rounded-lg font-semibold hover:from-green-600 hover:to-emerald-600 transition shadow-lg"
+                    >
+                      시작하기
+                    </button>
+                  </div>
+                \`;
+              } else {
+                throw new Error('체험 활성화 실패');
+              }
+            } catch (error) {
+              console.error('Trial activation error:', error);
+              document.getElementById('content').innerHTML = \`
+                <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+                  <div class="text-6xl mb-4">❌</div>
+                  <h1 class="text-2xl font-bold text-gray-900 mb-2">오류 발생</h1>
+                  <p class="text-gray-600 mb-6">무료 체험 활성화 중 문제가 발생했습니다.</p>
+                  <button 
+                    onclick="window.location.href='/'"
+                    class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+                  >
+                    홈으로 돌아가기
+                  </button>
+                </div>
+              \`;
+            }
+          }
+          
+          activateTrial();
+        </script>
+    </body>
+    </html>
+  `);
+});
+
+// Trial Fail - Billing key registration failed
+app.get('/trial-fail', (c) => {
+  const code = c.req.query('code');
+  const message = c.req.query('message');
+  
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>무료 체험 실패 - WorVox</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-gray-50">
+        <div class="min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
+                <div class="text-6xl mb-4">❌</div>
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">카드 등록 실패</h1>
+                <p class="text-gray-600 mb-2">${message || '카드 등록이 취소되었습니다.'}</p>
+                <p class="text-sm text-gray-400 mb-6">오류 코드: ${code || 'N/A'}</p>
+                <button 
+                  onclick="window.location.href='/'"
+                  class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+                >
+                  홈으로 돌아가기
+                </button>
+            </div>
+        </div>
+    </body>
+    </html>
+  `);
+});
+
 // Health check
 app.get('/api/health', (c) => {
   return c.json({ 

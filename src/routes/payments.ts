@@ -209,4 +209,340 @@ payments.get('/history/:userId', async (c) => {
   }
 });
 
+// ========================================
+// Free Trial with Billing Key (2-week trial)
+// ========================================
+
+// Start free trial - generate customer key
+payments.post('/trial/start', async (c) => {
+  try {
+    const { userId, plan } = await c.req.json();
+
+    if (!userId || !plan) {
+      return c.json({ error: 'Missing required fields' }, 400);
+    }
+
+    if (!['core', 'premium'].includes(plan)) {
+      return c.json({ error: 'Invalid plan. Must be "core" or "premium"' }, 400);
+    }
+
+    console.log(`🎁 Starting free trial for user ${userId}, plan: ${plan}`);
+
+    // Check if user already has active trial or subscription
+    const user = await c.env.DB.prepare(
+      'SELECT id, plan, is_trial, trial_end_date FROM users WHERE id = ?'
+    ).bind(userId).first();
+
+    if (!user) {
+      return c.json({ error: 'User not found' }, 404);
+    }
+
+    // Check if user already has active paid plan
+    if (user.plan && user.plan !== 'free' && !user.is_trial) {
+      return c.json({ error: '이미 유료 플랜을 사용 중입니다' }, 400);
+    }
+
+    // Check if user already has active trial
+    if (user.is_trial && user.trial_end_date) {
+      const trialEndDate = new Date(user.trial_end_date);
+      if (trialEndDate > new Date()) {
+        return c.json({ error: '이미 무료 체험을 이용 중입니다' }, 400);
+      }
+    }
+
+    // Generate unique customer key for Toss Payments
+    const customerKey = `customer_${userId}_${Date.now()}`;
+
+    // Store customer key in database
+    await c.env.DB.prepare(
+      'UPDATE users SET toss_customer_key = ? WHERE id = ?'
+    ).bind(customerKey, userId).run();
+
+    console.log(`✅ Customer key generated: ${customerKey}`);
+
+    return c.json({
+      success: true,
+      customerKey,
+      plan,
+      message: '무료 체험을 시작합니다'
+    });
+
+  } catch (error) {
+    console.error('Trial start error:', error);
+    return c.json({ 
+      error: 'Failed to start trial',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
+// Confirm billing key and activate trial
+payments.post('/trial/confirm', async (c) => {
+  try {
+    const { userId, plan, billingKey, customerKey } = await c.req.json();
+
+    if (!userId || !plan || !billingKey || !customerKey) {
+      return c.json({ error: 'Missing required fields' }, 400);
+    }
+
+    console.log(`🎉 Activating trial for user ${userId}, billing key: ${billingKey}`);
+
+    // Calculate trial dates (2 weeks from now)
+    const trialStartDate = new Date();
+    const trialEndDate = new Date();
+    trialEndDate.setDate(trialEndDate.getDate() + 14); // 2 weeks
+
+    // Update user with billing key and trial info
+    await c.env.DB.prepare(`
+      UPDATE users 
+      SET 
+        billing_key = ?,
+        toss_customer_key = ?,
+        plan = ?,
+        is_trial = 1,
+        trial_start_date = datetime('now'),
+        trial_end_date = datetime('now', '+14 days'),
+        auto_billing_enabled = 1,
+        subscription_start_date = datetime('now'),
+        subscription_end_date = datetime('now', '+14 days')
+      WHERE id = ?
+    `).bind(billingKey, customerKey, plan, userId).run();
+
+    // Log trial activation
+    await c.env.DB.prepare(`
+      INSERT INTO activity_logs (user_id, activity_type, description, created_at)
+      VALUES (?, 'trial_start', ?, datetime('now'))
+    `).bind(
+      userId,
+      `Started ${plan} free trial (2 weeks)`
+    ).run();
+
+    console.log(`✅ Trial activated until ${trialEndDate.toISOString()}`);
+
+    return c.json({
+      success: true,
+      plan,
+      trialStartDate: trialStartDate.toISOString(),
+      trialEndDate: trialEndDate.toISOString(),
+      message: '무료 체험이 시작되었습니다!'
+    });
+
+  } catch (error) {
+    console.error('Trial confirm error:', error);
+    return c.json({ 
+      error: 'Failed to confirm trial',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
+// Cancel trial (user cancels before trial ends)
+payments.post('/trial/cancel', async (c) => {
+  try {
+    const { userId } = await c.req.json();
+
+    if (!userId) {
+      return c.json({ error: 'Missing userId' }, 400);
+    }
+
+    console.log(`❌ Cancelling trial for user ${userId}`);
+
+    // Check if user has active trial
+    const user = await c.env.DB.prepare(
+      'SELECT id, is_trial, trial_end_date FROM users WHERE id = ?'
+    ).bind(userId).first();
+
+    if (!user || !user.is_trial) {
+      return c.json({ error: '활성화된 무료 체험이 없습니다' }, 400);
+    }
+
+    // Disable auto billing but keep trial active until end date
+    await c.env.DB.prepare(
+      'UPDATE users SET auto_billing_enabled = 0 WHERE id = ?'
+    ).bind(userId).run();
+
+    // Log cancellation
+    await c.env.DB.prepare(`
+      INSERT INTO activity_logs (user_id, activity_type, description, created_at)
+      VALUES (?, 'trial_cancel', ?, datetime('now'))
+    `).bind(
+      userId,
+      'Cancelled free trial auto-billing'
+    ).run();
+
+    console.log(`✅ Trial cancelled, will expire at ${user.trial_end_date}`);
+
+    return c.json({
+      success: true,
+      message: '자동 결제가 취소되었습니다. 체험 종료일까지는 계속 사용하실 수 있습니다.'
+    });
+
+  } catch (error) {
+    console.error('Trial cancel error:', error);
+    return c.json({ 
+      error: 'Failed to cancel trial',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
+// Execute billing for trial users (called by cron job)
+payments.post('/billing/execute', async (c) => {
+  try {
+    const authHeader = c.req.header('Authorization');
+    const cronSecret = c.env.CRON_SECRET || 'default-secret-change-me';
+
+    // Simple auth check (in production, use proper auth)
+    if (authHeader !== `Bearer ${cronSecret}`) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    console.log('🤖 Running billing cron job...');
+
+    // Find users whose trial ends today and have auto billing enabled
+    const today = new Date().toISOString().split('T')[0];
+    const { results: usersToCharge } = await c.env.DB.prepare(`
+      SELECT id, username, email, plan, billing_key, trial_end_date
+      FROM users
+      WHERE is_trial = 1
+        AND auto_billing_enabled = 1
+        AND date(trial_end_date) <= date('now')
+        AND billing_failure_count < 3
+    `).all();
+
+    console.log(`📋 Found ${usersToCharge?.length || 0} users to charge`);
+
+    const results = [];
+
+    for (const user of (usersToCharge || [])) {
+      try {
+        console.log(`💳 Charging user ${user.id} (${user.email})`);
+
+        // Determine amount based on plan
+        const amount = user.plan === 'core' ? 9900 : 19000;
+        const orderName = `WorVox ${user.plan.toUpperCase()} 월간 구독`;
+
+        // Call Toss Payments Billing API
+        const tossResponse = await fetch('https://api.tosspayments.com/v1/billing/' + user.billing_key, {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Basic ' + btoa(c.env.TOSS_SECRET_KEY + ':'),
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            customerKey: user.billing_key,
+            amount,
+            orderId: `auto_${user.id}_${Date.now()}`,
+            orderName,
+            customerEmail: user.email,
+            customerName: user.username
+          })
+        });
+
+        const tossData = await tossResponse.json();
+
+        if (tossResponse.ok) {
+          // Payment successful - convert trial to paid subscription
+          await c.env.DB.prepare(`
+            UPDATE users
+            SET 
+              is_trial = 0,
+              trial_start_date = NULL,
+              trial_end_date = NULL,
+              subscription_start_date = datetime('now'),
+              subscription_end_date = datetime('now', '+1 month'),
+              billing_period = 'monthly',
+              last_billing_attempt = datetime('now'),
+              billing_failure_count = 0
+            WHERE id = ?
+          `).bind(user.id).run();
+
+          // Record payment
+          await c.env.DB.prepare(`
+            INSERT INTO payment_orders (order_id, user_id, plan_name, amount, status, created_at)
+            VALUES (?, ?, ?, ?, 'completed', datetime('now'))
+          `).bind(
+            `auto_${user.id}_${Date.now()}`,
+            user.id,
+            user.plan,
+            amount
+          ).run();
+
+          // Log success
+          await c.env.DB.prepare(`
+            INSERT INTO activity_logs (user_id, activity_type, description, created_at)
+            VALUES (?, 'auto_billing_success', ?, datetime('now'))
+          `).bind(
+            user.id,
+            `Auto-charged ${amount}원 for ${user.plan} plan`
+          ).run();
+
+          results.push({ userId: user.id, status: 'success', amount });
+          console.log(`✅ User ${user.id} charged successfully`);
+
+        } else {
+          // Payment failed - increment failure count
+          await c.env.DB.prepare(`
+            UPDATE users
+            SET 
+              last_billing_attempt = datetime('now'),
+              billing_failure_count = billing_failure_count + 1
+            WHERE id = ?
+          `).bind(user.id).run();
+
+          // Log failure
+          await c.env.DB.prepare(`
+            INSERT INTO activity_logs (user_id, activity_type, description, created_at)
+            VALUES (?, 'auto_billing_failed', ?, datetime('now'))
+          `).bind(
+            user.id,
+            `Auto-billing failed: ${tossData.message || 'Unknown error'}`
+          ).run();
+
+          results.push({ userId: user.id, status: 'failed', error: tossData.message });
+          console.log(`❌ User ${user.id} billing failed: ${tossData.message}`);
+
+          // If 3rd failure, downgrade to free
+          const updatedUser = await c.env.DB.prepare(
+            'SELECT billing_failure_count FROM users WHERE id = ?'
+          ).bind(user.id).first();
+
+          if (updatedUser && updatedUser.billing_failure_count >= 3) {
+            await c.env.DB.prepare(`
+              UPDATE users
+              SET 
+                plan = 'free',
+                is_trial = 0,
+                trial_start_date = NULL,
+                trial_end_date = NULL,
+                auto_billing_enabled = 0,
+                subscription_end_date = datetime('now')
+              WHERE id = ?
+            `).bind(user.id).run();
+
+            console.log(`⬇️ User ${user.id} downgraded to free after 3 failures`);
+          }
+        }
+
+      } catch (error) {
+        console.error(`Error charging user ${user.id}:`, error);
+        results.push({ userId: user.id, status: 'error', error: String(error) });
+      }
+    }
+
+    return c.json({
+      success: true,
+      processedCount: results.length,
+      results
+    });
+
+  } catch (error) {
+    console.error('Billing execute error:', error);
+    return c.json({ 
+      error: 'Failed to execute billing',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
 export default payments;

@@ -6962,7 +6962,11 @@ Proceed to payment?
 
                   <!-- Core Plan -->
                   <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-blue-200 transition-all hover:shadow-2xl transform hover:-translate-y-1">
-                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-6 text-center text-white">
+                    <!-- Free Trial Badge -->
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg z-10">
+                      🎁 2주 무료 체험
+                    </div>
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-6 text-center text-white pt-8">
                       <div class="text-4xl mb-3">💙</div>
                       <h3 class="text-2xl font-bold mb-2">Core</h3>
                       <div class="mb-4">
@@ -6993,9 +6997,17 @@ Proceed to payment?
                           <span class="text-gray-400">리포트 & 분석</span>
                         </li>
                       </ul>
+                      
+                      <!-- Free Trial Button -->
+                      <button onclick="worvox.startFreeTrial('core')" 
+                        class="w-full py-3 mb-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg font-semibold hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg">
+                        <i class="fas fa-gift mr-2"></i>2주 무료로 시작하기
+                      </button>
+                      
+                      <!-- Regular Purchase Button -->
                       <button onclick="worvox.selectPlan('Core')" 
-                        class="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transition-all">
-                        선택하기
+                        class="w-full py-2 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-all text-sm">
+                        바로 구매하기
                       </button>
                     </div>
                   </div>
@@ -7006,7 +7018,11 @@ Proceed to payment?
                     <div class="absolute top-4 right-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
                       🔥 POPULAR
                     </div>
-                    <div class="bg-gradient-to-br from-purple-500 to-pink-500 p-6 text-center text-white">
+                    <!-- Free Trial Badge -->
+                    <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg z-10">
+                      🎁 2주 무료 체험
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-500 to-pink-500 p-6 text-center text-white pt-8">
                       <div class="text-4xl mb-3">✨</div>
                       <h3 class="text-2xl font-bold mb-2">Premium</h3>
                       <div class="mb-4">
@@ -7037,9 +7053,17 @@ Proceed to payment?
                           <span class="text-gray-700">+ Core 모든 기능</span>
                         </li>
                       </ul>
+                      
+                      <!-- Free Trial Button -->
+                      <button onclick="worvox.startFreeTrial('premium')" 
+                        class="w-full py-3 mb-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg font-semibold hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg">
+                        <i class="fas fa-gift mr-2"></i>2주 무료로 시작하기
+                      </button>
+                      
+                      <!-- Regular Purchase Button -->
                       <button onclick="worvox.selectPlan('Premium')" 
-                        class="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-semibold hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg">
-                        선택하기
+                        class="w-full py-2 bg-white text-purple-600 border-2 border-purple-600 rounded-lg font-medium hover:bg-purple-50 transition-all text-sm">
+                        바로 구매하기
                       </button>
                     </div>
                   </div>
@@ -9256,6 +9280,150 @@ Proceed to payment?
   }
   
   // Select plan based on current billing period
+  // Start 2-week free trial with billing key
+  async startFreeTrial(plan) {
+    if (!this.currentUser) {
+      alert('로그인이 필요합니다.');
+      this.showLogin();
+      return;
+    }
+
+    console.log(`🎁 Starting free trial for ${plan}`);
+
+    // Show confirmation modal
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+      <div class="bg-white rounded-2xl p-6 max-w-lg w-full mx-4 shadow-2xl">
+        <div class="text-center mb-6">
+          <div class="text-5xl mb-3">🎁</div>
+          <h3 class="text-2xl font-bold text-gray-900 mb-2">2주 무료 체험</h3>
+          <p class="text-gray-600 text-sm">
+            ${plan === 'core' ? 'Core' : 'Premium'} 플랜을 지금 무료로 시작하세요!
+          </p>
+        </div>
+        
+        <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4 mb-6">
+          <h4 class="font-semibold text-gray-900 mb-3 flex items-center">
+            <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+            중요 안내
+          </h4>
+          <ul class="space-y-2 text-sm text-gray-700">
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mr-2 mt-0.5"></i>
+              <span><strong>지금은 결제되지 않습니다</strong></span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-check text-green-500 mr-2 mt-0.5"></i>
+              <span><strong>2주간 모든 기능 무료</strong> 사용</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-calendar-check text-blue-500 mr-2 mt-0.5"></i>
+              <span>체험 종료일: <strong>${this.getFutureDate(14)}</strong></span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-credit-card text-purple-500 mr-2 mt-0.5"></i>
+              <span>체험 종료 후 자동 결제: <strong>${plan === 'core' ? '₩9,900' : '₩19,000'}</strong>/월</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-bell text-yellow-500 mr-2 mt-0.5"></i>
+              <span><strong>3일 전</strong> 이메일로 알림 발송</span>
+            </li>
+            <li class="flex items-start">
+              <i class="fas fa-times-circle text-red-500 mr-2 mt-0.5"></i>
+              <span><strong>언제든 해지 가능</strong> (내 정보 > 구독 관리)</span>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-6">
+          <p class="text-xs text-gray-700">
+            <i class="fas fa-exclamation-triangle text-yellow-600 mr-1"></i>
+            다음 단계에서 카드 정보를 등록하시면 무료 체험이 시작됩니다.
+          </p>
+        </div>
+        
+        <div class="flex items-start mb-6">
+          <input type="checkbox" id="agreeTerms" class="mt-1 mr-2">
+          <label for="agreeTerms" class="text-sm text-gray-700">
+            위 내용을 확인했으며, 무료 체험 종료 후 자동 결제에 동의합니다.
+          </label>
+        </div>
+        
+        <div class="flex gap-3">
+          <button onclick="this.closest('.fixed').remove()" 
+            class="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-all">
+            취소
+          </button>
+          <button onclick="worvox.confirmFreeTrial('${plan}'); this.closest('.fixed').remove();" 
+            class="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg font-semibold hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            id="confirmTrialBtn"
+            disabled>
+            카드 등록하고 시작
+          </button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Enable button when checkbox is checked
+    const checkbox = document.getElementById('agreeTerms');
+    const confirmBtn = document.getElementById('confirmTrialBtn');
+    checkbox.addEventListener('change', () => {
+      confirmBtn.disabled = !checkbox.checked;
+    });
+  }
+
+  // Get future date string (for display)
+  getFutureDate(days) {
+    const date = new Date();
+    date.setDate(date.getDate() + days);
+    return date.toLocaleDateString('ko-KR', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  }
+
+  // Confirm and proceed with trial
+  async confirmFreeTrial(plan) {
+    try {
+      console.log(`✅ User confirmed trial for ${plan}`);
+
+      // Step 1: Start trial on backend (get customerKey)
+      const startResponse = await axios.post('/api/payments/trial/start', {
+        userId: this.currentUser.id,
+        plan
+      });
+
+      if (!startResponse.data.success) {
+        throw new Error(startResponse.data.error || '체험 시작 실패');
+      }
+
+      const { customerKey } = startResponse.data;
+      console.log(`📝 Customer key: ${customerKey}`);
+
+      // Step 2: Initialize Toss Payments Billing
+      const clientKey = 'test_ck_d26DlbXAaV0eR7QxP00rqY50Q9RB';
+      const tossPayments = TossPayments(clientKey);
+
+      // Step 3: Request billing key (카드 등록)
+      const billing = tossPayments.payment({ customerKey });
+      
+      await billing.requestBillingAuth({
+        method: 'CARD',
+        successUrl: window.location.origin + `/trial-success?plan=${plan}&userId=${this.currentUser.id}&customerKey=${customerKey}`,
+        failUrl: window.location.origin + '/trial-fail',
+        customerEmail: this.currentUser.email,
+        customerName: this.currentUser.username
+      });
+
+    } catch (error) {
+      console.error('Free trial error:', error);
+      alert('무료 체험 시작 중 오류가 발생했습니다: ' + (error.response?.data?.error || error.message));
+    }
+  }
+
   async selectPlan(planName) {
     if (!this.currentUser) {
       alert('로그인이 필요합니다.');
