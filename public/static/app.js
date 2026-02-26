@@ -2074,7 +2074,10 @@ class WorVox {
       // 3. Request payment
       await payment.requestPayment({
         method: 'CARD',
-        amount: { value: finalAmount },
+        amount: { 
+          value: finalAmount,
+          currency: 'KRW'
+        },
         orderId: orderId,
         orderName: orderName,
         successUrl: window.location.origin + '/payment/success',
@@ -8768,7 +8771,10 @@ Proceed to payment?
       // 3. Request payment
       await payment.requestPayment({
         method: 'CARD',
-        amount: { value: amount },
+        amount: { 
+          value: amount,
+          currency: 'KRW'
+        },
         orderId: orderId,
         orderName: orderName,
         successUrl: window.location.origin + '/payment/success',
