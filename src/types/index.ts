@@ -3,6 +3,8 @@ export type Bindings = {
   OPENAI_API_KEY: string;
   OPENAI_API_BASE?: string;
   ELEVENLABS_API_KEY: string;
+  TOSS_CLIENT_KEY: string;
+  TOSS_SECRET_KEY: string;
 }
 
 export type Level = 'beginner' | 'intermediate' | 'advanced';

@@ -10,5 +10,8 @@
       "database_name": "worvox-production",
       "database_id": "a2f5a937-d5b5-48e4-9009-66b1676de98b"
     }
-  ]
+  ],
+  "vars": {
+    "TOSS_CLIENT_KEY": "test_ck_d26DlbXAaV0eR7QxP00rqY50Q9RB"
+  }
 }

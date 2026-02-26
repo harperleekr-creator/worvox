@@ -2000,6 +2000,17 @@ class WorVox {
 
   // Purchase lesson packages (일반결제)
   async purchaseLessons(lessonCount, amount, packageType = 'one-time') {
+    if (!this.currentUser) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    // Free trial - no payment needed
+    if (packageType === 'free') {
+      alert(`🎁 무료 체험 신청 완료!\n\n${lessonCount}회 수업권\n\n강사 배정 및 일정 조율을 위해\n곧 연락드리겠습니다! 🚀`);
+      return;
+    }
+
     // Apply discount for Core/Premium users
     let finalAmount = amount;
     let discountPercent = 0;
@@ -2021,43 +2032,56 @@ class WorVox {
       ? `\n${planName} 회원 할인: -${discountPercent}% (₩${(amount - finalAmount).toLocaleString()} 할인)\n` 
       : '';
     
-    const packageTypeText = packageType === 'monthly' ? '월정기 구독' : packageType === 'free' ? '무료 체험' : '일반결제';
+    const packageTypeText = packageType === 'monthly' ? '월정기 구독' : '일반결제';
     
     const confirmed = confirm(`
-🎓 1:1 Live Speaking Session 수업권 ${packageType === 'free' ? '체험' : '구매'}
+🎓 1:1 Live Speaking Session 수업권 구매
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 패키지: ${packageName}
 구매 방식: ${packageTypeText}
-${amount > 0 ? `정가: ₩${amount.toLocaleString()}${discountText}` : ''}
-최종 금액: ${amount > 0 ? `₩${finalAmount.toLocaleString()}` : '무료'}
-${amount > 0 ? `회당 가격: ₩${pricePerLesson.toLocaleString()}` : ''}
+정가: ₩${amount.toLocaleString()}${discountText}최종 금액: ₩${finalAmount.toLocaleString()}
+회당 가격: ₩${pricePerLesson.toLocaleString()}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-${packageType === 'free' ? '무료 체험을 신청하시겠습니까?' : '구매하시겠습니까?'}
+결제를 진행하시겠습니까?
     `);
     
     if (!confirmed) return;
     
     try {
-      // TODO: Implement NHN KCP 일반결제 integration
-      if (packageType === 'free') {
-        alert(`🎁 무료 체험 신청 완료!\n\n${packageName}\n\n강사 배정 및 일정 조율을 위해\n곧 연락드리겠습니다! 🚀`);
-      } else if (packageType === 'monthly') {
-        alert(`💳 월정기 구독 준비 중...\n\n${packageName}\n구독 금액: ₩${finalAmount.toLocaleString()} / 월\n\nNHN KCP 정기결제 시스템 연동 준비 중입니다.\n곧 만나요! 🚀`);
-      } else {
-        alert(`💳 결제 준비 중...\n\n${packageName}\n결제 금액: ₩${finalAmount.toLocaleString()}\n\nNHN KCP 일반결제 시스템 연동 준비 중입니다.\n곧 만나요! 🚀`);
+      // 1. Prepare order
+      const prepareResponse = await axios.post('/api/payments/prepare', {
+        planName: `Live Speaking ${lessonCount}회`,
+        price: finalAmount,
+        period: packageType,
+        userId: this.currentUser.id
+      });
+
+      if (!prepareResponse.data.success) {
+        throw new Error('결제 준비 실패');
       }
-      
-      // Simulate purchase success (for testing)
-      // After payment success, save to DB:
-      // - lesson_purchases table
-      // - total_lessons: lessonCount
-      // - remaining_lessons: lessonCount
-      // - amount: finalAmount
+
+      const { orderId, orderName } = prepareResponse.data;
+
+      // 2. Initialize Toss Payments
+      const clientKey = 'test_ck_d26DlbXAaV0eR7QxP00rqY50Q9RB';
+      const tossPayments = TossPayments(clientKey);
+
+      // 3. Request payment
+      await tossPayments.requestPayment({
+        method: 'CARD',
+        amount: { value: finalAmount },
+        orderId: orderId,
+        orderName: orderName,
+        successUrl: window.location.origin + '/payment/success',
+        failUrl: window.location.origin + '/payment/fail',
+        customerEmail: this.currentUser.email,
+        customerName: this.currentUser.username,
+      });
       
     } catch (error) {
       console.error('Lesson purchase error:', error);
-      alert('❌ 구매 처리 중 오류가 발생했습니다.\n다시 시도해주세요.');
+      alert('❌ 결제 시작 중 오류가 발생했습니다.\n' + (error.message || ''));
     }
   }
 
@@ -8694,17 +8718,61 @@ Proceed to payment?
   }
   
   // Select plan based on current billing period
-  selectPlan(planName) {
+  async selectPlan(planName) {
+    if (!this.currentUser) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
     const period = this.currentBillingPeriod || 'monthly';
-    let price;
+    let amount;
+    let priceText;
     
     if (planName === 'Core') {
-      price = period === 'monthly' ? '₩9,900/월' : '₩97,416/년';
+      amount = period === 'monthly' ? 9900 : 97416;
+      priceText = period === 'monthly' ? '₩9,900/월' : '₩97,416/년';
     } else if (planName === 'Premium') {
-      price = period === 'monthly' ? '₩19,000/월' : '₩186,960/년';
+      amount = period === 'monthly' ? 19000 : 186960;
+      priceText = period === 'monthly' ? '₩19,000/월' : '₩186,960/년';
+    } else {
+      return;
     }
-    
-    this.showPaymentStayTuned(planName, price);
+
+    try {
+      // 1. Prepare order
+      const prepareResponse = await axios.post('/api/payments/prepare', {
+        planName,
+        price: amount,
+        period,
+        userId: this.currentUser.id
+      });
+
+      if (!prepareResponse.data.success) {
+        throw new Error('결제 준비 실패');
+      }
+
+      const { orderId, orderName } = prepareResponse.data;
+
+      // 2. Initialize Toss Payments
+      const clientKey = 'test_ck_d26DlbXAaV0eR7QxP00rqY50Q9RB';
+      const tossPayments = TossPayments(clientKey);
+
+      // 3. Request payment
+      await tossPayments.requestPayment({
+        method: 'CARD',
+        amount: { value: amount },
+        orderId: orderId,
+        orderName: orderName,
+        successUrl: window.location.origin + '/payment/success',
+        failUrl: window.location.origin + '/payment/fail',
+        customerEmail: this.currentUser.email,
+        customerName: this.currentUser.username,
+      });
+
+    } catch (error) {
+      console.error('Payment initiation error:', error);
+      alert('결제 시작 중 오류가 발생했습니다.\n' + (error.message || ''));
+    }
   }
 
   // Payment Stay Tuned Modal
