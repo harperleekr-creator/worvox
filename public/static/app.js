@@ -59,6 +59,13 @@ class WorVox {
           "I have two bags to check in.",
           "Is the flight on time?",
           "Where is gate number fifteen?"
+        ],
+        translations: [
+          "뉴욕행 KE123편으로 체크인하고 싶습니다.",
+          "창가 좌석으로 부탁드립니다.",
+          "위탁 수하물이 두 개 있습니다.",
+          "비행기가 정시에 출발하나요?",
+          "15번 게이트가 어디인가요?"
         ]
       },
       { id: 2, title: "호텔 예약", category: "여행", difficulty: "beginner", icon: "🏨", description: "호텔 룸 예약 및 체크인",
@@ -68,6 +75,13 @@ class WorVox {
           "Could you call a taxi for me, please?",
           "Does the room have Wi-Fi?",
           "Is breakfast included in the rate?"
+        ],
+        translations: [
+          "스미스 이름으로 예약했습니다.",
+          "체크아웃 시간이 언제인가요?",
+          "택시를 불러주시겠어요?",
+          "방에 와이파이가 있나요?",
+          "조식이 요금에 포함되어 있나요?"
         ]
       },
       { id: 3, title: "레스토랑 주문", category: "일상", difficulty: "beginner", icon: "🍽️", description: "레스토랑에서 음식 주문하기",
@@ -77,6 +91,13 @@ class WorVox {
           "Could I get the bill, please?",
           "What would you recommend?",
           "Is this dish spicy?"
+        ],
+        translations: [
+          "메뉴판을 볼 수 있을까요?",
+          "그릴에 구운 연어와 야채로 주세요.",
+          "계산서를 받을 수 있을까요?",
+          "추천해주실 만한 게 있나요?",
+          "이 요리는 매운가요?"
         ]
       },
       { id: 4, title: "길 묻기", category: "일상", difficulty: "beginner", icon: "🗺️", description: "길을 잃었을 때 방향 묻기",
@@ -86,6 +107,13 @@ class WorVox {
           "Thank you for your help.",
           "Should I turn left or right at the traffic light?",
           "How long will it take to walk there?"
+        ],
+        translations: [
+          "실례합니다, 기차역으로 어떻게 가나요?",
+          "걸어갈 수 있는 거리인가요?",
+          "도와주셔서 감사합니다.",
+          "신호등에서 왼쪽으로 돌아야 하나요, 오른쪽으로 돌아야 하나요?",
+          "걸어서 얼마나 걸리나요?"
         ]
       },
       { id: 5, title: "카페 주문", category: "일상", difficulty: "beginner", icon: "☕", description: "커피숍에서 음료 주문",
@@ -95,6 +123,13 @@ class WorVox {
           "Can I pay with a credit card?",
           "Could I also get a blueberry muffin?",
           "Do you have almond milk?"
+        ],
+        translations: [
+          "큰 사이즈 카푸치노 테이크아웃으로 주세요.",
+          "무설탕 옵션이 있나요?",
+          "신용카드로 결제할 수 있나요?",
+          "블루베리 머핀도 하나 주시겠어요?",
+          "아몬드 우유가 있나요?"
         ]
       },
       { id: 6, title: "택시 타기", category: "교통", difficulty: "beginner", icon: "🚕", description: "택시 타고 목적지 가기",
@@ -104,6 +139,13 @@ class WorVox {
           "Keep the change, thank you.",
           "Can you help me with my luggage?",
           "Could you turn on the air conditioning?"
+        ],
+        translations: [
+          "공항으로 가주시겠어요?",
+          "거기까지 얼마나 걸리나요?",
+          "거스름돈은 가지세요, 감사합니다.",
+          "짐 좀 도와주시겠어요?",
+          "에어컨 좀 켜주시겠어요?"
         ]
       },
       { id: 7, title: "쇼핑하기", category: "일상", difficulty: "beginner", icon: "🛍️", description: "매장에서 물건 구매하기",
@@ -113,6 +155,13 @@ class WorVox {
           "I'll take it. Can I pay by card?",
           "Can I try this on?",
           "Do you have this in a different color?"
+        ],
+        translations: [
+          "이것보다 작은 사이즈가 있나요?",
+          "이것은 얼마인가요?",
+          "이걸로 하겠습니다. 카드로 결제할 수 있나요?",
+          "이것 입어봐도 될까요?",
+          "이것 다른 색깔로 있나요?"
         ]
       },
       { id: 8, title: "은행 업무", category: "비즈니스", difficulty: "intermediate", icon: "🏦", description: "계좌 개설 및 은행 업무",
@@ -122,6 +171,13 @@ class WorVox {
           "What's the minimum balance requirement?",
           "Are there any monthly fees?",
           "How long will it take to process?"
+        ],
+        translations: [
+          "당좌예금 계좌를 개설하고 싶습니다.",
+          "어떤 서류를 가져와야 하나요?",
+          "최소 잔액 요건이 얼마인가요?",
+          "월 수수료가 있나요?",
+          "처리하는 데 얼마나 걸리나요?"
         ]
       },
       { id: 9, title: "병원 예약", category: "일상", difficulty: "intermediate", icon: "🏥", description: "의사 진료 예약하기",
@@ -131,6 +187,13 @@ class WorVox {
           "Do you accept my insurance?",
           "What's the earliest available appointment?",
           "Should I bring my medical records?"
+        ],
+        translations: [
+          "존슨 박사님과 진료 예약을 하고 싶습니다.",
+          "지난 주부터 계속 두통이 있었습니다.",
+          "제 보험을 받으시나요?",
+          "가장 빠른 예약 가능한 시간이 언제인가요?",
+          "진료 기록을 가져와야 하나요?"
         ]
       },
       { id: 10, title: "전화 예약", category: "일상", difficulty: "intermediate", icon: "📞", description: "전화로 레스토랑 예약",
@@ -140,6 +203,13 @@ class WorVox {
           "Could you please confirm my reservation?",
           "Is there a dress code?",
           "Can we bring our own wine?"
+        ],
+        translations: [
+          "저녁 7시에 4명으로 예약하고 싶습니다.",
+          "창가 자리가 있나요?",
+          "예약을 확인해주시겠어요?",
+          "복장 규정이 있나요?",
+          "와인을 직접 가져가도 되나요?"
         ]
       },
       { id: 11, title: "면접 대비", category: "비즈니스", difficulty: "advanced", icon: "💼", description: "영어 취업 면접 준비",
@@ -149,6 +219,13 @@ class WorVox {
           "What opportunities are there for professional development?",
           "Why should we hire you for this role?",
           "Where do you see yourself in five years?"
+        ],
+        translations: [
+          "저는 디지털 마케팅 분야에서 5년의 경력이 있습니다.",
+          "제 능력이 이 직책에 완벽하게 부합한다고 생각합니다.",
+          "전문성 개발을 위한 기회는 어떤 것이 있나요?",
+          "왜 저를 이 역할에 채용해야 할까요?",
+          "5년 후 자신의 모습을 어떻게 보시나요?"
         ]
       },
       { id: 12, title: "회의 진행", category: "비즈니스", difficulty: "advanced", icon: "👥", description: "영어 비즈니스 미팅",
@@ -848,7 +925,23 @@ class WorVox {
       "Innovation thrives in environments that encourage experimentation and embrace calculated risks."
     ];
     
-    const randomSentence = sentences[Math.floor(Math.random() * sentences.length)];
+    const randomIndex = Math.floor(Math.random() * sentences.length);
+    const randomSentence = sentences[randomIndex];
+    
+    // Translation map for sentences
+    const translations = [
+      "일관된 연습이 어떤 기술이든 마스터하는 핵심이라고 믿습니다.",
+      "일기예보에 따르면 주말 내내 많은 비가 예상됩니다.",
+      "그녀는 전문 사진작가가 되려는 꿈을 추구하기로 결심했습니다.",
+      "새로운 언어를 배우는 것은 다른 문화와 관점의 문을 열어줍니다.",
+      "기술은 우리가 서로 소통하는 방식을 근본적으로 변화시켰습니다.",
+      "규칙적인 운동과 균형 잡힌 식단은 건강 유지에 필수적입니다.",
+      "회사는 해외 시장으로 사업을 확장할 계획을 발표했습니다.",
+      "책을 읽는 것은 어휘력과 비판적 사고 능력을 향상시키는 데 도움이 됩니다.",
+      "그는 컴퓨터 과학 전공으로 우등 졸업을 했습니다.",
+      "환경 보호는 전 세계 모든 정부의 우선순위가 되어야 합니다."
+    ];
+    const translation = translations[randomIndex] || '';
     
     const app = document.getElementById('app');
     app.innerHTML = `
@@ -873,8 +966,11 @@ class WorVox {
                 ${seconds}초 챌린지
               </div>
             </div>
-            <p class="text-2xl md:text-3xl text-gray-900 leading-relaxed text-center font-medium" id="challengeSentence">
+            <p class="text-2xl md:text-3xl text-gray-900 leading-relaxed text-center font-medium mb-4" id="challengeSentence">
               ${randomSentence}
+            </p>
+            <p class="text-base text-gray-600 text-center italic" id="challengeTranslation">
+              ${translation}
             </p>
           </div>
           
@@ -910,6 +1006,7 @@ class WorVox {
     this.timerChallenge = {
       seconds: seconds,
       sentence: randomSentence,
+      translation: translation,
       started: false,
       recording: false
     };
@@ -1119,6 +1216,10 @@ class WorVox {
       const transcription = sttResponse.data.transcription || sttResponse.data.text || '';
       console.log('Timer Mode: Transcription:', transcription);
       
+      // Create audio URL for playback
+      const audioUrl = URL.createObjectURL(audioBlob);
+      this.timerChallenge.audioUrl = audioUrl;
+      
       // Show results
       this.showTimerResults(transcription);
       
@@ -1201,12 +1302,27 @@ class WorVox {
                   
                   <div class="space-y-4">
                     <div>
-                      <div class="text-sm text-gray-600 mb-2">원본 문장</div>
-                      <div class="bg-gray-50 rounded-lg p-4 text-gray-900">${originalSentence}</div>
+                      <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm text-gray-600">원본 문장</div>
+                        <button onclick="worvox.playReferenceAudio('${originalSentence.replace(/'/g, "\\'")}', 0)" 
+                          class="text-blue-600 hover:text-blue-800 text-xs px-3 py-1 rounded hover:bg-blue-50 transition-all">
+                          <i class="fas fa-volume-up mr-1"></i>원문 듣기
+                        </button>
+                      </div>
+                      <div class="bg-gray-50 rounded-lg p-4 text-gray-900 mb-2">${originalSentence}</div>
+                      <div class="text-xs text-gray-500 italic px-4">${this.timerChallenge.translation || ''}</div>
                     </div>
                     
                     <div>
-                      <div class="text-sm text-gray-600 mb-2">당신이 말한 내용</div>
+                      <div class="flex items-center justify-between mb-2">
+                        <div class="text-sm text-gray-600">당신이 말한 내용</div>
+                        ${this.timerChallenge.audioUrl ? `
+                          <button onclick="worvox.playUserRecording('${this.timerChallenge.audioUrl}', 0)" 
+                            class="text-purple-600 hover:text-purple-800 text-xs px-3 py-1 rounded hover:bg-purple-50 transition-all">
+                            <i class="fas fa-play mr-1"></i>내 발음 듣기
+                          </button>
+                        ` : ''}
+                      </div>
                       <div class="bg-purple-50 rounded-lg p-4 text-gray-900">${transcription || '(인식되지 않음)'}</div>
                     </div>
                     
@@ -1507,8 +1623,11 @@ class WorVox {
                     <div class="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-4">
                       문장 ${currentSentenceIndex + 1}
                     </div>
-                    <div class="text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-relaxed" id="currentSentence">
+                    <div class="text-2xl md:text-3xl font-bold text-gray-900 mb-3 leading-relaxed" id="currentSentence">
                       ${currentSentence}
+                    </div>
+                    <div class="text-base text-gray-600 mb-6 italic" id="currentTranslation">
+                      ${scenario.translations ? scenario.translations[currentSentenceIndex] : ''}
                     </div>
                     
                     <!-- Play Audio Button -->
@@ -1629,6 +1748,64 @@ class WorVox {
     }
   }
   
+  // Play reference audio (원문 듣기)
+  async playReferenceAudio(text, index) {
+    try {
+      console.log('Playing reference audio:', text);
+      
+      // Call TTS API
+      const response = await axios.post('/api/tts/speak', { text }, { 
+        responseType: 'arraybuffer',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      // Create and play audio
+      const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+      };
+      
+      audio.onerror = (e) => {
+        console.error('Audio playback error:', e);
+        URL.revokeObjectURL(audioUrl);
+        alert('오디오 재생 중 오류가 발생했습니다.');
+      };
+      
+      await audio.play();
+      console.log('Reference audio playback started');
+      
+    } catch (error) {
+      console.error('TTS error:', error);
+      alert('오디오 재생 중 오류가 발생했습니다.');
+    }
+  }
+  
+  // Play user recording (내 발음 듣기)
+  async playUserRecording(audioUrl, index) {
+    try {
+      console.log('Playing user recording:', audioUrl);
+      
+      const audio = new Audio(audioUrl);
+      
+      audio.onerror = (e) => {
+        console.error('Audio playback error:', e);
+        alert('녹음 재생 중 오류가 발생했습니다.');
+      };
+      
+      await audio.play();
+      console.log('User recording playback started');
+      
+    } catch (error) {
+      console.error('Recording playback error:', error);
+      alert('녹음 재생 중 오류가 발생했습니다.');
+    }
+  }
+  
   // Toggle recording for scenario practice
   async toggleScenarioRecording() {
     if (this.currentScenarioPractice.isRecording) {
@@ -1735,13 +1912,22 @@ class WorVox {
       // Calculate 3 scores: Accuracy, Pronunciation, Fluency
       const scores = this.calculateDetailedScores(originalSentence, transcription, audioBlob);
       
+      // Create audio URL for playback
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      // Get translation
+      const translations = this.currentScenarioPractice.scenario.translations || [];
+      const translation = translations[this.currentScenarioPractice.currentSentenceIndex] || '';
+      
       // Save result
       this.currentScenarioPractice.results.push({
         original: originalSentence,
+        translation: translation,
         transcription: transcription,
         accuracy: scores.accuracy,
         pronunciation: scores.pronunciation,
-        fluency: scores.fluency
+        fluency: scores.fluency,
+        audioUrl: audioUrl
       });
       
       // Show instant result for this sentence
@@ -2079,20 +2265,47 @@ class WorVox {
                   <div class="space-y-4">
                     ${results.map((result, index) => `
                       <div class="border border-gray-200 rounded-lg p-4">
-                        <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center justify-between mb-3">
                           <span class="text-sm font-semibold text-gray-700">문장 ${index + 1}</span>
-                          <span class="text-sm font-bold ${
-                            result.accuracy >= 80 ? 'text-green-600' :
-                            result.accuracy >= 60 ? 'text-blue-600' :
-                            result.accuracy >= 40 ? 'text-yellow-600' : 'text-red-600'
-                          }">${result.accuracy}%</span>
+                          <div class="flex gap-2">
+                            <span class="text-xs font-medium px-2 py-1 rounded ${
+                              result.accuracy >= 80 ? 'bg-green-100 text-green-700' :
+                              result.accuracy >= 60 ? 'bg-blue-100 text-blue-700' :
+                              result.accuracy >= 40 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+                            }">정확도 ${result.accuracy}%</span>
+                            <span class="text-xs font-medium px-2 py-1 rounded ${
+                              result.pronunciation >= 80 ? 'bg-green-100 text-green-700' :
+                              result.pronunciation >= 60 ? 'bg-blue-100 text-blue-700' :
+                              result.pronunciation >= 40 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+                            }">발음 ${result.pronunciation}%</span>
+                            <span class="text-xs font-medium px-2 py-1 rounded ${
+                              result.fluency >= 80 ? 'bg-green-100 text-green-700' :
+                              result.fluency >= 60 ? 'bg-blue-100 text-blue-700' :
+                              result.fluency >= 40 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+                            }">유창성 ${result.fluency}%</span>
+                          </div>
                         </div>
-                        <div class="mb-2">
-                          <div class="text-xs text-gray-600 mb-1">원본 문장</div>
-                          <div class="bg-gray-50 rounded p-2 text-sm text-gray-900">${result.original}</div>
+                        <div class="mb-3">
+                          <div class="flex items-center justify-between mb-1">
+                            <div class="text-xs text-gray-600">원본 문장</div>
+                            <button onclick="worvox.playReferenceAudio('${result.original.replace(/'/g, "\\'")}', ${index})" 
+                              class="text-blue-600 hover:text-blue-800 text-xs px-2 py-1 rounded hover:bg-blue-50 transition-all">
+                              <i class="fas fa-volume-up mr-1"></i>원문 듣기
+                            </button>
+                          </div>
+                          <div class="bg-gray-50 rounded p-2 text-sm text-gray-900 mb-1">${result.original}</div>
+                          <div class="text-xs text-gray-500 italic">${result.translation || ''}</div>
                         </div>
-                        <div>
-                          <div class="text-xs text-gray-600 mb-1">당신이 말한 내용</div>
+                        <div class="mb-3">
+                          <div class="flex items-center justify-between mb-1">
+                            <div class="text-xs text-gray-600">당신이 말한 내용</div>
+                            ${result.audioUrl ? `
+                              <button onclick="worvox.playUserRecording('${result.audioUrl}', ${index})" 
+                                class="text-purple-600 hover:text-purple-800 text-xs px-2 py-1 rounded hover:bg-purple-50 transition-all">
+                                <i class="fas fa-play mr-1"></i>내 발음 듣기
+                              </button>
+                            ` : ''}
+                          </div>
                           <div class="bg-blue-50 rounded p-2 text-sm text-gray-900">${result.transcription || '(인식되지 않음)'}</div>
                         </div>
                       </div>
