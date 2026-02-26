@@ -33,20 +33,31 @@
 - **리워드**: 레벨별 잠금 해제 기능
 - **대시보드**: 학습 진도, XP, 레벨 표시
 
-### 💳 결제 시스템 (준비 중)
-- **플랜**: Free, Premium (₩9,900/월), Business (₩32,000/월)
-- **Real Conversation**: 1:1 프리미엄 전화영어
+### 💳 결제 시스템
+- **플랜**: Free, Core (₩9,900/월), Premium (₩19,000/월)
+  - 월간/연간 결제 선택 (연간 18% 할인)
+  - Core: ₩9,900/월 또는 ₩97,416/년
+  - Premium: ₩19,000/월 또는 ₩186,960/년
+- **1:1 Live Speaking**: 프리미엄 전화영어
   - 1회 체험권 (무료)
-  - Pro 10회권 (₩165,000)
-  - Pro 30회권 (₩495,000)
-  - Premium 회원: 15% 추가 할인
-  - Business 회원: 25% 추가 할인
-- **NHN KCP 결제 연동 예정**
+  - 10회권 (₩165,000)
+  - 20회권 (₩330,000)
+  - Core 회원: 10% 추가 할인
+  - Premium 회원: 20% 추가 할인
+- **Toss Payments 연동 완료** (테스트 모드)
 
 ### 🔐 인증
 - **Google OAuth 로그인** (활성화)
 - **이메일/비밀번호 로그인** (회원가입 및 로그인)
 - **로그아웃 기능**: 모든 인증 데이터 초기화 (localStorage, sessionStorage, Google Sign-In 세션)
+
+### 👑 관리자 대시보드
+- **통계**: 총 사용자, 활성 사용자, 총 세션, 총 매출
+- **사용자 관리**: 전체 사용자 목록, 검색, 플랜 변경, 관리자 권한 설정
+- **세션 로그**: 모든 대화 세션 조회 및 상세 보기
+- **결제 내역**: 결제 주문 내역, 상태별 필터링
+- **활동 로그**: 사용자 활동 추적 (로그인, 세션, 결제 등)
+- **권한 관리**: 관리자 인증 미들웨어로 보안 강화
 
 ---
 
@@ -100,7 +111,7 @@
 - **STT**: Google Speech-to-Text API
 - **TTS**: Google Text-to-Speech API
 - **LLM**: OpenAI GPT-3.5/4
-- **Payment**: NHN KCP (예정)
+- **Payment**: Toss Payments (테스트 모드 활성화)
 
 ---
 
@@ -121,6 +132,8 @@ webapp/
 │   │   ├── vocabulary.ts   # Vocabulary features
 │   │   ├── gamification.ts # XP, Level, Rewards
 │   │   ├── usage.ts        # Usage tracking
+│   │   ├── payments.ts     # Toss Payments integration
+│   │   ├── admin.ts        # Admin dashboard API
 │   │   └── preview.ts      # Preview features
 │   └── types.ts            # TypeScript types
 ├── public/
@@ -139,7 +152,8 @@ webapp/
 │   ├── 0008_add_more_vocabulary.sql
 │   ├── 0009_add_custom_wordbooks.sql
 │   ├── 0010_add_toeic_vocabulary.sql
-│   └── (0015_add_session_analysis.sql - 예정)
+│   ├── 0019_add_password_auth.sql
+│   └── 0020_add_admin_and_tracking.sql
 ├── .git/                   # Git repository
 ├── .gitignore
 ├── ecosystem.config.cjs    # PM2 configuration
@@ -254,7 +268,7 @@ OPENAI_API_BASE=https://api.openai.com/v1
 ## 📊 데이터베이스 스키마
 
 ### 주요 테이블
-- **users**: 사용자 정보 (Google OAuth 연동)
+- **users**: 사용자 정보 (Google OAuth, 이메일/비밀번호 인증, 관리자 플래그)
 - **sessions**: 대화 세션 기록
 - **messages**: 대화 메시지 로그 (user/assistant)
 - **topics**: 대화 주제 템플릿
@@ -263,6 +277,9 @@ OPENAI_API_BASE=https://api.openai.com/v1
 - **vocabulary_bookmarks**: 북마크한 단어
 - **user_stats**: 일별 학습 통계
 - **gamification_stats**: XP, 레벨, 진도 추적
+- **payment_orders**: 결제 주문 내역 (Toss Payments)
+- **activity_logs**: 사용자 활동 로그 (로그인, 세션, 결제 등)
+- **session_durations**: 세션 체류 시간 추적
 
 ### 예정된 테이블 (PHASE 1)
 - **session_reports**: 세션별 분석 리포트 (점수, 통계)
@@ -304,17 +321,20 @@ OPENAI_API_BASE=https://api.openai.com/v1
 - **암호화**: HTTPS/TLS 1.3 (Cloudflare)
 
 ### 사업자 정보
-- **상호**: 하퍼잉글리쉬
+- **상호**: 위아솔루션즈
 - **대표자**: 이강돈
 - **사업자번호**: 542-07-02097
+- **주소**: 대전광역시 서구 대덕대로241번길 20, 5층 548-2호
+- **통신판매**: 제 2021-대전동구-0501호
+- **문의전화**: 070-8064-0485
 
 ---
 
 ## 🐛 알려진 이슈
 
-- [ ] Real Conversation 예약 기능 미구현 (UI만 존재)
+- [ ] 1:1 Live Speaking 예약 기능 미구현 (결제는 완료, 예약 시스템 필요)
 - [ ] PHASE 1 분석 리포트 미구현
-- [ ] 백엔드 이메일/비밀번호 인증 API 미구현 (프론트엔드만 구현됨)
+- [ ] Toss Payments 테스트 모드 (프로덕션 키로 교체 필요)
 
 ---
 
@@ -325,21 +345,23 @@ OPENAI_API_BASE=https://api.openai.com/v1
 - [x] Vocabulary 학습 (단어장, 플래시카드, 퀴즈)
 - [x] History & Statistics 페이지
 - [x] Gamification (레벨, XP, 리워드)
-- [x] 요금제 페이지 (Free, Premium, Business)
-- [x] Real Conversation 수업권 구매 UI
+- [x] 요금제 페이지 (Free, Core, Premium)
+- [x] 1:1 Live Speaking 수업권 구매 UI
+- [x] Toss Payments 결제 연동 (테스트 모드)
 - [x] 법적 문서 (이용약관, 개인정보처리방침, 환불정책)
+- [x] 관리자 대시보드 (사용자 관리, 통계, 로그)
+- [x] Footer 정보 (사업자번호, 주소, 통신판매, 전화번호)
 
 ### 🔄 진행 중
 - [ ] **PHASE 1**: 대화 분석 & 피드백 리포트
-- [ ] NHN KCP 결제 연동 (배치결제 + 일반결제)
+- [ ] Toss Payments 프로덕션 모드 전환
 
 ### 📅 향후 계획
 - [ ] **PHASE 2**: 드릴 시스템 강화 (발음 유사도, 반복 연습)
 - [ ] **PHASE 3**: 진행도 추적 (주간 그래프, 취약점 분석)
 - [ ] **PHASE 4**: 동기부여 (Streak, 배지, 친구 경쟁)
 - [ ] **PHASE 5**: 결제 기능 완성 (Free 제한, Premium 혜택)
-- [ ] Real Conversation 예약 시스템 구현
-- [ ] Google 로그인 재활성화
+- [ ] 1:1 Live Speaking 예약 시스템 구현
 - [ ] 모바일 앱 (React Native 또는 PWA)
 
 ---
