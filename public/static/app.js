@@ -2901,11 +2901,18 @@ Proceed to payment?
 
   async completeOnboarding() {
     try {
-      const response = await axios.post('/api/users/auth', this.onboardingData);
+      // Update user level after onboarding
+      const response = await axios.patch(`/api/users/${this.currentUser.id}/level`, {
+        level: this.onboardingData.level
+      });
 
       if (response.data.success) {
-        this.currentUser = response.data.user;
+        // Update current user data
+        this.currentUser.level = this.onboardingData.level;
         localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
+        
+        // Load gamification stats and show home
+        await this.loadUsageFromServer();
         await this.loadGamificationStats();
         this.showTopicSelection();
       }
