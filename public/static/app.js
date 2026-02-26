@@ -2068,6 +2068,10 @@ class WorVox {
     const totalSentences = this.currentScenarioPractice.scenario.sentences.length;
     const hasMore = sentenceNumber < totalSentences;
     
+    // Get audio URL from the latest result
+    const latestResult = this.currentScenarioPractice.results[this.currentScenarioPractice.results.length - 1];
+    const audioUrl = latestResult?.audioUrl || null;
+    
     const app = document.getElementById('app');
     app.innerHTML = `
       <div class="flex h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
@@ -2147,8 +2151,14 @@ class WorVox {
                 <!-- Sentence Comparison -->
                 <div class="border-t pt-6">
                   <div class="mb-4">
-                    <div class="text-sm font-semibold text-gray-700 mb-2">
-                      <i class="fas fa-check-circle text-green-600 mr-1"></i>원문
+                    <div class="flex items-center justify-between mb-2">
+                      <div class="text-sm font-semibold text-gray-700">
+                        <i class="fas fa-check-circle text-green-600 mr-1"></i>원문
+                      </div>
+                      <button onclick="worvox.playReferenceAudio('${originalSentence.replace(/'/g, "\\'")}', ${sentenceNumber})" 
+                        class="text-blue-600 hover:text-blue-800 text-sm px-3 py-1 rounded hover:bg-blue-50 transition-all">
+                        <i class="fas fa-volume-up mr-1"></i>원문 듣기
+                      </button>
                     </div>
                     <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-gray-800">
                       ${originalSentence}
@@ -2156,8 +2166,16 @@ class WorVox {
                   </div>
                   
                   <div>
-                    <div class="text-sm font-semibold text-gray-700 mb-2">
-                      <i class="fas fa-microphone text-blue-600 mr-1"></i>내 발음
+                    <div class="flex items-center justify-between mb-2">
+                      <div class="text-sm font-semibold text-gray-700">
+                        <i class="fas fa-microphone text-blue-600 mr-1"></i>내 발음
+                      </div>
+                      ${audioUrl ? `
+                        <button onclick="worvox.playUserRecording('${audioUrl}', ${sentenceNumber})" 
+                          class="text-purple-600 hover:text-purple-800 text-sm px-3 py-1 rounded hover:bg-purple-50 transition-all">
+                          <i class="fas fa-play mr-1"></i>내 발음 듣기
+                        </button>
+                      ` : ''}
                     </div>
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-gray-800">
                       ${transcription || '(인식되지 않음)'}
