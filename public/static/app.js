@@ -7119,26 +7119,31 @@ const heyspeak = worvox;
 // Google Sign-In callback
 window.handleGoogleLogin = async (response) => {
   try {
-    console.log('Google Sign-In response:', response);
+    console.log('🔐 Google Sign-In response received');
+    console.log('Credential length:', response.credential?.length);
     
     // Send credential to backend
+    console.log('📤 Sending credential to backend...');
     const result = await axios.post('/api/users/google-login', {
       credential: response.credential
     });
     
-    console.log('Login successful:', result.data);
+    console.log('✅ Login successful:', result.data);
     
     // Store user data with correct key
     localStorage.setItem('worvox_user', JSON.stringify(result.data.user));
+    console.log('💾 User data stored in localStorage');
     
     // Update app state
     worvox.currentUser = result.data.user;
     
     // If new user, show onboarding steps
     if (result.data.isNew) {
+      console.log('🆕 New user - showing onboarding');
       worvox.onboardingStep = 2; // Start from step 2 (level selection)
       worvox.showOnboardingStep();
     } else {
+      console.log('👤 Existing user - loading data...');
       // Load user data and show home
       await worvox.loadUsageFromServer();
       await worvox.loadGamificationStats();
@@ -7146,8 +7151,21 @@ window.handleGoogleLogin = async (response) => {
     }
     
   } catch (error) {
-    console.error('Google login error:', error);
-    const errorMsg = error.response?.data?.error || '로그인에 실패했습니다. 다시 시도해주세요.';
+    console.error('❌ Google login error:', error);
+    console.error('Error response:', error.response?.data);
+    console.error('Error status:', error.response?.status);
+    
+    let errorMsg = '로그인에 실패했습니다. 다시 시도해주세요.';
+    
+    if (error.response?.data?.error) {
+      errorMsg = error.response.data.error;
+      if (error.response.data.details) {
+        errorMsg += '\n상세: ' + error.response.data.details;
+      }
+    } else if (error.message) {
+      errorMsg += '\n오류: ' + error.message;
+    }
+    
     alert(errorMsg);
   }
 };

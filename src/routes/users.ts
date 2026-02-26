@@ -34,28 +34,52 @@ users.post('/check-username', async (c) => {
 // Google Sign-In with JWT credential
 users.post('/google-login', async (c) => {
   try {
-    const { credential } = await c.req.json();
+    console.log('🔐 Google login attempt...');
+    const body = await c.req.json();
+    console.log('📦 Request body keys:', Object.keys(body));
+    
+    const { credential } = body;
 
     if (!credential) {
+      console.error('❌ No credential provided');
       return c.json({ error: 'Google credential is required' }, 400);
     }
+
+    console.log('🔑 Credential received, length:', credential.length);
 
     // Decode JWT token (payload is base64 encoded)
     const parts = credential.split('.');
     if (parts.length !== 3) {
+      console.error('❌ Invalid JWT format, parts:', parts.length);
       return c.json({ error: 'Invalid JWT token format' }, 400);
     }
 
-    const payload = JSON.parse(atob(parts[1]));
+    console.log('🔓 Decoding JWT payload...');
+    let payload;
+    try {
+      payload = JSON.parse(atob(parts[1]));
+      console.log('✅ JWT decoded successfully');
+      console.log('👤 User info:', { 
+        email: payload.email, 
+        name: payload.name,
+        sub: payload.sub 
+      });
+    } catch (decodeError) {
+      console.error('❌ JWT decode error:', decodeError);
+      return c.json({ error: 'Failed to decode JWT token' }, 400);
+    }
     
     const googleId = payload.sub;
     const email = payload.email;
-    const name = payload.name || email.split('@')[0];
+    const name = payload.name || email?.split('@')[0] || 'User';
     const picture = payload.picture || null;
 
     if (!googleId || !email) {
-      return c.json({ error: 'Invalid Google token data' }, 400);
+      console.error('❌ Missing required fields:', { googleId, email });
+      return c.json({ error: 'Invalid Google token data (missing email or ID)' }, 400);
     }
+
+    console.log('🔍 Checking existing user with google_id:', googleId);
 
     // Check if user exists with this Google ID
     const existingUser = await c.env.DB.prepare(
@@ -63,8 +87,11 @@ users.post('/google-login', async (c) => {
     ).bind(googleId).first();
 
     if (existingUser) {
+      console.log('✅ Existing user found:', existingUser.id);
+      
       // Update profile picture if changed
       if (picture && existingUser.google_picture !== picture) {
+        console.log('🖼️ Updating profile picture...');
         await c.env.DB.prepare(
           'UPDATE users SET google_picture = ? WHERE id = ?'
         ).bind(picture, existingUser.id).run();
@@ -77,12 +104,16 @@ users.post('/google-login', async (c) => {
       });
     }
 
+    console.log('🔍 Checking existing user with email:', email);
+
     // Check if user exists with this email
     const emailUser = await c.env.DB.prepare(
       'SELECT * FROM users WHERE email = ? OR google_email = ?'
     ).bind(email, email).first();
 
     if (emailUser) {
+      console.log('✅ Email user found, linking Google account...');
+      
       // Link Google account to existing user
       await c.env.DB.prepare(
         `UPDATE users SET google_id = ?, google_email = ?, google_picture = ?, auth_provider = 'google' 
@@ -93,6 +124,8 @@ users.post('/google-login', async (c) => {
         'SELECT * FROM users WHERE id = ?'
       ).bind(emailUser.id).first();
 
+      console.log('✅ Google account linked successfully');
+
       return c.json({
         user: updatedUser,
         success: true,
@@ -100,6 +133,8 @@ users.post('/google-login', async (c) => {
         linked: true,
       });
     }
+
+    console.log('🆕 Creating new user...');
 
     // Create new user with Google account
     const username = name;
@@ -110,10 +145,13 @@ users.post('/google-login', async (c) => {
     ).bind(username, email, googleId, email, picture).run();
 
     const userId = result.meta.last_row_id;
+    console.log('✅ New user created with ID:', userId);
 
     const newUser = await c.env.DB.prepare(
       'SELECT * FROM users WHERE id = ?'
     ).bind(userId).first();
+
+    console.log('🎉 Google login successful!');
 
     return c.json({
       user: newUser,
@@ -122,7 +160,12 @@ users.post('/google-login', async (c) => {
     });
 
   } catch (error) {
-    console.error('Google login error:', error);
+    console.error('❌ Google login error:', error);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown',
+      stack: error instanceof Error ? error.stack : undefined
+    });
+    
     return c.json({ 
       error: 'Failed to login with Google',
       details: error instanceof Error ? error.message : 'Unknown error'
