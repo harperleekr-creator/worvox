@@ -9061,7 +9061,7 @@ Proceed to payment?
       });
 
       if (statsResponse.data.success) {
-        const { stats, recentPayments } = statsResponse.data;
+        const stats = statsResponse.data.data;
         
         // Update stat cards
         document.getElementById('stat-total-users').textContent = stats.totalUsers || 0;
@@ -9071,9 +9071,6 @@ Proceed to payment?
 
         // Draw plan distribution chart
         this.drawPlanChart(stats.planDistribution || []);
-
-        // Display recent payments
-        this.displayRecentPayments(recentPayments || []);
       }
 
       // Load users
@@ -9082,7 +9079,7 @@ Proceed to payment?
       });
 
       if (usersResponse.data.success) {
-        this.allUsers = usersResponse.data.users || [];
+        this.allUsers = usersResponse.data.data.users || [];
         this.displayUsers(this.allUsers);
       }
 
