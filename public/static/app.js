@@ -347,6 +347,443 @@ class WorVox {
     }
   }
 
+  // Timer Mode - Premium Feature
+  showTimerMode() {
+    // Check if premium user
+    if (!this.isPremiumUser()) {
+      alert('⏱️ 타이머 모드는 Premium 전용 기능입니다!\n\n지금 Premium으로 업그레이드하고 압박 훈련을 시작하세요.');
+      this.showPlan();
+      return;
+    }
+
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+        ${this.getSidebar('timer-mode')}
+        
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- Mobile Header -->
+          <div class="md:hidden bg-white border-b border-purple-200 px-4 py-3">
+            <div class="flex items-center justify-between">
+              <button onclick="worvox.showTopicSelection()" class="text-gray-600">
+                <i class="fas fa-arrow-left text-xl"></i>
+              </button>
+              <h1 class="text-lg font-semibold text-gray-800">⏱️ 타이머 모드</h1>
+              <div class="w-6"></div>
+            </div>
+          </div>
+          
+          <!-- Desktop Top Bar -->
+          <div class="hidden md:flex bg-white border-b border-purple-200 px-6 py-3 items-center gap-4">
+            <button onclick="worvox.showTopicSelection()" 
+              class="text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all">
+              <i class="fas fa-arrow-left text-xl"></i>
+            </button>
+            <h2 class="text-lg font-semibold text-gray-800">
+              <i class="fas fa-stopwatch mr-2 text-purple-600"></i>타이머 모드 - 압박 훈련
+            </h2>
+            <span class="ml-auto bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm px-4 py-1 rounded-full font-bold">
+              PREMIUM
+            </span>
+          </div>
+          
+          <!-- Content Area -->
+          <div class="flex-1 overflow-y-auto">
+            <div class="p-4 md:p-8">
+              <div class="max-w-4xl mx-auto">
+                <!-- Intro Card -->
+                <div class="bg-white rounded-2xl p-6 md:p-8 shadow-lg border-2 border-purple-200 mb-6">
+                  <div class="text-center mb-6">
+                    <div class="text-6xl mb-4">⏱️</div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-3">타이머 모드</h2>
+                    <p class="text-gray-600 text-lg">제한 시간 안에 문장을 완성하는 압박 훈련</p>
+                  </div>
+                  
+                  <div class="bg-purple-50 rounded-xl p-6 mb-6">
+                    <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                      <i class="fas fa-info-circle text-purple-600"></i>
+                      사용 방법
+                    </h3>
+                    <ol class="space-y-2 text-gray-700">
+                      <li class="flex items-start gap-2">
+                        <span class="font-bold text-purple-600">1.</span>
+                        <span>시간 제한(5초 또는 10초)을 선택하세요</span>
+                      </li>
+                      <li class="flex items-start gap-2">
+                        <span class="font-bold text-purple-600">2.</span>
+                        <span>화면에 표시된 문장을 읽고 준비하세요</span>
+                      </li>
+                      <li class="flex items-start gap-2">
+                        <span class="font-bold text-purple-600">3.</span>
+                        <span><kbd class="px-2 py-1 bg-white rounded border text-sm font-mono">Tab</kbd> 키를 누르면 타이머가 시작됩니다</span>
+                      </li>
+                      <li class="flex items-start gap-2">
+                        <span class="font-bold text-purple-600">4.</span>
+                        <span>제한 시간 안에 문장을 말하세요 (중단 없이!)</span>
+                      </li>
+                      <li class="flex items-start gap-2">
+                        <span class="font-bold text-purple-600">5.</span>
+                        <span>타이머 종료 시 AI가 발음과 유창성을 분석합니다</span>
+                      </li>
+                    </ol>
+                  </div>
+                  
+                  <!-- Timer Selection -->
+                  <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <button onclick="worvox.startTimerChallenge(5)" 
+                      class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl p-6 transition-all transform hover:scale-105">
+                      <div class="text-4xl mb-2">⚡</div>
+                      <div class="text-2xl font-bold mb-1">5초 챌린지</div>
+                      <div class="text-blue-100 text-sm">빠른 반응 훈련</div>
+                    </button>
+                    
+                    <button onclick="worvox.startTimerChallenge(10)" 
+                      class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl p-6 transition-all transform hover:scale-105">
+                      <div class="text-4xl mb-2">🎯</div>
+                      <div class="text-2xl font-bold mb-1">10초 챌린지</div>
+                      <div class="text-purple-100 text-sm">정확한 발음 훈련</div>
+                    </button>
+                  </div>
+                  
+                  <!-- Benefits -->
+                  <div class="grid md:grid-cols-3 gap-4 pt-6 border-t border-gray-200">
+                    <div class="text-center">
+                      <div class="text-3xl mb-2">🚀</div>
+                      <div class="font-bold text-gray-900 mb-1">빠른 반응력</div>
+                      <div class="text-sm text-gray-600">즉각적인 대응 능력 향상</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-3xl mb-2">💪</div>
+                      <div class="font-bold text-gray-900 mb-1">압박 극복</div>
+                      <div class="text-sm text-gray-600">긴장 상황 대처 훈련</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-3xl mb-2">📊</div>
+                      <div class="font-bold text-gray-900 mb-1">AI 분석</div>
+                      <div class="text-sm text-gray-600">정확한 피드백 제공</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              ${this.getFooter()}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Start Timer Challenge
+  startTimerChallenge(seconds) {
+    // Sample sentences for timer challenge
+    const sentences = [
+      "I believe that consistent practice is the key to mastering any skill.",
+      "The weather forecast predicts heavy rain throughout the weekend.",
+      "She decided to pursue her dream of becoming a professional photographer.",
+      "Learning a new language opens doors to different cultures and perspectives.",
+      "Technology has fundamentally changed the way we communicate with each other.",
+      "Regular exercise and a balanced diet are essential for maintaining good health.",
+      "The company announced plans to expand its operations into international markets.",
+      "Reading books helps improve vocabulary and critical thinking skills.",
+      "He graduated from university with honors in computer science.",
+      "Environmental protection should be a priority for all governments worldwide."
+    ];
+    
+    const randomSentence = sentences[Math.floor(Math.random() * sentences.length)];
+    
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-pink-900">
+        <div class="flex-1 flex flex-col items-center justify-center p-4">
+          <!-- Timer Display -->
+          <div id="timerDisplay" class="text-center mb-8">
+            <div class="text-8xl md:text-9xl font-bold text-white mb-4" id="timerCountdown">${seconds}</div>
+            <div class="text-2xl text-purple-200 font-medium">준비하세요...</div>
+          </div>
+          
+          <!-- Sentence Card -->
+          <div class="bg-white rounded-2xl p-8 md:p-12 shadow-2xl max-w-4xl w-full mb-8">
+            <div class="text-center mb-6">
+              <div class="inline-block bg-purple-100 text-purple-800 px-4 py-2 rounded-full text-sm font-bold mb-4">
+                ${seconds}초 챌린지
+              </div>
+            </div>
+            <p class="text-2xl md:text-3xl text-gray-900 leading-relaxed text-center font-medium" id="challengeSentence">
+              ${randomSentence}
+            </p>
+          </div>
+          
+          <!-- Instructions -->
+          <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 max-w-2xl w-full">
+            <div class="text-center">
+              <div class="text-white text-lg mb-3" id="instructionText">
+                <i class="fas fa-keyboard text-2xl mb-2"></i>
+                <p><kbd class="px-3 py-2 bg-white/20 rounded-lg text-xl font-mono font-bold">Tab</kbd> 키를 눌러 시작하세요</p>
+              </div>
+              <div class="text-purple-200 text-sm" id="statusText">
+                문장을 읽고 준비가 되면 Tab 키를 누르세요
+              </div>
+            </div>
+          </div>
+          
+          <!-- Recording Indicator (Hidden initially) -->
+          <div id="recordingIndicator" class="hidden mt-6">
+            <div class="flex items-center gap-3 bg-red-500 text-white px-6 py-3 rounded-full animate-pulse">
+              <div class="w-3 h-3 bg-white rounded-full animate-ping"></div>
+              <span class="font-bold">녹음 중...</span>
+            </div>
+          </div>
+          
+          <!-- Exit Button -->
+          <button onclick="worvox.showTimerMode()" 
+            class="mt-8 text-white/70 hover:text-white transition-all">
+            <i class="fas fa-times mr-2"></i>나가기
+          </button>
+        </div>
+      </div>
+    `;
+    
+    // Store challenge data
+    this.timerChallenge = {
+      seconds: seconds,
+      sentence: randomSentence,
+      started: false,
+      recording: false
+    };
+    
+    // Add keyboard event listener for Tab key
+    document.addEventListener('keydown', this.handleTimerKeyPress.bind(this));
+  }
+
+  // Handle Timer Key Press
+  handleTimerKeyPress(e) {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      
+      if (!this.timerChallenge.started) {
+        this.startTimerCountdown();
+      }
+    }
+  }
+
+  // Start Timer Countdown
+  async startTimerCountdown() {
+    this.timerChallenge.started = true;
+    
+    const countdownEl = document.getElementById('timerCountdown');
+    const instructionEl = document.getElementById('instructionText');
+    const statusEl = document.getElementById('statusText');
+    const recordingIndicator = document.getElementById('recordingIndicator');
+    
+    // Update UI
+    instructionEl.innerHTML = '<p class="text-2xl">🎤 지금 말하세요!</p>';
+    statusEl.textContent = '타이머가 시작되었습니다. 문장을 말하세요!';
+    recordingIndicator.classList.remove('hidden');
+    
+    // Start recording
+    await this.startTimerRecording();
+    
+    // Countdown
+    let timeLeft = this.timerChallenge.seconds;
+    
+    const interval = setInterval(() => {
+      timeLeft--;
+      countdownEl.textContent = timeLeft;
+      
+      // Color change as time runs out
+      if (timeLeft <= 3) {
+        countdownEl.classList.add('text-red-400');
+      }
+      
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        this.endTimerChallenge();
+      }
+    }, 1000);
+  }
+
+  // Start Timer Recording
+  async startTimerRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.mediaRecorder = new MediaRecorder(stream);
+      this.audioChunks = [];
+      
+      this.mediaRecorder.ondataavailable = (event) => {
+        this.audioChunks.push(event.data);
+      };
+      
+      this.mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
+        await this.analyzeTimerPerformance(audioBlob);
+      };
+      
+      this.mediaRecorder.start();
+      this.timerChallenge.recording = true;
+    } catch (error) {
+      console.error('Recording error:', error);
+      alert('마이크 접근 권한이 필요합니다.');
+    }
+  }
+
+  // End Timer Challenge
+  async endTimerChallenge() {
+    // Remove keyboard listener
+    document.removeEventListener('keydown', this.handleTimerKeyPress);
+    
+    // Stop recording
+    if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+      this.mediaRecorder.stop();
+    }
+    
+    // Show completion message
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-pink-900 items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-8 md:p-12 shadow-2xl max-w-2xl w-full text-center">
+          <div class="text-6xl mb-4">⏱️</div>
+          <h2 class="text-3xl font-bold text-gray-900 mb-3">시간 종료!</h2>
+          <p class="text-gray-600 text-lg mb-6">AI가 당신의 발음을 분석하고 있습니다...</p>
+          <div class="flex items-center justify-center gap-2 mb-8">
+            <div class="w-3 h-3 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+            <div class="w-3 h-3 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+            <div class="w-3 h-3 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Analyze Timer Performance
+  async analyzeTimerPerformance(audioBlob) {
+    try {
+      // Convert audio to text using STT
+      const formData = new FormData();
+      formData.append('audio', audioBlob);
+      
+      const sttResponse = await axios.post('/api/stt', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      const transcription = sttResponse.data.text || '';
+      
+      // Show results
+      this.showTimerResults(transcription);
+      
+    } catch (error) {
+      console.error('Analysis error:', error);
+      this.showTimerResults('(분석 실패)');
+    }
+  }
+
+  // Show Timer Results
+  showTimerResults(transcription) {
+    const originalSentence = this.timerChallenge.sentence;
+    const timeLimit = this.timerChallenge.seconds;
+    
+    // Simple similarity check (word count comparison)
+    const originalWords = originalSentence.toLowerCase().split(' ').length;
+    const spokenWords = transcription.toLowerCase().split(' ').length;
+    const completeness = Math.min(100, Math.round((spokenWords / originalWords) * 100));
+    
+    // Determine rating
+    let rating, ratingColor, ratingIcon;
+    if (completeness >= 80) {
+      rating = '훌륭해요!';
+      ratingColor = 'text-green-600';
+      ratingIcon = '🌟';
+    } else if (completeness >= 60) {
+      rating = '좋아요!';
+      ratingColor = 'text-blue-600';
+      ratingIcon = '👍';
+    } else if (completeness >= 40) {
+      rating = '괜찮아요';
+      ratingColor = 'text-yellow-600';
+      ratingIcon = '😊';
+    } else {
+      rating = '다시 도전!';
+      ratingColor = 'text-red-600';
+      ratingIcon = '💪';
+    }
+    
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+        ${this.getSidebar('timer-mode')}
+        
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- Header -->
+          <div class="bg-white border-b border-purple-200 px-4 md:px-6 py-3">
+            <h2 class="text-lg font-semibold text-gray-800">
+              <i class="fas fa-chart-bar mr-2 text-purple-600"></i>타이머 챌린지 결과
+            </h2>
+          </div>
+          
+          <!-- Content -->
+          <div class="flex-1 overflow-y-auto">
+            <div class="p-4 md:p-8">
+              <div class="max-w-4xl mx-auto">
+                <!-- Rating Card -->
+                <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-purple-200 mb-6 text-center">
+                  <div class="text-6xl mb-4">${ratingIcon}</div>
+                  <h2 class="text-3xl font-bold ${ratingColor} mb-2">${rating}</h2>
+                  <div class="text-5xl font-bold text-purple-600 mb-2">${completeness}%</div>
+                  <p class="text-gray-600">완성도</p>
+                </div>
+                
+                <!-- Details -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+                  <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <i class="fas fa-clipboard-list text-purple-600"></i>
+                    상세 결과
+                  </h3>
+                  
+                  <div class="space-y-4">
+                    <div>
+                      <div class="text-sm text-gray-600 mb-2">원본 문장</div>
+                      <div class="bg-gray-50 rounded-lg p-4 text-gray-900">${originalSentence}</div>
+                    </div>
+                    
+                    <div>
+                      <div class="text-sm text-gray-600 mb-2">당신이 말한 내용</div>
+                      <div class="bg-purple-50 rounded-lg p-4 text-gray-900">${transcription || '(인식되지 않음)'}</div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 pt-4 border-t">
+                      <div class="text-center">
+                        <div class="text-2xl font-bold text-purple-600">${timeLimit}초</div>
+                        <div class="text-sm text-gray-600">시간 제한</div>
+                      </div>
+                      <div class="text-center">
+                        <div class="text-2xl font-bold text-purple-600">${spokenWords}/${originalWords}</div>
+                        <div class="text-sm text-gray-600">단어 수</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="grid md:grid-cols-2 gap-4">
+                  <button onclick="worvox.startTimerChallenge(${timeLimit})" 
+                    class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl p-4 font-bold transition-all">
+                    <i class="fas fa-redo mr-2"></i>다시 도전하기
+                  </button>
+                  <button onclick="worvox.showTimerMode()" 
+                    class="bg-white hover:bg-gray-50 border-2 border-purple-200 text-purple-600 rounded-xl p-4 font-bold transition-all">
+                    <i class="fas fa-home mr-2"></i>돌아가기
+                  </button>
+                </div>
+              </div>
+              
+              ${this.getFooter()}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   showRealConversation() {
     const app = document.getElementById('app');
     app.innerHTML = `
@@ -1529,9 +1966,44 @@ Proceed to payment?
                 ` : ''}
                 
                 <!-- Feature Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">${this.topics.filter(topic => 
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
+                  ${this.topics.filter(topic => 
                     topic.name === 'Vocabulary' || topic.name === 'AI English Conversation'
                   ).map(topic => `
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-lg hover:border-emerald-400 transition-all cursor-pointer"
+                      data-topic-id="${topic.id}" 
+                      data-topic-name="${this.escapeHtml(topic.name)}" 
+                      data-topic-level="${topic.level}"
+                      onclick="worvox.startTopicById(${topic.id})">
+                      <div class="w-12 h-12 bg-${topic.name === 'AI English Conversation' ? 'emerald' : 'blue'}-100 rounded-xl flex items-center justify-center mb-4">
+                        <span class="text-2xl">${topic.icon}</span>
+                      </div>
+                      <h3 class="text-xl font-semibold text-gray-900 mb-2">${topic.name}</h3>
+                      <p class="text-gray-600 mb-4">${topic.description}</p>
+                      <div class="flex items-center justify-between">
+                        <span class="text-sm text-${topic.name === 'AI English Conversation' ? 'emerald' : 'blue'}-600 font-medium">Start learning →</span>
+                        <span class="text-xs bg-gray-100 px-2 py-1 rounded">${topic.level}</span>
+                      </div>
+                    </div>
+                  `).join('')}
+                  
+                  <!-- Timer Mode Card (Premium Feature) -->
+                  <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 shadow-sm border-2 border-purple-200 hover:shadow-lg hover:border-purple-400 transition-all cursor-pointer relative"
+                    onclick="worvox.showTimerMode()">
+                    <div class="absolute top-3 right-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs px-2 py-1 rounded-full font-bold">
+                      PREMIUM
+                    </div>
+                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
+                      <span class="text-2xl">⏱️</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">타이머 모드</h3>
+                    <p class="text-gray-600 mb-4">5초/10초 제한 안에 문장을 완성하는 압박 훈련</p>
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm text-purple-600 font-medium">시작하기 →</span>
+                      <span class="text-xs bg-purple-100 px-2 py-1 rounded">Premium</span>
+                    </div>
+                  </div>
+                </div>
                     <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-lg hover:border-emerald-400 transition-all cursor-pointer"
                       data-topic-id="${topic.id}" 
                       data-topic-name="${this.escapeHtml(topic.name)}" 
