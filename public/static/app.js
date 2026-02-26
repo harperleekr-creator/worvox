@@ -452,16 +452,11 @@ class WorVox {
             <i class="fas fa-phone-volume" style="width: 20px; text-align: center;"></i>
             <span class="text-sm">1:1 Live Speaking</span>
           </a>
-          
-          ${this.currentUser && this.currentUser.is_admin ? `
-          <div class="border-t border-gray-700 my-2 pt-2">
-            <a href="#" onclick="worvox.showAdmin(); worvox.closeMobileSidebar(); return false;" 
-              class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'admin' ? 'bg-red-900' : 'hover:bg-red-900'} transition-all text-red-400 hover:text-red-300">
-              <i class="fas fa-shield-alt" style="width: 20px; text-align: center;"></i>
-              <span class="font-semibold">Admin</span>
-            </a>
-          </div>
-          ` : ''}
+          <a href="#" onclick="worvox.showAdmin(); worvox.closeMobileSidebar(); return false;" 
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg ${activeItem === 'admin' ? 'bg-gray-800' : 'hover:bg-gray-800'} transition-all">
+            <i class="fas fa-shield-alt" style="width: 20px; text-align: center;"></i>
+            <span>Admin</span>
+          </a>
         </nav>
         
         <!-- User Profile -->
@@ -8915,11 +8910,6 @@ Proceed to payment?
 
   // Admin Dashboard
   async showAdmin() {
-    if (!this.currentUser || !this.currentUser.is_admin) {
-      alert('관리자 권한이 필요합니다.');
-      return;
-    }
-
     const app = document.getElementById('app');
     app.innerHTML = `
       ${this.getSidebar('admin')}

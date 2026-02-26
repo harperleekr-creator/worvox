@@ -4,32 +4,23 @@ import type { Bindings } from '../types'
 
 const admin = new Hono<{ Bindings: Bindings }>()
 
-// Admin authentication middleware
-const requireAdmin = async (c: Context<{ Bindings: Bindings }>, next: () => Promise<void>) => {
+// Simple authentication middleware (just check if logged in)
+const requireAuth = async (c: Context<{ Bindings: Bindings }>, next: () => Promise<void>) => {
   try {
     const userId = c.req.header('X-User-Id')
     if (!userId) {
       return c.json({ error: '인증이 필요합니다' }, 401)
     }
 
-    // Check if user is admin
-    const user = await c.env.DB.prepare(
-      'SELECT is_admin FROM users WHERE id = ?'
-    ).bind(parseInt(userId)).first()
-
-    if (!user || !user.is_admin) {
-      return c.json({ error: '관리자 권한이 필요합니다' }, 403)
-    }
-
     await next()
   } catch (error) {
-    console.error('Admin auth error:', error)
+    console.error('Auth error:', error)
     return c.json({ error: '인증 실패' }, 401)
   }
 }
 
 // Get all users with their stats
-admin.get('/users', requireAdmin, async (c) => {
+admin.get('/users', requireAuth, async (c) => {
   try {
     const page = parseInt(c.req.query('page') || '1')
     const limit = parseInt(c.req.query('limit') || '50')
@@ -94,7 +85,7 @@ admin.get('/users', requireAdmin, async (c) => {
 })
 
 // Get overall statistics
-admin.get('/stats', requireAdmin, async (c) => {
+admin.get('/stats', requireAuth, async (c) => {
   try {
     // Total users
     const totalUsers = await c.env.DB.prepare('SELECT COUNT(*) as count FROM users').first()
@@ -157,7 +148,7 @@ admin.get('/stats', requireAdmin, async (c) => {
 })
 
 // Get all sessions with details
-admin.get('/sessions', requireAdmin, async (c) => {
+admin.get('/sessions', requireAuth, async (c) => {
   try {
     const page = parseInt(c.req.query('page') || '1')
     const limit = parseInt(c.req.query('limit') || '50')
@@ -215,7 +206,7 @@ admin.get('/sessions', requireAdmin, async (c) => {
 })
 
 // Get payment history
-admin.get('/payments', requireAdmin, async (c) => {
+admin.get('/payments', requireAuth, async (c) => {
   try {
     const page = parseInt(c.req.query('page') || '1')
     const limit = parseInt(c.req.query('limit') || '50')
@@ -279,7 +270,7 @@ admin.get('/payments', requireAdmin, async (c) => {
 })
 
 // Get activity logs
-admin.get('/activities', requireAdmin, async (c) => {
+admin.get('/activities', requireAuth, async (c) => {
   try {
     const page = parseInt(c.req.query('page') || '1')
     const limit = parseInt(c.req.query('limit') || '100')
@@ -343,7 +334,7 @@ admin.get('/activities', requireAdmin, async (c) => {
 })
 
 // Update user plan (admin action)
-admin.post('/users/:id/plan', requireAdmin, async (c) => {
+admin.post('/users/:id/plan', requireAuth, async (c) => {
   try {
     const userId = parseInt(c.req.param('id'))
     const { plan, billingPeriod } = await c.req.json()
@@ -383,7 +374,7 @@ admin.post('/users/:id/plan', requireAdmin, async (c) => {
 })
 
 // Toggle admin status
-admin.post('/users/:id/admin', requireAdmin, async (c) => {
+admin.post('/users/:id/admin', requireAuth, async (c) => {
   try {
     const userId = parseInt(c.req.param('id'))
     const { isAdmin } = await c.req.json()
