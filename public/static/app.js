@@ -3904,8 +3904,18 @@ Proceed to payment?
 
   // Load latest report for dashboard
   async loadLatestReport() {
+    const reportContainer = document.getElementById('latestReportContent');
+    if (!reportContainer) return;
+
     try {
       if (!this.currentUser || !this.currentUser.id) {
+        reportContainer.innerHTML = `
+          <div class="text-center py-8 md:py-12">
+            <i class="fas fa-chart-line text-gray-300 text-4xl md:text-5xl mb-3"></i>
+            <p class="text-sm md:text-base text-gray-500 font-medium mb-2">최근 리포트 없음</p>
+            <p class="text-xs md:text-sm text-gray-400">AI 대화를 시작하고 리포트를 받아보세요</p>
+          </div>
+        `;
         return;
       }
 
@@ -3913,9 +3923,6 @@ Proceed to payment?
       
       if (response.data.success && response.data.report) {
         const report = response.data.report;
-        const reportContainer = document.getElementById('latestReportContent');
-        
-        if (!reportContainer) return;
         
         // Calculate average score
         const avgScore = Math.round((report.grammar_score + report.vocabulary_score + report.fluency_score) / 3);
@@ -3978,10 +3985,26 @@ Proceed to payment?
             ` : ''}
           </div>
         `;
+      } else {
+        // No report found
+        reportContainer.innerHTML = `
+          <div class="text-center py-8 md:py-12">
+            <i class="fas fa-chart-line text-gray-300 text-4xl md:text-5xl mb-3"></i>
+            <p class="text-sm md:text-base text-gray-500 font-medium mb-2">최근 리포트 없음</p>
+            <p class="text-xs md:text-sm text-gray-400">AI 대화를 시작하고 리포트를 받아보세요</p>
+          </div>
+        `;
       }
     } catch (error) {
       console.error('Error loading latest report:', error);
-      // Silent fail - just keep the empty state
+      // Show empty state on error
+      reportContainer.innerHTML = `
+        <div class="text-center py-8 md:py-12">
+          <i class="fas fa-chart-line text-gray-300 text-4xl md:text-5xl mb-3"></i>
+          <p class="text-sm md:text-base text-gray-500 font-medium mb-2">최근 리포트 없음</p>
+          <p class="text-xs md:text-sm text-gray-400">AI 대화를 시작하고 리포트를 받아보세요</p>
+        </div>
+      `;
     }
   }
 
