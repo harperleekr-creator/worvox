@@ -5,6 +5,7 @@
 
 ## 🌐 배포 URL
 - **Production**: https://worvox.com
+- **Preview**: https://bd254444.worvox.pages.dev
 - **GitHub**: https://github.com/harperleekr-creator/worvox
 
 ---
