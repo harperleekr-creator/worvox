@@ -9013,16 +9013,35 @@ Proceed to payment?
                   </h3>
                   
                   <div class="space-y-4">
+                    ${this.currentUser.is_trial ? `
+                    <!-- Free Trial Badge -->
+                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-4 mb-4">
+                      <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white text-2xl">
+                          🎁
+                        </div>
+                        <div>
+                          <h4 class="text-lg font-bold text-gray-900">2주 무료 체험 중</h4>
+                          <p class="text-sm text-green-700">${this.currentUser.plan.toUpperCase()} 플랜</p>
+                        </div>
+                      </div>
+                    </div>
+                    ` : ''}
+                    
                     <!-- Current Plan -->
                     <div class="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg">
                       <div>
-                        <p class="text-sm text-gray-600 mb-1">현재 플랜</p>
+                        <p class="text-sm text-gray-600 mb-1">${this.currentUser.is_trial ? '체험 플랜' : '현재 플랜'}</p>
                         <p class="text-xl font-bold text-gray-900">${this.currentUser.plan.toUpperCase()} 플랜</p>
-                        <p class="text-sm text-gray-500">${this.currentUser.billing_period === 'monthly' ? '월간 구독' : '연간 구독'}</p>
+                        ${this.currentUser.is_trial ? `
+                          <p class="text-sm text-green-600 font-medium">✨ 무료 체험</p>
+                        ` : `
+                          <p class="text-sm text-gray-500">${this.currentUser.billing_period === 'monthly' ? '월간 구독' : '연간 구독'}</p>
+                        `}
                       </div>
                       <div class="text-right">
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                          <i class="fas fa-check-circle mr-1"></i>활성
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${this.currentUser.is_trial ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
+                          <i class="fas fa-check-circle mr-1"></i>${this.currentUser.is_trial ? '체험 중' : '활성'}
                         </span>
                       </div>
                     </div>
@@ -9030,41 +9049,87 @@ Proceed to payment?
                     <!-- Subscription Period -->
                     <div class="grid grid-cols-2 gap-4">
                       <div class="p-4 bg-gray-50 rounded-lg">
-                        <p class="text-xs text-gray-500 mb-1">구독 시작일</p>
+                        <p class="text-xs text-gray-500 mb-1">${this.currentUser.is_trial ? '체험 시작일' : '구독 시작일'}</p>
                         <p class="text-sm font-semibold text-gray-900">
-                          ${this.currentUser.subscription_start_date ? new Date(this.currentUser.subscription_start_date).toLocaleDateString('ko-KR') : '-'}
+                          ${(this.currentUser.is_trial ? this.currentUser.trial_start_date : this.currentUser.subscription_start_date) ? 
+                            new Date(this.currentUser.is_trial ? this.currentUser.trial_start_date : this.currentUser.subscription_start_date).toLocaleDateString('ko-KR') : '-'}
                         </p>
                       </div>
                       <div class="p-4 bg-gray-50 rounded-lg">
-                        <p class="text-xs text-gray-500 mb-1">구독 종료일</p>
+                        <p class="text-xs text-gray-500 mb-1">${this.currentUser.is_trial ? '체험 종료일' : '구독 종료일'}</p>
                         <p class="text-sm font-semibold text-gray-900">
-                          ${this.currentUser.subscription_end_date ? new Date(this.currentUser.subscription_end_date).toLocaleDateString('ko-KR') : '-'}
+                          ${(this.currentUser.is_trial ? this.currentUser.trial_end_date : this.currentUser.subscription_end_date) ? 
+                            new Date(this.currentUser.is_trial ? this.currentUser.trial_end_date : this.currentUser.subscription_end_date).toLocaleDateString('ko-KR') : '-'}
                         </p>
                       </div>
                     </div>
                     
                     <!-- Remaining Days -->
-                    ${this.currentUser.subscription_end_date ? `
-                    <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    ${(this.currentUser.is_trial ? this.currentUser.trial_end_date : this.currentUser.subscription_end_date) ? `
+                    <div class="p-4 ${this.currentUser.is_trial ? 'bg-green-50 border-green-200' : 'bg-blue-50 border-blue-200'} rounded-lg border">
                       <div class="flex items-center justify-between">
-                        <div>
-                          <p class="text-sm text-blue-900 font-medium">남은 기간</p>
-                          <p class="text-xs text-blue-600 mt-1">구독이 자동으로 갱신됩니다</p>
+                        <div class="flex-1">
+                          <p class="text-sm ${this.currentUser.is_trial ? 'text-green-900' : 'text-blue-900'} font-medium">남은 기간</p>
+                          ${this.currentUser.is_trial ? `
+                            <p class="text-xs ${this.currentUser.auto_billing_enabled ? 'text-orange-600' : 'text-green-600'} mt-1">
+                              ${this.currentUser.auto_billing_enabled ? 
+                                `⚠️ 체험 종료 후 자동 결제: ${this.currentUser.plan === 'core' ? '₩9,900' : '₩19,000'}/월` : 
+                                '✓ 체험 종료 후 자동 결제 안됨'}
+                            </p>
+                          ` : `
+                            <p class="text-xs text-blue-600 mt-1">구독이 자동으로 갱신됩니다</p>
+                          `}
                         </div>
                         <div class="text-right">
-                          <p class="text-2xl font-bold text-blue-600">
-                            ${Math.max(0, Math.ceil((new Date(this.currentUser.subscription_end_date) - new Date()) / (1000 * 60 * 60 * 24)))}일
+                          <p class="text-3xl font-bold ${this.currentUser.is_trial ? 'text-green-600' : 'text-blue-600'}">
+                            ${Math.max(0, Math.ceil((new Date(this.currentUser.is_trial ? this.currentUser.trial_end_date : this.currentUser.subscription_end_date) - new Date()) / (1000 * 60 * 60 * 24)))}
                           </p>
+                          <p class="text-sm ${this.currentUser.is_trial ? 'text-green-600' : 'text-blue-600'} font-medium">일</p>
                         </div>
                       </div>
                     </div>
                     ` : ''}
                     
+                    ${this.currentUser.is_trial && this.currentUser.auto_billing_enabled ? `
+                    <!-- Trial Warning -->
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                      <div class="flex items-start gap-3">
+                        <i class="fas fa-info-circle text-yellow-600 text-lg mt-0.5"></i>
+                        <div class="flex-1 text-sm">
+                          <p class="font-semibold text-yellow-900 mb-1">자동 결제 안내</p>
+                          <p class="text-yellow-700">
+                            무료 체험 종료 시 등록된 카드로 ${this.currentUser.plan === 'core' ? '₩9,900' : '₩19,000'}이 자동 결제됩니다.
+                            원치 않으시면 아래 버튼으로 해지해주세요.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Cancel Trial Button -->
+                    <button onclick="worvox.cancelTrial()" 
+                      class="w-full py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg font-semibold transition-all border border-red-200">
+                      <i class="fas fa-times-circle mr-2"></i>무료 체험 해지 (${this.currentUser.trial_end_date ? new Date(this.currentUser.trial_end_date).toLocaleDateString('ko-KR') : '종료일'}까지 사용 가능)
+                    </button>
+                    ` : this.currentUser.is_trial ? `
+                    <!-- Trial Canceled Notice -->
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                      <div class="flex items-start gap-3">
+                        <i class="fas fa-check-circle text-gray-600 text-lg mt-0.5"></i>
+                        <div class="flex-1 text-sm">
+                          <p class="font-semibold text-gray-900 mb-1">자동 결제 해지됨</p>
+                          <p class="text-gray-600">
+                            체험 종료일(${this.currentUser.trial_end_date ? new Date(this.currentUser.trial_end_date).toLocaleDateString('ko-KR') : '-'})까지 계속 사용하실 수 있습니다.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    ` : `
                     <!-- Cancel Subscription -->
                     <button onclick="worvox.cancelSubscription()" 
                       class="w-full py-3 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg font-semibold transition-all border border-red-200">
                       <i class="fas fa-times-circle mr-2"></i>구독 취소
                     </button>
+                    `}
                   </div>
                 </div>
                 ` : ''}
@@ -9230,6 +9295,49 @@ Proceed to payment?
     }
   }
 
+  // Cancel free trial (disable auto billing)
+  async cancelTrial() {
+    const trialEndDate = this.currentUser.trial_end_date ? 
+      new Date(this.currentUser.trial_end_date).toLocaleDateString('ko-KR') : '종료일';
+    
+    // Confirmation dialog
+    const confirmed = confirm(
+      '무료 체험을 해지하시겠습니까?\n\n' +
+      '해지하시면:\n' +
+      `• ${trialEndDate}까지 ${this.currentUser.plan.toUpperCase()} 기능을 계속 사용할 수 있습니다\n` +
+      '• 자동 결제가 취소됩니다\n' +
+      '• 체험 종료 후 자동으로 Free 플랜으로 전환됩니다\n' +
+      '• 언제든지 다시 구독할 수 있습니다'
+    );
+
+    if (!confirmed) return;
+
+    try {
+      console.log('Canceling trial for user:', this.currentUser.id);
+
+      const response = await axios.post('/api/payments/trial/cancel', {
+        userId: this.currentUser.id
+      });
+
+      if (response.data.success) {
+        alert(`체험이 해지되었습니다.\n${trialEndDate}까지 계속 사용하실 수 있습니다.`);
+        
+        // Update local user data
+        this.currentUser.auto_billing_enabled = false;
+        localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
+        
+        // Refresh profile page
+        this.showProfile();
+      } else {
+        alert('체험 해지에 실패했습니다. 다시 시도해주세요.');
+      }
+
+    } catch (error) {
+      console.error('Cancel trial error:', error);
+      alert('체험 해지에 실패했습니다. 다시 시도해주세요.\n' + (error.response?.data?.error || error.message));
+    }
+  }
+
   toggleBillingPeriod(period) {
     const monthlyBtn = document.getElementById('monthlyToggle');
     const yearlyBtn = document.getElementById('yearlyToggle');
@@ -9290,6 +9398,11 @@ Proceed to payment?
 
     console.log(`🎁 Starting free trial for ${plan}`);
 
+    // Calculate future date
+    const futureDate = this.getFutureDate(14);
+    const planName = plan === 'core' ? 'Core' : 'Premium';
+    const planPrice = plan === 'core' ? '₩9,900' : '₩19,000';
+
     // Show confirmation modal
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
@@ -9299,7 +9412,7 @@ Proceed to payment?
           <div class="text-5xl mb-3">🎁</div>
           <h3 class="text-2xl font-bold text-gray-900 mb-2">2주 무료 체험</h3>
           <p class="text-gray-600 text-sm">
-            ${plan === 'core' ? 'Core' : 'Premium'} 플랜을 지금 무료로 시작하세요!
+            ${planName} 플랜을 지금 무료로 시작하세요!
           </p>
         </div>
         
@@ -9319,11 +9432,11 @@ Proceed to payment?
             </li>
             <li class="flex items-start">
               <i class="fas fa-calendar-check text-blue-500 mr-2 mt-0.5"></i>
-              <span>체험 종료일: <strong>${this.getFutureDate(14)}</strong></span>
+              <span>체험 종료일: <strong>${futureDate}</strong></span>
             </li>
             <li class="flex items-start">
               <i class="fas fa-credit-card text-purple-500 mr-2 mt-0.5"></i>
-              <span>체험 종료 후 자동 결제: <strong>${plan === 'core' ? '₩9,900' : '₩19,000'}</strong>/월</span>
+              <span>체험 종료 후 자동 결제: <strong>${planPrice}</strong>/월</span>
             </li>
             <li class="flex items-start">
               <i class="fas fa-bell text-yellow-500 mr-2 mt-0.5"></i>
