@@ -65,7 +65,7 @@ app.get('/api/health', (c) => {
 // Main page
 app.get('/', (c) => {
   // Force COMPLETE cache busting - change this number to force refresh
-  const FORCE_VERSION = '20260225-payment-modal-v1';
+  const FORCE_VERSION = '20260226-billing-toggle-v1';
   const version = `${FORCE_VERSION}-${Date.now()}`;
   
   return c.html(`
