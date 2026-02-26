@@ -1529,7 +1529,9 @@ Proceed to payment?
                 ` : ''}
                 
                 <!-- Feature Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">${this.topics.map(topic => `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">${this.topics.filter(topic => 
+                    topic.name === 'Vocabulary' || topic.name === 'AI English Conversation'
+                  ).map(topic => `
                     <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-lg hover:border-emerald-400 transition-all cursor-pointer"
                       data-topic-id="${topic.id}" 
                       data-topic-name="${this.escapeHtml(topic.name)}" 
