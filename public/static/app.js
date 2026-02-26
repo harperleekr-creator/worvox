@@ -10013,7 +10013,7 @@ Proceed to payment?
             <button onclick="worvox.viewUserDetail(${user.id})" class="text-blue-600 hover:text-blue-900 mr-3" title="상세 보기">
               <i class="fas fa-eye"></i>
             </button>
-            <button onclick="worvox.changeUserPlan(${user.id}, '${user.plan || 'free}')" class="text-green-600 hover:text-green-900 mr-3" title="플랜 변경">
+            <button onclick="worvox.changeUserPlan(${user.id}, '${user.plan || 'free'}')" class="text-green-600 hover:text-green-900 mr-3" title="플랜 변경">
               <i class="fas fa-edit"></i>
             </button>
             <button onclick="worvox.deleteUser(${user.id}, '${user.username}')" class="text-red-600 hover:text-red-900" title="사용자 삭제">
