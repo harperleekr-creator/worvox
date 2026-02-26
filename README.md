@@ -25,6 +25,12 @@
   - 북마크 기능
   - 학습 진도 추적
 - **Topic Selection**: 다양한 주제별 대화 (Daily, Business, Travel, Interview)
+- **Scenario Mode** (Core/Premium 전용): 실생활 상황 기반 대화 연습
+  - 30가지 다양한 시나리오 (여행, 일상, 비즈니스, 여가 등)
+  - 각 시나리오당 5개의 실전 문장 연습
+  - 난이도별 필터링 (Beginner, Intermediate, Advanced)
+  - 카테고리별 검색 (여행, 일상, 비즈니스 등)
+  - 음성 인식 및 발음 평가
 - **Learning History**: 과거 대화 세션 기록 및 조회
 - **Statistics**: 학습 통계 및 진도 시각화
 
