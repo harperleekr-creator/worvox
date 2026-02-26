@@ -2528,9 +2528,19 @@ Proceed to payment?
       this.userPlan = response.data.user.plan || 'free';
       console.log('User plan updated to:', this.userPlan);
 
-      // Move to next step (level selection)
-      alert(`환영합니다, ${name}님! 이제 영어 레벨을 선택해주세요.`);
-      this.nextStep();
+      // If new user, show onboarding steps
+      if (response.data.isNew) {
+        console.log('🆕 New user - showing onboarding');
+        alert(`환영합니다, ${name}님! 이제 영어 레벨을 선택해주세요.`);
+        this.onboardingStep = 2; // Start from step 2 (level selection)
+        this.showOnboardingStep();
+      } else {
+        console.log('👤 Existing user - loading data...');
+        // Load user data and show home
+        await this.loadUsageFromServer();
+        await this.loadGamificationStats();
+        this.showTopicSelection();
+      }
 
     } catch (error) {
       console.error('Signup error:', error);
