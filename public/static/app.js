@@ -700,12 +700,12 @@ class WorVox {
       formData.append('audio', audioBlob, `timer-recording.${fileExt}`);
       
       console.log('Timer Mode: Sending audio to STT API...');
-      const sttResponse = await axios.post('/api/stt', formData, {
+      const sttResponse = await axios.post('/api/stt/transcribe', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       
       console.log('Timer Mode: STT response:', sttResponse.data);
-      const transcription = sttResponse.data.text || '';
+      const transcription = sttResponse.data.transcription || sttResponse.data.text || '';
       console.log('Timer Mode: Transcription:', transcription);
       
       // Show results
