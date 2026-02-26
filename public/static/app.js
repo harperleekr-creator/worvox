@@ -2004,23 +2004,6 @@ Proceed to payment?
                     </div>
                   </div>
                 </div>
-                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-lg hover:border-emerald-400 transition-all cursor-pointer"
-                      data-topic-id="${topic.id}" 
-                      data-topic-name="${this.escapeHtml(topic.name)}" 
-                      data-topic-level="${topic.level}"
-                      onclick="worvox.startTopicById(${topic.id})">
-                      <div class="w-12 h-12 bg-${topic.name === 'AI English Conversation' ? 'emerald' : 'blue'}-100 rounded-xl flex items-center justify-center mb-4">
-                        <span class="text-2xl">${topic.icon}</span>
-                      </div>
-                      <h3 class="text-xl font-semibold text-gray-900 mb-2">${topic.name}</h3>
-                      <p class="text-gray-600 mb-4">${topic.description}</p>
-                      <div class="flex items-center justify-between">
-                        <span class="text-sm text-${topic.name === 'AI English Conversation' ? 'emerald' : 'blue'}-600 font-medium">Start learning →</span>
-                        <span class="text-xs bg-gray-100 px-2 py-1 rounded">${topic.level}</span>
-                      </div>
-                    </div>
-                  `).join('')}
-                </div>
                 
                 <!-- Stats Summary -->
                 <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-8 text-white">
