@@ -205,24 +205,48 @@ fuser -k 3000/tcp
 ## 🚀 배포
 
 ### Cloudflare Pages 배포
+
+#### 1. Cloudflare API 키 설정 (최초 1회)
+1. Deploy 탭에서 Cloudflare API 키 설정
+2. API 키는 [Cloudflare Dashboard](https://dash.cloudflare.com/profile/api-tokens)에서 생성
+3. 필요한 권한: `Cloudflare Pages - Edit`
+
+#### 2. 프로덕션 데이터베이스 마이그레이션 (최초 1회)
 ```bash
-# 1. Cloudflare API 키 설정 (최초 1회)
-# Deploy 탭에서 API 키 설정 필요
-
-# 2. 빌드
-npm run build
-
-# 3. 배포
-npm run deploy
-
-# 또는 프로덕션 배포 (프로젝트명 지정)
-npm run deploy:prod
+# Cloudflare API 키가 설정된 후 실행
+npm run db:migrate:prod
 ```
 
-### 데이터베이스 마이그레이션 (프로덕션)
+#### 3. 빌드 및 배포
 ```bash
-# 프로덕션 D1 데이터베이스에 마이그레이션 적용
-npm run db:migrate:prod
+# 빌드
+npm run build
+
+# 배포 (프로젝트명 지정)
+npm run deploy:prod
+
+# 또는 간단히
+npm run deploy
+```
+
+#### 4. 배포 확인
+- Production: https://worvox.com
+- Preview: https://[branch].worvox.pages.dev
+
+### Google Login 설정
+Google Sign-In이 작동하려면:
+1. [Google Cloud Console](https://console.cloud.google.com/)에서 프로젝트 생성
+2. OAuth 2.0 클라이언트 ID 생성
+3. 승인된 JavaScript 원본에 도메인 추가:
+   - `https://worvox.com`
+   - `https://worvox.pages.dev`
+4. 클라이언트 ID를 `src/index.tsx`에 업데이트
+
+### 환경 변수 (프로덕션)
+Cloudflare Pages 대시보드에서 설정:
+```
+OPENAI_API_KEY=your_openai_key
+OPENAI_API_BASE=https://api.openai.com/v1
 ```
 
 ---
