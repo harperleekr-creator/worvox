@@ -882,7 +882,9 @@ class WorVox {
           <div class="text-center mb-4">
             <button id="timerRecordBtn" 
               onclick="worvox.startTimerCountdown()" 
-              class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-emerald-500 text-white flex items-center justify-center hover:bg-emerald-600 transition-all shadow-2xl mx-auto transform hover:scale-105">
+              ontouchstart="this.style.transform='scale(0.95)'" 
+              ontouchend="this.style.transform='scale(1)'"
+              class="w-20 h-20 md:w-24 md:h-24 rounded-full bg-emerald-500 text-white flex items-center justify-center hover:bg-emerald-600 transition-all shadow-2xl mx-auto transform hover:scale-105 active:scale-95">
               <i class="fas fa-microphone text-3xl md:text-4xl"></i>
             </button>
             <div class="text-white text-lg mt-4" id="instructionText">
@@ -915,8 +917,11 @@ class WorVox {
 
   // Start Timer Countdown
   async startTimerCountdown() {
+    console.log('🎬 startTimerCountdown called');
+    
     // Prevent multiple starts
     if (this.timerChallenge.started) {
+      console.log('⚠️ Timer already started');
       return;
     }
     
@@ -943,7 +948,16 @@ class WorVox {
     recordBtn.innerHTML = '<i class="fas fa-microphone text-3xl md:text-4xl animate-pulse"></i>';
     
     // Start recording with proper audio configuration
-    await this.startTimerRecording();
+    try {
+      await this.startTimerRecording();
+      console.log('✅ Recording started successfully');
+    } catch (error) {
+      console.error('❌ Failed to start recording:', error);
+      alert('마이크 권한이 필요합니다. 브라우저 설정에서 마이크 권한을 허용해주세요.');
+      this.timerChallenge.started = false;
+      this.showTimerMode();
+      return;
+    }
     
     // Countdown
     let timeLeft = this.timerChallenge.seconds;
