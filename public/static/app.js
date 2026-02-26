@@ -5800,6 +5800,11 @@ Proceed to payment?
     }
   }
 
+  // Increment daily usage (alias for saveUsageToServer)
+  async incrementDailyUsage(featureType) {
+    return this.saveUsageToServer(featureType);
+  }
+
   // Reset daily usage
   resetDailyUsage() {
     this.dailyUsage = {
