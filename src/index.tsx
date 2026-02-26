@@ -17,6 +17,7 @@ import gamification from './routes/gamification';
 import usage from './routes/usage';
 import analysis from './routes/analysis';
 import payments from './routes/payments';
+import admin from './routes/admin';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -52,6 +53,7 @@ app.route('/api/gamification', gamification);
 app.route('/api/usage', usage);
 app.route('/api/analysis', analysis);
 app.route('/api/payments', payments);
+app.route('/api/admin', admin);
 
 // Preview routes
 app.route('/preview', preview);
