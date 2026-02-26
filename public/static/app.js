@@ -1732,28 +1732,20 @@ class WorVox {
       const transcription = sttResponse.data.transcription || sttResponse.data.text || '';
       const originalSentence = this.currentScenarioPractice.scenario.sentences[this.currentScenarioPractice.currentSentenceIndex];
       
-      // Calculate accuracy
-      const accuracy = this.calculateSentenceAccuracy(originalSentence, transcription);
+      // Calculate 3 scores: Accuracy, Pronunciation, Fluency
+      const scores = this.calculateDetailedScores(originalSentence, transcription, audioBlob);
       
       // Save result
       this.currentScenarioPractice.results.push({
         original: originalSentence,
         transcription: transcription,
-        accuracy: accuracy
+        accuracy: scores.accuracy,
+        pronunciation: scores.pronunciation,
+        fluency: scores.fluency
       });
       
-      // Move to next sentence or show results
-      this.currentScenarioPractice.currentSentenceIndex++;
-      
-      if (this.currentScenarioPractice.currentSentenceIndex < this.currentScenarioPractice.scenario.sentences.length) {
-        // Show next sentence
-        setTimeout(() => {
-          this.showScenarioPractice();
-        }, 500);
-      } else {
-        // Show final results
-        this.showScenarioResults();
-      }
+      // Show instant result for this sentence
+      this.showInstantSentenceResult(scores, originalSentence, transcription);
       
     } catch (error) {
       console.error('Analysis error:', error);
@@ -1775,6 +1767,257 @@ class WorVox {
     });
     
     return Math.round((matches / originalWords.length) * 100);
+  }
+  
+  // Calculate detailed scores: Accuracy, Pronunciation, Fluency
+  calculateDetailedScores(original, transcription, audioBlob) {
+    const originalWords = original.toLowerCase().replace(/[.,!?]/g, '').split(' ').filter(w => w.length > 0);
+    const transcribedWords = transcription.toLowerCase().replace(/[.,!?]/g, '').split(' ').filter(w => w.length > 0);
+    
+    // 1. Accuracy: Word matching rate
+    let matches = 0;
+    originalWords.forEach(word => {
+      if (transcribedWords.includes(word)) {
+        matches++;
+      }
+    });
+    const accuracy = Math.round((matches / originalWords.length) * 100);
+    
+    // 2. Pronunciation: Character-level similarity (Levenshtein distance)
+    const pronunciation = this.calculatePronunciationScore(original, transcription);
+    
+    // 3. Fluency: Based on transcription length and word count
+    const fluency = this.calculateFluencyScore(original, transcription);
+    
+    return { accuracy, pronunciation, fluency };
+  }
+  
+  // Calculate pronunciation score based on character similarity
+  calculatePronunciationScore(original, transcription) {
+    const orig = original.toLowerCase().replace(/[.,!?]/g, '');
+    const trans = transcription.toLowerCase().replace(/[.,!?]/g, '');
+    
+    // Levenshtein distance
+    const distance = this.levenshteinDistance(orig, trans);
+    const maxLength = Math.max(orig.length, trans.length);
+    const similarity = maxLength === 0 ? 100 : Math.round((1 - distance / maxLength) * 100);
+    
+    return Math.max(0, Math.min(100, similarity));
+  }
+  
+  // Calculate fluency score based on length and completeness
+  calculateFluencyScore(original, transcription) {
+    const originalWords = original.toLowerCase().replace(/[.,!?]/g, '').split(' ').filter(w => w.length > 0);
+    const transcribedWords = transcription.toLowerCase().replace(/[.,!?]/g, '').split(' ').filter(w => w.length > 0);
+    
+    // Check if transcription is complete
+    const lengthRatio = transcribedWords.length / originalWords.length;
+    const lengthScore = Math.min(100, lengthRatio * 100);
+    
+    // Penalize if too short or too long
+    let fluency = lengthScore;
+    if (lengthRatio < 0.5) {
+      fluency = lengthScore * 0.6; // Too short
+    } else if (lengthRatio > 1.5) {
+      fluency = lengthScore * 0.8; // Too long
+    }
+    
+    return Math.round(Math.max(0, Math.min(100, fluency)));
+  }
+  
+  // Levenshtein distance algorithm
+  levenshteinDistance(str1, str2) {
+    const matrix = [];
+    
+    for (let i = 0; i <= str2.length; i++) {
+      matrix[i] = [i];
+    }
+    
+    for (let j = 0; j <= str1.length; j++) {
+      matrix[0][j] = j;
+    }
+    
+    for (let i = 1; i <= str2.length; i++) {
+      for (let j = 1; j <= str1.length; j++) {
+        if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+          matrix[i][j] = matrix[i - 1][j - 1];
+        } else {
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+        }
+      }
+    }
+    
+    return matrix[str2.length][str1.length];
+  }
+  
+  // Show instant result after each sentence
+  showInstantSentenceResult(scores, originalSentence, transcription) {
+    const { accuracy, pronunciation, fluency } = scores;
+    const averageScore = Math.round((accuracy + pronunciation + fluency) / 3);
+    
+    let rating, ratingColor, ratingIcon;
+    if (averageScore >= 80) {
+      rating = '훌륭해요!';
+      ratingColor = 'text-green-600';
+      ratingIcon = '🌟';
+    } else if (averageScore >= 60) {
+      rating = '좋아요!';
+      ratingColor = 'text-blue-600';
+      ratingIcon = '👍';
+    } else if (averageScore >= 40) {
+      rating = '괜찮아요';
+      ratingColor = 'text-yellow-600';
+      ratingIcon = '😊';
+    } else {
+      rating = '다시 도전!';
+      ratingColor = 'text-red-600';
+      ratingIcon = '💪';
+    }
+    
+    const sentenceNumber = this.currentScenarioPractice.currentSentenceIndex + 1;
+    const totalSentences = this.currentScenarioPractice.scenario.sentences.length;
+    const hasMore = sentenceNumber < totalSentences;
+    
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+        ${this.getSidebar('scenario-mode')}
+        
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- Header -->
+          <div class="bg-white border-b border-blue-200 px-4 md:px-6 py-3">
+            <h2 class="text-lg font-semibold text-gray-800">
+              <i class="fas fa-chart-bar mr-2 text-blue-600"></i>문장 ${sentenceNumber} 결과
+            </h2>
+          </div>
+          
+          <!-- Content -->
+          <div class="flex-1 overflow-y-auto p-4 md:p-8">
+            <div class="max-w-4xl mx-auto">
+              <!-- Result Card -->
+              <div class="bg-white rounded-2xl p-6 md:p-8 shadow-xl border-2 border-blue-200 mb-6">
+                <!-- Rating -->
+                <div class="text-center mb-6">
+                  <div class="text-6xl mb-4">${ratingIcon}</div>
+                  <h3 class="text-3xl font-bold ${ratingColor} mb-2">${rating}</h3>
+                  <p class="text-gray-600">전체 점수: <span class="text-2xl font-bold text-blue-600">${averageScore}점</span></p>
+                </div>
+                
+                <!-- Score Breakdown -->
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                  <div class="text-center">
+                    <div class="text-gray-600 text-sm mb-2">정확성</div>
+                    <div class="relative w-20 h-20 mx-auto">
+                      <svg class="transform -rotate-90 w-20 h-20">
+                        <circle cx="40" cy="40" r="30" stroke="#e5e7eb" stroke-width="8" fill="none" />
+                        <circle cx="40" cy="40" r="30" stroke="#3b82f6" stroke-width="8" fill="none"
+                          stroke-dasharray="${2 * Math.PI * 30}" 
+                          stroke-dashoffset="${2 * Math.PI * 30 * (1 - accuracy / 100)}" 
+                          stroke-linecap="round" />
+                      </svg>
+                      <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="text-lg font-bold text-blue-600">${accuracy}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="text-center">
+                    <div class="text-gray-600 text-sm mb-2">발음</div>
+                    <div class="relative w-20 h-20 mx-auto">
+                      <svg class="transform -rotate-90 w-20 h-20">
+                        <circle cx="40" cy="40" r="30" stroke="#e5e7eb" stroke-width="8" fill="none" />
+                        <circle cx="40" cy="40" r="30" stroke="#10b981" stroke-width="8" fill="none"
+                          stroke-dasharray="${2 * Math.PI * 30}" 
+                          stroke-dashoffset="${2 * Math.PI * 30 * (1 - pronunciation / 100)}" 
+                          stroke-linecap="round" />
+                      </svg>
+                      <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="text-lg font-bold text-green-600">${pronunciation}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="text-center">
+                    <div class="text-gray-600 text-sm mb-2">유창성</div>
+                    <div class="relative w-20 h-20 mx-auto">
+                      <svg class="transform -rotate-90 w-20 h-20">
+                        <circle cx="40" cy="40" r="30" stroke="#e5e7eb" stroke-width="8" fill="none" />
+                        <circle cx="40" cy="40" r="30" stroke="#f59e0b" stroke-width="8" fill="none"
+                          stroke-dasharray="${2 * Math.PI * 30}" 
+                          stroke-dashoffset="${2 * Math.PI * 30 * (1 - fluency / 100)}" 
+                          stroke-linecap="round" />
+                      </svg>
+                      <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="text-lg font-bold text-yellow-600">${fluency}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Sentence Comparison -->
+                <div class="border-t pt-6">
+                  <div class="mb-4">
+                    <div class="text-sm font-semibold text-gray-700 mb-2">
+                      <i class="fas fa-check-circle text-green-600 mr-1"></i>원문
+                    </div>
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-gray-800">
+                      ${originalSentence}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div class="text-sm font-semibold text-gray-700 mb-2">
+                      <i class="fas fa-microphone text-blue-600 mr-1"></i>내 발음
+                    </div>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-gray-800">
+                      ${transcription || '(인식되지 않음)'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Action Buttons -->
+              <div class="flex gap-4">
+                ${hasMore ? `
+                  <button onclick="worvox.moveToNextSentence()" 
+                    class="flex-1 py-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl font-bold text-lg hover:from-blue-600 hover:to-indigo-600 transition-all shadow-lg">
+                    <i class="fas fa-arrow-right mr-2"></i>다음 문장
+                  </button>
+                ` : `
+                  <button onclick="worvox.showScenarioMode()" 
+                    class="flex-1 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-bold text-lg hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg">
+                    <i class="fas fa-check-circle mr-2"></i>완료
+                  </button>
+                `}
+                
+                <button onclick="worvox.showScenarioMode()" 
+                  class="px-6 py-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all">
+                  <i class="fas fa-times mr-2"></i>종료
+                </button>
+              </div>
+              
+              <!-- Progress Info -->
+              <div class="mt-6 text-center text-gray-600">
+                <i class="fas fa-info-circle mr-1"></i>
+                진행 상황: ${sentenceNumber} / ${totalSentences}
+              </div>
+            </div>
+            
+            ${this.getFooter()}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  // Move to next sentence
+  moveToNextSentence() {
+    this.currentScenarioPractice.currentSentenceIndex++;
+    this.showScenarioPractice();
   }
   
   // Show scenario results
