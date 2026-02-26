@@ -2065,7 +2065,7 @@ class WorVox {
 
       // 2. Initialize Toss Payments
       const clientKey = 'test_ck_d26DlbXAaV0eR7QxP00rqY50Q9RB';
-      const tossPayments = TossPayments(clientKey);
+      const tossPayments = await loadTossPayments(clientKey);
 
       // 3. Request payment
       await tossPayments.requestPayment({
@@ -8755,7 +8755,7 @@ Proceed to payment?
 
       // 2. Initialize Toss Payments
       const clientKey = 'test_ck_d26DlbXAaV0eR7QxP00rqY50Q9RB';
-      const tossPayments = TossPayments(clientKey);
+      const tossPayments = await loadTossPayments(clientKey);
 
       // 3. Request payment
       await tossPayments.requestPayment({
