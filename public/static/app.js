@@ -54,33 +54,6 @@ class WorVox {
   }
 
   async init() {
-    // ========== TEMPORARY: Skip login for NHN KCP integration ==========
-    // TODO: Re-enable Google login and onboarding after KCP integration
-    
-    // Create temporary test user
-    this.currentUser = {
-      id: 1,  // INTEGER ID for database compatibility
-      email: 'test@worvox.com',
-      username: 'Test User',
-      profilePicture: null,
-      level: 'intermediate',
-      plan: 'free'
-    };
-    
-    // Save to localStorage
-    localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
-    
-    // Load usage data
-    await this.loadUsageFromServer();
-    await this.loadGamificationStats();
-    
-    // Show dashboard directly
-    this.showTopicSelection();
-    
-    /* ========== ORIGINAL CODE (commented out) ==========
-    // Initialize Google Sign-In
-    this.initGoogleSignIn();
-    
     // Check for existing user in localStorage
     const savedUser = localStorage.getItem('worvox_user');
     if (savedUser) {
@@ -92,7 +65,6 @@ class WorVox {
     } else {
       this.showLogin();
     }
-    ========== END ORIGINAL CODE ========== */
   }
 
   async loadGamificationStats() {
