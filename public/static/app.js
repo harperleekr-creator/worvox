@@ -9850,6 +9850,7 @@ Proceed to payment?
   async confirmFreeTrial(plan) {
     try {
       console.log(`✅ User confirmed trial for ${plan}`);
+      console.log(`👤 Current user:`, this.currentUser);
 
       // Step 1: Start trial on backend (get customerKey)
       const startResponse = await axios.post('/api/payments/trial/start', {
@@ -9857,8 +9858,11 @@ Proceed to payment?
         plan
       });
 
+      console.log(`📡 Trial start response:`, startResponse.data);
+
       if (!startResponse.data.success) {
-        throw new Error(startResponse.data.error || '체험 시작 실패');
+        const errorMsg = startResponse.data.details || startResponse.data.error || '체험 시작 실패';
+        throw new Error(errorMsg);
       }
 
       const { customerKey } = startResponse.data;

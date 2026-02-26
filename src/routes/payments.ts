@@ -218,6 +218,8 @@ payments.post('/trial/start', async (c) => {
   try {
     const { userId, plan } = await c.req.json();
 
+    console.log(`📥 Received trial request - userId: ${userId} (type: ${typeof userId}), plan: ${plan}`);
+
     if (!userId || !plan) {
       return c.json({ error: 'Missing required fields' }, 400);
     }
@@ -230,11 +232,16 @@ payments.post('/trial/start', async (c) => {
 
     // Check if user already has active trial or subscription
     const user = await c.env.DB.prepare(
-      'SELECT id, plan, is_trial, trial_end_date FROM users WHERE id = ?'
+      'SELECT id, username, email, plan, is_trial, trial_end_date FROM users WHERE id = ?'
     ).bind(userId).first();
 
+    console.log(`🔍 User lookup result:`, user ? `Found: ${user.username} (${user.email})` : 'Not found');
+
     if (!user) {
-      return c.json({ error: 'User not found' }, 404);
+      return c.json({ 
+        error: 'User not found', 
+        details: `사용자 ID ${userId}를 찾을 수 없습니다.`
+      }, 404);
     }
 
     // Check if user already has active paid plan
