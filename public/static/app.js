@@ -4439,10 +4439,19 @@ Proceed to payment?
       const response = await axios.get(`/api/history/sessions/${this.currentUser.id}`);
       const sessions = response.data.sessions;
       
-      // Group sessions by type
-      const aiConversations = sessions.filter(s => !s.topic_name.includes('타이머') && !s.topic_name.includes('시나리오'));
-      const timerSessions = sessions.filter(s => s.topic_name.includes('타이머'));
-      const scenarioSessions = sessions.filter(s => s.topic_name.includes('시나리오'));
+      // Group sessions by type (handle null topic_name)
+      const aiConversations = sessions.filter(s => {
+        const topicName = s.topic_name || '';
+        return !topicName.includes('타이머') && !topicName.includes('시나리오');
+      });
+      const timerSessions = sessions.filter(s => {
+        const topicName = s.topic_name || '';
+        return topicName.includes('타이머');
+      });
+      const scenarioSessions = sessions.filter(s => {
+        const topicName = s.topic_name || '';
+        return topicName.includes('시나리오');
+      });
 
       const app = document.getElementById('app');
       app.innerHTML = `
@@ -6458,7 +6467,7 @@ Proceed to payment?
                     <button id="yearlyToggle" onclick="worvox.toggleBillingPeriod('yearly')" 
                       class="px-6 py-2.5 rounded-full font-semibold transition-all text-gray-600">
                       연별 결제
-                      <span class="ml-2 text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">15% 할인</span>
+                      <span class="ml-2 text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">18% 할인</span>
                     </button>
                   </div>
                 </div>
@@ -6510,7 +6519,7 @@ Proceed to payment?
                         <span id="corePrice" class="text-3xl font-bold">₩9,900</span>
                         <span id="corePeriod" class="text-blue-100 text-sm">/월</span>
                         <div id="coreYearlySavings" class="hidden text-xs text-green-300 mt-1">
-                          월 ₩9,900 × 12개월 = ₩118,800 → 15% 할인
+                          월 ₩9,900 × 12개월 = ₩118,800 → 18% 할인
                         </div>
                       </div>
                       <p class="text-sm text-blue-100">무제한 대화</p>
@@ -6554,7 +6563,7 @@ Proceed to payment?
                         <span id="premiumPrice" class="text-3xl font-bold">₩19,000</span>
                         <span id="premiumPeriod" class="text-purple-100 text-sm">/월</span>
                         <div id="premiumYearlySavings" class="hidden text-xs text-green-300 mt-1">
-                          월 ₩19,000 × 12개월 = ₩228,000 → 15% 할인
+                          월 ₩19,000 × 12개월 = ₩228,000 → 18% 할인
                         </div>
                       </div>
                       <p class="text-sm text-purple-100">완벽한 학습 경험</p>
@@ -8664,19 +8673,19 @@ Proceed to payment?
       
       this.currentBillingPeriod = 'monthly';
     } else {
-      // Yearly prices (15% discount)
+      // Yearly prices (18% discount)
       yearlyBtn.classList.add('bg-gradient-to-r', 'from-purple-500', 'to-pink-500', 'text-white');
       yearlyBtn.classList.remove('text-gray-600');
       monthlyBtn.classList.remove('bg-gradient-to-r', 'from-purple-500', 'to-pink-500', 'text-white');
       monthlyBtn.classList.add('text-gray-600');
       
-      // Core: 9,900 × 12 = 118,800 → 15% discount = 100,980
-      corePrice.textContent = '₩100,980';
+      // Core: 9,900 × 12 = 118,800 → 18% discount = 97,416
+      corePrice.textContent = '₩97,416';
       corePeriod.textContent = '/년';
       coreYearlySavings.classList.remove('hidden');
       
-      // Premium: 19,000 × 12 = 228,000 → 15% discount = 193,800
-      premiumPrice.textContent = '₩193,800';
+      // Premium: 19,000 × 12 = 228,000 → 18% discount = 186,960
+      premiumPrice.textContent = '₩186,960';
       premiumPeriod.textContent = '/년';
       premiumYearlySavings.classList.remove('hidden');
       
@@ -8690,9 +8699,9 @@ Proceed to payment?
     let price;
     
     if (planName === 'Core') {
-      price = period === 'monthly' ? '₩9,900/월' : '₩100,980/년';
+      price = period === 'monthly' ? '₩9,900/월' : '₩97,416/년';
     } else if (planName === 'Premium') {
-      price = period === 'monthly' ? '₩19,000/월' : '₩193,800/년';
+      price = period === 'monthly' ? '₩19,000/월' : '₩186,960/년';
     }
     
     this.showPaymentStayTuned(planName, price);
