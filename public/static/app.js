@@ -9729,11 +9729,14 @@ Proceed to payment?
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${studyHours}h ${studyMinutes}m</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(user.created_at).toLocaleDateString()}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm">
-            <button onclick="worvox.viewUserDetail(${user.id})" class="text-blue-600 hover:text-blue-900 mr-3">
+            <button onclick="worvox.viewUserDetail(${user.id})" class="text-blue-600 hover:text-blue-900 mr-3" title="상세 보기">
               <i class="fas fa-eye"></i>
             </button>
-            <button onclick="worvox.changeUserPlan(${user.id}, '${user.plan || 'free'}')" class="text-green-600 hover:text-green-900">
+            <button onclick="worvox.changeUserPlan(${user.id}, '${user.plan || 'free}')" class="text-green-600 hover:text-green-900 mr-3" title="플랜 변경">
               <i class="fas fa-edit"></i>
+            </button>
+            <button onclick="worvox.deleteUser(${user.id}, '${user.username}')" class="text-red-600 hover:text-red-900" title="사용자 삭제">
+              <i class="fas fa-trash"></i>
             </button>
           </td>
         </tr>
@@ -9804,6 +9807,43 @@ Proceed to payment?
     } catch (error) {
       console.error('Change plan error:', error);
       alert('플랜 변경에 실패했습니다: ' + (error.response?.data?.error || error.message));
+    }
+  }
+
+  async deleteUser(userId, username) {
+    // Confirmation dialog
+    const confirmed = confirm(
+      `⚠️ 사용자 삭제 확인\n\n사용자: ${username}\n\n이 작업은 되돌릴 수 없습니다.\n- 모든 대화 세션\n- 학습 기록\n- 결제 내역\n등이 영구적으로 삭제됩니다.\n\n정말 삭제하시겠습니까?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    // Double confirmation for safety
+    const doubleConfirm = confirm(
+      `최종 확인: "${username}" 사용자를 정말로 삭제하시겠습니까?`
+    );
+
+    if (!doubleConfirm) {
+      return;
+    }
+
+    try {
+      console.log(`🗑️ Attempting to delete user ${userId} (${username})`);
+      
+      const response = await axios.delete(`/api/admin/users/${userId}`, {
+        headers: { 'X-User-Id': this.currentUser.id }
+      });
+
+      if (response.data.success) {
+        alert(`✅ 사용자 "${username}"이(가) 삭제되었습니다.`);
+        // Reload admin data to refresh the user list
+        this.loadAdminData();
+      }
+    } catch (error) {
+      console.error('Delete user error:', error);
+      alert('❌ 사용자 삭제에 실패했습니다: ' + (error.response?.data?.error || error.message));
     }
   }
 

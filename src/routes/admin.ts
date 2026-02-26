@@ -393,4 +393,60 @@ admin.post('/users/:id/admin', requireAuth, async (c) => {
   }
 })
 
+// Delete user (admin action)
+admin.delete('/users/:id', requireAuth, async (c) => {
+  try {
+    const userId = parseInt(c.req.param('id'))
+    const adminUserId = parseInt(c.req.header('X-User-Id') || '0')
+
+    console.log(`🗑️ Admin ${adminUserId} attempting to delete user ${userId}`)
+
+    // Check if user exists
+    const user = await c.env.DB.prepare(
+      'SELECT id, username, email FROM users WHERE id = ?'
+    ).bind(userId).first()
+
+    if (!user) {
+      return c.json({ error: '사용자를 찾을 수 없습니다' }, 404)
+    }
+
+    console.log(`📝 Deleting user: ${user.username} (${user.email})`)
+
+    // Delete related data in correct order (respect foreign key constraints)
+    // 1. Delete messages (depends on sessions)
+    await c.env.DB.prepare('DELETE FROM messages WHERE session_id IN (SELECT id FROM sessions WHERE user_id = ?)').bind(userId).run()
+    
+    // 2. Delete sessions
+    await c.env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(userId).run()
+    
+    // 3. Delete session_durations
+    await c.env.DB.prepare('DELETE FROM session_durations WHERE user_id = ?').bind(userId).run()
+    
+    // 4. Delete vocabulary_progress
+    await c.env.DB.prepare('DELETE FROM vocabulary_progress WHERE user_id = ?').bind(userId).run()
+    
+    // 5. Delete payment_orders
+    await c.env.DB.prepare('DELETE FROM payment_orders WHERE user_id = ?').bind(userId).run()
+    
+    // 6. Delete activity_logs
+    await c.env.DB.prepare('DELETE FROM activity_logs WHERE user_id = ?').bind(userId).run()
+    
+    // 7. Delete usage_tracking
+    await c.env.DB.prepare('DELETE FROM usage_tracking WHERE user_id = ?').bind(userId).run()
+    
+    // 8. Finally delete the user
+    await c.env.DB.prepare('DELETE FROM users WHERE id = ?').bind(userId).run()
+
+    console.log(`✅ User ${userId} deleted successfully`)
+
+    return c.json({
+      success: true,
+      message: '사용자가 삭제되었습니다'
+    })
+  } catch (error) {
+    console.error('Admin delete user error:', error)
+    return c.json({ error: '사용자 삭제 실패: ' + (error as Error).message }, 500)
+  }
+})
+
 export default admin
