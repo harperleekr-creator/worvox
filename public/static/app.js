@@ -10594,24 +10594,49 @@ Proceed to payment?
 
   async changeUserPlan(userId, currentPlan) {
     const plans = ['free', 'core', 'premium', 'business'];
-    const planNames = { free: 'Free', core: 'Core', premium: 'Premium', business: 'Business' };
+    const planNames = { 
+      free: 'Free (무료)', 
+      core: 'Core (₩9,900/월)', 
+      premium: 'Premium (₩19,000/월)', 
+      business: 'Business (협의)' 
+    };
     
     const options = plans.map(p => `<option value="${p}" ${p === currentPlan ? 'selected' : ''}>${planNames[p]}</option>`).join('');
     
     const modal = document.createElement('div');
     modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
     modal.innerHTML = `
-      <div class="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+      <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
         <h3 class="text-lg font-semibold mb-4">플랜 변경</h3>
-        <select id="new-plan-select" class="w-full px-4 py-2 border border-gray-300 rounded-lg mb-4">
-          ${options}
-        </select>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">플랜 선택</label>
+          <select id="new-plan-select" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            ${options}
+          </select>
+        </div>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">결제 주기</label>
+          <select id="billing-period-select" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            <option value="monthly">월간 (1개월)</option>
+            <option value="yearly">연간 (12개월)</option>
+          </select>
+        </div>
+        
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+          <p class="text-sm text-blue-800">
+            <i class="fas fa-info-circle mr-1"></i>
+            플랜 변경 시 구독 기간이 오늘부터 자동으로 설정됩니다.
+          </p>
+        </div>
+        
         <div class="flex gap-2">
-          <button onclick="this.closest('.fixed').remove()" class="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">
+          <button onclick="this.closest('.fixed').remove()" class="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">
             취소
           </button>
-          <button onclick="worvox.confirmPlanChange(${userId}, document.getElementById('new-plan-select').value); this.closest('.fixed').remove();" 
-            class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          <button onclick="worvox.confirmPlanChange(${userId}, document.getElementById('new-plan-select').value, document.getElementById('billing-period-select').value); this.closest('.fixed').remove();" 
+            class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             변경
           </button>
         </div>
@@ -10620,20 +10645,26 @@ Proceed to payment?
     document.body.appendChild(modal);
   }
 
-  async confirmPlanChange(userId, newPlan) {
+  async confirmPlanChange(userId, newPlan, billingPeriod) {
     try {
+      console.log(`📝 Changing plan for user ${userId}: ${newPlan} (${billingPeriod})`);
+      
       const response = await axios.post(`/api/admin/users/${userId}/plan`, 
-        { plan: newPlan },
+        { 
+          plan: newPlan,
+          billingPeriod: billingPeriod || 'monthly'
+        },
         { headers: { 'X-User-Id': this.currentUser.id } }
       );
 
       if (response.data.success) {
-        alert('플랜이 변경되었습니다.');
+        const periodText = billingPeriod === 'yearly' ? '12개월' : '1개월';
+        alert(`✅ 플랜이 변경되었습니다.\n\n새 플랜: ${newPlan.toUpperCase()}\n구독 기간: ${periodText}`);
         this.loadAdminData();
       }
     } catch (error) {
       console.error('Change plan error:', error);
-      alert('플랜 변경에 실패했습니다: ' + (error.response?.data?.error || error.message));
+      alert('❌ 플랜 변경에 실패했습니다: ' + (error.response?.data?.error || error.message));
     }
   }
 

@@ -433,7 +433,11 @@ admin.get('/users/:id', requireAuth, async (c) => {
 admin.post('/users/:id/plan', requireAuth, async (c) => {
   try {
     const userId = parseInt(c.req.param('id'))
-    const { plan, billingPeriod } = await c.req.json()
+    const body = await c.req.json()
+    const plan = body.plan
+    const billingPeriod = body.billingPeriod || 'monthly' // Default to monthly
+
+    console.log(`📝 Admin updating plan for user ${userId}: ${plan} (${billingPeriod})`)
 
     if (!['free', 'core', 'premium', 'business'].includes(plan)) {
       return c.json({ error: '유효하지 않은 플랜입니다' }, 400)
@@ -443,29 +447,51 @@ admin.post('/users/:id/plan', requireAuth, async (c) => {
       return c.json({ error: '유효하지 않은 결제 주기입니다' }, 400)
     }
 
-    // Update user plan
+    // Calculate subscription period based on billing period
+    const periodMonths = billingPeriod === 'monthly' ? 1 : 12
+
+    // Get current date in Korea timezone
+    const koreaDate = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' }))
+    const startDate = koreaDate.toISOString()
+    
+    // Calculate end date
+    const endDate = new Date(koreaDate)
+    endDate.setMonth(endDate.getMonth() + periodMonths)
+    const endDateISO = endDate.toISOString()
+
+    console.log(`  📅 Subscription: ${startDate} → ${endDateISO}`)
+
+    // Update user plan with Korea timezone dates
     await c.env.DB.prepare(`
       UPDATE users 
       SET plan = ?, 
           billing_period = ?,
-          subscription_start_date = datetime('now'),
-          subscription_end_date = datetime('now', '+' || ? || ' ' || ?)
+          subscription_start_date = ?,
+          subscription_end_date = ?
       WHERE id = ?
     `).bind(
       plan,
       billingPeriod,
-      billingPeriod === 'monthly' ? 1 : 12,
-      billingPeriod === 'monthly' ? 'month' : 'months',
+      startDate,
+      endDateISO,
       userId
     ).run()
 
+    console.log(`✅ Plan updated successfully for user ${userId}`)
+
     return c.json({
       success: true,
-      message: '플랜이 업데이트되었습니다'
+      message: '플랜이 업데이트되었습니다',
+      data: {
+        plan,
+        billingPeriod,
+        subscriptionStartDate: startDate,
+        subscriptionEndDate: endDateISO
+      }
     })
   } catch (error) {
     console.error('Admin update plan error:', error)
-    return c.json({ error: '플랜 업데이트 실패' }, 500)
+    return c.json({ error: '플랜 업데이트 실패: ' + (error as Error).message }, 500)
   }
 })
 
