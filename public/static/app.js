@@ -10554,7 +10554,7 @@ Proceed to payment?
           <td class="px-6 py-4 whitespace-nowrap">${planBadge}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${user.total_sessions || 0}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${studyHours}h ${studyMinutes}m</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(user.created_at).toLocaleDateString()}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(user.created_at).toLocaleDateString('ko-KR')}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm">
             <button onclick="worvox.viewUserDetail(${user.id})" class="text-blue-600 hover:text-blue-900 mr-3" title="상세 보기">
               <i class="fas fa-eye"></i>
@@ -10562,7 +10562,7 @@ Proceed to payment?
             <button onclick="worvox.changeUserPlan(${user.id}, '${user.plan || 'free'}')" class="text-green-600 hover:text-green-900 mr-3" title="플랜 변경">
               <i class="fas fa-edit"></i>
             </button>
-            <button onclick="worvox.deleteUser(${user.id}, '${user.username}')" class="text-red-600 hover:text-red-900" title="사용자 삭제">
+            <button onclick="worvox.deleteUser(${user.id}, '${user.username.replace(/'/g, "\\'")}')" class="text-red-600 hover:text-red-900" title="사용자 삭제">
               <i class="fas fa-trash"></i>
             </button>
           </td>
