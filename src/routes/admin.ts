@@ -413,29 +413,83 @@ admin.delete('/users/:id', requireAuth, async (c) => {
     console.log(`📝 Deleting user: ${user.username} (${user.email})`)
 
     // Delete related data in correct order (respect foreign key constraints)
-    // 1. Delete messages (depends on sessions)
-    await c.env.DB.prepare('DELETE FROM messages WHERE session_id IN (SELECT id FROM sessions WHERE user_id = ?)').bind(userId).run()
+    // Use try-catch for each deletion to handle tables that may not exist
     
-    // 2. Delete sessions
-    await c.env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(userId).run()
+    try {
+      // 1. Delete session_reports (may reference sessions)
+      await c.env.DB.prepare('DELETE FROM session_reports WHERE session_id IN (SELECT id FROM sessions WHERE user_id = ?)').bind(userId).run()
+      console.log('  ✓ Deleted session_reports')
+    } catch (e) { console.log('  - session_reports not found or error:', (e as Error).message) }
     
-    // 3. Delete session_durations
-    await c.env.DB.prepare('DELETE FROM session_durations WHERE user_id = ?').bind(userId).run()
+    try {
+      // 2. Delete session_feedback (may reference sessions)
+      await c.env.DB.prepare('DELETE FROM session_feedback WHERE session_id IN (SELECT id FROM sessions WHERE user_id = ?)').bind(userId).run()
+      console.log('  ✓ Deleted session_feedback')
+    } catch (e) { console.log('  - session_feedback not found or error:', (e as Error).message) }
     
-    // 4. Delete vocabulary_progress
-    await c.env.DB.prepare('DELETE FROM vocabulary_progress WHERE user_id = ?').bind(userId).run()
+    try {
+      // 3. Delete messages (depends on sessions)
+      await c.env.DB.prepare('DELETE FROM messages WHERE session_id IN (SELECT id FROM sessions WHERE user_id = ?)').bind(userId).run()
+      console.log('  ✓ Deleted messages')
+    } catch (e) { console.log('  - messages not found or error:', (e as Error).message) }
     
-    // 5. Delete payment_orders
-    await c.env.DB.prepare('DELETE FROM payment_orders WHERE user_id = ?').bind(userId).run()
+    try {
+      // 4. Delete sessions
+      await c.env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(userId).run()
+      console.log('  ✓ Deleted sessions')
+    } catch (e) { console.log('  - sessions not found or error:', (e as Error).message) }
     
-    // 6. Delete activity_logs
-    await c.env.DB.prepare('DELETE FROM activity_logs WHERE user_id = ?').bind(userId).run()
+    try {
+      // 5. Delete session_durations
+      await c.env.DB.prepare('DELETE FROM session_durations WHERE user_id = ?').bind(userId).run()
+      console.log('  ✓ Deleted session_durations')
+    } catch (e) { console.log('  - session_durations not found or error:', (e as Error).message) }
     
-    // 7. Delete usage_tracking
-    await c.env.DB.prepare('DELETE FROM usage_tracking WHERE user_id = ?').bind(userId).run()
+    try {
+      // 6. Delete user_vocabulary_progress (correct table name)
+      await c.env.DB.prepare('DELETE FROM user_vocabulary_progress WHERE user_id = ?').bind(userId).run()
+      console.log('  ✓ Deleted user_vocabulary_progress')
+    } catch (e) { console.log('  - user_vocabulary_progress not found or error:', (e as Error).message) }
     
-    // 8. Finally delete the user
+    try {
+      // 7. Delete user_stats
+      await c.env.DB.prepare('DELETE FROM user_stats WHERE user_id = ?').bind(userId).run()
+      console.log('  ✓ Deleted user_stats')
+    } catch (e) { console.log('  - user_stats not found or error:', (e as Error).message) }
+    
+    try {
+      // 8. Delete user_badges
+      await c.env.DB.prepare('DELETE FROM user_badges WHERE user_id = ?').bind(userId).run()
+      console.log('  ✓ Deleted user_badges')
+    } catch (e) { console.log('  - user_badges not found or error:', (e as Error).message) }
+    
+    try {
+      // 9. Delete payment_orders
+      await c.env.DB.prepare('DELETE FROM payment_orders WHERE user_id = ?').bind(userId).run()
+      console.log('  ✓ Deleted payment_orders')
+    } catch (e) { console.log('  - payment_orders not found or error:', (e as Error).message) }
+    
+    try {
+      // 10. Delete activity_logs
+      await c.env.DB.prepare('DELETE FROM activity_logs WHERE user_id = ?').bind(userId).run()
+      console.log('  ✓ Deleted activity_logs')
+    } catch (e) { console.log('  - activity_logs not found or error:', (e as Error).message) }
+    
+    try {
+      // 11. Delete user_activity_log (alternative table)
+      await c.env.DB.prepare('DELETE FROM user_activity_log WHERE user_id = ?').bind(userId).run()
+      console.log('  ✓ Deleted user_activity_log')
+    } catch (e) { console.log('  - user_activity_log not found or error:', (e as Error).message) }
+    
+    try {
+      // 12. Delete usage_tracking
+      await c.env.DB.prepare('DELETE FROM usage_tracking WHERE user_id = ?').bind(userId).run()
+      console.log('  ✓ Deleted usage_tracking')
+    } catch (e) { console.log('  - usage_tracking not found or error:', (e as Error).message) }
+    
+    // 13. Finally delete the user (this must succeed)
     await c.env.DB.prepare('DELETE FROM users WHERE id = ?').bind(userId).run()
+    console.log('  ✓ Deleted user')
 
     console.log(`✅ User ${userId} deleted successfully`)
 
