@@ -397,6 +397,29 @@ class WorVox {
           "I'd love to go back someday.",
           "Have you ever been to Europe?",
           "I'm planning a trip to Japan next year."
+        ],
+        translations: [
+          "지난 여름에 파리를 방문했는데 정말 놀라웠습니다.",
+          "현지 음식이 정말 맛있었습니다.",
+          "언젠가 다시 가고 싶습니다.",
+          "유럽에 가본 적 있으신가요?",
+          "내년에 일본 여행을 계획하고 있습니다."
+        ]
+      },
+      { id: 31, title: "군사영어", category: "비즈니스", difficulty: "advanced", icon: "🎖️", description: "군사 작전 및 임무 관련 대화",
+        sentences: [
+          "Roger that, we're proceeding to the designated checkpoint.",
+          "Request permission to engage the target.",
+          "All units, stand by for further instructions.",
+          "Enemy contact at grid coordinates three-one-seven-niner.",
+          "Mission accomplished, returning to base."
+        ],
+        translations: [
+          "알겠습니다, 지정된 검문소로 이동 중입니다.",
+          "목표물 교전 허가를 요청합니다.",
+          "전 부대, 추가 지시가 있을 때까지 대기하십시오.",
+          "좌표 3179에서 적과 조우했습니다.",
+          "임무 완수, 기지로 복귀 중입니다."
         ]
       }
     ];
@@ -1285,17 +1308,49 @@ class WorVox {
     const spokenWords = transcription.toLowerCase().split(' ').length;
     const completeness = Math.min(100, Math.round((spokenWords / originalWords) * 100));
     
-    // Determine rating
+    // 🎯 Get analysis scores (accuracy, pronunciation, fluency)
+    let accuracyScore = completeness; // Default based on word count
+    let pronunciationScore = 75; // Default
+    let fluencyScore = 70; // Default
+    
+    // Try to get AI analysis if session exists
+    if (this.timerChallenge.sessionId && transcription && transcription !== '(인식되지 않음)') {
+      try {
+        const analysisResponse = await axios.post('/api/chat', {
+          sessionId: this.timerChallenge.sessionId,
+          message: `타이머 챌린지 분석 요청:\n\n원본: "${originalSentence}"\n사용자 발화: "${transcription}"\n\n다음 항목에 대해 0-100 점수를 제공하세요:\n1. Accuracy (정확성): 원본과의 내용 일치도\n2. Pronunciation (발음): 발음 품질 추정\n3. Fluency (유창성): 유창성 및 자연스러움\n\nJSON 형식으로만 응답: {"accuracy": <점수>, "pronunciation": <점수>, "fluency": <점수>}`,
+          useGPT4: false
+        });
+        
+        // Parse AI response
+        const aiText = analysisResponse.data.response;
+        const jsonMatch = aiText.match(/\{[^}]+\}/);
+        if (jsonMatch) {
+          const scores = JSON.parse(jsonMatch[0]);
+          accuracyScore = scores.accuracy || accuracyScore;
+          pronunciationScore = scores.pronunciation || pronunciationScore;
+          fluencyScore = scores.fluency || fluencyScore;
+          console.log('✅ Timer analysis scores:', scores);
+        }
+      } catch (error) {
+        console.warn('⚠️ Failed to get AI analysis, using default scores:', error);
+      }
+    }
+    
+    // Calculate average score for rating
+    const averageScore = Math.round((accuracyScore + pronunciationScore + fluencyScore) / 3);
+    
+    // Determine rating based on average
     let rating, ratingColor, ratingIcon;
-    if (completeness >= 80) {
+    if (averageScore >= 80) {
       rating = '훌륭해요!';
       ratingColor = 'text-green-600';
       ratingIcon = '🌟';
-    } else if (completeness >= 60) {
+    } else if (averageScore >= 60) {
       rating = '좋아요!';
       ratingColor = 'text-blue-600';
       ratingIcon = '👍';
-    } else if (completeness >= 40) {
+    } else if (averageScore >= 40) {
       rating = '괜찮아요';
       ratingColor = 'text-yellow-600';
       ratingIcon = '😊';
@@ -1326,8 +1381,66 @@ class WorVox {
                 <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-purple-200 mb-6 text-center">
                   <div class="text-6xl mb-4">${ratingIcon}</div>
                   <h2 class="text-3xl font-bold ${ratingColor} mb-2">${rating}</h2>
-                  <div class="text-5xl font-bold text-purple-600 mb-2">${completeness}%</div>
-                  <p class="text-gray-600">완성도</p>
+                  <div class="text-5xl font-bold text-purple-600 mb-2">${averageScore}점</div>
+                  <p class="text-gray-600">평균 점수</p>
+                </div>
+                
+                <!-- Score Breakdown -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+                  <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <i class="fas fa-chart-line text-purple-600"></i>
+                    상세 점수
+                  </h3>
+                  
+                  <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="text-center">
+                      <div class="text-gray-600 text-sm mb-2">정확성</div>
+                      <div class="relative w-20 h-20 mx-auto">
+                        <svg class="transform -rotate-90 w-20 h-20">
+                          <circle cx="40" cy="40" r="30" stroke="#e5e7eb" stroke-width="8" fill="none" />
+                          <circle cx="40" cy="40" r="30" stroke="#3b82f6" stroke-width="8" fill="none"
+                            stroke-dasharray="${2 * Math.PI * 30}" 
+                            stroke-dashoffset="${2 * Math.PI * 30 * (1 - accuracyScore / 100)}" 
+                            stroke-linecap="round" />
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                          <span class="text-lg font-bold text-blue-600">${accuracyScore}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="text-center">
+                      <div class="text-gray-600 text-sm mb-2">발음</div>
+                      <div class="relative w-20 h-20 mx-auto">
+                        <svg class="transform -rotate-90 w-20 h-20">
+                          <circle cx="40" cy="40" r="30" stroke="#e5e7eb" stroke-width="8" fill="none" />
+                          <circle cx="40" cy="40" r="30" stroke="#10b981" stroke-width="8" fill="none"
+                            stroke-dasharray="${2 * Math.PI * 30}" 
+                            stroke-dashoffset="${2 * Math.PI * 30 * (1 - pronunciationScore / 100)}" 
+                            stroke-linecap="round" />
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                          <span class="text-lg font-bold text-green-600">${pronunciationScore}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="text-center">
+                      <div class="text-gray-600 text-sm mb-2">유창성</div>
+                      <div class="relative w-20 h-20 mx-auto">
+                        <svg class="transform -rotate-90 w-20 h-20">
+                          <circle cx="40" cy="40" r="30" stroke="#e5e7eb" stroke-width="8" fill="none" />
+                          <circle cx="40" cy="40" r="30" stroke="#f59e0b" stroke-width="8" fill="none"
+                            stroke-dasharray="${2 * Math.PI * 30}" 
+                            stroke-dashoffset="${2 * Math.PI * 30 * (1 - fluencyScore / 100)}" 
+                            stroke-linecap="round" />
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                          <span class="text-lg font-bold text-yellow-600">${fluencyScore}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 
                 <!-- Details -->
@@ -1590,6 +1703,26 @@ class WorVox {
     // Increment usage
     this.incrementDailyUsage('scenarioMode');
     
+    // Shuffle sentences for randomization
+    const shuffledSentences = [...scenario.sentences];
+    const shuffledTranslations = [...(scenario.translations || [])];
+    
+    // Fisher-Yates shuffle algorithm
+    for (let i = shuffledSentences.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledSentences[i], shuffledSentences[j]] = [shuffledSentences[j], shuffledSentences[i]];
+      if (shuffledTranslations.length > 0) {
+        [shuffledTranslations[i], shuffledTranslations[j]] = [shuffledTranslations[j], shuffledTranslations[i]];
+      }
+    }
+    
+    // Create shuffled scenario
+    const shuffledScenario = {
+      ...scenario,
+      sentences: shuffledSentences,
+      translations: shuffledTranslations
+    };
+    
     // Create session for scenario mode
     try {
       const sessionResponse = await axios.post('/api/sessions/create', {
@@ -1598,9 +1731,9 @@ class WorVox {
         level: this.currentUser.level || 'intermediate'
       });
       
-      // Initialize scenario practice state
+      // Initialize scenario practice state with shuffled scenario
       this.currentScenarioPractice = {
-        scenario: scenario,
+        scenario: shuffledScenario,
         sessionId: sessionResponse.data.sessionId,
         currentSentenceIndex: 0,
         results: [],
@@ -1614,9 +1747,9 @@ class WorVox {
     } catch (error) {
       console.warn('⚠️ Failed to create scenario session:', error);
       
-      // Initialize without session
+      // Initialize without session with shuffled scenario
       this.currentScenarioPractice = {
-        scenario: scenario,
+        scenario: shuffledScenario,
         currentSentenceIndex: 0,
         results: [],
         isPlaying: false,
