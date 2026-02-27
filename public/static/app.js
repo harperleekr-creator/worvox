@@ -10338,15 +10338,17 @@ Proceed to payment?
                 </div>
               </div>
 
-              <!-- Charts Row -->
-              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <div class="bg-white rounded-lg shadow p-4">
-                  <h3 class="text-base font-semibold mb-3">플랜 분포</h3>
-                  <canvas id="plan-chart" height="120"></canvas>
+              <!-- Charts Row - Compact Size -->
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                <div class="bg-white rounded-lg shadow p-3">
+                  <h3 class="text-sm font-semibold mb-2">플랜 분포</h3>
+                  <div class="h-32">
+                    <canvas id="plan-chart" class="max-h-32"></canvas>
+                  </div>
                 </div>
-                <div class="bg-white rounded-lg shadow p-4">
-                  <h3 class="text-base font-semibold mb-3">최근 결제</h3>
-                  <div id="recent-payments" class="space-y-2 max-h-40 overflow-y-auto">
+                <div class="bg-white rounded-lg shadow p-3">
+                  <h3 class="text-sm font-semibold mb-2">최근 결제</h3>
+                  <div id="recent-payments" class="space-y-1 h-32 overflow-y-auto text-xs">
                     <!-- Payments will be loaded here -->
                   </div>
                 </div>
@@ -10470,16 +10472,24 @@ Proceed to payment?
         datasets: [{
           data: data,
           backgroundColor: colors,
-          borderWidth: 2,
+          borderWidth: 1,
           borderColor: '#fff'
         }]
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false,
+        maintainAspectRatio: true,
+        aspectRatio: 2,
         plugins: {
           legend: {
-            position: 'bottom'
+            position: 'right',
+            labels: {
+              boxWidth: 12,
+              font: {
+                size: 10
+              },
+              padding: 8
+            }
           }
         }
       }
@@ -10491,19 +10501,19 @@ Proceed to payment?
     if (!container) return;
 
     if (payments.length === 0) {
-      container.innerHTML = '<p class="text-gray-500 text-center py-4">결제 내역이 없습니다.</p>';
+      container.innerHTML = '<p class="text-gray-400 text-center py-2 text-xs">결제 내역이 없습니다.</p>';
       return;
     }
 
-    container.innerHTML = payments.map(payment => `
-      <div class="flex items-center justify-between py-2 border-b border-gray-100">
-        <div class="flex-1">
-          <p class="font-medium text-sm">${payment.username || payment.email}</p>
-          <p class="text-xs text-gray-500">${payment.plan_name}</p>
+    container.innerHTML = payments.slice(0, 5).map(payment => `
+      <div class="flex items-center justify-between py-1.5 border-b border-gray-100 last:border-0">
+        <div class="flex-1 min-w-0">
+          <p class="font-medium text-xs truncate">${payment.username || payment.email}</p>
+          <p class="text-xs text-gray-400">${payment.plan_name}</p>
         </div>
-        <div class="text-right">
-          <p class="font-semibold text-sm">₩${payment.amount.toLocaleString()}</p>
-          <p class="text-xs text-gray-500">${new Date(payment.confirmed_at).toLocaleDateString()}</p>
+        <div class="text-right ml-2">
+          <p class="font-semibold text-xs">₩${payment.amount.toLocaleString()}</p>
+          <p class="text-xs text-gray-400">${new Date(payment.confirmed_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}</p>
         </div>
       </div>
     `).join('');
