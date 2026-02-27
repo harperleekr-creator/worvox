@@ -333,6 +333,102 @@ admin.get('/activities', requireAuth, async (c) => {
   }
 })
 
+// Get individual user details with comprehensive information
+admin.get('/users/:id', requireAuth, async (c) => {
+  try {
+    const userId = c.req.param('id')
+    
+    console.log(`📊 Fetching details for user ID: ${userId}`)
+    
+    // Get user basic info
+    const user = await c.env.DB.prepare(`
+      SELECT * FROM users WHERE id = ?
+    `).bind(userId).first()
+
+    if (!user) {
+      return c.json({ error: '사용자를 찾을 수 없습니다' }, 404)
+    }
+
+    // Get sessions
+    const sessions = await c.env.DB.prepare(`
+      SELECT 
+        s.*,
+        t.name as topic_name,
+        COUNT(m.id) as message_count
+      FROM sessions s
+      LEFT JOIN topics t ON s.topic_id = t.id
+      LEFT JOIN messages m ON s.id = m.session_id
+      WHERE s.user_id = ?
+      GROUP BY s.id
+      ORDER BY s.started_at DESC
+      LIMIT 20
+    `).bind(userId).all()
+
+    // Get payments
+    const payments = await c.env.DB.prepare(`
+      SELECT * FROM payment_orders 
+      WHERE user_id = ? 
+      ORDER BY created_at DESC 
+      LIMIT 10
+    `).bind(userId).all()
+
+    // Get last payment
+    const lastPayment = await c.env.DB.prepare(`
+      SELECT * FROM payment_orders 
+      WHERE user_id = ? AND status = 'completed'
+      ORDER BY confirmed_at DESC 
+      LIMIT 1
+    `).bind(userId).first()
+
+    // Get login sessions (activity logs)
+    const loginSessions = await c.env.DB.prepare(`
+      SELECT * FROM activity_logs 
+      WHERE user_id = ? AND activity_type = 'login'
+      ORDER BY created_at DESC 
+      LIMIT 20
+    `).bind(userId).all()
+
+    // Get usage statistics by feature type
+    const usageStats = await c.env.DB.prepare(`
+      SELECT 
+        feature_type,
+        SUM(usage_count) as total_count
+      FROM usage_tracking
+      WHERE user_id = ?
+      GROUP BY feature_type
+    `).bind(userId).all()
+
+    // Build usage summary object
+    const usageSummary: Record<string, number> = {}
+    if (usageStats.results) {
+      for (const stat of usageStats.results) {
+        usageSummary[stat.feature_type as string] = stat.total_count as number
+      }
+    }
+
+    console.log(`✅ User details loaded: ${user.username}`)
+    console.log(`  - Sessions: ${sessions.results?.length || 0}`)
+    console.log(`  - Payments: ${payments.results?.length || 0}`)
+    console.log(`  - Usage stats: ${JSON.stringify(usageSummary)}`)
+
+    return c.json({
+      success: true,
+      user,
+      sessions: sessions.results || [],
+      payments: payments.results || [],
+      lastPayment: lastPayment || null,
+      loginSessions: loginSessions.results || [],
+      usageSummary
+    })
+  } catch (error) {
+    console.error('Admin get user detail error:', error)
+    return c.json({ 
+      error: '사용자 상세 정보 조회 실패',
+      details: (error as Error).message 
+    }, 500)
+  }
+})
+
 // Update user plan (admin action)
 admin.post('/users/:id/plan', requireAuth, async (c) => {
   try {

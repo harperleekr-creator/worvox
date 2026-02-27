@@ -10681,7 +10681,21 @@ Proceed to payment?
       });
 
       if (response.data.success) {
-        const { user, sessions, payments, loginSessions } = response.data;
+        const { user, sessions, payments, lastPayment, loginSessions, usageSummary } = response.data;
+        
+        // Format last payment date
+        const lastPaymentDate = lastPayment 
+          ? new Date(lastPayment.confirmed_at).toLocaleDateString('ko-KR') 
+          : '결제 없음';
+        
+        // Usage features with Korean names
+        const featureNames = {
+          aiConversations: 'AI 대화',
+          pronunciationPractice: '발음 연습',
+          wordSearch: '단어 검색',
+          timerMode: '타이머 모드',
+          scenarioMode: '시나리오 모드'
+        };
         
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto';
@@ -10696,48 +10710,88 @@ Proceed to payment?
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div>
-                <h4 class="font-semibold mb-2">기본 정보</h4>
-                <p><strong>이메일:</strong> ${user.email || '-'}</p>
-                <p><strong>레벨:</strong> ${user.level}</p>
-                <p><strong>플랜:</strong> ${this.getPlanBadge(user.plan || 'free')}</p>
-                <p><strong>가입일:</strong> ${new Date(user.created_at).toLocaleString()}</p>
+                <h4 class="font-semibold mb-3 text-lg border-b pb-2">📋 기본 정보</h4>
+                <div class="space-y-2 text-sm">
+                  <p><strong>이메일:</strong> ${user.email || '-'}</p>
+                  <p><strong>레벨:</strong> ${user.level}</p>
+                  <p><strong>플랜:</strong> ${this.getPlanBadge(user.plan || 'free')}</p>
+                  <p><strong>가입일:</strong> ${new Date(user.created_at).toLocaleString('ko-KR')}</p>
+                  <p><strong>마지막 로그인:</strong> ${user.last_login_at ? new Date(user.last_login_at).toLocaleString('ko-KR') : '-'}</p>
+                </div>
               </div>
               <div>
-                <h4 class="font-semibold mb-2">통계</h4>
-                <p><strong>총 세션:</strong> ${sessions.length}</p>
-                <p><strong>총 메시지:</strong> ${sessions.reduce((sum, s) => sum + (s.message_count || 0), 0)}</p>
-                <p><strong>결제 횟수:</strong> ${payments.filter(p => p.status === 'completed').length}</p>
-                <p><strong>로그인 횟수:</strong> ${loginSessions.length}</p>
+                <h4 class="font-semibold mb-3 text-lg border-b pb-2">💳 결제 정보</h4>
+                <div class="space-y-2 text-sm">
+                  <p><strong>현재 플랜:</strong> ${this.getPlanBadge(user.plan || 'free')}</p>
+                  <p><strong>결제 주기:</strong> ${user.billing_period === 'monthly' ? '월간' : user.billing_period === 'yearly' ? '연간' : '-'}</p>
+                  <p><strong>마지막 결제:</strong> ${lastPaymentDate}</p>
+                  <p><strong>총 결제 횟수:</strong> ${payments.filter(p => p.status === 'completed').length}회</p>
+                  <p><strong>총 결제 금액:</strong> ₩${payments.filter(p => p.status === 'completed').reduce((sum, p) => sum + p.amount, 0).toLocaleString()}</p>
+                </div>
               </div>
             </div>
 
             <div class="mb-6">
-              <h4 class="font-semibold mb-2">최근 세션 (최대 10개)</h4>
-              <div class="max-h-64 overflow-y-auto">
-                ${sessions.slice(0, 10).map(s => `
-                  <div class="border-b py-2">
-                    <p class="text-sm"><strong>${s.topic_name || 'Unknown'}</strong></p>
-                    <p class="text-xs text-gray-500">${new Date(s.started_at).toLocaleString()} - 메시지: ${s.message_count || 0}</p>
+              <h4 class="font-semibold mb-3 text-lg border-b pb-2">📊 기능 사용 통계</h4>
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                ${Object.entries(featureNames).map(([key, name]) => `
+                  <div class="bg-blue-50 rounded-lg p-3 text-center">
+                    <div class="text-2xl font-bold text-blue-600">${usageSummary[key] || 0}</div>
+                    <div class="text-xs text-gray-600 mt-1">${name}</div>
                   </div>
-                `).join('') || '<p class="text-gray-500">세션 없음</p>'}
+                `).join('')}
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <h4 class="font-semibold mb-3 text-lg border-b pb-2">📚 학습 통계</h4>
+                <div class="space-y-2 text-sm">
+                  <p><strong>총 세션:</strong> ${sessions.length}회</p>
+                  <p><strong>총 메시지:</strong> ${sessions.reduce((sum, s) => sum + (s.message_count || 0), 0)}개</p>
+                  <p><strong>로그인 횟수:</strong> ${loginSessions.length}회</p>
+                </div>
+              </div>
+              <div>
+                <h4 class="font-semibold mb-3 text-lg border-b pb-2">🎯 게임화 정보</h4>
+                <div class="space-y-2 text-sm">
+                  <p><strong>사용자 레벨:</strong> ${user.user_level || 1}</p>
+                  <p><strong>경험치 (XP):</strong> ${user.xp || 0}</p>
+                  <p><strong>총 경험치:</strong> ${user.total_xp || 0}</p>
+                  <p><strong>코인:</strong> ${user.coins || 0}</p>
+                  <p><strong>현재 연속:</strong> ${user.current_streak || 0}일</p>
+                  <p><strong>최장 연속:</strong> ${user.longest_streak || 0}일</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-6">
+              <h4 class="font-semibold mb-3 text-lg border-b pb-2">🕒 최근 세션 (최대 10개)</h4>
+              <div class="max-h-48 overflow-y-auto">
+                ${sessions.slice(0, 10).map(s => `
+                  <div class="border-b py-2 hover:bg-gray-50">
+                    <p class="text-sm font-medium">${s.topic_name || 'Unknown'}</p>
+                    <p class="text-xs text-gray-500">${new Date(s.started_at).toLocaleString('ko-KR')} - 메시지: ${s.message_count || 0}개</p>
+                  </div>
+                `).join('') || '<p class="text-gray-500 text-sm py-4 text-center">세션 없음</p>'}
               </div>
             </div>
 
             <div>
-              <h4 class="font-semibold mb-2">결제 내역</h4>
+              <h4 class="font-semibold mb-3 text-lg border-b pb-2">💰 결제 내역</h4>
               <div class="max-h-48 overflow-y-auto">
                 ${payments.map(p => `
-                  <div class="border-b py-2 flex justify-between">
+                  <div class="border-b py-2 flex justify-between hover:bg-gray-50">
                     <div>
                       <p class="text-sm font-medium">${p.plan_name}</p>
-                      <p class="text-xs text-gray-500">${new Date(p.created_at).toLocaleString()}</p>
+                      <p class="text-xs text-gray-500">${new Date(p.created_at).toLocaleString('ko-KR')}</p>
                     </div>
                     <div class="text-right">
                       <p class="text-sm font-semibold">₩${p.amount.toLocaleString()}</p>
                       <p class="text-xs ${p.status === 'completed' ? 'text-green-600' : p.status === 'failed' ? 'text-red-600' : 'text-yellow-600'}">${p.status}</p>
                     </div>
                   </div>
-                `).join('') || '<p class="text-gray-500">결제 없음</p>'}
+                `).join('') || '<p class="text-gray-500 text-sm py-4 text-center">결제 없음</p>'}
               </div>
             </div>
           </div>
@@ -10746,7 +10800,7 @@ Proceed to payment?
       }
     } catch (error) {
       console.error('View user detail error:', error);
-      alert('사용자 정보 로딩 실패: ' + (error.response?.data?.error || error.message));
+      alert('사용자 정보 로딩 실패: ' + (error.response?.data?.error || error.response?.data?.details || error.message));
     }
   }
 }
