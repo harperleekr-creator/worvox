@@ -7292,7 +7292,7 @@ Proceed to payment?
                 </div>
                 
                 <!-- Pricing Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-6 mb-8 pt-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-6 mb-8 pt-8">
                   
                   <!-- Free Plan -->
                   <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-gray-200 transition-all hover:shadow-2xl">
@@ -7330,9 +7330,9 @@ Proceed to payment?
                   </div>
 
                   <!-- Core Plan -->
-                  <div class="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-blue-200 transition-all hover:shadow-2xl transform hover:-translate-y-1 relative">
+                  <div class="bg-white rounded-2xl shadow-lg border-2 border-blue-200 transition-all hover:shadow-2xl transform hover:-translate-y-1 relative" style="overflow: visible;">
                     <!-- Free Trial Badge with animation -->
-                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                    <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 z-10">
                       <div class="relative">
                         <div class="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full blur opacity-75 animate-pulse"></div>
                         <div class="relative bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 md:px-5 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-bold shadow-lg whitespace-nowrap">
@@ -7343,7 +7343,7 @@ Proceed to payment?
                         </div>
                       </div>
                     </div>
-                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-6 text-center text-white pt-8 md:pt-10">
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-6 text-center text-white pt-10 rounded-t-2xl">
                       <div class="text-4xl mb-3">💙</div>
                       <h3 class="text-2xl font-bold mb-2">Core</h3>
                       <div class="mb-4">
@@ -7396,13 +7396,13 @@ Proceed to payment?
                   </div>
 
                   <!-- Premium Plan (Most Popular) -->
-                  <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border-2 border-purple-400 relative transition-all hover:shadow-2xl transform hover:-translate-y-2">
+                  <div class="bg-white rounded-2xl shadow-2xl border-2 border-purple-400 relative transition-all hover:shadow-2xl transform hover:-translate-y-2" style="overflow: visible;">
                     <!-- Popular Badge -->
                     <div class="absolute top-4 right-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs font-bold shadow-lg z-10 animate-pulse">
                       🔥 POPULAR
                     </div>
                     <!-- Free Trial Badge with animation -->
-                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                    <div class="absolute -top-5 left-1/2 transform -translate-x-1/2 z-10">
                       <div class="relative">
                         <div class="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full blur opacity-75 animate-pulse"></div>
                         <div class="relative bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 md:px-5 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-bold shadow-lg whitespace-nowrap">
@@ -7413,7 +7413,7 @@ Proceed to payment?
                         </div>
                       </div>
                     </div>
-                    <div class="bg-gradient-to-br from-purple-500 to-pink-500 p-6 text-center text-white pt-8 md:pt-10">
+                    <div class="bg-gradient-to-br from-purple-500 to-pink-500 p-6 text-center text-white pt-10 rounded-t-2xl">
                       <div class="text-4xl mb-3">✨</div>
                       <h3 class="text-2xl font-bold mb-2">Premium</h3>
                       <div class="mb-4">
