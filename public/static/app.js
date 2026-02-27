@@ -10340,13 +10340,13 @@ Proceed to payment?
 
               <!-- Charts Row -->
               <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                <div class="bg-white rounded-lg shadow p-6">
-                  <h3 class="text-lg font-semibold mb-4">플랜 분포</h3>
-                  <canvas id="plan-chart" height="200"></canvas>
+                <div class="bg-white rounded-lg shadow p-4">
+                  <h3 class="text-base font-semibold mb-3">플랜 분포</h3>
+                  <canvas id="plan-chart" height="120"></canvas>
                 </div>
-                <div class="bg-white rounded-lg shadow p-6">
-                  <h3 class="text-lg font-semibold mb-4">최근 결제</h3>
-                  <div id="recent-payments" class="space-y-2 max-h-64 overflow-y-auto">
+                <div class="bg-white rounded-lg shadow p-4">
+                  <h3 class="text-base font-semibold mb-3">최근 결제</h3>
+                  <div id="recent-payments" class="space-y-2 max-h-40 overflow-y-auto">
                     <!-- Payments will be loaded here -->
                   </div>
                 </div>
