@@ -3887,16 +3887,64 @@ Proceed to payment?
     app.innerHTML = `
       <div class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl flex flex-col lg:flex-row overflow-hidden">
-          <!-- Left Side: Login Form -->
-          <div class="w-full lg:w-1/2 p-8">
+          <!-- Mobile: Introduction at Top -->
+          <div class="lg:hidden w-full bg-gradient-to-br from-indigo-600 to-purple-700 p-6 text-white">
+            <div class="space-y-4">
+              <div class="text-center">
+                <h2 class="text-2xl font-bold mb-2 leading-snug">AI와 함께하는 영어 학습의 새로운 시작</h2>
+                <p class="text-indigo-100 text-sm">WorVox는 인공지능 기술을 활용한 혁신적인 영어 학습 플랫폼입니다</p>
+              </div>
+              
+              <div class="grid grid-cols-2 gap-3">
+                <div class="flex items-center gap-2">
+                  <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
+                    🎯
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-xs">AI 실시간 대화</h3>
+                  </div>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                  <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
+                    ⏱️
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-xs">타이머 챌린지</h3>
+                  </div>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                  <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
+                    🎭
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-xs">시나리오 모드</h3>
+                  </div>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                  <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
+                    📊
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-xs">분석 리포트</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Login Form -->
+          <div class="w-full lg:w-1/2 p-6 lg:p-8">
             <!-- Header -->
-            <div class="text-center mb-6">
-              <h1 class="text-3xl font-bold gradient-text mb-2">WorVox</h1>
+            <div class="text-center mb-4 lg:mb-6">
+              <h1 class="text-2xl lg:text-3xl font-bold gradient-text mb-2">WorVox</h1>
               <p class="text-gray-600 text-sm">Step ${this.onboardingStep} of 3</p>
             </div>
 
             <!-- Progress Bar -->
-            <div class="w-full bg-gray-200 rounded-full h-2 mb-8">
+            <div class="w-full bg-gray-200 rounded-full h-2 mb-6 lg:mb-8">
               <div class="bg-gradient-to-r from-indigo-600 to-purple-600 h-2 rounded-full transition-all duration-300" 
                    style="width: ${progress}%"></div>
             </div>
@@ -3905,7 +3953,7 @@ Proceed to payment?
             ${steps[this.onboardingStep - 1]}
           </div>
           
-          <!-- Right Side: Introduction -->
+          <!-- Desktop: Introduction on Right -->
           <div class="hidden lg:flex w-full lg:w-1/2 bg-gradient-to-br from-indigo-600 to-purple-700 p-12 flex-col justify-center text-white">
             <div class="space-y-8">
               <div>
@@ -3925,7 +3973,7 @@ Proceed to payment?
                 </div>
                 
                 <div class="flex items-start gap-4">
-                  <div class="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center text-2xl">
+                  <div class="flex-shrink-0 w-8 h-12 bg-white/20 rounded-lg flex items-center justify-center text-2xl">
                     ⏱️
                   </div>
                   <div>
