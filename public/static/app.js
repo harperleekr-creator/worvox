@@ -2575,6 +2575,738 @@ class WorVox {
   }
 
 
+  // ==================== EXAM MODE ====================
+  
+  showExamMode() {
+    // Check if core or premium user
+    if (!this.isCoreOrPremiumUser()) {
+      alert('📝 시험 모드는 Core/Premium 전용 기능입니다!\n\n지금 업그레이드하고 실전 스피킹 테스트를 경험하세요.');
+      this.showPlan();
+      return;
+    }
+
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex h-screen bg-gradient-to-br from-orange-50 to-red-50">
+        ${this.getSidebar('exam-mode')}
+        
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- Mobile & Desktop Header with Back Button -->
+          <div class="bg-white border-b border-orange-200 px-4 md:px-6 py-3">
+            <div class="flex items-center gap-2 md:gap-4">
+              <button onclick="worvox.showTopicSelection()" 
+                class="text-gray-600 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 transition-all">
+                <i class="fas fa-arrow-left text-xl"></i>
+              </button>
+              <div class="flex-1">
+                <h1 class="text-lg md:text-2xl font-bold text-gray-800">
+                  <i class="fas fa-clipboard-check mr-2 text-orange-600"></i>시험 모드
+                </h1>
+                <p class="hidden md:block text-gray-600 text-sm mt-1">OPIC 스타일 실전 스피킹 테스트</p>
+              </div>
+              <span class="bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-bold">
+                PREMIUM
+              </span>
+            </div>
+          </div>
+          
+          <!-- Content Area -->
+          <div class="flex-1 overflow-y-auto">
+            <div class="p-4 md:p-8">
+              <div class="max-w-4xl mx-auto">
+                <!-- Intro Card -->
+                <div class="bg-white rounded-2xl p-6 md:p-8 shadow-lg border-2 border-orange-200 mb-6">
+                  <div class="text-center mb-6">
+                    <div class="text-6xl mb-4">📝</div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-3">시험 모드</h2>
+                    <p class="text-gray-600 text-lg">OPIC 스타일 5문항 스피킹 테스트</p>
+                  </div>
+                  
+                  <div class="bg-orange-50 rounded-xl p-6 mb-6">
+                    <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                      <i class="fas fa-info-circle text-orange-600"></i>
+                      시험 구성
+                    </h3>
+                    <ul class="space-y-2 text-gray-700">
+                      <li class="flex items-start gap-2">
+                        <i class="fas fa-check text-orange-600 mt-1"></i>
+                        <span><strong>총 5문항</strong> - 난이도가 점진적으로 증가</span>
+                      </li>
+                      <li class="flex items-start gap-2">
+                        <i class="fas fa-check text-orange-600 mt-1"></i>
+                        <span><strong>문제 1-2:</strong> 간단한 질문 (자기소개, 일상)</span>
+                      </li>
+                      <li class="flex items-start gap-2">
+                        <i class="fas fa-check text-orange-600 mt-1"></i>
+                        <span><strong>문제 3-4:</strong> 중급 난이도 (경험, 의견)</span>
+                      </li>
+                      <li class="flex items-start gap-2">
+                        <i class="fas fa-check text-orange-600 mt-1"></i>
+                        <span><strong>문제 5:</strong> 고급 롤플레잉 상황 연습</span>
+                      </li>
+                      <li class="flex items-start gap-2">
+                        <i class="fas fa-check text-orange-600 mt-1"></i>
+                        <span>각 문제별 <strong>정확도, 발음, 유창성</strong> 평가</span>
+                      </li>
+                      <li class="flex items-start gap-2">
+                        <i class="fas fa-check text-orange-600 mt-1"></i>
+                        <span>시험 종료 후 <strong>OPIC 등급</strong> 예상 결과 제공</span>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <div class="bg-gradient-to-r from-orange-100 to-red-100 rounded-xl p-6">
+                    <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                      <i class="fas fa-clock text-orange-600"></i>
+                      답변 시간 선택
+                    </h3>
+                    <p class="text-gray-700 mb-4">각 문제당 답변 시간을 선택하세요</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <button onclick="worvox.startExamTest(5)" 
+                        class="bg-white hover:bg-orange-50 border-2 border-orange-300 hover:border-orange-500 rounded-xl p-6 transition-all text-center group">
+                        <div class="text-4xl mb-2 group-hover:scale-110 transition-transform">⚡</div>
+                        <div class="text-2xl font-bold text-orange-600 mb-1">5초</div>
+                        <div class="text-sm text-gray-600">빠른 반응</div>
+                      </button>
+                      
+                      <button onclick="worvox.startExamTest(10)" 
+                        class="bg-white hover:bg-orange-50 border-2 border-orange-300 hover:border-orange-500 rounded-xl p-6 transition-all text-center group">
+                        <div class="text-4xl mb-2 group-hover:scale-110 transition-transform">🎯</div>
+                        <div class="text-2xl font-bold text-orange-600 mb-1">10초</div>
+                        <div class="text-sm text-gray-600">권장</div>
+                      </button>
+                      
+                      <button onclick="worvox.startExamTest(30)" 
+                        class="bg-white hover:bg-orange-50 border-2 border-orange-300 hover:border-orange-500 rounded-xl p-6 transition-all text-center group">
+                        <div class="text-4xl mb-2 group-hover:scale-110 transition-transform">💭</div>
+                        <div class="text-2xl font-bold text-orange-600 mb-1">30초</div>
+                        <div class="text-sm text-gray-600">충분한 시간</div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              ${this.getFooter()}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  async startExamTest(seconds) {
+    // Create exam questions (5 questions with increasing difficulty)
+    const examQuestions = [
+      // Question 1: Easy (자기소개)
+      {
+        id: 1,
+        difficulty: 'easy',
+        question: "Let's start with some background information about yourself. Please tell me about your name, where you're from, and what you do.",
+        questionKR: "당신의 배경에 대해 말해주세요. 이름, 출신, 그리고 하는 일에 대해 이야기해주세요.",
+        timeLimit: seconds
+      },
+      // Question 2: Easy (일상)
+      {
+        id: 2,
+        difficulty: 'easy',
+        question: "Tell me about your typical day. What time do you usually wake up and what do you do during the day?",
+        questionKR: "평소 하루 일과에 대해 말해주세요. 보통 몇 시에 일어나고 하루 동안 무엇을 하나요?",
+        timeLimit: seconds
+      },
+      // Question 3: Medium (경험)
+      {
+        id: 3,
+        difficulty: 'medium',
+        question: "Can you describe a memorable experience or event that happened in your life? What made it special and how did it affect you?",
+        questionKR: "인생에서 기억에 남는 경험이나 사건을 설명해주세요. 무엇이 특별했고 당신에게 어떤 영향을 주었나요?",
+        timeLimit: seconds
+      },
+      // Question 4: Medium (의견)
+      {
+        id: 4,
+        difficulty: 'medium',
+        question: "What is your opinion about working from home versus working in an office? What are the advantages and disadvantages of each?",
+        questionKR: "재택근무와 사무실 근무에 대한 의견은 무엇인가요? 각각의 장단점은 무엇인가요?",
+        timeLimit: seconds
+      },
+      // Question 5: Hard (롤플레잉)
+      {
+        id: 5,
+        difficulty: 'hard',
+        question: "I'm calling to make a reservation at your restaurant for this Saturday evening. I need a table for four people at 7 PM. Also, one of my guests has a food allergy to seafood. Could you accommodate this? And could you recommend some popular dishes from your menu?",
+        questionKR: "레스토랑에 이번 주 토요일 저녁 예약을 하려고 전화했습니다. 오후 7시에 4명을 위한 테이블이 필요합니다. 또한 손님 중 한 명이 해산물 알레르기가 있습니다. 수용 가능한가요? 그리고 메뉴에서 인기 있는 요리를 추천해 주시겠어요?",
+        timeLimit: seconds * 3  // Roleplay gets 3x time
+      }
+    ];
+
+    // Initialize exam state
+    this.currentExam = {
+      questions: examQuestions,
+      currentQuestionIndex: 0,
+      answers: [],
+      responseTimeLimit: seconds,
+      sessionId: null,
+      isQuestionRevealed: false
+    };
+
+    // Track exam mode usage
+    try {
+      this.incrementDailyUsage('exam_mode');
+    } catch (error) {
+      console.warn('⚠️ Failed to track usage:', error);
+    }
+
+    // Create session for exam mode
+    try {
+      const sessionResponse = await axios.post('/api/sessions/create', {
+        userId: this.currentUser.id,
+        topicId: 997, // Special ID for exam mode
+        level: this.currentUser.level || 'intermediate'
+      });
+      this.currentExam.sessionId = sessionResponse.data.sessionId;
+      console.log('✅ Exam session created:', this.currentExam.sessionId);
+    } catch (error) {
+      console.warn('⚠️ Failed to create exam session:', error);
+    }
+
+    // Show first question
+    this.showExamQuestion();
+  }
+
+  showExamQuestion() {
+    const { questions, currentQuestionIndex } = this.currentExam;
+    const question = questions[currentQuestionIndex];
+    const progress = Math.round(((currentQuestionIndex) / questions.length) * 100);
+
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex h-screen bg-gradient-to-br from-orange-900 via-red-900 to-pink-900">
+        <div class="flex-1 flex flex-col items-center justify-center p-4">
+          <!-- Back Button -->
+          <button onclick="if(confirm('시험을 중단하시겠습니까?')) worvox.showExamMode()" 
+            class="absolute top-4 left-4 md:top-6 md:left-6 text-white/70 hover:text-white transition-all p-2 hover:bg-white/10 rounded-lg">
+            <i class="fas fa-arrow-left text-xl mr-2"></i><span class="hidden md:inline">나가기</span>
+          </button>
+          
+          <!-- Progress -->
+          <div class="absolute top-4 right-4 md:top-6 md:right-6 text-white">
+            <div class="text-sm opacity-70 mb-1">문제</div>
+            <div class="text-2xl font-bold">${currentQuestionIndex + 1}/5</div>
+          </div>
+          
+          <!-- Question Card -->
+          <div class="bg-white rounded-2xl p-8 md:p-12 shadow-2xl max-w-4xl w-full mb-8 relative">
+            <!-- Blur Overlay (removed when start button is clicked) -->
+            <div id="questionBlur" class="absolute inset-0 backdrop-blur-md bg-white/50 rounded-2xl flex items-center justify-center z-10">
+              <button id="startQuestionBtn" onclick="worvox.revealExamQuestion()" 
+                class="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-12 py-6 rounded-xl text-2xl font-bold shadow-2xl transform hover:scale-105 transition-all">
+                <i class="fas fa-play mr-3"></i>시작하기
+              </button>
+            </div>
+            
+            <div class="text-center mb-6">
+              <div class="inline-block bg-orange-100 text-orange-800 px-4 py-2 rounded-full text-sm font-bold mb-4">
+                ${question.difficulty === 'easy' ? '⭐ 쉬움' : question.difficulty === 'medium' ? '⭐⭐ 보통' : '⭐⭐⭐ 어려움'}
+              </div>
+              <div class="text-lg text-gray-600 mb-4">Question ${question.id}</div>
+            </div>
+            
+            <div id="questionContent">
+              <p class="text-2xl md:text-3xl text-gray-900 leading-relaxed text-center font-medium mb-4">
+                ${question.question}
+              </p>
+              <p class="text-base text-gray-600 text-center italic">
+                ${question.questionKR}
+              </p>
+            </div>
+            
+            <!-- Timer (hidden initially) -->
+            <div id="examTimer" class="hidden mt-8">
+              <div class="text-center">
+                <div class="text-6xl font-bold text-orange-600 mb-2" id="examCountdown">${question.timeLimit}</div>
+                <div class="text-gray-600">남은 시간</div>
+              </div>
+            </div>
+            
+            <!-- Recording Status (hidden initially) -->
+            <div id="examRecordingStatus" class="hidden mt-6 text-center">
+              <div class="inline-flex items-center gap-3 bg-red-500 text-white px-6 py-3 rounded-full animate-pulse">
+                <div class="w-3 h-3 bg-white rounded-full animate-ping"></div>
+                <span class="font-bold">녹음 중...</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Instruction Text (hidden initially) -->
+          <div id="instructionText" class="hidden text-white text-center">
+            <p class="text-lg font-medium">답변을 말해주세요</p>
+            <p class="text-sm text-white/70 mt-2">타이머가 끝나면 자동으로 다음 문제로 넘어갑니다</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  async revealExamQuestion() {
+    const { questions, currentQuestionIndex } = this.currentExam;
+    const question = questions[currentQuestionIndex];
+
+    // Remove blur
+    const blurEl = document.getElementById('questionBlur');
+    if (blurEl) {
+      blurEl.remove();
+    }
+
+    this.currentExam.isQuestionRevealed = true;
+
+    // Read question with TTS
+    try {
+      const response = await axios.post('/api/tts', {
+        text: question.question,
+        languageCode: 'en-US'
+      });
+
+      if (response.data.audioUrl) {
+        const audio = new Audio(response.data.audioUrl);
+        
+        // Start countdown after audio finishes
+        audio.onended = () => {
+          this.startExamCountdown();
+        };
+        
+        audio.play();
+        
+        // Show "listening" status
+        const instructionEl = document.getElementById('instructionText');
+        if (instructionEl) {
+          instructionEl.classList.remove('hidden');
+          instructionEl.innerHTML = `
+            <p class="text-lg font-medium">🔊 문제를 듣고 있습니다...</p>
+            <p class="text-sm text-white/70 mt-2">잠시만 기다려주세요</p>
+          `;
+        }
+      } else {
+        // If TTS fails, start countdown immediately
+        this.startExamCountdown();
+      }
+    } catch (error) {
+      console.error('TTS error:', error);
+      // Start countdown even if TTS fails
+      this.startExamCountdown();
+    }
+  }
+
+  async startExamCountdown() {
+    const { questions, currentQuestionIndex } = this.currentExam;
+    const question = questions[currentQuestionIndex];
+
+    // Show timer
+    const timerEl = document.getElementById('examTimer');
+    const instructionEl = document.getElementById('instructionText');
+    const recordingStatusEl = document.getElementById('examRecordingStatus');
+    
+    if (timerEl) timerEl.classList.remove('hidden');
+    if (recordingStatusEl) recordingStatusEl.classList.remove('hidden');
+    if (instructionEl) {
+      instructionEl.classList.remove('hidden');
+      instructionEl.innerHTML = `
+        <p class="text-lg font-medium">답변을 말해주세요</p>
+        <p class="text-sm text-white/70 mt-2">타이머가 끝나면 자동으로 다음 문제로 넘어갑니다</p>
+      `;
+    }
+
+    // Start recording
+    await this.startExamRecording();
+
+    // Countdown
+    let timeLeft = question.timeLimit;
+    const countdownEl = document.getElementById('examCountdown');
+
+    const interval = setInterval(() => {
+      timeLeft--;
+      if (countdownEl) {
+        countdownEl.textContent = timeLeft;
+        
+        // Change color when time is running out
+        if (timeLeft <= 3) {
+          countdownEl.classList.add('text-red-600');
+        }
+      }
+
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        this.stopExamRecording();
+      }
+    }, 1000);
+  }
+
+  async startExamRecording() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.examMediaRecorder = new MediaRecorder(stream);
+      this.examAudioChunks = [];
+
+      this.examMediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          this.examAudioChunks.push(event.data);
+        }
+      };
+
+      this.examMediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(this.examAudioChunks, { type: 'audio/webm' });
+        await this.processExamAnswer(audioBlob);
+      };
+
+      this.examMediaRecorder.start();
+      console.log('✅ Exam recording started');
+    } catch (error) {
+      console.error('Failed to start exam recording:', error);
+      alert('마이크 접근 권한이 필요합니다.');
+    }
+  }
+
+  stopExamRecording() {
+    if (this.examMediaRecorder && this.examMediaRecorder.state === 'recording') {
+      this.examMediaRecorder.stop();
+      this.examMediaRecorder.stream.getTracks().forEach(track => track.stop());
+      console.log('✅ Exam recording stopped');
+    }
+  }
+
+  async processExamAnswer(audioBlob) {
+    const { questions, currentQuestionIndex } = this.currentExam;
+    const question = questions[currentQuestionIndex];
+
+    // Show processing message
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex h-screen bg-gradient-to-br from-orange-50 to-red-50 items-center justify-center">
+        <div class="text-center">
+          <i class="fas fa-spinner fa-spin text-6xl text-orange-600 mb-4"></i>
+          <p class="text-xl font-bold text-gray-800">답변 분석 중...</p>
+          <p class="text-gray-600 mt-2">잠시만 기다려주세요</p>
+        </div>
+      </div>
+    `;
+
+    try {
+      // Upload audio and get transcription
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'answer.webm');
+
+      const uploadResponse = await axios.post('/api/voice-upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      const audioUrl = uploadResponse.data.url;
+      const transcription = uploadResponse.data.transcription || '';
+
+      // Get AI analysis
+      let accuracy = 70, pronunciation = 70, fluency = 70;
+      
+      if (this.currentExam.sessionId && transcription) {
+        try {
+          const analysisResponse = await axios.post('/api/chat', {
+            sessionId: this.currentExam.sessionId,
+            message: `Exam Question Analysis:\n\nQuestion: "${question.question}"\nUser Answer: "${transcription}"\n\nPlease provide scores (0-100) for:\n1. Accuracy: How well the answer addresses the question\n2. Pronunciation: Estimated pronunciation quality based on transcription\n3. Fluency: Fluency and naturalness\n\nRespond ONLY in JSON format: {"accuracy": <score>, "pronunciation": <score>, "fluency": <score>}`,
+            useGPT4: false
+          });
+
+          const aiText = analysisResponse.data.response;
+          const jsonMatch = aiText.match(/\{[^}]+\}/);
+          if (jsonMatch) {
+            const scores = JSON.parse(jsonMatch[0]);
+            accuracy = scores.accuracy || accuracy;
+            pronunciation = scores.pronunciation || pronunciation;
+            fluency = scores.fluency || fluency;
+          }
+        } catch (error) {
+          console.warn('⚠️ Failed to get AI analysis:', error);
+        }
+      }
+
+      // Save answer
+      this.currentExam.answers.push({
+        questionId: question.id,
+        question: question.question,
+        questionKR: question.questionKR,
+        transcription: transcription,
+        audioUrl: audioUrl,
+        accuracy: accuracy,
+        pronunciation: pronunciation,
+        fluency: fluency,
+        averageScore: Math.round((accuracy + pronunciation + fluency) / 3)
+      });
+
+      // Save to session messages
+      if (this.currentExam.sessionId) {
+        try {
+          await axios.post('/api/messages/create', {
+            sessionId: this.currentExam.sessionId,
+            role: 'system',
+            content: `Exam Q${question.id}: ${question.question}`
+          });
+
+          await axios.post('/api/messages/create', {
+            sessionId: this.currentExam.sessionId,
+            role: 'user',
+            content: transcription || '(인식되지 않음)'
+          });
+        } catch (error) {
+          console.warn('⚠️ Failed to save messages:', error);
+        }
+      }
+
+      // Move to next question or show results
+      this.currentExam.currentQuestionIndex++;
+
+      if (this.currentExam.currentQuestionIndex < questions.length) {
+        // Show next question
+        this.currentExam.isQuestionRevealed = false;
+        this.showExamQuestion();
+      } else {
+        // End session and show results
+        if (this.currentExam.sessionId) {
+          try {
+            await axios.post(`/api/sessions/end/${this.currentExam.sessionId}`);
+            console.log('✅ Exam session ended');
+          } catch (error) {
+            console.warn('⚠️ Failed to end session:', error);
+          }
+        }
+        this.showExamResults();
+      }
+    } catch (error) {
+      console.error('Failed to process exam answer:', error);
+      alert('답변 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+      this.showExamMode();
+    }
+  }
+
+  async playExamAudio(audioUrl) {
+    if (this.currentAudio) {
+      this.currentAudio.pause();
+    }
+
+    this.currentAudio = new Audio(audioUrl);
+    
+    try {
+      await this.currentAudio.play();
+    } catch (error) {
+      console.error('Failed to play audio:', error);
+    }
+  }
+
+  showExamResults() {
+    const { answers } = this.currentExam;
+
+    // Calculate average scores
+    const totalAccuracy = answers.reduce((sum, a) => sum + a.accuracy, 0);
+    const totalPronunciation = answers.reduce((sum, a) => sum + a.pronunciation, 0);
+    const totalFluency = answers.reduce((sum, a) => sum + a.fluency, 0);
+
+    const avgAccuracy = Math.round(totalAccuracy / answers.length);
+    const avgPronunciation = Math.round(totalPronunciation / answers.length);
+    const avgFluency = Math.round(totalFluency / answers.length);
+    const overallAverage = Math.round((avgAccuracy + avgPronunciation + avgFluency) / 3);
+
+    // Determine OPIC level
+    let opicLevel = 'Novice Low';
+    let opicColor = 'text-gray-600';
+    let opicBg = 'bg-gray-100';
+    let opicDescription = '기초적인 표현이 가능한 수준';
+
+    if (overallAverage >= 90) {
+      opicLevel = 'Advanced Low';
+      opicColor = 'text-purple-600';
+      opicBg = 'bg-purple-100';
+      opicDescription = '복잡한 상황에서도 효과적으로 의사소통 가능';
+    } else if (overallAverage >= 80) {
+      opicLevel = 'Intermediate High';
+      opicColor = 'text-blue-600';
+      opicBg = 'bg-blue-100';
+      opicDescription = '다양한 주제에 대해 유창하게 대화 가능';
+    } else if (overallAverage >= 70) {
+      opicLevel = 'Intermediate Mid';
+      opicColor = 'text-green-600';
+      opicBg = 'bg-green-100';
+      opicDescription = '일상적인 주제에 대해 자신있게 대화 가능';
+    } else if (overallAverage >= 60) {
+      opicLevel = 'Intermediate Low';
+      opicColor = 'text-yellow-600';
+      opicBg = 'bg-yellow-100';
+      opicDescription = '익숙한 주제에 대해 간단한 대화 가능';
+    } else if (overallAverage >= 50) {
+      opicLevel = 'Novice High';
+      opicColor = 'text-orange-600';
+      opicBg = 'bg-orange-100';
+      opicDescription = '기본적인 정보 교환 가능';
+    }
+
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex h-screen bg-gradient-to-br from-orange-50 to-red-50">
+        ${this.getSidebar('exam-mode')}
+        
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- Header -->
+          <div class="bg-white border-b border-orange-200 px-4 md:px-6 py-3">
+            <h2 class="text-lg font-semibold text-gray-800">
+              <i class="fas fa-chart-bar mr-2 text-orange-600"></i>시험 결과
+            </h2>
+          </div>
+          
+          <!-- Content -->
+          <div class="flex-1 overflow-y-auto">
+            <div class="p-4 md:p-8">
+              <div class="max-w-4xl mx-auto">
+                <!-- Overall Result Card -->
+                <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-orange-200 mb-6">
+                  <div class="text-center mb-6">
+                    <div class="text-6xl mb-4">🎓</div>
+                    <h2 class="text-3xl font-bold text-gray-900 mb-3">시험 완료!</h2>
+                    <div class="text-5xl font-bold text-orange-600 mb-2">${overallAverage}점</div>
+                    <p class="text-gray-600 mb-4">평균 점수</p>
+                    
+                    <!-- OPIC Level -->
+                    <div class="inline-block ${opicBg} ${opicColor} px-6 py-3 rounded-xl font-bold text-xl mb-2">
+                      ${opicLevel}
+                    </div>
+                    <p class="text-gray-600">${opicDescription}</p>
+                  </div>
+                  
+                  <!-- Average Scores -->
+                  <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="text-center">
+                      <div class="text-gray-600 text-sm mb-2">평균 정확도</div>
+                      <div class="relative w-20 h-20 mx-auto">
+                        <svg class="transform -rotate-90 w-20 h-20">
+                          <circle cx="40" cy="40" r="30" stroke="#e5e7eb" stroke-width="8" fill="none" />
+                          <circle cx="40" cy="40" r="30" stroke="#3b82f6" stroke-width="8" fill="none"
+                            stroke-dasharray="${2 * Math.PI * 30}" 
+                            stroke-dashoffset="${2 * Math.PI * 30 * (1 - avgAccuracy / 100)}" 
+                            stroke-linecap="round" />
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                          <span class="text-lg font-bold text-blue-600">${avgAccuracy}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="text-center">
+                      <div class="text-gray-600 text-sm mb-2">평균 발음</div>
+                      <div class="relative w-20 h-20 mx-auto">
+                        <svg class="transform -rotate-90 w-20 h-20">
+                          <circle cx="40" cy="40" r="30" stroke="#e5e7eb" stroke-width="8" fill="none" />
+                          <circle cx="40" cy="40" r="30" stroke="#10b981" stroke-width="8" fill="none"
+                            stroke-dasharray="${2 * Math.PI * 30}" 
+                            stroke-dashoffset="${2 * Math.PI * 30 * (1 - avgPronunciation / 100)}" 
+                            stroke-linecap="round" />
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                          <span class="text-lg font-bold text-green-600">${avgPronunciation}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="text-center">
+                      <div class="text-gray-600 text-sm mb-2">평균 유창성</div>
+                      <div class="relative w-20 h-20 mx-auto">
+                        <svg class="transform -rotate-90 w-20 h-20">
+                          <circle cx="40" cy="40" r="30" stroke="#e5e7eb" stroke-width="8" fill="none" />
+                          <circle cx="40" cy="40" r="30" stroke="#f59e0b" stroke-width="8" fill="none"
+                            stroke-dasharray="${2 * Math.PI * 30}" 
+                            stroke-dashoffset="${2 * Math.PI * 30 * (1 - avgFluency / 100)}" 
+                            stroke-linecap="round" />
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                          <span class="text-lg font-bold text-orange-600">${avgFluency}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Detailed Results by Question -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+                  <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <i class="fas fa-list-check text-orange-600"></i>
+                    문제별 결과
+                  </h3>
+                  
+                  <div class="space-y-4">
+                    ${answers.map((answer, index) => `
+                      <div class="border border-gray-200 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-3">
+                          <span class="text-sm font-semibold text-gray-700">문제 ${answer.questionId}</span>
+                          <div class="flex gap-2">
+                            <span class="text-xs font-medium px-2 py-1 rounded ${
+                              answer.accuracy >= 80 ? 'bg-green-100 text-green-700' :
+                              answer.accuracy >= 60 ? 'bg-blue-100 text-blue-700' :
+                              answer.accuracy >= 40 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+                            }">정확도 ${answer.accuracy}</span>
+                            <span class="text-xs font-medium px-2 py-1 rounded ${
+                              answer.pronunciation >= 80 ? 'bg-green-100 text-green-700' :
+                              answer.pronunciation >= 60 ? 'bg-blue-100 text-blue-700' :
+                              answer.pronunciation >= 40 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+                            }">발음 ${answer.pronunciation}</span>
+                            <span class="text-xs font-medium px-2 py-1 rounded ${
+                              answer.fluency >= 80 ? 'bg-green-100 text-green-700' :
+                              answer.fluency >= 60 ? 'bg-blue-100 text-blue-700' :
+                              answer.fluency >= 40 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+                            }">유창성 ${answer.fluency}</span>
+                          </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                          <div class="flex items-center justify-between mb-1">
+                            <div class="text-xs text-gray-600">질문</div>
+                          </div>
+                          <div class="bg-gray-50 rounded p-2 text-sm text-gray-900 mb-1">${answer.question}</div>
+                          <div class="text-xs text-gray-500 italic">${answer.questionKR}</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                          <div class="flex items-center justify-between mb-1">
+                            <div class="text-xs text-gray-600">당신의 답변</div>
+                            ${answer.audioUrl ? `
+                              <button onclick="worvox.playExamAudio('${answer.audioUrl}')" 
+                                class="text-purple-600 hover:text-purple-800 text-xs px-2 py-1 rounded hover:bg-purple-50 transition-all">
+                                <i class="fas fa-play mr-1"></i>다시 듣기
+                              </button>
+                            ` : ''}
+                          </div>
+                          <div class="bg-blue-50 rounded p-2 text-sm text-gray-900">${answer.transcription || '(인식되지 않음)'}</div>
+                        </div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="grid md:grid-cols-2 gap-4">
+                  <button onclick="worvox.showExamMode()" 
+                    class="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-xl p-4 font-bold transition-all">
+                    <i class="fas fa-redo mr-2"></i>다시 시험보기
+                  </button>
+                  <button onclick="worvox.showTopicSelection()" 
+                    class="bg-white hover:bg-gray-50 border-2 border-orange-200 text-orange-600 rounded-xl p-4 font-bold transition-all">
+                    <i class="fas fa-home mr-2"></i>홈으로
+                  </button>
+                </div>
+              </div>
+              
+              ${this.getFooter()}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+
   showRealConversation() {
     const app = document.getElementById('app');
     app.innerHTML = `
@@ -4066,6 +4798,24 @@ Proceed to payment?
                     <div class="flex items-center justify-between">
                       <span class="text-sm text-blue-600 font-medium">시작하기 →</span>
                       <span class="text-xs bg-blue-100 px-2 py-1 rounded">Core+</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Exam Mode Card (Core/Premium Feature) -->
+                  <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-6 shadow-sm border-2 border-orange-200 hover:shadow-lg hover:border-orange-400 transition-all cursor-pointer relative"
+                    onclick="worvox.showExamMode()">
+                    <div class="absolute top-3 right-3 flex gap-1">
+                      <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-bold">CORE</span>
+                      <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-bold">PREMIUM</span>
+                    </div>
+                    <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-4">
+                      <span class="text-2xl">📝</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">시험 모드</h3>
+                    <p class="text-gray-600 mb-4">OPIC 스타일 5문항 실전 스피킹 테스트</p>
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm text-orange-600 font-medium">시작하기 →</span>
+                      <span class="text-xs bg-orange-100 px-2 py-1 rounded">Core+</span>
                     </div>
                   </div>
                 </div>
