@@ -28,6 +28,17 @@ sessions.post('/create', async (c) => {
 
     const sessionId = result.meta.last_row_id;
 
+    // Record attendance for today (auto-ignore if already recorded)
+    try {
+      await c.env.DB.prepare(`
+        INSERT OR IGNORE INTO attendance (user_id, attendance_date)
+        VALUES (?, DATE('now', '+9 hours'))
+      `).bind(userId).run();
+    } catch (err) {
+      // Don't fail session creation if attendance recording fails
+      console.error('Failed to record attendance:', err);
+    }
+
     return c.json({
       sessionId,
       topic: topicResult,

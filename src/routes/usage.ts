@@ -94,4 +94,61 @@ app.post('/:userId', async (c) => {
   }
 });
 
+// Get user's attendance dates (dates when they used any feature)
+app.get('/users/:userId/attendance', async (c) => {
+  try {
+    const userId = c.req.param('userId');
+    const year = c.req.query('year') || new Date().getFullYear().toString();
+    const month = c.req.query('month') || (new Date().getMonth() + 1).toString();
+    
+    // Try to get from new attendance table first
+    const attendanceResult = await c.env.DB.prepare(`
+      SELECT attendance_date
+      FROM attendance
+      WHERE user_id = ?
+      ORDER BY attendance_date DESC
+    `).bind(userId).all();
+
+    let attendanceDates = attendanceResult.results?.map((row: any) => row.attendance_date) || [];
+    
+    // Fallback to usage_tracking if attendance table is empty
+    if (attendanceDates.length === 0) {
+      const usageResult = await c.env.DB.prepare(`
+        SELECT DISTINCT usage_date as attendance_date
+        FROM usage_tracking
+        WHERE user_id = ?
+        ORDER BY usage_date DESC
+      `).bind(userId).all();
+      
+      attendanceDates = usageResult.results?.map((row: any) => row.attendance_date) || [];
+    }
+
+    // Get total attendance count
+    const totalResult = await c.env.DB.prepare(`
+      SELECT COUNT(*) as total
+      FROM attendance
+      WHERE user_id = ?
+    `).bind(userId).first();
+
+    // Calculate current streak (simple version: days attended in last 30 days)
+    const streakResult = await c.env.DB.prepare(`
+      SELECT COUNT(DISTINCT attendance_date) as streak
+      FROM attendance
+      WHERE user_id = ?
+        AND attendance_date >= DATE('now', '+9 hours', '-30 days')
+        AND attendance_date <= DATE('now', '+9 hours')
+    `).bind(userId).first();
+
+    return c.json({ 
+      success: true, 
+      attendanceDates,
+      total: (totalResult as any)?.total || 0,
+      currentStreak: (streakResult as any)?.streak || 0,
+    });
+  } catch (error) {
+    console.error('Error getting attendance:', error);
+    return c.json({ success: false, error: 'Failed to get attendance', attendanceDates: [] }, 500);
+  }
+});
+
 export default app;

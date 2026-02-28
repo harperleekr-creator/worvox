@@ -10519,6 +10519,19 @@ Proceed to payment?
                 </div>
                 `}
 
+                <!-- Attendance Calendar -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                  <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-calendar-check text-emerald-600 mr-2"></i>출석 현황
+                  </h3>
+                  <div id="attendanceCalendar">
+                    <div class="text-center py-8">
+                      <i class="fas fa-spinner fa-spin text-3xl text-gray-400 mb-2"></i>
+                      <p class="text-sm text-gray-500">출석 현황을 불러오는 중...</p>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- Subscription Info -->
                 ${this.currentUser.plan && this.currentUser.plan !== 'free' ? `
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
@@ -10684,6 +10697,164 @@ Proceed to payment?
         </div>
       </div>
     `;
+    
+    // Load attendance calendar
+    this.loadAttendanceCalendar();
+  }
+
+  // Load and render attendance calendar
+  async loadAttendanceCalendar() {
+    try {
+      // Get attendance data from usage tracking
+      const response = await axios.get(`/api/usage/users/${this.currentUser.id}/attendance`);
+      const attendanceDates = response.data.attendanceDates || [];
+      const total = response.data.total || 0;
+      const currentStreak = response.data.currentStreak || 0;
+      
+      this.renderAttendanceCalendar(attendanceDates, total, currentStreak);
+    } catch (error) {
+      console.error('Failed to load attendance:', error);
+      // Render empty calendar on error
+      this.renderAttendanceCalendar([], 0, 0);
+    }
+  }
+
+  // Render attendance calendar
+  renderAttendanceCalendar(attendanceDates, totalDays = 0, currentStreak = 0) {
+    const container = document.getElementById('attendanceCalendar');
+    if (!container) return;
+
+    // Get current date
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth();
+
+    // Get first and last day of current month
+    const firstDay = new Date(currentYear, currentMonth, 1);
+    const lastDay = new Date(currentYear, currentMonth + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay(); // 0 = Sunday
+
+    // Convert attendance dates to Set for quick lookup
+    const attendanceSet = new Set(attendanceDates.map(date => {
+      const d = new Date(date);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }));
+
+    // Calculate attendance rate
+    const attendanceCount = Array.from(attendanceSet).filter(dateStr => {
+      const [year, month] = dateStr.split('-').map(Number);
+      return year === currentYear && month === currentMonth + 1;
+    }).length;
+    const attendanceRate = daysInMonth > 0 ? Math.round((attendanceCount / daysInMonth) * 100) : 0;
+
+    // Days of week labels
+    const dayLabels = ['일', '월', '화', '수', '목', '금', '토'];
+
+    // Build calendar HTML
+    let calendarHTML = `
+      <div class="mb-4">
+        <div class="flex items-center justify-between mb-4">
+          <h4 class="text-lg font-semibold text-gray-900">
+            ${currentYear}년 ${currentMonth + 1}월
+          </h4>
+          <div class="flex items-center gap-2">
+            <span class="text-sm text-gray-600">출석률</span>
+            <span class="text-lg font-bold text-emerald-600">${attendanceRate}%</span>
+          </div>
+        </div>
+        
+        <!-- Day Labels -->
+        <div class="grid grid-cols-7 gap-2 mb-2">
+          ${dayLabels.map((day, idx) => `
+            <div class="text-center text-sm font-medium ${idx === 0 ? 'text-red-500' : idx === 6 ? 'text-blue-500' : 'text-gray-600'}">
+              ${day}
+            </div>
+          `).join('')}
+        </div>
+        
+        <!-- Calendar Days -->
+        <div class="grid grid-cols-7 gap-2">
+    `;
+
+    // Add empty cells for days before month starts
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      calendarHTML += '<div class="aspect-square"></div>';
+    }
+
+    // Add days of month
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const isAttended = attendanceSet.has(dateStr);
+      const isToday = day === today.getDate();
+      const isPast = new Date(currentYear, currentMonth, day) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const isFuture = new Date(currentYear, currentMonth, day) > today;
+
+      let dayClass = 'aspect-square flex items-center justify-center rounded-lg text-sm font-medium transition-all ';
+      
+      if (isToday && isAttended) {
+        dayClass += 'bg-gradient-to-br from-emerald-500 to-green-600 text-white ring-2 ring-emerald-300 ring-offset-2';
+      } else if (isToday) {
+        dayClass += 'bg-gray-200 text-gray-700 ring-2 ring-gray-300 ring-offset-2';
+      } else if (isAttended) {
+        dayClass += 'bg-emerald-100 text-emerald-700 border-2 border-emerald-500';
+      } else if (isFuture) {
+        dayClass += 'bg-gray-50 text-gray-400';
+      } else if (isPast) {
+        dayClass += 'bg-red-50 text-red-300';
+      } else {
+        dayClass += 'bg-gray-100 text-gray-500';
+      }
+
+      calendarHTML += `
+        <div class="${dayClass}" title="${isAttended ? '출석' : '미출석'}">
+          ${day}
+        </div>
+      `;
+    }
+
+    calendarHTML += `
+        </div>
+      </div>
+      
+      <!-- Legend -->
+      <div class="flex flex-wrap items-center justify-center gap-4 pt-4 border-t border-gray-200">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 bg-emerald-100 border-2 border-emerald-500 rounded"></div>
+          <span class="text-xs text-gray-600">출석</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 bg-red-50 rounded"></div>
+          <span class="text-xs text-gray-600">미출석 (지나간 날)</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 bg-gray-50 rounded"></div>
+          <span class="text-xs text-gray-600">아직 오지 않은 날</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 bg-gradient-to-br from-emerald-500 to-green-600 rounded ring-2 ring-emerald-300"></div>
+          <span class="text-xs text-gray-600">오늘 (출석)</span>
+        </div>
+      </div>
+      
+      <!-- Attendance Stats -->
+      <div class="mt-4 grid grid-cols-3 gap-3">
+        <div class="p-3 bg-emerald-50 rounded-lg text-center">
+          <div class="text-xs text-gray-600 mb-1">이번 달</div>
+          <div class="text-xl font-bold text-emerald-600">${attendanceCount}일</div>
+        </div>
+        <div class="p-3 bg-blue-50 rounded-lg text-center">
+          <div class="text-xs text-gray-600 mb-1">총 출석</div>
+          <div class="text-xl font-bold text-blue-600">${totalDays}일</div>
+        </div>
+        <div class="p-3 bg-purple-50 rounded-lg text-center">
+          <div class="text-xs text-gray-600 mb-1">연속 출석</div>
+          <div class="text-xl font-bold text-purple-600">${currentStreak}일</div>
+        </div>
+      </div>
+    `;
+
+    container.innerHTML = calendarHTML;
   }
 
   // Update user profile
