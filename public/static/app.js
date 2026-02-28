@@ -2861,40 +2861,95 @@ class WorVox {
 
     this.currentExam.isQuestionRevealed = true;
 
+    // Show "listening" status immediately
+    const instructionEl = document.getElementById('instructionText');
+    if (instructionEl) {
+      instructionEl.classList.remove('hidden');
+      instructionEl.innerHTML = `
+        <p class="text-lg font-medium">🔊 문제를 듣고 있습니다...</p>
+        <p class="text-sm text-white/70 mt-2">잠시만 기다려주세요</p>
+      `;
+    }
+
     // Read question with TTS
     try {
-      const response = await axios.post('/api/tts', {
-        text: question.question,
-        languageCode: 'en-US'
+      console.log('🎤 Requesting TTS for question:', question.question);
+      
+      const response = await axios.post('/api/tts/speak', {
+        text: question.question
+      }, {
+        responseType: 'blob'
       });
 
-      if (response.data.audioUrl) {
-        const audio = new Audio(response.data.audioUrl);
+      console.log('✅ TTS response received');
+
+      if (response.data) {
+        // Create audio URL from blob
+        const audioBlob = response.data;
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+        
+        // Add error handler
+        audio.onerror = (error) => {
+          console.error('❌ Audio playback error:', error);
+          if (instructionEl) {
+            instructionEl.innerHTML = `
+              <p class="text-lg font-medium text-yellow-300">⚠️ 음성 재생 실패</p>
+              <p class="text-sm text-white/70 mt-2">3초 후 타이머가 시작됩니다</p>
+            `;
+          }
+          setTimeout(() => {
+            this.startExamCountdown();
+          }, 3000);
+        };
         
         // Start countdown after audio finishes
         audio.onended = () => {
+          console.log('✅ TTS playback finished');
+          URL.revokeObjectURL(audioUrl); // Clean up
           this.startExamCountdown();
         };
         
-        audio.play();
-        
-        // Show "listening" status
-        const instructionEl = document.getElementById('instructionText');
-        if (instructionEl) {
-          instructionEl.classList.remove('hidden');
-          instructionEl.innerHTML = `
-            <p class="text-lg font-medium">🔊 문제를 듣고 있습니다...</p>
-            <p class="text-sm text-white/70 mt-2">잠시만 기다려주세요</p>
-          `;
+        // Start playing
+        try {
+          await audio.play();
+          console.log('🔊 TTS audio is playing...');
+        } catch (playError) {
+          console.error('❌ Failed to play audio:', playError);
+          URL.revokeObjectURL(audioUrl); // Clean up
+          if (instructionEl) {
+            instructionEl.innerHTML = `
+              <p class="text-lg font-medium text-yellow-300">⚠️ 음성 재생 실패</p>
+              <p class="text-sm text-white/70 mt-2">3초 후 타이머가 시작됩니다</p>
+            `;
+          }
+          setTimeout(() => {
+            this.startExamCountdown();
+          }, 3000);
         }
       } else {
-        // If TTS fails, start countdown immediately
-        this.startExamCountdown();
+        console.warn('⚠️ No audio data in TTS response');
+        if (instructionEl) {
+          instructionEl.innerHTML = `
+            <p class="text-lg font-medium text-yellow-300">⚠️ TTS 응답 없음</p>
+            <p class="text-sm text-white/70 mt-2">3초 후 타이머가 시작됩니다</p>
+          `;
+        }
+        setTimeout(() => {
+          this.startExamCountdown();
+        }, 3000);
       }
     } catch (error) {
-      console.error('TTS error:', error);
-      // Start countdown even if TTS fails
-      this.startExamCountdown();
+      console.error('❌ TTS request error:', error);
+      if (instructionEl) {
+        instructionEl.innerHTML = `
+          <p class="text-lg font-medium text-yellow-300">⚠️ TTS 요청 실패</p>
+          <p class="text-sm text-white/70 mt-2">3초 후 타이머가 시작됩니다</p>
+        `;
+      }
+      setTimeout(() => {
+        this.startExamCountdown();
+      }, 3000);
     }
   }
 
