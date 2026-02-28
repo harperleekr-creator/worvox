@@ -3067,7 +3067,7 @@ Proceed to payment?
           <div class="hidden lg:flex w-full lg:w-1/2 bg-gradient-to-br from-indigo-600 to-purple-700 p-12 flex-col justify-center text-white">
             <div class="space-y-8">
               <div>
-                <h2 class="text-4xl font-bold mb-4">AI와 함께하는<br/>영어 학습의 새로운 시작</h2>
+                <h2 class="text-4xl font-bold mb-4">AI와 함께하는 영어 학습의 새로운 시작</h2>
                 <p class="text-indigo-100 text-lg">WorVox는 인공지능 기술을 활용한 혁신적인 영어 학습 플랫폼입니다</p>
               </div>
               
@@ -3088,7 +3088,7 @@ Proceed to payment?
                   </div>
                   <div>
                     <h3 class="font-semibold text-lg mb-1">타이머 챌린지</h3>
-                    <p class="text-indigo-100 text-sm">제한 시간 안에 문장을 정확하게 발음하는 스피드 훈련</p>
+                    <p class="text-indigo-100 text-sm">제한 시간 안에 문장을 말하는 스피드 훈련</p>
                   </div>
                 </div>
                 
@@ -3108,7 +3108,7 @@ Proceed to payment?
                   </div>
                   <div>
                     <h3 class="font-semibold text-lg mb-1">상세한 분석 리포트</h3>
-                    <p class="text-indigo-100 text-sm">문법, 어휘, 유창성을 분석하여 개인 맞춤 피드백 제공</p>
+                    <p class="text-indigo-100 text-sm">문법, 어휘, 유창성을 분석한 개인 맞춤 피드백 제공</p>
                   </div>
                 </div>
               </div>
