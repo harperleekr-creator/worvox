@@ -3827,21 +3827,22 @@ Proceed to payment?
                   <!-- Free Plan: Progress Bars with Limits -->
                   <div class="space-y-4">
                     <!-- AI Conversation Usage -->
-                    <div>
+                    <button onclick="worvox.showAIConversation()" class="w-full text-left hover:bg-blue-50 rounded-lg p-3 transition-all cursor-pointer">
                       <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center gap-2">
                           <i class="fas fa-comment text-blue-600"></i>
                           <span class="text-sm text-gray-700">AI 대화</span>
+                          <i class="fas fa-arrow-right text-xs text-gray-400"></i>
                         </div>
                         <span class="text-sm font-medium text-gray-900" data-usage-count="ai_conversation">${this.getDailyUsage('ai_conversation')}/${this.usageLimits.free.aiConversations}회</span>
                       </div>
                       <div class="w-full bg-gray-200 rounded-full h-2">
                         <div class="bg-blue-600 h-2 rounded-full transition-all" data-usage-bar="ai_conversation" style="width: ${(this.getDailyUsage('ai_conversation') / this.usageLimits.free.aiConversations) * 100}%"></div>
                       </div>
-                    </div>
+                    </button>
                     
                     <!-- Timer Mode Usage (Free: 0) -->
-                    <div>
+                    <button onclick="worvox.showTimerMode()" class="w-full text-left hover:bg-purple-50 rounded-lg p-3 transition-all cursor-pointer opacity-60">
                       <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center gap-2">
                           <i class="fas fa-stopwatch text-purple-600"></i>
@@ -3850,10 +3851,10 @@ Proceed to payment?
                         </div>
                         <span class="text-sm font-medium text-gray-400">이용 불가</span>
                       </div>
-                    </div>
+                    </button>
                     
                     <!-- Scenario Mode Usage (Free: 0) -->
-                    <div>
+                    <button onclick="worvox.showScenarioMode()" class="w-full text-left hover:bg-indigo-50 rounded-lg p-3 transition-all cursor-pointer opacity-60">
                       <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center gap-2">
                           <i class="fas fa-film text-indigo-600"></i>
@@ -3862,7 +3863,7 @@ Proceed to payment?
                         </div>
                         <span class="text-sm font-medium text-gray-400">이용 불가</span>
                       </div>
-                    </div>
+                    </button>
                     
                     <!-- Word Search Usage -->
                     <div>
@@ -3882,42 +3883,45 @@ Proceed to payment?
                   <!-- Core Plan: Mixed (Unlimited + Limited) -->
                   <div class="space-y-3">
                     <!-- AI Conversation Usage (Unlimited) -->
-                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                    <button onclick="worvox.showAIConversation()" class="w-full flex items-center justify-between p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-all cursor-pointer">
                       <div class="flex items-center gap-3">
                         <i class="fas fa-comment text-blue-600 text-lg"></i>
                         <span class="text-sm font-medium text-gray-700">AI 대화</span>
                         <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">무제한</span>
+                        <i class="fas fa-arrow-right text-xs text-gray-400"></i>
                       </div>
                       <span class="text-lg font-bold text-blue-600" data-usage-count="ai_conversation">${this.getDailyUsage('ai_conversation')}회</span>
-                    </div>
+                    </button>
                     
                     <!-- Timer Mode Usage (Limited: 30) -->
-                    <div class="p-3 bg-purple-50 rounded-lg">
+                    <button onclick="worvox.showTimerMode()" class="w-full p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-all cursor-pointer text-left">
                       <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center gap-3">
                           <i class="fas fa-stopwatch text-purple-600 text-lg"></i>
                           <span class="text-sm font-medium text-gray-700">타이머 모드</span>
+                          <i class="fas fa-arrow-right text-xs text-gray-400"></i>
                         </div>
                         <span class="text-sm font-medium text-gray-900" data-usage-count="timer_mode">${this.getDailyUsage('timer_mode')}/${this.usageLimits.core.timerMode}회</span>
                       </div>
                       <div class="w-full bg-purple-200 rounded-full h-2">
                         <div class="bg-purple-600 h-2 rounded-full transition-all" data-usage-bar="timer_mode" style="width: ${(this.getDailyUsage('timer_mode') / this.usageLimits.core.timerMode) * 100}%"></div>
                       </div>
-                    </div>
+                    </button>
                     
                     <!-- Scenario Mode Usage (Limited: 30) -->
-                    <div class="p-3 bg-indigo-50 rounded-lg">
+                    <button onclick="worvox.showScenarioMode()" class="w-full p-3 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-all cursor-pointer text-left">
                       <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center gap-3">
                           <i class="fas fa-film text-indigo-600 text-lg"></i>
                           <span class="text-sm font-medium text-gray-700">시나리오 모드</span>
+                          <i class="fas fa-arrow-right text-xs text-gray-400"></i>
                         </div>
                         <span class="text-sm font-medium text-gray-900" data-usage-count="scenario_mode">${this.getDailyUsage('scenario_mode')}/${this.usageLimits.core.scenarioMode}회</span>
                       </div>
                       <div class="w-full bg-indigo-200 rounded-full h-2">
                         <div class="bg-indigo-600 h-2 rounded-full transition-all" data-usage-bar="scenario_mode" style="width: ${(this.getDailyUsage('scenario_mode') / this.usageLimits.core.scenarioMode) * 100}%"></div>
                       </div>
-                    </div>
+                    </button>
                     
                     <!-- Word Search Usage (Unlimited) -->
                     <div class="flex items-center justify-between p-3 bg-emerald-50 rounded-lg">
@@ -3933,34 +3937,37 @@ Proceed to payment?
                   <!-- Premium Plan: Count Only (All Unlimited) -->
                   <div class="space-y-3">
                     <!-- AI Conversation Usage -->
-                    <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                    <button onclick="worvox.showAIConversation()" class="w-full flex items-center justify-between p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-all cursor-pointer">
                       <div class="flex items-center gap-3">
                         <i class="fas fa-comment text-blue-600 text-lg"></i>
                         <span class="text-sm font-medium text-gray-700">AI 대화</span>
                         <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">무제한</span>
+                        <i class="fas fa-arrow-right text-xs text-gray-400"></i>
                       </div>
                       <span class="text-lg font-bold text-blue-600" data-usage-count="ai_conversation">${this.getDailyUsage('ai_conversation')}회</span>
-                    </div>
+                    </button>
                     
                     <!-- Timer Mode Usage -->
-                    <div class="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                    <button onclick="worvox.showTimerMode()" class="w-full flex items-center justify-between p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-all cursor-pointer">
                       <div class="flex items-center gap-3">
                         <i class="fas fa-stopwatch text-purple-600 text-lg"></i>
                         <span class="text-sm font-medium text-gray-700">타이머 모드</span>
                         <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">무제한</span>
+                        <i class="fas fa-arrow-right text-xs text-gray-400"></i>
                       </div>
                       <span class="text-lg font-bold text-purple-600" data-usage-count="timer_mode">${this.getDailyUsage('timer_mode')}회</span>
-                    </div>
+                    </button>
                     
                     <!-- Scenario Mode Usage -->
-                    <div class="flex items-center justify-between p-3 bg-indigo-50 rounded-lg">
+                    <button onclick="worvox.showScenarioMode()" class="w-full flex items-center justify-between p-3 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-all cursor-pointer">
                       <div class="flex items-center gap-3">
                         <i class="fas fa-film text-indigo-600 text-lg"></i>
                         <span class="text-sm font-medium text-gray-700">시나리오 모드</span>
                         <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">무제한</span>
+                        <i class="fas fa-arrow-right text-xs text-gray-400"></i>
                       </div>
                       <span class="text-lg font-bold text-indigo-600" data-usage-count="scenario_mode">${this.getDailyUsage('scenario_mode')}회</span>
-                    </div>
+                    </button>
                     
                     <!-- Word Search Usage -->
                     <div class="flex items-center justify-between p-3 bg-emerald-50 rounded-lg">
