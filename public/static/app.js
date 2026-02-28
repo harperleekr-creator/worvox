@@ -2697,48 +2697,103 @@ class WorVox {
   }
 
   async startExamTest(seconds) {
-    // Create exam questions (5 questions with increasing difficulty)
+    // Question pool (50 questions total)
+    const allQuestions = {
+      easy: [
+        { question: "Let's start with some background information about yourself. Please tell me about your name, where you're from, and what you do.", questionKR: "당신의 배경에 대해 말해주세요. 이름, 출신, 그리고 하는 일에 대해 이야기해주세요." },
+        { question: "Tell me about your typical day. What time do you usually wake up and what do you do during the day?", questionKR: "평소 하루 일과에 대해 말해주세요. 보통 몇 시에 일어나고 하루 동안 무엇을 하나요?" },
+        { question: "What are your hobbies? How often do you do them and why do you enjoy them?", questionKR: "취미가 무엇인가요? 얼마나 자주 하며 왜 즐기시나요?" },
+        { question: "Describe your family. How many people are in your family and what do they do?", questionKR: "가족에 대해 설명해주세요. 가족은 몇 명이며 무엇을 하나요?" },
+        { question: "What kind of music do you like? Who is your favorite artist or band?", questionKR: "어떤 음악을 좋아하나요? 가장 좋아하는 아티스트나 밴드는 누구인가요?" },
+        { question: "Tell me about your favorite food. What is it and why do you like it?", questionKR: "가장 좋아하는 음식에 대해 말해주세요. 무엇이며 왜 좋아하나요?" },
+        { question: "What do you usually do on weekends? Do you prefer staying at home or going out?", questionKR: "주말에 보통 무엇을 하나요? 집에 있는 것과 외출하는 것 중 어느 것을 선호하나요?" },
+        { question: "Describe your bedroom or living space. What does it look like?", questionKR: "당신의 침실이나 생활 공간을 설명해주세요. 어떻게 생겼나요?" },
+        { question: "What is your favorite season and why do you like it?", questionKR: "가장 좋아하는 계절은 무엇이며 왜 좋아하나요?" },
+        { question: "Tell me about your best friend. How did you meet and what do you like about them?", questionKR: "가장 친한 친구에 대해 말해주세요. 어떻게 만났고 무엇이 좋나요?" },
+        { question: "What kind of movies or TV shows do you enjoy watching?", questionKR: "어떤 종류의 영화나 TV 프로그램을 즐겨보나요?" },
+        { question: "Describe your neighborhood. What is it like and what facilities are nearby?", questionKR: "당신의 동네를 설명해주세요. 어떤 곳이며 근처에 어떤 시설이 있나요?" },
+        { question: "What do you usually eat for breakfast? Do you cook it yourself or buy it?", questionKR: "아침으로 보통 무엇을 먹나요? 직접 요리하나요 아니면 사나요?" },
+        { question: "Tell me about your favorite color and why you like it.", questionKR: "가장 좋아하는 색깔과 그 이유를 말해주세요." },
+        { question: "What kind of weather do you prefer? Do you like hot or cold weather?", questionKR: "어떤 날씨를 선호하나요? 더운 날씨와 추운 날씨 중 어느 것을 좋아하나요?" },
+        { question: "Describe your daily commute. How do you get to work or school?", questionKR: "일상적인 통근에 대해 설명해주세요. 직장이나 학교에 어떻게 가나요?" },
+        { question: "What sports or physical activities do you enjoy? How often do you exercise?", questionKR: "어떤 스포츠나 신체 활동을 즐기나요? 얼마나 자주 운동하나요?" },
+        { question: "Tell me about your favorite place in your city. What makes it special?", questionKR: "도시에서 가장 좋아하는 장소에 대해 말해주세요. 무엇이 특별한가요?" },
+        { question: "What do you like to do when you have free time during the week?", questionKR: "주중에 여가 시간이 있을 때 무엇을 하고 싶으신가요?" },
+        { question: "Describe your morning routine. What do you do first after waking up?", questionKR: "아침 루틴을 설명해주세요. 일어나서 가장 먼저 무엇을 하나요?" }
+      ],
+      medium: [
+        { question: "Can you describe a memorable experience or event that happened in your life? What made it special and how did it affect you?", questionKR: "인생에서 기억에 남는 경험이나 사건을 설명해주세요. 무엇이 특별했고 당신에게 어떤 영향을 주었나요?" },
+        { question: "What is your opinion about working from home versus working in an office? What are the advantages and disadvantages of each?", questionKR: "재택근무와 사무실 근무에 대한 의견은 무엇인가요? 각각의 장단점은 무엇인가요?" },
+        { question: "Tell me about a time when you faced a difficult challenge. How did you overcome it and what did you learn?", questionKR: "어려운 도전에 직면했던 때를 말해주세요. 어떻게 극복했고 무엇을 배웠나요?" },
+        { question: "Do you think social media has a positive or negative impact on society? Explain your reasoning.", questionKR: "소셜 미디어가 사회에 긍정적 또는 부정적 영향을 미친다고 생각하나요? 이유를 설명해주세요." },
+        { question: "Describe your ideal vacation. Where would you go and what would you do there?", questionKR: "이상적인 휴가를 설명해주세요. 어디로 가고 싶으며 그곳에서 무엇을 하고 싶나요?" },
+        { question: "What are the most important qualities in a good friend? Give examples from your own experience.", questionKR: "좋은 친구의 가장 중요한 자질은 무엇인가요? 자신의 경험에서 예를 들어주세요." },
+        { question: "How has technology changed the way people communicate? Is this change positive or negative?", questionKR: "기술이 사람들의 의사소통 방식을 어떻게 변화시켰나요? 이 변화는 긍정적인가요 부정적인가요?" },
+        { question: "Tell me about a goal you set for yourself. Did you achieve it? Why or why not?", questionKR: "스스로 세운 목표에 대해 말해주세요. 달성했나요? 왜 그랬거나 그렇지 않았나요?" },
+        { question: "What do you think is the biggest problem facing young people today? How can it be solved?", questionKR: "오늘날 젊은이들이 직면한 가장 큰 문제는 무엇이라고 생각하나요? 어떻게 해결할 수 있을까요?" },
+        { question: "Describe a book or movie that had a strong impact on you. Why was it so meaningful?", questionKR: "강한 영향을 준 책이나 영화를 설명해주세요. 왜 그렇게 의미가 있었나요?" },
+        { question: "What are the benefits and drawbacks of living in a big city compared to a small town?", questionKR: "작은 마을에 비해 대도시에 사는 것의 장단점은 무엇인가요?" },
+        { question: "How do you usually make important decisions? What factors do you consider?", questionKR: "중요한 결정을 내릴 때 보통 어떻게 하나요? 어떤 요소를 고려하나요?" },
+        { question: "Tell me about a skill you would like to learn. Why is it important to you?", questionKR: "배우고 싶은 기술에 대해 말해주세요. 왜 그것이 중요한가요?" },
+        { question: "What role does family play in your culture? How has this changed over generations?", questionKR: "당신의 문화에서 가족은 어떤 역할을 하나요? 세대를 거치며 어떻게 변화했나요?" },
+        { question: "Describe a time when you had to adapt to a new situation. How did you handle it?", questionKR: "새로운 상황에 적응해야 했던 때를 설명해주세요. 어떻게 처리했나요?" },
+        { question: "What do you think makes a person successful? Is it talent, hard work, or luck?", questionKR: "사람을 성공하게 만드는 것은 무엇이라고 생각하나요? 재능, 노력, 아니면 운인가요?" },
+        { question: "How has your education influenced your career choices? Would you change anything if you could?", questionKR: "교육이 경력 선택에 어떤 영향을 주었나요? 할 수 있다면 무엇을 바꾸고 싶나요?" },
+        { question: "What are the advantages and disadvantages of studying abroad?", questionKR: "해외 유학의 장단점은 무엇인가요?" },
+        { question: "Tell me about a tradition or custom from your culture that you value. Why is it important?", questionKR: "당신이 소중히 여기는 문화의 전통이나 관습에 대해 말해주세요. 왜 중요한가요?" },
+        { question: "How do you balance work and personal life? What strategies do you use?", questionKR: "일과 개인 생활의 균형을 어떻게 맞추나요? 어떤 전략을 사용하나요?" }
+      ],
+      hard: [
+        { question: "I'm calling to make a reservation at your restaurant for this Saturday evening. I need a table for four people at 7 PM. Also, one of my guests has a food allergy to seafood. Could you accommodate this? And could you recommend some popular dishes from your menu?", questionKR: "레스토랑에 이번 주 토요일 저녁 예약을 하려고 전화했습니다. 오후 7시에 4명을 위한 테이블이 필요합니다. 또한 손님 중 한 명이 해산물 알레르기가 있습니다. 수용 가능한가요? 그리고 메뉴에서 인기 있는 요리를 추천해 주시겠어요?" },
+        { question: "You're at a hotel and there's a problem with your room - the air conditioning doesn't work and it's very hot. Call the front desk to explain the situation and ask for a solution. Be polite but firm about needing this resolved quickly.", questionKR: "호텔에 있는데 방에 문제가 있습니다. 에어컨이 작동하지 않고 매우 덥습니다. 프론트 데스크에 전화하여 상황을 설명하고 해결책을 요청하세요. 예의바르되 빨리 해결해야 한다는 점을 단호하게 말하세요." },
+        { question: "Imagine you're interviewing for your dream job. The interviewer asks: 'Why should we hire you over other qualified candidates? What unique value do you bring to our company?' Answer this question convincingly.", questionKR: "꿈의 직장 면접을 본다고 상상해보세요. 면접관이 묻습니다: '다른 자격을 갖춘 후보자들보다 왜 당신을 채용해야 하나요? 우리 회사에 어떤 독특한 가치를 가져다줄 수 있나요?' 이 질문에 설득력 있게 답하세요." },
+        { question: "You purchased an expensive electronic device online, but it arrived damaged. Call customer service to explain the problem, express your frustration, and negotiate a solution - either a full refund or a replacement with expedited shipping.", questionKR: "온라인에서 비싼 전자기기를 구매했는데 파손된 상태로 도착했습니다. 고객 서비스에 전화하여 문제를 설명하고, 불만을 표현하며, 해결책을 협상하세요. 전액 환불이나 빠른 배송으로 교체를 요청하세요." },
+        { question: "You're organizing a surprise birthday party for your friend. Call several people to invite them and coordinate: What should everyone bring? When should they arrive? How can you keep it a secret? Make sure everyone understands the plan.", questionKR: "친구를 위한 깜짝 생일 파티를 준비하고 있습니다. 여러 사람에게 전화하여 초대하고 조율하세요: 각자 무엇을 가져와야 하나요? 언제 도착해야 하나요? 어떻게 비밀을 유지할 수 있나요? 모두가 계획을 이해하도록 하세요." },
+        { question: "Your flight has been cancelled due to weather, and you need to catch an important business meeting tomorrow in another city. Talk to the airline representative to find alternative solutions - different flights, other airlines, or compensation for the inconvenience.", questionKR: "날씨로 인해 항공편이 취소되었고, 내일 다른 도시에서 중요한 비즈니스 미팅에 참석해야 합니다. 항공사 직원과 이야기하여 대안을 찾으세요. 다른 항공편, 다른 항공사 또는 불편에 대한 보상 등을 논의하세요." },
+        { question: "You're a doctor explaining a medical diagnosis to a patient. The patient has high blood pressure and needs to make lifestyle changes. Explain the condition, why it's serious, what changes they need to make, and answer their concerns about medication side effects.", questionKR: "의사로서 환자에게 의학적 진단을 설명하고 있습니다. 환자는 고혈압이 있으며 생활 습관을 바꿔야 합니다. 병의 상태, 왜 심각한지, 어떤 변화가 필요한지 설명하고 약물 부작용에 대한 우려에 답하세요." },
+        { question: "You're mediating a conflict between two coworkers who disagree about how to complete a project. Listen to both sides, understand their perspectives, and propose a compromise that addresses everyone's concerns while ensuring the project succeeds.", questionKR: "프로젝트 완성 방법에 대해 의견이 다른 두 동료 사이의 갈등을 중재하고 있습니다. 양측의 이야기를 듣고, 그들의 관점을 이해하며, 프로젝트가 성공하도록 하면서 모든 사람의 우려를 해결하는 타협안을 제시하세요." },
+        { question: "You're giving a presentation to convince investors to fund your business idea. Explain what your business does, why it's innovative, what problem it solves, who your target customers are, and why investors should believe in your success.", questionKR: "투자자들에게 비즈니스 아이디어에 자금을 지원하도록 설득하는 프레젠테이션을 하고 있습니다. 비즈니스가 무엇을 하는지, 왜 혁신적인지, 어떤 문제를 해결하는지, 목표 고객이 누구인지, 투자자들이 왜 성공을 믿어야 하는지 설명하세요." },
+        { question: "You're a teacher calling a parent about their child's behavior problems in class. The child is disruptive and not completing homework. Explain the situation diplomatically, discuss possible causes, and work with the parent to create an action plan for improvement.", questionKR: "교사로서 수업 중 아이의 행동 문제에 대해 학부모에게 전화하고 있습니다. 아이가 수업을 방해하고 숙제를 완성하지 않습니다. 상황을 외교적으로 설명하고, 가능한 원인을 논의하며, 개선을 위한 행동 계획을 학부모와 함께 만드세요." }
+      ]
+    };
+
+    // Randomly select questions: 2 easy, 2 medium, 1 hard
+    const shuffleArray = (array) => {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    };
+
+    const selectedEasy = shuffleArray(allQuestions.easy).slice(0, 2);
+    const selectedMedium = shuffleArray(allQuestions.medium).slice(0, 2);
+    const selectedHard = shuffleArray(allQuestions.hard).slice(0, 1);
+
+    // Create final exam questions with proper structure
     const examQuestions = [
-      // Question 1: Easy (자기소개)
-      {
-        id: 1,
+      ...selectedEasy.map((q, idx) => ({
+        id: idx + 1,
         difficulty: 'easy',
-        question: "Let's start with some background information about yourself. Please tell me about your name, where you're from, and what you do.",
-        questionKR: "당신의 배경에 대해 말해주세요. 이름, 출신, 그리고 하는 일에 대해 이야기해주세요.",
+        question: q.question,
+        questionKR: q.questionKR,
         timeLimit: seconds
-      },
-      // Question 2: Easy (일상)
-      {
-        id: 2,
-        difficulty: 'easy',
-        question: "Tell me about your typical day. What time do you usually wake up and what do you do during the day?",
-        questionKR: "평소 하루 일과에 대해 말해주세요. 보통 몇 시에 일어나고 하루 동안 무엇을 하나요?",
-        timeLimit: seconds
-      },
-      // Question 3: Medium (경험)
-      {
-        id: 3,
+      })),
+      ...selectedMedium.map((q, idx) => ({
+        id: idx + 3,
         difficulty: 'medium',
-        question: "Can you describe a memorable experience or event that happened in your life? What made it special and how did it affect you?",
-        questionKR: "인생에서 기억에 남는 경험이나 사건을 설명해주세요. 무엇이 특별했고 당신에게 어떤 영향을 주었나요?",
+        question: q.question,
+        questionKR: q.questionKR,
         timeLimit: seconds
-      },
-      // Question 4: Medium (의견)
-      {
-        id: 4,
-        difficulty: 'medium',
-        question: "What is your opinion about working from home versus working in an office? What are the advantages and disadvantages of each?",
-        questionKR: "재택근무와 사무실 근무에 대한 의견은 무엇인가요? 각각의 장단점은 무엇인가요?",
-        timeLimit: seconds
-      },
-      // Question 5: Hard (롤플레잉)
-      {
+      })),
+      ...selectedHard.map((q, idx) => ({
         id: 5,
         difficulty: 'hard',
-        question: "I'm calling to make a reservation at your restaurant for this Saturday evening. I need a table for four people at 7 PM. Also, one of my guests has a food allergy to seafood. Could you accommodate this? And could you recommend some popular dishes from your menu?",
-        questionKR: "레스토랑에 이번 주 토요일 저녁 예약을 하려고 전화했습니다. 오후 7시에 4명을 위한 테이블이 필요합니다. 또한 손님 중 한 명이 해산물 알레르기가 있습니다. 수용 가능한가요? 그리고 메뉴에서 인기 있는 요리를 추천해 주시겠어요?",
+        question: q.question,
+        questionKR: q.questionKR,
         timeLimit: seconds * 3  // Roleplay gets 3x time
-      }
+      }))
     ];
 
     // Initialize exam state
