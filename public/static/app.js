@@ -3067,8 +3067,8 @@ Proceed to payment?
           <div class="hidden lg:flex w-full lg:w-1/2 bg-gradient-to-br from-indigo-600 to-purple-700 p-12 flex-col justify-center text-white">
             <div class="space-y-8">
               <div>
-                <h2 class="text-4xl font-bold mb-4">AI와 함께하는 영어 학습의 새로운 시작</h2>
-                <p class="text-indigo-100 text-lg">WorVox는 인공지능 기술을 활용한 혁신적인 영어 학습 플랫폼입니다</p>
+                <h2 class="text-4xl font-bold mb-4 leading-snug">AI와 함께하는<br/>영어 학습의 새로운 시작</h2>
+                <p class="text-indigo-100 text-lg leading-relaxed">WorVox는 인공지능 기술을 활용한<br/>혁신적인 영어 학습 플랫폼입니다</p>
               </div>
               
               <div class="space-y-6">
