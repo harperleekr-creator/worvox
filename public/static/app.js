@@ -6693,14 +6693,33 @@ Proceed to payment?
       ? Math.round((new Date(session.ended_at) - sessionDate) / 1000 / 60)
       : 'In progress';
     
+    // Set proper names and icons for special modes
+    let topicName = session.topic_name || 'Conversation';
+    let topicIcon = session.topic_icon || '📚';
+    let topicDescription = session.topic_description || '';
+    
+    if (session.topic_id === 999) {
+      topicName = '⏱️ 타이머 모드';
+      topicIcon = '⏱️';
+      topicDescription = '시간 제한 압박 훈련';
+    } else if (session.topic_id === 998) {
+      topicName = '🎬 시나리오 모드';
+      topicIcon = '🎬';
+      topicDescription = '실전 상황 대화 연습';
+    } else if (session.topic_id === 997) {
+      topicName = '🎓 시험 모드';
+      topicIcon = '🎓';
+      topicDescription = 'OPIC 스타일 말하기 시험';
+    }
+    
     return `
       <div class="border-2 border-gray-200 rounded-xl p-3 md:p-4 hover:border-indigo-500 transition-all">
         <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
           <!-- Main content area -->
           <div class="flex-1 cursor-pointer" onclick="worvox.showConversation(${session.id})">
             <div class="flex items-center gap-2 mb-2 flex-wrap">
-              <span class="text-2xl">${session.topic_icon || '📚'}</span>
-              <h4 class="text-base md:text-lg font-bold text-gray-800">${session.topic_name || 'Conversation'}</h4>
+              <span class="text-2xl">${topicIcon}</span>
+              <h4 class="text-base md:text-lg font-bold text-gray-800">${topicName}</h4>
               ${session.has_report ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold">✓ 분석완료</span>' : ''}
             </div>
             <div class="flex items-center gap-2 md:gap-4 text-xs md:text-sm text-gray-600 flex-wrap">
@@ -6711,8 +6730,8 @@ Proceed to payment?
                 ${session.level}
               </span>
             </div>
-            ${session.topic_description ? `
-              <p class="text-gray-600 text-xs md:text-sm mt-2">${session.topic_description}</p>
+            ${topicDescription ? `
+              <p class="text-gray-600 text-xs md:text-sm mt-2">${topicDescription}</p>
             ` : ''}
           </div>
           
