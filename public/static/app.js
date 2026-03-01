@@ -5114,6 +5114,11 @@ Proceed to payment?
     }
   }
 
+  // Navigate to AI Conversation (Topic Selection)
+  showAIConversation() {
+    this.showTopicSelection();
+  }
+
   async showTopicSelection() {
     try {
       // Fetch topics
