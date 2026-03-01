@@ -207,21 +207,25 @@ aiPrompts.post('/generate', async (c) => {
     if (userId) {
       const user = await c.env.DB.prepare(
         'SELECT plan, use_ai_prompts FROM users WHERE id = ?'
-      ).bind(userId).first();
+      ).bind(userId).first<{ plan: string | null; use_ai_prompts: number }>();
 
-      console.log('👤 User plan check:', { userId, plan: user?.plan, use_ai_prompts: user?.use_ai_prompts });
+      const userPlan = user?.plan || 'free';
+      const aiEnabled = user?.use_ai_prompts || 0;
+
+      console.log('👤 User plan check:', { userId, plan: userPlan, use_ai_prompts: aiEnabled });
 
       // Allow: premium, core, b2b plans
-      if (!user || !['premium', 'core', 'b2b'].includes(user.plan)) {
+      if (!['premium', 'core', 'b2b'].includes(userPlan)) {
         return c.json({ 
           success: false, 
-          error: 'Premium or Core plan required for AI-generated prompts',
-          requiresPremium: true
+          error: `Premium or Core plan required for AI-generated prompts. Current plan: ${userPlan}`,
+          requiresPremium: true,
+          currentPlan: userPlan
         }, 403);
       }
 
       // Check if user has AI prompts enabled
-      if (!user.use_ai_prompts) {
+      if (aiEnabled !== 1) {
         return c.json({
           success: false,
           error: 'AI prompts not enabled. Please enable in profile settings.',
