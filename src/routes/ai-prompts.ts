@@ -4,11 +4,18 @@ import type { Bindings } from '../types';
 
 const aiPrompts = new Hono<{ Bindings: Bindings }>();
 
-// Initialize OpenAI client
-const getOpenAIClient = () => {
+// Initialize OpenAI client (needs to be called with env from context)
+const getOpenAIClient = (env: any) => {
+  const apiKey = env.OPENAI_API_KEY;
+  const baseURL = env.OPENAI_BASE_URL || env.OPENAI_API_BASE;
+  
+  if (!apiKey) {
+    throw new Error('OPENAI_API_KEY not configured in environment variables');
+  }
+  
   return new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-    baseURL: process.env.OPENAI_BASE_URL,
+    apiKey,
+    baseURL,
   });
 };
 
@@ -200,7 +207,7 @@ aiPrompts.post('/generate', async (c) => {
     const systemPrompt = systemPrompts[level][mode];
 
     // Call OpenAI API
-    const client = getOpenAIClient();
+    const client = getOpenAIClient(c.env);
     const completion = await client.chat.completions.create({
       model: 'gpt-5-mini',
       messages: [
