@@ -188,7 +188,7 @@ aiPrompts.post('/generate', async (c) => {
       baseUrl: c.env.OPENAI_API_BASE
     });
 
-    const { mode, level, userId } = await c.req.json();
+    const { mode, level, userId, topic, description } = await c.req.json();
 
     // Validate input
     if (!mode || !level) {
@@ -237,13 +237,19 @@ aiPrompts.post('/generate', async (c) => {
     // Get system prompt
     const systemPrompt = systemPrompts[level][mode];
 
+    // Build user prompt with topic/description if provided
+    let userPrompt = `Generate a ${mode} prompt for ${level} level.`;
+    if (mode === 'scenario' && topic) {
+      userPrompt = `Generate a realistic 5-sentence conversation scenario about: "${topic}". Description: ${description || 'A typical situation'}. Make it appropriate for ${level} level English learners.`;
+    }
+
     // Call OpenAI API
     const client = getOpenAIClient(c.env);
     const completion = await client.chat.completions.create({
       model: 'gpt-3.5-turbo',
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: `Generate a ${mode} prompt for ${level} level.` }
+        { role: 'user', content: userPrompt }
       ],
       temperature: 0.8,
       max_completion_tokens: 300

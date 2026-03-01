@@ -1877,7 +1877,7 @@ class WorVox {
     // AI 생성 시나리오 사용 여부 확인
     if (this.currentUser.use_ai_prompts && this.isPremiumUser()) {
       try {
-        console.log('🤖 Generating AI scenario for level:', this.currentUser.level);
+        console.log('🤖 Generating AI scenario for:', scenario.title, '(', scenario.description, ')');
         
         // Show loading screen
         const app = document.getElementById('app');
@@ -1888,11 +1888,10 @@ class WorVox {
                 <div class="inline-block p-4 bg-blue-100 rounded-full mb-4">
                   <i class="fas fa-magic text-4xl text-blue-600 animate-pulse"></i>
                 </div>
-                <h3 class="text-2xl font-bold text-gray-800 mb-2">AI 시나리오 생성 중...</h3>
-                <p class="text-gray-600">
-                  ${this.currentUser.level === 'beginner' ? '초급 수준의 간단한 대화를 준비하고 있습니다' :
-                    this.currentUser.level === 'intermediate' ? '중급 수준의 실용적인 대화를 생성하고 있습니다' :
-                    '고급 수준의 전문적인 대화를 만들고 있습니다'}
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">${scenario.icon} ${scenario.title}</h3>
+                <p class="text-gray-600 mb-4">AI 시나리오 생성 중...</p>
+                <p class="text-sm text-gray-500">
+                  ${scenario.description}
                 </p>
               </div>
               <div class="flex justify-center">
@@ -1905,7 +1904,9 @@ class WorVox {
         const response = await axios.post('/api/ai-prompts/generate', {
           mode: 'scenario',
           level: this.currentUser.level || 'intermediate',
-          userId: this.currentUser.id
+          userId: this.currentUser.id,
+          topic: scenario.title,
+          description: scenario.description
         });
         
         console.log('🤖 AI Response:', response.data);
@@ -3067,6 +3068,7 @@ class WorVox {
               difficulty: idx < 2 ? 'easy' : idx < 4 ? 'medium' : 'hard',
               question: q,
               questionKR: '', // AI doesn't provide Korean translations yet
+              timeLimit: idx === 4 ? seconds * 3 : seconds, // Last question gets 3x time
               isAiGenerated: true
             }));
           } else {
