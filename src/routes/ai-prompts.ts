@@ -240,13 +240,13 @@ aiPrompts.post('/generate', async (c) => {
     // Call OpenAI API
     const client = getOpenAIClient(c.env);
     const completion = await client.chat.completions.create({
-      model: 'gpt-5-mini',
+      model: 'gpt-3.5-turbo',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: `Generate a ${mode} prompt for ${level} level.` }
       ],
       temperature: 0.8,
-      max_tokens: 300
+      max_completion_tokens: 300
     });
 
     const generatedContent = completion.choices[0].message.content?.trim() || '';
