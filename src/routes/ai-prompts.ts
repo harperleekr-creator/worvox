@@ -203,17 +203,29 @@ aiPrompts.post('/generate', async (c) => {
       return c.json({ success: false, error: 'Invalid level' }, 400);
     }
 
-    // Check if user is Premium (if userId provided)
+    // Check if user is Premium or Core (if userId provided)
     if (userId) {
       const user = await c.env.DB.prepare(
-        'SELECT plan FROM users WHERE id = ?'
+        'SELECT plan, use_ai_prompts FROM users WHERE id = ?'
       ).bind(userId).first();
 
-      if (!user || (user.plan !== 'premium' && user.plan !== 'b2b')) {
+      console.log('👤 User plan check:', { userId, plan: user?.plan, use_ai_prompts: user?.use_ai_prompts });
+
+      // Allow: premium, core, b2b plans
+      if (!user || !['premium', 'core', 'b2b'].includes(user.plan)) {
         return c.json({ 
           success: false, 
-          error: 'Premium plan required for AI-generated prompts',
+          error: 'Premium or Core plan required for AI-generated prompts',
           requiresPremium: true
+        }, 403);
+      }
+
+      // Check if user has AI prompts enabled
+      if (!user.use_ai_prompts) {
+        return c.json({
+          success: false,
+          error: 'AI prompts not enabled. Please enable in profile settings.',
+          requiresActivation: true
         }, 403);
       }
     }
