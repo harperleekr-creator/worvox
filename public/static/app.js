@@ -3162,13 +3162,16 @@ class WorVox {
         }
       }
 
+      // Create audio URL for playback
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
       // Save answer
       this.currentExam.answers.push({
         questionId: question.id,
         question: question.question,
         questionKR: question.questionKR,
         transcription: transcription,
-        audioUrl: null, // Audio not stored for exam mode
+        audioUrl: audioUrl, // Store audio URL for playback
         accuracy: accuracy,
         pronunciation: pronunciation,
         fluency: fluency,
@@ -3220,17 +3223,54 @@ class WorVox {
     }
   }
 
-  async playExamAudio(audioUrl) {
+  async playExamAudio(audioUrl, buttonElement) {
+    // Stop any currently playing audio
     if (this.currentAudio) {
       this.currentAudio.pause();
+      this.currentAudio = null;
     }
 
-    this.currentAudio = new Audio(audioUrl);
-    
+    // Visual feedback: find the button that was clicked
+    const button = buttonElement ? buttonElement : event?.target?.closest('button');
+    const originalHTML = button?.innerHTML || '';
+
     try {
+      if (button) {
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>재생 중...';
+      }
+
+      this.currentAudio = new Audio(audioUrl);
+      
+      // Reset button when audio ends
+      this.currentAudio.onended = () => {
+        if (button) {
+          button.disabled = false;
+          button.innerHTML = originalHTML;
+        }
+        this.currentAudio = null;
+      };
+
+      // Reset button on error
+      this.currentAudio.onerror = () => {
+        if (button) {
+          button.disabled = false;
+          button.innerHTML = originalHTML;
+        }
+        console.error('Failed to play audio');
+        alert('오디오 재생에 실패했습니다.');
+        this.currentAudio = null;
+      };
+
       await this.currentAudio.play();
+      console.log('✅ Playing exam answer audio');
     } catch (error) {
       console.error('Failed to play audio:', error);
+      if (button) {
+        button.disabled = false;
+        button.innerHTML = originalHTML;
+      }
+      alert('오디오 재생에 실패했습니다.');
     }
   }
 
