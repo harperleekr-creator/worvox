@@ -3341,7 +3341,7 @@ class WorVox {
     }
   }
 
-  showExamResults() {
+  async showExamResults() {
     const { answers } = this.currentExam;
 
     // Calculate average scores
