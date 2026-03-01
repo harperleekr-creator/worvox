@@ -1911,12 +1911,8 @@ class WorVox {
         console.log('🤖 AI Response:', response.data);
         
         if (response.data.success && response.data.data) {
-          // Parse AI-generated scenario (format: "1. sentence\n2. sentence...")
-          const generatedText = response.data.data.content || response.data.data.prompt;
-          const sentences = generatedText.split('\n')
-            .filter(line => line.trim())
-            .map(line => line.replace(/^\d+\.\s*/, '').trim())
-            .filter(s => s.length > 0);
+          // AI returns { sentences: [...] } directly
+          const sentences = response.data.data.sentences || [];
           
           if (sentences.length >= 3) {
             console.log('✅ Using AI-generated scenario:', sentences);
@@ -1927,7 +1923,7 @@ class WorVox {
               isAiGenerated: true
             };
           } else {
-            console.warn('⚠️ AI scenario too short, using default');
+            console.warn('⚠️ AI scenario too short, using default. Got:', sentences.length, 'sentences');
           }
         }
       } catch (error) {
@@ -3061,12 +3057,8 @@ class WorVox {
         console.log('🤖 AI Response:', response.data);
         
         if (response.data.success && response.data.data) {
-          // Parse AI-generated questions (format: "1. question\n2. question...")
-          const generatedText = response.data.data.content || response.data.data.prompt;
-          const questions = generatedText.split('\n')
-            .filter(line => line.trim())
-            .map(line => line.replace(/^\d+\.\s*/, '').trim())
-            .filter(q => q.length > 0);
+          // AI returns { questions: [...] } directly
+          const questions = response.data.data.questions || [];
           
           if (questions.length >= 5) {
             console.log('✅ Using AI-generated exam questions:', questions);
@@ -3078,7 +3070,7 @@ class WorVox {
               isAiGenerated: true
             }));
           } else {
-            console.warn('⚠️ AI exam questions too short, using default');
+            console.warn('⚠️ AI exam questions too short, using default. Got:', questions.length, 'questions');
           }
         }
       } catch (error) {
