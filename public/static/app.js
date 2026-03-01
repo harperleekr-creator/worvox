@@ -25,28 +25,32 @@ class WorVox {
         pronunciationPractice: 10,
         wordSearch: 10,
         timerMode: 0,  // Free users: no access
-        scenarioMode: 0  // Free users: no access
+        scenarioMode: 0,  // Free users: no access
+        examMode: 0  // Free users: no access
       },
       core: {
         aiConversations: Infinity,  // Core: unlimited
         pronunciationPractice: Infinity,
         wordSearch: Infinity,  // Core: unlimited
         timerMode: 30,  // Core: 30 per day
-        scenarioMode: 30  // Core: 30 per day
+        scenarioMode: 30,  // Core: 30 per day
+        examMode: 10  // Core: 10 per day
       },
       premium: {
         aiConversations: Infinity,
         pronunciationPractice: Infinity,
         wordSearch: Infinity,
         timerMode: Infinity,
-        scenarioMode: Infinity
+        scenarioMode: Infinity,
+        examMode: Infinity
       },
       business: {
         aiConversations: Infinity,
         pronunciationPractice: Infinity,
         wordSearch: Infinity,
         timerMode: Infinity,
-        scenarioMode: Infinity
+        scenarioMode: Infinity,
+        examMode: Infinity
       }
     };
     
@@ -4820,6 +4824,18 @@ Proceed to payment?
                       </div>
                     </button>
                     
+                    <!-- Exam Mode Usage (Free: 0) -->
+                    <button onclick="worvox.showExamMode()" class="w-full text-left hover:bg-orange-50 rounded-lg p-3 transition-all cursor-pointer opacity-60">
+                      <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2">
+                          <i class="fas fa-graduation-cap text-orange-600"></i>
+                          <span class="text-sm text-gray-700">시험 모드</span>
+                          <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Core+</span>
+                        </div>
+                        <span class="text-sm font-medium text-gray-400">이용 불가</span>
+                      </div>
+                    </button>
+                    
                     <!-- Word Search Usage -->
                     <div>
                       <div class="flex items-center justify-between mb-2">
@@ -4878,6 +4894,21 @@ Proceed to payment?
                       </div>
                     </button>
                     
+                    <!-- Exam Mode Usage (Limited: 10) -->
+                    <button onclick="worvox.showExamMode()" class="w-full p-3 bg-orange-50 rounded-lg hover:bg-orange-100 transition-all cursor-pointer text-left">
+                      <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-3">
+                          <i class="fas fa-graduation-cap text-orange-600 text-lg"></i>
+                          <span class="text-sm font-medium text-gray-700">시험 모드</span>
+                          <i class="fas fa-arrow-right text-xs text-gray-400"></i>
+                        </div>
+                        <span class="text-sm font-medium text-gray-900" data-usage-count="exam_mode">${this.getDailyUsage('exam_mode')}/${this.usageLimits.core.examMode}회</span>
+                      </div>
+                      <div class="w-full bg-orange-200 rounded-full h-2">
+                        <div class="bg-orange-600 h-2 rounded-full transition-all" data-usage-bar="exam_mode" style="width: ${(this.getDailyUsage('exam_mode') / this.usageLimits.core.examMode) * 100}%"></div>
+                      </div>
+                    </button>
+                    
                     <!-- Word Search Usage (Unlimited) -->
                     <div class="flex items-center justify-between p-3 bg-emerald-50 rounded-lg">
                       <div class="flex items-center gap-3">
@@ -4922,6 +4953,17 @@ Proceed to payment?
                         <i class="fas fa-arrow-right text-xs text-gray-400"></i>
                       </div>
                       <span class="text-lg font-bold text-indigo-600" data-usage-count="scenario_mode">${this.getDailyUsage('scenario_mode')}회</span>
+                    </button>
+                    
+                    <!-- Exam Mode Usage -->
+                    <button onclick="worvox.showExamMode()" class="w-full flex items-center justify-between p-3 bg-orange-50 rounded-lg hover:bg-orange-100 transition-all cursor-pointer">
+                      <div class="flex items-center gap-3">
+                        <i class="fas fa-graduation-cap text-orange-600 text-lg"></i>
+                        <span class="text-sm font-medium text-gray-700">시험 모드</span>
+                        <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">무제한</span>
+                        <i class="fas fa-arrow-right text-xs text-gray-400"></i>
+                      </div>
+                      <span class="text-lg font-bold text-orange-600" data-usage-count="exam_mode">${this.getDailyUsage('exam_mode')}회</span>
                     </button>
                     
                     <!-- Word Search Usage -->
@@ -6408,15 +6450,18 @@ Proceed to payment?
       const sessions = response.data.sessions;
       
       // Group sessions by type
-      // Special topic IDs: 998 = Scenario Mode, 999 = Timer Mode
+      // Special topic IDs: 997 = Exam Mode, 998 = Scenario Mode, 999 = Timer Mode
       const aiConversations = sessions.filter(s => {
-        return s.topic_id !== 998 && s.topic_id !== 999;
+        return s.topic_id !== 997 && s.topic_id !== 998 && s.topic_id !== 999;
       });
       const timerSessions = sessions.filter(s => {
         return s.topic_id === 999;
       });
       const scenarioSessions = sessions.filter(s => {
         return s.topic_id === 998;
+      });
+      const examSessions = sessions.filter(s => {
+        return s.topic_id === 997;
       });
 
       const app = document.getElementById('app');
@@ -6436,7 +6481,7 @@ Proceed to payment?
                 </button>
                 <div>
                   <h1 class="text-lg md:text-2xl font-bold text-gray-800">📚 학습 기록</h1>
-                  <p class="hidden md:block text-gray-600 text-sm mt-1">AI 대화, 타이머 모드, 시나리오 모드 기록을 확인하세요</p>
+                  <p class="hidden md:block text-gray-600 text-sm mt-1">AI 대화, 타이머, 시나리오, 시험 모드 기록을 확인하세요</p>
                 </div>
               </div>
             </div>
@@ -6455,6 +6500,10 @@ Proceed to payment?
                 <button onclick="worvox.showHistoryTab('scenario', event)" 
                   class="history-tab px-4 py-3 font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap">
                   <i class="fas fa-film mr-2"></i>시나리오 모드 (${scenarioSessions.length})
+                </button>
+                <button onclick="worvox.showHistoryTab('exam', event)" 
+                  class="history-tab px-4 py-3 font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap">
+                  <i class="fas fa-graduation-cap mr-2"></i>시험 모드 (${examSessions.length})
                 </button>
               </div>
             </div>
@@ -6524,6 +6573,28 @@ Proceed to payment?
                       <h2 class="text-xl font-bold text-gray-800 mb-4">시나리오 모드 기록 (${scenarioSessions.length})</h2>
                       <div class="space-y-4">
                         ${this.groupSessionsByDate(scenarioSessions)}
+                      </div>
+                    </div>
+                  `}
+                </div>
+                
+                <!-- Exam Mode Tab -->
+                <div id="historyTab-exam" class="history-tab-content hidden">
+                  ${examSessions.length === 0 ? `
+                    <div class="bg-white rounded-2xl shadow-sm p-12 text-center">
+                      <div class="text-6xl mb-4">🎓</div>
+                      <h3 class="text-xl font-bold text-gray-800 mb-2">시험 모드 기록이 없습니다</h3>
+                      <p class="text-gray-600 mb-6">OPIC 스타일 말하기 시험을 연습해보세요!</p>
+                      <button onclick="worvox.showExamMode()" 
+                        class="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-lg font-semibold transition-all">
+                        시험 모드 시작하기
+                      </button>
+                    </div>
+                  ` : `
+                    <div class="bg-white rounded-2xl shadow-sm p-6">
+                      <h2 class="text-xl font-bold text-gray-800 mb-4">시험 모드 기록 (${examSessions.length})</h2>
+                      <div class="space-y-4">
+                        ${this.groupSessionsByDate(examSessions)}
                       </div>
                     </div>
                   `}
