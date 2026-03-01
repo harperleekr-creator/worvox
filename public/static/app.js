@@ -10079,26 +10079,32 @@ Proceed to payment?
     try {
       // First try to get the session info to determine the mode
       const sessionResponse = await axios.get(`/api/sessions/${sessionId}`);
-      const session = sessionResponse.data;
+      const session = sessionResponse.data.session || sessionResponse.data;
+      
+      console.log('📍 Session data:', session);
+      console.log('📍 Topic ID:', session.topic_id);
       
       // Determine if this is a mode report (timer/scenario/exam) or AI conversation
       if (session.topic_id === 999 || session.topic_id === 998 || session.topic_id === 997) {
         // Mode report: timer (999), scenario (998), exam (997)
+        console.log('✅ Mode report detected, calling showModeReport');
         this.showModeReport(sessionId);
       } else {
         // AI conversation report
+        console.log('✅ AI conversation detected, fetching analysis report');
         const response = await axios.get(`/api/analysis/sessions/${sessionId}/report`);
         if (response.data.success && response.data.report) {
           this.showSessionReport(response.data.report.id);
         } else {
           alert('이 세션의 리포트를 찾을 수 없습니다.');
-          this.showTopicSelection();
+          this.showHistory();
         }
       }
     } catch (error) {
-      console.error('Report not found:', error);
-      alert('리포트를 불러오는 데 실패했습니다.');
-      this.showTopicSelection();
+      console.error('❌ Report error:', error);
+      console.error('❌ Error details:', error.response?.data);
+      alert('리포트를 불러오는 데 실패했습니다.\n' + (error.response?.data?.error || error.message));
+      this.showHistory();
     }
   }
   
