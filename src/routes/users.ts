@@ -462,6 +462,50 @@ users.get('/:userId', async (c) => {
   }
 });
 
+// Update user settings (general)
+users.patch('/:userId', async (c) => {
+  try {
+    const userId = c.req.param('userId');
+    const updates = await c.req.json();
+
+    console.log('📝 User update:', userId, updates);
+
+    // Build dynamic UPDATE query
+    const allowedFields = ['use_ai_prompts', 'username', 'level'];
+    const updateFields: string[] = [];
+    const values: any[] = [];
+
+    for (const [key, value] of Object.entries(updates)) {
+      if (allowedFields.includes(key)) {
+        updateFields.push(`${key} = ?`);
+        values.push(value);
+      }
+    }
+
+    if (updateFields.length === 0) {
+      return c.json({ error: 'No valid fields to update' }, 400);
+    }
+
+    values.push(userId); // Add userId for WHERE clause
+
+    await c.env.DB.prepare(
+      `UPDATE users SET ${updateFields.join(', ')} WHERE id = ?`
+    ).bind(...values).run();
+
+    return c.json({
+      success: true,
+      message: 'User settings updated successfully',
+    });
+
+  } catch (error) {
+    console.error('Update user error:', error);
+    return c.json({ 
+      error: 'Failed to update user settings',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
 // Update user level
 users.patch('/:userId/level', async (c) => {
   try {
