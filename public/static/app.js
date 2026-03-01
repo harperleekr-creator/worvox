@@ -1736,10 +1736,10 @@ class WorVox {
                     <div class="flex-1">
                       <h4 class="font-bold text-green-900 flex items-center gap-2">
                         <i class="fas fa-magic text-green-600"></i>
-                        AI 시나리오 생성 (준비 중)
+                        AI 시나리오 생성 활성화
                       </h4>
                       <p class="text-sm text-green-700 mt-1">
-                        현재는 기본 30개 시나리오를 사용합니다 • AI 생성 시나리오는 곧 출시 예정입니다
+                        당신의 ${this.currentUser.level === 'beginner' ? '초급' : this.currentUser.level === 'intermediate' ? '중급' : '고급'} 수준에 맞춘 실전 대화가 자동 생성됩니다
                       </p>
                     </div>
                   </div>
@@ -1752,6 +1752,12 @@ class WorVox {
                       <h4 class="font-bold text-gray-900">기본 시나리오 사용</h4>
                       <p class="text-sm text-gray-600 mt-1">
                         30개의 실전 상황 시나리오로 연습합니다
+                        ${this.isPremiumUser() ? ' • <a href="#" onclick="event.preventDefault(); document.querySelector(\'#profile-settings\').scrollIntoView();" class="text-blue-600 hover:underline">AI 생성 활성화하기</a>' : ' • <a href="#" onclick="event.preventDefault(); worvox.showPlan();" class="text-blue-600 hover:underline">Premium으로 AI 생성 이용하기</a>'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                `}
                       </p>
                     </div>
                   </div>
@@ -1871,22 +1877,92 @@ class WorVox {
     // Increment usage
     this.incrementDailyUsage('scenarioMode');
     
-    // Shuffle sentences for randomization
-    const shuffledSentences = [...scenario.sentences];
-    const shuffledTranslations = [...(scenario.translations || [])];
+    let finalScenario = scenario;
     
-    // Fisher-Yates shuffle algorithm
-    for (let i = shuffledSentences.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffledSentences[i], shuffledSentences[j]] = [shuffledSentences[j], shuffledSentences[i]];
-      if (shuffledTranslations.length > 0) {
-        [shuffledTranslations[i], shuffledTranslations[j]] = [shuffledTranslations[j], shuffledTranslations[i]];
+    // AI 생성 시나리오 사용 여부 확인
+    if (this.currentUser.use_ai_prompts && this.isPremiumUser()) {
+      try {
+        console.log('🤖 Generating AI scenario for level:', this.currentUser.level);
+        
+        // Show loading screen
+        const app = document.getElementById('app');
+        app.innerHTML = `
+          <div class="flex h-screen bg-gradient-to-br from-blue-50 to-indigo-50 items-center justify-center">
+            <div class="bg-white rounded-2xl shadow-2xl p-8 md:p-12 max-w-md text-center">
+              <div class="mb-6">
+                <div class="inline-block p-4 bg-blue-100 rounded-full mb-4">
+                  <i class="fas fa-magic text-4xl text-blue-600 animate-pulse"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">AI 시나리오 생성 중...</h3>
+                <p class="text-gray-600">
+                  ${this.currentUser.level === 'beginner' ? '초급 수준의 간단한 대화를 준비하고 있습니다' :
+                    this.currentUser.level === 'intermediate' ? '중급 수준의 실용적인 대화를 생성하고 있습니다' :
+                    '고급 수준의 전문적인 대화를 만들고 있습니다'}
+                </p>
+              </div>
+              <div class="flex justify-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        const response = await axios.post('/api/ai-prompts/generate', {
+          mode: 'scenario',
+          level: this.currentUser.level || 'intermediate',
+          userId: this.currentUser.id
+        });
+        
+        console.log('🤖 AI Response:', response.data);
+        
+        if (response.data.success && response.data.data) {
+          // Parse AI-generated scenario (format: "1. sentence\n2. sentence...")
+          const generatedText = response.data.data.content || response.data.data.prompt;
+          const sentences = generatedText.split('\n')
+            .filter(line => line.trim())
+            .map(line => line.replace(/^\d+\.\s*/, '').trim())
+            .filter(s => s.length > 0);
+          
+          if (sentences.length >= 3) {
+            console.log('✅ Using AI-generated scenario:', sentences);
+            finalScenario = {
+              ...scenario,
+              sentences: sentences,
+              translations: [], // AI doesn't provide translations yet
+              isAiGenerated: true
+            };
+          } else {
+            console.warn('⚠️ AI scenario too short, using default');
+          }
+        }
+      } catch (error) {
+        console.error('❌ AI scenario generation failed:', error.response?.data || error.message);
+        alert('AI 시나리오 생성에 실패했습니다. 기본 시나리오를 사용합니다.');
+      }
+    }
+    
+    // Shuffle sentences for randomization (only if not AI-generated)
+    let shuffledSentences, shuffledTranslations;
+    if (finalScenario.isAiGenerated) {
+      shuffledSentences = finalScenario.sentences;
+      shuffledTranslations = [];
+    } else {
+      shuffledSentences = [...finalScenario.sentences];
+      shuffledTranslations = [...(finalScenario.translations || [])];
+      
+      // Fisher-Yates shuffle algorithm
+      for (let i = shuffledSentences.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledSentences[i], shuffledSentences[j]] = [shuffledSentences[j], shuffledSentences[i]];
+        if (shuffledTranslations.length > 0) {
+          [shuffledTranslations[i], shuffledTranslations[j]] = [shuffledTranslations[j], shuffledTranslations[i]];
+        }
       }
     }
     
     // Create shuffled scenario
     const shuffledScenario = {
-      ...scenario,
+      ...finalScenario,
       sentences: shuffledSentences,
       translations: shuffledTranslations
     };
@@ -2886,10 +2962,10 @@ class WorVox {
                       <div class="flex-1">
                         <h4 class="font-bold text-green-900 flex items-center gap-2">
                           <i class="fas fa-magic text-green-600"></i>
-                          AI 시험 문제 생성 (준비 중)
+                          AI 시험 문제 생성 활성화
                         </h4>
                         <p class="text-sm text-green-700 mt-1">
-                          현재는 기본 문제 세트를 사용합니다 • AI 맞춤형 시험 문제는 곧 출시 예정입니다
+                          당신의 ${this.currentUser.level === 'beginner' ? '초급' : this.currentUser.level === 'intermediate' ? '중급' : '고급'} 수준에 맞춘 OPIC 스타일 질문이 자동 생성됩니다
                         </p>
                       </div>
                     </div>
@@ -2902,6 +2978,7 @@ class WorVox {
                         <h4 class="font-bold text-gray-900">기본 시험 문제 사용</h4>
                         <p class="text-sm text-gray-600 mt-1">
                           검증된 OPIC 스타일 시험 문제로 평가합니다
+                          ${this.isPremiumUser() ? ' • <a href="#" onclick="event.preventDefault(); document.querySelector(\'#profile-settings\').scrollIntoView();" class="text-blue-600 hover:underline">AI 생성 활성화하기</a>' : ' • <a href="#" onclick="event.preventDefault(); worvox.showPlan();" class="text-blue-600 hover:underline">Premium으로 AI 생성 이용하기</a>'}
                         </p>
                       </div>
                     </div>
@@ -2950,8 +3027,75 @@ class WorVox {
   }
 
   async startExamTest(seconds) {
-    // Question pool (50 questions total)
-    const allQuestions = {
+    let examQuestions = [];
+    
+    // AI 생성 시험 문제 사용 여부 확인
+    if (this.currentUser.use_ai_prompts && this.isPremiumUser()) {
+      try {
+        console.log('🤖 Generating AI exam questions for level:', this.currentUser.level);
+        
+        // Show loading screen
+        const app = document.getElementById('app');
+        app.innerHTML = `
+          <div class="flex h-screen bg-gradient-to-br from-orange-50 to-red-50 items-center justify-center">
+            <div class="bg-white rounded-2xl shadow-2xl p-8 md:p-12 max-w-md text-center">
+              <div class="mb-6">
+                <div class="inline-block p-4 bg-orange-100 rounded-full mb-4">
+                  <i class="fas fa-magic text-4xl text-orange-600 animate-pulse"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">AI 시험 문제 생성 중...</h3>
+                <p class="text-gray-600">
+                  ${this.currentUser.level === 'beginner' ? '초급 수준의 간단한 질문을 준비하고 있습니다' :
+                    this.currentUser.level === 'intermediate' ? '중급 수준의 실전 질문을 생성하고 있습니다' :
+                    '고급 수준의 심화 질문을 만들고 있습니다'}
+                </p>
+              </div>
+              <div class="flex justify-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600"></div>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        const response = await axios.post('/api/ai-prompts/generate', {
+          mode: 'exam',
+          level: this.currentUser.level || 'intermediate',
+          userId: this.currentUser.id
+        });
+        
+        console.log('🤖 AI Response:', response.data);
+        
+        if (response.data.success && response.data.data) {
+          // Parse AI-generated questions (format: "1. question\n2. question...")
+          const generatedText = response.data.data.content || response.data.data.prompt;
+          const questions = generatedText.split('\n')
+            .filter(line => line.trim())
+            .map(line => line.replace(/^\d+\.\s*/, '').trim())
+            .filter(q => q.length > 0);
+          
+          if (questions.length >= 5) {
+            console.log('✅ Using AI-generated exam questions:', questions);
+            examQuestions = questions.map((q, idx) => ({
+              id: idx + 1,
+              difficulty: idx < 2 ? 'easy' : idx < 4 ? 'medium' : 'hard',
+              question: q,
+              questionKR: '', // AI doesn't provide Korean translations yet
+              isAiGenerated: true
+            }));
+          } else {
+            console.warn('⚠️ AI exam questions too short, using default');
+          }
+        }
+      } catch (error) {
+        console.error('❌ AI exam generation failed:', error.response?.data || error.message);
+        alert('AI 시험 문제 생성에 실패했습니다. 기본 문제를 사용합니다.');
+      }
+    }
+    
+    // Use default questions if AI generation failed or not enabled
+    if (examQuestions.length === 0) {
+      // Question pool (50 questions total)
+      const allQuestions = {
       easy: [
         { question: "Let's start with some background information about yourself. Please tell me about your name, where you're from, and what you do.", questionKR: "당신의 배경에 대해 말해주세요. 이름, 출신, 그리고 하는 일에 대해 이야기해주세요." },
         { question: "Tell me about your typical day. What time do you usually wake up and what do you do during the day?", questionKR: "평소 하루 일과에 대해 말해주세요. 보통 몇 시에 일어나고 하루 동안 무엇을 하나요?" },
@@ -3010,44 +3154,45 @@ class WorVox {
       ]
     };
 
-    // Randomly select questions: 2 easy, 2 medium, 1 hard
-    const shuffleArray = (array) => {
-      const shuffled = [...array];
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-      }
-      return shuffled;
-    };
+      // Randomly select questions: 2 easy, 2 medium, 1 hard
+      const shuffleArray = (array) => {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+      };
 
-    const selectedEasy = shuffleArray(allQuestions.easy).slice(0, 2);
-    const selectedMedium = shuffleArray(allQuestions.medium).slice(0, 2);
-    const selectedHard = shuffleArray(allQuestions.hard).slice(0, 1);
+      const selectedEasy = shuffleArray(allQuestions.easy).slice(0, 2);
+      const selectedMedium = shuffleArray(allQuestions.medium).slice(0, 2);
+      const selectedHard = shuffleArray(allQuestions.hard).slice(0, 1);
 
-    // Create final exam questions with proper structure
-    const examQuestions = [
-      ...selectedEasy.map((q, idx) => ({
-        id: idx + 1,
-        difficulty: 'easy',
-        question: q.question,
-        questionKR: q.questionKR,
-        timeLimit: seconds
-      })),
-      ...selectedMedium.map((q, idx) => ({
-        id: idx + 3,
-        difficulty: 'medium',
-        question: q.question,
-        questionKR: q.questionKR,
-        timeLimit: seconds
-      })),
-      ...selectedHard.map((q, idx) => ({
-        id: 5,
-        difficulty: 'hard',
-        question: q.question,
-        questionKR: q.questionKR,
-        timeLimit: seconds * 3  // Roleplay gets 3x time
-      }))
-    ];
+      // Create final exam questions with proper structure
+      examQuestions = [
+        ...selectedEasy.map((q, idx) => ({
+          id: idx + 1,
+          difficulty: 'easy',
+          question: q.question,
+          questionKR: q.questionKR,
+          timeLimit: seconds
+        })),
+        ...selectedMedium.map((q, idx) => ({
+          id: idx + 3,
+          difficulty: 'medium',
+          question: q.question,
+          questionKR: q.questionKR,
+          timeLimit: seconds
+        })),
+        ...selectedHard.map((q, idx) => ({
+          id: 5,
+          difficulty: 'hard',
+          question: q.question,
+          questionKR: q.questionKR,
+          timeLimit: seconds * 3  // Roleplay gets 3x time
+        }))
+      ];
+    }
 
     // Initialize exam state
     this.currentExam = {
