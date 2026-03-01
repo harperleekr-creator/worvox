@@ -126,11 +126,12 @@ payments.post('/confirm', async (c) => {
           SET plan = ?,
               billing_period = ?,
               subscription_start_date = datetime('now'),
-              subscription_end_date = datetime('now', '+' || ? || ' months')
+              subscription_end_date = datetime('now', '+' || ? || ' months'),
+              use_ai_prompts = 1
           WHERE id = ?
         `).bind(planType, billingPeriod, months, order.user_id).run();
 
-        console.log('User subscription updated successfully');
+        console.log('User subscription updated successfully (AI prompts auto-enabled)');
       }
     } catch (dbError) {
       console.log('DB update failed:', dbError);
