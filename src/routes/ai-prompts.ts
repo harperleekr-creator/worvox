@@ -184,10 +184,10 @@ aiPrompts.post('/generate', async (c) => {
     // Check if user is Premium (if userId provided)
     if (userId) {
       const user = await c.env.DB.prepare(
-        'SELECT plan_type FROM users WHERE id = ?'
+        'SELECT plan FROM users WHERE id = ?'
       ).bind(userId).first();
 
-      if (!user || (user.plan_type !== 'premium' && user.plan_type !== 'b2b')) {
+      if (!user || (user.plan !== 'premium' && user.plan !== 'b2b')) {
         return c.json({ 
           success: false, 
           error: 'Premium plan required for AI-generated prompts',
