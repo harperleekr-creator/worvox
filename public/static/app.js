@@ -4113,16 +4113,16 @@ Proceed to payment?
           </div>
           
           <!-- Login Form -->
-          <div class="w-full lg:w-1/2 p-6 lg:p-8">
+          <div class="w-full lg:w-1/2 p-6 lg:p-8 bg-gradient-to-br from-indigo-600 to-purple-700">
             <!-- Header -->
             <div class="text-center mb-4 lg:mb-6">
-              <h1 class="text-2xl lg:text-3xl font-bold gradient-text mb-2">WorVox</h1>
-              <p class="text-gray-600 text-sm">Step ${this.onboardingStep} of 3</p>
+              <h1 class="text-2xl lg:text-3xl font-bold text-white mb-2">WorVox</h1>
+              <p class="text-indigo-100 text-sm">Step ${this.onboardingStep} of 3</p>
             </div>
 
             <!-- Progress Bar -->
-            <div class="w-full bg-gray-200 rounded-full h-2 mb-6 lg:mb-8">
-              <div class="bg-gradient-to-r from-indigo-600 to-purple-600 h-2 rounded-full transition-all duration-300" 
+            <div class="w-full bg-white/20 rounded-full h-2 mb-6 lg:mb-8">
+              <div class="bg-white h-2 rounded-full transition-all duration-300" 
                    style="width: ${progress}%"></div>
             </div>
 
@@ -4225,8 +4225,8 @@ Proceed to payment?
       <div class="space-y-6">
         <div class="text-center">
           <div class="text-5xl mb-4">👋</div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome to WorVox!</h2>
-          <p class="text-gray-600">로그인하거나 회원가입하여 시작하세요</p>
+          <h2 class="text-2xl font-bold text-white mb-2">Welcome to WorVox!</h2>
+          <p class="text-indigo-100">로그인하거나 회원가입하여 시작하세요</p>
         </div>
         
         <!-- Google Sign-In Button -->
@@ -4235,10 +4235,10 @@ Proceed to payment?
         <!-- Divider -->
         <div class="relative">
           <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-gray-300"></div>
+            <div class="w-full border-t border-white/30"></div>
           </div>
           <div class="relative flex justify-center text-sm">
-            <span class="px-2 bg-white text-gray-500">또는</span>
+            <span class="px-2 bg-indigo-600 text-indigo-100">또는</span>
           </div>
         </div>
         
@@ -4246,26 +4246,26 @@ Proceed to payment?
         <div id="loginForm">
           <div class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
+              <label class="block text-sm font-medium text-white mb-2">이메일</label>
               <input type="email" id="loginEmail" 
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                class="w-full px-4 py-3 border border-white/30 bg-white/10 text-white placeholder-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
                 placeholder="example@email.com">
             </div>
             
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">비밀번호</label>
+              <label class="block text-sm font-medium text-white mb-2">비밀번호</label>
               <input type="password" id="loginPassword" 
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                class="w-full px-4 py-3 border border-white/30 bg-white/10 text-white placeholder-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
                 placeholder="••••••••">
             </div>
             
             <button onclick="worvox.handleEmailLogin()" 
-              class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all">
+              class="w-full py-3 bg-white text-indigo-600 rounded-lg font-semibold hover:bg-indigo-50 transition-all">
               로그인
             </button>
             
             <div class="text-center">
-              <button onclick="worvox.showSignupForm()" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+              <button onclick="worvox.showSignupForm()" class="text-white hover:text-indigo-100 text-sm font-medium">
                 계정이 없으신가요? <span class="underline">회원가입</span>
               </button>
             </div>
@@ -4276,48 +4276,48 @@ Proceed to payment?
         <div id="signupForm" class="hidden">
           <div class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">이름</label>
+              <label class="block text-sm font-medium text-white mb-2">이름</label>
               <input type="text" id="signupName" 
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                class="w-full px-4 py-3 border border-white/30 bg-white/10 text-white placeholder-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
                 placeholder="홍길동">
             </div>
             
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
+              <label class="block text-sm font-medium text-white mb-2">이메일</label>
               <input type="email" id="signupEmail" 
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                class="w-full px-4 py-3 border border-white/30 bg-white/10 text-white placeholder-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
                 placeholder="example@email.com">
             </div>
             
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">비밀번호</label>
+              <label class="block text-sm font-medium text-white mb-2">비밀번호</label>
               <input type="password" id="signupPassword" 
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                class="w-full px-4 py-3 border border-white/30 bg-white/10 text-white placeholder-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
                 placeholder="8자 이상">
             </div>
             
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">비밀번호 확인</label>
+              <label class="block text-sm font-medium text-white mb-2">비밀번호 확인</label>
               <input type="password" id="signupPasswordConfirm" 
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                class="w-full px-4 py-3 border border-white/30 bg-white/10 text-white placeholder-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
                 placeholder="비밀번호 재입력">
             </div>
             
             <button onclick="worvox.handleEmailSignup()" 
-              class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all">
+              class="w-full py-3 bg-white text-indigo-600 rounded-lg font-semibold hover:bg-indigo-50 transition-all">
               회원가입
             </button>
             
             <div class="text-center">
-              <button onclick="worvox.showLoginForm()" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+              <button onclick="worvox.showLoginForm()" class="text-white hover:text-indigo-100 text-sm font-medium">
                 이미 계정이 있으신가요? <span class="underline">로그인</span>
               </button>
             </div>
           </div>
         </div>
         
-        <div class="mt-6 text-center text-xs text-gray-500">
-          <p>가입하면 <a href="#" onclick="worvox.showTerms(); return false;" class="text-indigo-600 hover:underline">이용약관</a> 및 <a href="#" onclick="worvox.showPrivacy(); return false;" class="text-indigo-600 hover:underline">개인정보처리방침</a>에 동의하는 것으로 간주됩니다</p>
+        <div class="mt-6 text-center text-xs text-indigo-100">
+          <p>가입하면 <a href="#" onclick="worvox.showTerms(); return false;" class="text-white hover:underline font-medium">이용약관</a> 및 <a href="#" onclick="worvox.showPrivacy(); return false;" class="text-white hover:underline font-medium">개인정보처리방침</a>에 동의하는 것으로 간주됩니다</p>
         </div>
       </div>
     `;
@@ -4459,28 +4459,28 @@ Proceed to payment?
       <div class="space-y-6">
         <div class="text-center">
           <div class="text-5xl mb-4">📚</div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">English Level</h2>
-          <p class="text-gray-600">What's your current level?</p>
+          <h2 class="text-2xl font-bold text-white mb-2">English Level</h2>
+          <p class="text-indigo-100">What's your current level?</p>
         </div>
         
         <div class="space-y-3">
           ${levels.map(level => `
             <button onclick="worvox.selectOption('level', '${level.value}')" 
-              class="w-full p-4 border-2 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left ${this.onboardingData.level === level.value ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}">
+              class="w-full p-4 border-2 rounded-xl transition-all text-left ${this.onboardingData.level === level.value ? 'border-white bg-white/20' : 'border-white/30 hover:border-white hover:bg-white/10'}">
               <div class="flex items-center">
                 <span class="text-3xl mr-4">${level.icon}</span>
                 <div class="flex-1">
-                  <div class="font-semibold text-gray-800">${level.label}</div>
-                  <div class="text-sm text-gray-600">${level.desc}</div>
+                  <div class="font-semibold text-white">${level.label}</div>
+                  <div class="text-sm text-indigo-100">${level.desc}</div>
                 </div>
-                ${this.onboardingData.level === level.value ? '<span class="text-indigo-600">✓</span>' : ''}
+                ${this.onboardingData.level === level.value ? '<span class="text-white">✓</span>' : ''}
               </div>
             </button>
           `).join('')}
         </div>
 
         <button onclick="worvox.prevStep()" 
-          class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
+          class="w-full border-2 border-white/30 text-white py-3 rounded-lg font-semibold hover:bg-white/10 transition-all">
           Back
         </button>
       </div>
@@ -4499,28 +4499,28 @@ Proceed to payment?
       <div class="space-y-6">
         <div class="text-center">
           <div class="text-5xl mb-4">💼</div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">Occupation</h2>
-          <p class="text-gray-600">What do you do?</p>
+          <h2 class="text-2xl font-bold text-white mb-2">Occupation</h2>
+          <p class="text-indigo-100">What do you do?</p>
         </div>
         
         <div class="space-y-3 max-h-96 overflow-y-auto">
           ${occupations.map(occ => `
             <button onclick="worvox.selectOption('occupation', '${occ.value}')" 
-              class="w-full p-4 border-2 rounded-xl hover:border-indigo-500 hover:bg-indigo-50 transition-all text-left ${this.onboardingData.occupation === occ.value ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200'}">
+              class="w-full p-4 border-2 rounded-xl transition-all text-left ${this.onboardingData.occupation === occ.value ? 'border-white bg-white/20' : 'border-white/30 hover:border-white hover:bg-white/10'}">
               <div class="flex items-center">
                 <span class="text-3xl mr-4">${occ.icon}</span>
                 <div class="flex-1">
-                  <div class="font-semibold text-gray-800">${occ.label}</div>
-                  <div class="text-sm text-gray-600">${occ.desc}</div>
+                  <div class="font-semibold text-white">${occ.label}</div>
+                  <div class="text-sm text-indigo-100">${occ.desc}</div>
                 </div>
-                ${this.onboardingData.occupation === occ.value ? '<span class="text-indigo-600">✓</span>' : ''}
+                ${this.onboardingData.occupation === occ.value ? '<span class="text-white">✓</span>' : ''}
               </div>
             </button>
           `).join('')}
         </div>
 
         <button onclick="worvox.prevStep()" 
-          class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all">
+          class="w-full border-2 border-white/30 text-white py-3 rounded-lg font-semibold hover:bg-white/10 transition-all">
           Back
         </button>
       </div>
