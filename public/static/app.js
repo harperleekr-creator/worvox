@@ -1758,11 +1758,6 @@ class WorVox {
                   </div>
                 </div>
                 `}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                `}
                 
                 <!-- Filter Buttons -->
                 <div class="flex flex-wrap gap-2 mb-6">
