@@ -12,19 +12,36 @@ sessions.post('/create', async (c) => {
       return c.json({ error: 'userId and topicId are required' }, 400);
     }
 
-    // Get topic details
-    const topicResult = await c.env.DB.prepare(
-      'SELECT * FROM topics WHERE id = ?'
-    ).bind(topicId).first();
+    let topicName = 'Conversation';
+    let topicLevel = level || 'intermediate';
+    let topicResult: any = null;
 
-    if (!topicResult) {
-      return c.json({ error: 'Topic not found' }, 404);
+    // Special topic IDs don't need topics table lookup
+    // 997 = Exam Mode, 998 = Scenario Mode, 999 = Timer Mode
+    if (topicId === 997) {
+      topicName = 'Exam Mode';
+    } else if (topicId === 998) {
+      topicName = 'Scenario Mode';
+    } else if (topicId === 999) {
+      topicName = 'Timer Mode';
+    } else {
+      // Get topic details from topics table for regular topics
+      topicResult = await c.env.DB.prepare(
+        'SELECT * FROM topics WHERE id = ?'
+      ).bind(topicId).first();
+
+      if (!topicResult) {
+        return c.json({ error: 'Topic not found' }, 404);
+      }
+
+      topicName = topicResult.name;
+      topicLevel = level || topicResult.level;
     }
 
-    // Create new session with KST timezone (UTC+9)
+    // Create new session with KST timezone (UTC+9) and topic_id
     const result = await c.env.DB.prepare(
-      'INSERT INTO sessions (user_id, topic, level, started_at) VALUES (?, ?, ?, datetime("now", "+9 hours"))'
-    ).bind(userId, topicResult.name, level || topicResult.level).run();
+      'INSERT INTO sessions (user_id, topic_id, topic, level, started_at) VALUES (?, ?, ?, ?, datetime("now", "+9 hours"))'
+    ).bind(userId, topicId, topicName, topicLevel).run();
 
     const sessionId = result.meta.last_row_id;
 
@@ -41,7 +58,7 @@ sessions.post('/create', async (c) => {
 
     return c.json({
       sessionId,
-      topic: topicResult,
+      topic: topicResult || { id: topicId, name: topicName, level: topicLevel },
       success: true,
     });
 
