@@ -3102,16 +3102,16 @@ class WorVox {
     `;
 
     try {
-      // Upload audio and get transcription
+      // Transcribe audio using STT API
       const formData = new FormData();
       formData.append('audio', audioBlob, 'answer.webm');
 
-      const uploadResponse = await axios.post('/api/voice-upload', formData, {
+      const sttResponse = await axios.post('/api/stt/transcribe', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
 
-      const audioUrl = uploadResponse.data.url;
-      const transcription = uploadResponse.data.transcription || '';
+      const transcription = sttResponse.data.transcription || '';
+      console.log('✅ Transcription:', transcription);
 
       // Get AI analysis
       let accuracy = 70, pronunciation = 70, fluency = 70;
@@ -3143,7 +3143,7 @@ class WorVox {
         question: question.question,
         questionKR: question.questionKR,
         transcription: transcription,
-        audioUrl: audioUrl,
+        audioUrl: null, // Audio not stored for exam mode
         accuracy: accuracy,
         pronunciation: pronunciation,
         fluency: fluency,
