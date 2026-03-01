@@ -19,6 +19,7 @@ import analysis from './routes/analysis';
 import payments from './routes/payments';
 import admin from './routes/admin';
 import attendance from './routes/attendance';
+import pronunciationAnalysis from './routes/pronunciation-analysis';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -56,6 +57,7 @@ app.route('/api/analysis', analysis);
 app.route('/api/payments', payments);
 app.route('/api/admin', admin);
 app.route('/api/attendance', attendance);
+app.route('/api/pronunciation', pronunciationAnalysis);
 
 // Preview routes
 app.route('/preview', preview);

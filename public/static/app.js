@@ -1250,14 +1250,16 @@ class WorVox {
       
       console.log('Timer Mode: STT response:', sttResponse.data);
       const transcription = sttResponse.data.transcription || sttResponse.data.text || '';
+      const audioAnalysis = sttResponse.data.analysis || null;
       console.log('Timer Mode: Transcription:', transcription);
+      console.log('Timer Mode: Audio analysis:', audioAnalysis);
       
       // Create audio URL for playback
       const audioUrl = URL.createObjectURL(audioBlob);
       this.timerChallenge.audioUrl = audioUrl;
       
-      // Show results
-      this.showTimerResults(transcription);
+      // Show results with analysis data
+      this.showTimerResults(transcription, audioAnalysis);
       
     } catch (error) {
       console.error('Timer Mode: Analysis error:', error);
@@ -1275,7 +1277,7 @@ class WorVox {
   }
 
   // Show Timer Results
-  async showTimerResults(transcription) {
+  async showTimerResults(transcription, audioAnalysis = null) {
     const originalSentence = this.timerChallenge.sentence;
     const timeLimit = this.timerChallenge.seconds;
     
@@ -1310,30 +1312,29 @@ class WorVox {
     
     // 🎯 Get analysis scores (accuracy, pronunciation, fluency)
     let accuracyScore = completeness; // Default based on word count
-    let pronunciationScore = 75; // Default
-    let fluencyScore = 70; // Default
+    let pronunciationScore = audioAnalysis?.pronunciationScore || 75; // From STT analysis
+    let fluencyScore = audioAnalysis?.fluencyScore || 70; // From STT analysis
+    let feedback = ''
     
-    // Try to get AI analysis if session exists
-    if (this.timerChallenge.sessionId && transcription && transcription !== '(인식되지 않음)') {
+    // Get detailed AI pronunciation analysis
+    if (transcription && transcription !== '(인식되지 않음)') {
       try {
-        const analysisResponse = await axios.post('/api/chat', {
-          sessionId: this.timerChallenge.sessionId,
-          message: `타이머 챌린지 분석 요청:\n\n원본: "${originalSentence}"\n사용자 발화: "${transcription}"\n\n다음 항목에 대해 0-100 점수를 제공하세요:\n1. Accuracy (정확성): 원본과의 내용 일치도\n2. Pronunciation (발음): 발음 품질 추정\n3. Fluency (유창성): 유창성 및 자연스러움\n\nJSON 형식으로만 응답: {"accuracy": <점수>, "pronunciation": <점수>, "fluency": <점수>}`,
-          useGPT4: false
+        console.log('🎯 Requesting detailed pronunciation analysis...');
+        const analysisResponse = await axios.post('/api/pronunciation/analyze', {
+          referenceText: originalSentence,
+          userTranscription: transcription,
+          audioAnalysis: audioAnalysis
         });
         
-        // Parse AI response
-        const aiText = analysisResponse.data.response;
-        const jsonMatch = aiText.match(/\{[^}]+\}/);
-        if (jsonMatch) {
-          const scores = JSON.parse(jsonMatch[0]);
-          accuracyScore = scores.accuracy || accuracyScore;
-          pronunciationScore = scores.pronunciation || pronunciationScore;
-          fluencyScore = scores.fluency || fluencyScore;
-          console.log('✅ Timer analysis scores:', scores);
+        if (analysisResponse.data.success) {
+          accuracyScore = analysisResponse.data.accuracy;
+          pronunciationScore = analysisResponse.data.pronunciation;
+          fluencyScore = analysisResponse.data.fluency;
+          feedback = analysisResponse.data.feedback || '';
+          console.log('✅ Detailed analysis:', {accuracyScore, pronunciationScore, fluencyScore, feedback});
         }
       } catch (error) {
-        console.warn('⚠️ Failed to get AI analysis, using default scores:', error);
+        console.warn('⚠️ Failed to get detailed analysis, using STT-based scores:', error);
       }
     }
     
@@ -2102,10 +2103,33 @@ class WorVox {
       });
       
       const transcription = sttResponse.data.transcription || sttResponse.data.text || '';
+      const audioAnalysis = sttResponse.data.analysis || null;
       const originalSentence = this.currentScenarioPractice.scenario.sentences[this.currentScenarioPractice.currentSentenceIndex];
       
-      // Calculate 3 scores: Accuracy, Pronunciation, Fluency
-      const scores = this.calculateDetailedScores(originalSentence, transcription, audioBlob);
+      // Get detailed pronunciation analysis
+      let scores = this.calculateDetailedScores(originalSentence, transcription, audioBlob);
+      
+      // Try to get AI-based detailed analysis
+      if (transcription) {
+        try {
+          const analysisResponse = await axios.post('/api/pronunciation/analyze', {
+            referenceText: originalSentence,
+            userTranscription: transcription,
+            audioAnalysis: audioAnalysis
+          });
+          
+          if (analysisResponse.data.success) {
+            scores = {
+              accuracy: analysisResponse.data.accuracy,
+              pronunciation: analysisResponse.data.pronunciation,
+              fluency: analysisResponse.data.fluency
+            };
+            console.log('✅ Scenario detailed analysis:', scores);
+          }
+        } catch (error) {
+          console.warn('⚠️ Failed to get detailed analysis, using basic scores:', error);
+        }
+      }
       
       // Create audio URL for playback
       const audioUrl = URL.createObjectURL(audioBlob);
@@ -3111,29 +3135,30 @@ class WorVox {
       });
 
       const transcription = sttResponse.data.transcription || '';
-      console.log('✅ Transcription:', transcription);
+      const audioAnalysis = sttResponse.data.analysis || null;
+      console.log('✅ Exam transcription:', transcription);
+      console.log('✅ Exam audio analysis:', audioAnalysis);
 
-      // Get AI analysis
+      // Get detailed pronunciation analysis
       let accuracy = 70, pronunciation = 70, fluency = 70;
       
-      if (this.currentExam.sessionId && transcription) {
+      if (transcription) {
         try {
-          const analysisResponse = await axios.post('/api/chat', {
-            sessionId: this.currentExam.sessionId,
-            message: `Exam Question Analysis:\n\nQuestion: "${question.question}"\nUser Answer: "${transcription}"\n\nPlease provide scores (0-100) for:\n1. Accuracy: How well the answer addresses the question\n2. Pronunciation: Estimated pronunciation quality based on transcription\n3. Fluency: Fluency and naturalness\n\nRespond ONLY in JSON format: {"accuracy": <score>, "pronunciation": <score>, "fluency": <score>}`,
-            useGPT4: false
+          console.log('🎯 Requesting detailed pronunciation analysis for exam...');
+          const analysisResponse = await axios.post('/api/pronunciation/analyze', {
+            referenceText: question.question,
+            userTranscription: transcription,
+            audioAnalysis: audioAnalysis
           });
 
-          const aiText = analysisResponse.data.response;
-          const jsonMatch = aiText.match(/\{[^}]+\}/);
-          if (jsonMatch) {
-            const scores = JSON.parse(jsonMatch[0]);
-            accuracy = scores.accuracy || accuracy;
-            pronunciation = scores.pronunciation || pronunciation;
-            fluency = scores.fluency || fluency;
+          if (analysisResponse.data.success) {
+            accuracy = analysisResponse.data.accuracy;
+            pronunciation = analysisResponse.data.pronunciation;
+            fluency = analysisResponse.data.fluency;
+            console.log('✅ Exam detailed analysis:', {accuracy, pronunciation, fluency});
           }
         } catch (error) {
-          console.warn('⚠️ Failed to get AI analysis:', error);
+          console.warn('⚠️ Failed to get detailed analysis, using default scores:', error);
         }
       }
 
