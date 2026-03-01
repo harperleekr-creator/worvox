@@ -850,6 +850,44 @@ class WorVox {
                     </ol>
                   </div>
                   
+                  <!-- AI Prompt Status Banner -->
+                  ${this.currentUser.use_ai_prompts && this.isPremiumUser() ? `
+                  <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-4 mb-6">
+                    <div class="flex items-center gap-3">
+                      <div class="text-3xl">🤖</div>
+                      <div class="flex-1">
+                        <h4 class="font-bold text-green-900 flex items-center gap-2">
+                          <i class="fas fa-magic text-green-600"></i>
+                          AI 프롬프트 생성 활성화
+                        </h4>
+                        <p class="text-sm text-green-700 mt-1">
+                          ${
+                            this.currentUser.level === 'beginner' ? '🌱 초급 레벨에 맞는 간단한 문장이 생성됩니다' :
+                            this.currentUser.level === 'intermediate' ? '🌿 중급 레벨에 맞는 실용적인 문장이 생성됩니다' :
+                            '🌳 고급 레벨에 맞는 심화 문장이 생성됩니다'
+                          }
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  ` : `
+                  <div class="bg-gray-50 border-2 border-gray-200 rounded-xl p-4 mb-6">
+                    <div class="flex items-center gap-3">
+                      <div class="text-3xl">📚</div>
+                      <div class="flex-1">
+                        <h4 class="font-bold text-gray-900">기본 문장 풀 사용</h4>
+                        <p class="text-sm text-gray-600 mt-1">
+                          50개의 고정된 문장으로 연습합니다
+                          ${this.isPremiumUser() ? 
+                            ' • <a href="#" onclick="worvox.showProfile(); return false;" class="text-purple-600 hover:underline">설정에서 AI 프롬프트를 활성화하세요</a>' : 
+                            ' • <a href="#" onclick="worvox.showPaymentPage(); return false;" class="text-purple-600 hover:underline">Premium으로 업그레이드하여 AI 맞춤 문장을 받으세요</a>'
+                          }
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  `}
+                  
                   <!-- Timer Selection -->
                   <div class="grid md:grid-cols-2 gap-4 mb-6">
                     <button onclick="worvox.startTimerChallenge(5)" 
@@ -902,27 +940,55 @@ class WorVox {
 
     // Check if AI prompts are enabled
     if (this.currentUser.use_ai_prompts && this.isPremiumUser()) {
+      // Show loading indicator
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="flex h-screen items-center justify-center bg-gradient-to-br from-purple-900 via-purple-800 to-pink-900">
+          <div class="text-center text-white">
+            <div class="text-6xl mb-4">🤖</div>
+            <h2 class="text-2xl font-bold mb-2">AI 프롬프트 생성 중...</h2>
+            <p class="text-purple-200">
+              ${
+                this.currentUser.level === 'beginner' ? '초급 레벨에 맞는 간단한 문장을 준비하고 있습니다' :
+                this.currentUser.level === 'intermediate' ? '중급 레벨에 맞는 실용적인 문장을 준비하고 있습니다' :
+                '고급 레벨에 맞는 심화 문장을 준비하고 있습니다'
+              }
+            </p>
+            <div class="mt-6">
+              <i class="fas fa-spinner fa-spin text-4xl"></i>
+            </div>
+          </div>
+        </div>
+      `;
+
       try {
+        console.log('🤖 Generating AI prompt for level:', this.currentUser.level);
         const response = await axios.post('/api/ai-prompts/generate', {
           mode: 'timer',
           level: this.currentUser.level,
           userId: this.currentUser.id
         });
 
-        if (response.data.success) {
+        console.log('🤖 AI Response:', response.data);
+
+        if (response.data.success && response.data.data.sentence) {
           randomSentence = response.data.data.sentence;
-          translation = ''; // AI generated, no translation available
-          console.log('Using AI-generated prompt:', randomSentence);
+          translation = '✨ AI가 생성한 맞춤형 문장'; // AI generated indicator
+          console.log('✅ Using AI-generated prompt:', randomSentence);
         } else {
-          throw new Error('AI generation failed');
+          throw new Error('AI generation failed: ' + JSON.stringify(response.data));
         }
       } catch (error) {
-        console.error('AI prompt generation failed, using default pool:', error);
-        // Fall back to default sentences
+        console.error('❌ AI prompt generation failed:', error);
+        console.error('Error details:', error.response?.data);
+        
+        // Show error and fall back to default
+        alert('AI 프롬프트 생성에 실패했습니다.\n기본 문장 풀을 사용합니다.');
         ({ randomSentence, translation } = this.getDefaultTimerSentence());
       }
     } else {
       // Use default sentences pool
+      console.log('📚 Using default sentence pool');
       ({ randomSentence, translation } = this.getDefaultTimerSentence());
     }
     
@@ -1661,6 +1727,36 @@ class WorVox {
                     </div>
                   </div>
                 </div>
+                
+                <!-- AI Prompt Status Banner -->
+                ${this.currentUser.use_ai_prompts && this.isPremiumUser() ? `
+                <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-4 mb-6">
+                  <div class="flex items-center gap-3">
+                    <div class="text-3xl">🤖</div>
+                    <div class="flex-1">
+                      <h4 class="font-bold text-green-900 flex items-center gap-2">
+                        <i class="fas fa-magic text-green-600"></i>
+                        AI 시나리오 생성 (준비 중)
+                      </h4>
+                      <p class="text-sm text-green-700 mt-1">
+                        현재는 기본 30개 시나리오를 사용합니다 • AI 생성 시나리오는 곧 출시 예정입니다
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                ` : `
+                <div class="bg-gray-50 border-2 border-gray-200 rounded-xl p-4 mb-6">
+                  <div class="flex items-center gap-3">
+                    <div class="text-3xl">📚</div>
+                    <div class="flex-1">
+                      <h4 class="font-bold text-gray-900">기본 시나리오 사용</h4>
+                      <p class="text-sm text-gray-600 mt-1">
+                        30개의 실전 상황 시나리오로 연습합니다
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                `}
                 
                 <!-- Filter Buttons -->
                 <div class="flex flex-wrap gap-2 mb-6">
@@ -2781,6 +2877,36 @@ class WorVox {
                       </li>
                     </ul>
                   </div>
+                  
+                  <!-- AI Prompt Status Banner -->
+                  ${this.currentUser.use_ai_prompts && this.isPremiumUser() ? `
+                  <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-4 mb-6">
+                    <div class="flex items-center gap-3">
+                      <div class="text-3xl">🤖</div>
+                      <div class="flex-1">
+                        <h4 class="font-bold text-green-900 flex items-center gap-2">
+                          <i class="fas fa-magic text-green-600"></i>
+                          AI 시험 문제 생성 (준비 중)
+                        </h4>
+                        <p class="text-sm text-green-700 mt-1">
+                          현재는 기본 문제 세트를 사용합니다 • AI 맞춤형 시험 문제는 곧 출시 예정입니다
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  ` : `
+                  <div class="bg-gray-50 border-2 border-gray-200 rounded-xl p-4 mb-6">
+                    <div class="flex items-center gap-3">
+                      <div class="text-3xl">📚</div>
+                      <div class="flex-1">
+                        <h4 class="font-bold text-gray-900">기본 시험 문제 사용</h4>
+                        <p class="text-sm text-gray-600 mt-1">
+                          검증된 OPIC 스타일 시험 문제로 평가합니다
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  `}
                   
                   <div class="bg-gradient-to-r from-orange-100 to-red-100 rounded-xl p-6">
                     <h3 class="font-bold text-gray-900 mb-3 flex items-center gap-2">
