@@ -32,13 +32,22 @@
   - 빠른 반응력 및 유창성 향상
   - 실시간 음성 인식 및 AI 분석
   - 발음 및 유창성 피드백 제공
+  - **🤖 AI 프롬프트 생성** (Premium 전용): 사용자 레벨(beginner/intermediate/advanced)에 맞춘 무한대의 새로운 문장 생성
 - **Scenario Mode** (Core/Premium 전용): 실생활 상황 기반 대화 연습
   - 30가지 다양한 시나리오 (여행, 일상, 비즈니스, 여가 등)
   - 각 시나리오당 5개의 실전 문장 연습
   - 난이도별 필터링 (Beginner, Intermediate, Advanced)
   - 카테고리별 검색 (여행, 일상, 비즈니스 등)
   - 음성 인식 및 발음 평가
+  - **🤖 AI 시나리오 생성** (Premium 전용, 예정): 레벨별 맞춤 대화 시나리오 자동 생성
+- **Exam Mode** (Core/Premium 전용): OPIC 스타일 실전 모의고사
+  - 5문항으로 구성된 말하기 시험
+  - 레벨별 평가 (Novice Low ~ Advanced Low)
+  - 발음, 유창성, 정확성 종합 평가
+  - **🤖 AI 질문 생성** (Premium 전용, 예정): 레벨별 맞춤 시험 문제 자동 생성
 - **Learning History**: 과거 대화 세션 기록 및 조회
+  - 모드별 리포트 보기 (타이머, 시나리오, 시험 모드)
+  - 세션별 상세 분석 및 점수
 - **Statistics**: 학습 통계 및 진도 시각화
 
 ### 🎮 게임화 (Gamification)
@@ -126,7 +135,7 @@
 ### APIs & Services
 - **STT**: Google Speech-to-Text API
 - **TTS**: Google Text-to-Speech API
-- **LLM**: OpenAI GPT-3.5/4
+- **LLM**: OpenAI GPT-3.5/4 (대화) + GPT-5-mini (AI 프롬프트 생성)
 - **Payment**: Toss Payments (테스트 모드 활성화)
 
 ---
@@ -150,6 +159,8 @@ webapp/
 │   │   ├── usage.ts        # Usage tracking
 │   │   ├── payments.ts     # Toss Payments integration
 │   │   ├── admin.ts        # Admin dashboard API
+│   │   ├── ai-prompts.ts   # AI prompt generation (Premium)
+│   │   ├── mode-reports.ts # Mode reports (Timer/Scenario/Exam)
 │   │   └── preview.ts      # Preview features
 │   └── types.ts            # TypeScript types
 ├── public/
@@ -304,7 +315,7 @@ OPENAI_API_BASE=https://api.openai.com/v1
 ## 📊 데이터베이스 스키마
 
 ### 주요 테이블
-- **users**: 사용자 정보 (Google OAuth, 이메일/비밀번호 인증, 관리자 플래그)
+- **users**: 사용자 정보 (Google OAuth, 이메일/비밀번호 인증, 관리자 플래그, AI 프롬프트 설정)
 - **sessions**: 대화 세션 기록
 - **messages**: 대화 메시지 로그 (user/assistant)
 - **topics**: 대화 주제 템플릿
@@ -316,6 +327,8 @@ OPENAI_API_BASE=https://api.openai.com/v1
 - **payment_orders**: 결제 주문 내역 (Toss Payments)
 - **activity_logs**: 사용자 활동 로그 (로그인, 세션, 결제 등)
 - **session_durations**: 세션 체류 시간 추적
+- **mode_reports**: 모드별 학습 리포트 (타이머, 시나리오, 시험)
+- **ai_generated_prompts**: AI 생성 프롬프트 캐시 (재사용 및 오프라인 지원)
 
 ### 예정된 테이블 (PHASE 1)
 - **session_reports**: 세션별 분석 리포트 (점수, 통계)
@@ -387,6 +400,12 @@ OPENAI_API_BASE=https://api.openai.com/v1
 - [x] 법적 문서 (이용약관, 개인정보처리방침, 환불정책)
 - [x] 관리자 대시보드 (사용자 관리, 통계, 로그)
 - [x] Footer 정보 (사업자번호, 주소, 통신판매, 전화번호)
+- [x] **🤖 AI 프롬프트 생성** (Premium 전용)
+  - [x] 타이머 모드: 레벨별 맞춤 문장 생성
+  - [x] 설정 UI: 프로필에서 AI 프롬프트 토글
+  - [x] 자동 캐싱: 생성된 프롬프트 재사용
+  - [ ] 시나리오 모드 통합 (예정)
+  - [ ] 시험 모드 통합 (예정)
 
 ### 🔄 진행 중
 - [ ] **PHASE 1**: 대화 분석 & 피드백 리포트
@@ -415,4 +434,4 @@ Copyright © 2026 WorVox. All rights reserved.
 
 ---
 
-**Last Updated**: 2026-02-26
+**Last Updated**: 2026-03-01
