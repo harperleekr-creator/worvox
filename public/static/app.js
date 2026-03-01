@@ -1309,6 +1309,9 @@ class WorVox {
       }
     }
     
+    // Save session ID for later report saving
+    const sessionId = this.timerChallenge.sessionId;
+    
     // Simple similarity check (word count comparison)
     const originalWords = originalSentence.toLowerCase().split(' ').length;
     const spokenWords = transcription.toLowerCase().split(' ').length;
@@ -1363,6 +1366,34 @@ class WorVox {
       rating = '다시 도전!';
       ratingColor = 'text-red-600';
       ratingIcon = '💪';
+    }
+    
+    // 💾 Save timer report to database
+    if (sessionId && this.currentUser) {
+      try {
+        const reportData = {
+          originalSentence,
+          transcription,
+          timeLimit,
+          accuracyScore,
+          pronunciationScore,
+          fluencyScore,
+          averageScore,
+          rating,
+          feedback,
+          completedAt: new Date().toISOString()
+        };
+        
+        await axios.post('/api/mode-reports/save', {
+          sessionId: sessionId,
+          userId: this.currentUser.id,
+          modeType: 'timer',
+          reportData: reportData
+        });
+        console.log('✅ Timer report saved successfully');
+      } catch (error) {
+        console.warn('⚠️ Failed to save timer report:', error);
+      }
     }
     
     const app = document.getElementById('app');
@@ -2498,6 +2529,38 @@ class WorVox {
       ratingIcon = '💪';
     }
     
+    // 💾 Save scenario report to database
+    if (sessionId && this.currentUser) {
+      try {
+        const avgPronunciation = Math.round(results.reduce((sum, r) => sum + (r.pronunciation || 0), 0) / results.length);
+        const avgFluency = Math.round(results.reduce((sum, r) => sum + (r.fluency || 0), 0) / results.length);
+        
+        const reportData = {
+          scenario: {
+            title: scenario.title,
+            icon: scenario.icon
+          },
+          results: results,
+          averageAccuracy,
+          averagePronunciation: avgPronunciation,
+          averageFluency: avgFluency,
+          rating,
+          totalSentences: results.length,
+          completedAt: new Date().toISOString()
+        };
+        
+        await axios.post('/api/mode-reports/save', {
+          sessionId: sessionId,
+          userId: this.currentUser.id,
+          modeType: 'scenario',
+          reportData: reportData
+        });
+        console.log('✅ Scenario report saved successfully');
+      } catch (error) {
+        console.warn('⚠️ Failed to save scenario report:', error);
+      }
+    }
+    
     const app = document.getElementById('app');
     app.innerHTML = `
       <div class="flex h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
@@ -3322,6 +3385,33 @@ class WorVox {
       opicColor = 'text-orange-600';
       opicBg = 'bg-orange-100';
       opicDescription = '기본적인 정보 교환 가능';
+    }
+
+    // 💾 Save exam report to database
+    if (this.currentExam.sessionId && this.currentUser) {
+      try {
+        const reportData = {
+          answers: answers,
+          avgAccuracy,
+          avgPronunciation,
+          avgFluency,
+          overallAverage,
+          opicLevel,
+          opicDescription,
+          totalQuestions: answers.length,
+          completedAt: new Date().toISOString()
+        };
+        
+        await axios.post('/api/mode-reports/save', {
+          sessionId: this.currentExam.sessionId,
+          userId: this.currentUser.id,
+          modeType: 'exam',
+          reportData: reportData
+        });
+        console.log('✅ Exam report saved successfully');
+      } catch (error) {
+        console.warn('⚠️ Failed to save exam report:', error);
+      }
     }
 
     const app = document.getElementById('app');
@@ -9926,18 +10016,370 @@ Proceed to payment?
 
   async showSessionReportById(sessionId) {
     try {
-      const response = await axios.get(`/api/analysis/sessions/${sessionId}/report`);
-      if (response.data.success && response.data.report) {
-        this.showSessionReport(response.data.report.id);
+      // First try to get the session info to determine the mode
+      const sessionResponse = await axios.get(`/api/sessions/${sessionId}`);
+      const session = sessionResponse.data;
+      
+      // Determine if this is a mode report (timer/scenario/exam) or AI conversation
+      if (session.topic_id === 999 || session.topic_id === 998 || session.topic_id === 997) {
+        // Mode report: timer (999), scenario (998), exam (997)
+        this.showModeReport(sessionId);
       } else {
-        alert('이 세션의 리포트를 찾을 수 없습니다.');
-        this.showTopicSelection();
+        // AI conversation report
+        const response = await axios.get(`/api/analysis/sessions/${sessionId}/report`);
+        if (response.data.success && response.data.report) {
+          this.showSessionReport(response.data.report.id);
+        } else {
+          alert('이 세션의 리포트를 찾을 수 없습니다.');
+          this.showTopicSelection();
+        }
       }
     } catch (error) {
       console.error('Report not found:', error);
       alert('리포트를 불러오는 데 실패했습니다.');
       this.showTopicSelection();
     }
+  }
+  
+  async showModeReport(sessionId) {
+    try {
+      const response = await axios.get(`/api/mode-reports/session/${sessionId}`);
+      if (!response.data.success) {
+        alert('리포트를 찾을 수 없습니다.');
+        this.showHistory();
+        return;
+      }
+      
+      const { report } = response.data;
+      const { modeType, reportData } = report;
+      
+      // Display report based on mode type
+      if (modeType === 'timer') {
+        this.displayTimerReport(reportData);
+      } else if (modeType === 'scenario') {
+        this.displayScenarioReport(reportData);
+      } else if (modeType === 'exam') {
+        this.displayExamReport(reportData);
+      }
+    } catch (error) {
+      console.error('Failed to load mode report:', error);
+      alert('리포트를 불러오는 데 실패했습니다.');
+      this.showHistory();
+    }
+  }
+  
+  displayTimerReport(reportData) {
+    const app = document.getElementById('app');
+    const { 
+      originalSentence, transcription, timeLimit, 
+      accuracyScore, pronunciationScore, fluencyScore, 
+      averageScore, rating, feedback 
+    } = reportData;
+    
+    let ratingColor, ratingIcon;
+    if (averageScore >= 80) {
+      ratingColor = 'text-green-600';
+      ratingIcon = '🌟';
+    } else if (averageScore >= 60) {
+      ratingColor = 'text-blue-600';
+      ratingIcon = '👍';
+    } else if (averageScore >= 40) {
+      ratingColor = 'text-yellow-600';
+      ratingIcon = '😊';
+    } else {
+      ratingColor = 'text-red-600';
+      ratingIcon = '💪';
+    }
+    
+    app.innerHTML = `
+      <div class="flex h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+        ${this.getSidebar('timer-mode')}
+        
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- Header -->
+          <div class="bg-white border-b border-purple-200 px-4 md:px-6 py-3">
+            <div class="flex items-center justify-between">
+              <h2 class="text-lg font-semibold text-gray-800">
+                <i class="fas fa-clock mr-2 text-purple-600"></i>타이머 모드 리포트
+              </h2>
+              <button onclick="worvox.showHistory()" class="text-gray-600 hover:text-gray-800">
+                <i class="fas fa-times text-xl"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Content -->
+          <div class="flex-1 overflow-y-auto">
+            <div class="p-4 md:p-8">
+              <div class="max-w-4xl mx-auto">
+                <!-- Rating Card -->
+                <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-purple-200 mb-6 text-center">
+                  <div class="text-6xl mb-4">${ratingIcon}</div>
+                  <h2 class="text-3xl font-bold ${ratingColor} mb-2">${rating}</h2>
+                  <div class="text-5xl font-bold text-purple-600 mb-2">${averageScore}점</div>
+                  <p class="text-gray-600">평균 점수</p>
+                </div>
+                
+                <!-- Score Breakdown -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+                  <h3 class="font-bold text-gray-900 mb-4">상세 점수</h3>
+                  <div class="grid grid-cols-3 gap-4">
+                    <div class="text-center">
+                      <div class="text-3xl font-bold text-purple-600">${accuracyScore}</div>
+                      <div class="text-sm text-gray-600">정확도</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-3xl font-bold text-blue-600">${pronunciationScore}</div>
+                      <div class="text-sm text-gray-600">발음</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-3xl font-bold text-green-600">${fluencyScore}</div>
+                      <div class="text-sm text-gray-600">유창성</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Original & Transcription -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+                  <div class="mb-4">
+                    <div class="text-sm text-gray-500 mb-2">원문 (${timeLimit}초 제한)</div>
+                    <div class="text-lg text-gray-900">${originalSentence}</div>
+                  </div>
+                  <div>
+                    <div class="text-sm text-gray-500 mb-2">당신의 답변</div>
+                    <div class="text-lg text-purple-600">${transcription}</div>
+                  </div>
+                </div>
+                
+                ${feedback ? `
+                <div class="bg-blue-50 rounded-2xl p-6 shadow-lg mb-6">
+                  <h3 class="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                    <i class="fas fa-lightbulb text-yellow-500"></i>
+                    AI 피드백
+                  </h3>
+                  <p class="text-gray-700">${feedback}</p>
+                </div>
+                ` : ''}
+                
+                <div class="flex gap-4">
+                  <button onclick="worvox.showTimerMode()" class="flex-1 px-6 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold">
+                    <i class="fas fa-redo mr-2"></i>다시 도전
+                  </button>
+                  <button onclick="worvox.showHistory()" class="flex-1 px-6 py-4 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl font-semibold">
+                    <i class="fas fa-arrow-left mr-2"></i>돌아가기
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            ${this.getFooter()}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  displayScenarioReport(reportData) {
+    const app = document.getElementById('app');
+    const { scenario, results, averageAccuracy, rating } = reportData;
+    
+    let ratingColor, ratingIcon;
+    if (averageAccuracy >= 80) {
+      ratingColor = 'text-green-600';
+      ratingIcon = '🌟';
+    } else if (averageAccuracy >= 60) {
+      ratingColor = 'text-blue-600';
+      ratingIcon = '👍';
+    } else if (averageAccuracy >= 40) {
+      ratingColor = 'text-yellow-600';
+      ratingIcon = '😊';
+    } else {
+      ratingColor = 'text-red-600';
+      ratingIcon = '💪';
+    }
+    
+    app.innerHTML = `
+      <div class="flex h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+        ${this.getSidebar('scenario-mode')}
+        
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- Header -->
+          <div class="bg-white border-b border-blue-200 px-4 md:px-6 py-3">
+            <div class="flex items-center justify-between">
+              <h2 class="text-lg font-semibold text-gray-800">
+                <i class="fas fa-film mr-2 text-blue-600"></i>${scenario.icon} ${scenario.title} - 리포트
+              </h2>
+              <button onclick="worvox.showHistory()" class="text-gray-600 hover:text-gray-800">
+                <i class="fas fa-times text-xl"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Content -->
+          <div class="flex-1 overflow-y-auto">
+            <div class="p-4 md:p-8">
+              <div class="max-w-4xl mx-auto">
+                <!-- Rating Card -->
+                <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-blue-200 mb-6 text-center">
+                  <div class="text-6xl mb-4">${ratingIcon}</div>
+                  <h2 class="text-3xl font-bold ${ratingColor} mb-2">${rating}</h2>
+                  <div class="text-5xl font-bold text-blue-600 mb-2">${averageAccuracy}%</div>
+                  <p class="text-gray-600">평균 정확도</p>
+                </div>
+                
+                <!-- Results -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+                  <h3 class="font-bold text-gray-900 mb-4">상세 결과</h3>
+                  <div class="space-y-4">
+                    ${results.map((result, index) => `
+                      <div class="border border-gray-200 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-2">
+                          <span class="text-sm font-semibold text-gray-700">문장 ${index + 1}</span>
+                          <div class="flex gap-2">
+                            <span class="text-xs px-2 py-1 rounded ${result.accuracy >= 80 ? 'bg-green-100 text-green-700' : result.accuracy >= 60 ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}">
+                              정확도 ${result.accuracy}%
+                            </span>
+                            ${result.pronunciation ? `<span class="text-xs px-2 py-1 rounded bg-purple-100 text-purple-700">발음 ${result.pronunciation}점</span>` : ''}
+                          </div>
+                        </div>
+                        <div class="text-sm text-gray-600 mb-1">원문: ${result.original}</div>
+                        <div class="text-sm text-blue-600">답변: ${result.transcription}</div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+                
+                <div class="flex gap-4">
+                  <button onclick="worvox.showScenarioMode()" class="flex-1 px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold">
+                    <i class="fas fa-redo mr-2"></i>다시 도전
+                  </button>
+                  <button onclick="worvox.showHistory()" class="flex-1 px-6 py-4 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl font-semibold">
+                    <i class="fas fa-arrow-left mr-2"></i>돌아가기
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            ${this.getFooter()}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  displayExamReport(reportData) {
+    const app = document.getElementById('app');
+    const { 
+      answers, avgAccuracy, avgPronunciation, avgFluency, 
+      overallAverage, opicLevel, opicDescription 
+    } = reportData;
+    
+    let opicColor, opicBg;
+    if (overallAverage >= 90) {
+      opicColor = 'text-purple-600';
+      opicBg = 'bg-purple-100';
+    } else if (overallAverage >= 80) {
+      opicColor = 'text-blue-600';
+      opicBg = 'bg-blue-100';
+    } else if (overallAverage >= 70) {
+      opicColor = 'text-green-600';
+      opicBg = 'bg-green-100';
+    } else if (overallAverage >= 60) {
+      opicColor = 'text-yellow-600';
+      opicBg = 'bg-yellow-100';
+    } else {
+      opicColor = 'text-orange-600';
+      opicBg = 'bg-orange-100';
+    }
+    
+    app.innerHTML = `
+      <div class="flex h-screen bg-gradient-to-br from-orange-50 to-red-50">
+        ${this.getSidebar('exam-mode')}
+        
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- Header -->
+          <div class="bg-white border-b border-orange-200 px-4 md:px-6 py-3">
+            <div class="flex items-center justify-between">
+              <h2 class="text-lg font-semibold text-gray-800">
+                <i class="fas fa-graduation-cap mr-2 text-orange-600"></i>시험 모드 리포트
+              </h2>
+              <button onclick="worvox.showHistory()" class="text-gray-600 hover:text-gray-800">
+                <i class="fas fa-times text-xl"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Content -->
+          <div class="flex-1 overflow-y-auto">
+            <div class="p-4 md:p-8">
+              <div class="max-w-4xl mx-auto">
+                <!-- OPIC Level Card -->
+                <div class="bg-white rounded-2xl p-8 shadow-lg border-2 border-orange-200 mb-6 text-center">
+                  <div class="text-5xl mb-4">🎓</div>
+                  <div class="inline-block ${opicBg} ${opicColor} px-6 py-2 rounded-full font-bold text-2xl mb-2">
+                    ${opicLevel}
+                  </div>
+                  <p class="text-gray-600 mt-2">${opicDescription}</p>
+                  <div class="text-5xl font-bold text-orange-600 mt-4">${overallAverage}점</div>
+                </div>
+                
+                <!-- Average Scores -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+                  <h3 class="font-bold text-gray-900 mb-4">평균 점수</h3>
+                  <div class="grid grid-cols-3 gap-4">
+                    <div class="text-center">
+                      <div class="text-3xl font-bold text-orange-600">${avgAccuracy}</div>
+                      <div class="text-sm text-gray-600">정확도</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-3xl font-bold text-blue-600">${avgPronunciation}</div>
+                      <div class="text-sm text-gray-600">발음</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-3xl font-bold text-green-600">${avgFluency}</div>
+                      <div class="text-sm text-gray-600">유창성</div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- All Answers -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+                  <h3 class="font-bold text-gray-900 mb-4">답변 상세</h3>
+                  <div class="space-y-6">
+                    ${answers.map((answer, index) => `
+                      <div class="border-l-4 border-orange-500 pl-4">
+                        <div class="flex items-center justify-between mb-2">
+                          <span class="font-semibold text-gray-800">문제 ${index + 1}</span>
+                          <div class="flex gap-2">
+                            <span class="text-xs px-2 py-1 rounded bg-orange-100 text-orange-700">정확도 ${answer.accuracy}</span>
+                            <span class="text-xs px-2 py-1 rounded bg-blue-100 text-blue-700">발음 ${answer.pronunciation}</span>
+                            <span class="text-xs px-2 py-1 rounded bg-green-100 text-green-700">유창성 ${answer.fluency}</span>
+                          </div>
+                        </div>
+                        <div class="text-sm text-gray-900 mb-1"><strong>Q:</strong> ${answer.questionEn}</div>
+                        ${answer.questionKr ? `<div class="text-xs text-gray-500 mb-2">${answer.questionKr}</div>` : ''}
+                        <div class="text-sm text-gray-700"><strong>A:</strong> ${answer.transcription || '(답변 없음)'}</div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+                
+                <div class="flex gap-4">
+                  <button onclick="worvox.showExamMode()" class="flex-1 px-6 py-4 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-semibold">
+                    <i class="fas fa-redo mr-2"></i>다시 시험보기
+                  </button>
+                  <button onclick="worvox.showHistory()" class="flex-1 px-6 py-4 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl font-semibold">
+                    <i class="fas fa-arrow-left mr-2"></i>돌아가기
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            ${this.getFooter()}
+          </div>
+        </div>
+      </div>
+    `;
   }
   
   // ========================================
