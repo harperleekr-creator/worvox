@@ -7,7 +7,14 @@ const aiPrompts = new Hono<{ Bindings: Bindings }>();
 // Initialize OpenAI client (needs to be called with env from context)
 const getOpenAIClient = (env: any) => {
   const apiKey = env.OPENAI_API_KEY;
-  const baseURL = env.OPENAI_BASE_URL || env.OPENAI_API_BASE;
+  const baseURL = env.OPENAI_BASE_URL || env.OPENAI_API_BASE || env.OPENAI_BASE_URL;
+  
+  console.log('🔧 Initializing OpenAI client:', {
+    hasApiKey: !!apiKey,
+    apiKeyPrefix: apiKey ? apiKey.substring(0, 10) + '...' : 'none',
+    baseURL: baseURL || 'default (api.openai.com)',
+    envKeys: Object.keys(env || {}).filter(k => k.includes('OPENAI'))
+  });
   
   if (!apiKey) {
     throw new Error('OPENAI_API_KEY not configured in environment variables');
@@ -173,6 +180,14 @@ Example format:
 // Generate AI prompt
 aiPrompts.post('/generate', async (c) => {
   try {
+    // Debug: Check if environment variables exist
+    console.log('🔍 Environment check:', {
+      hasApiKey: !!c.env.OPENAI_API_KEY,
+      hasBaseUrl: !!c.env.OPENAI_API_BASE,
+      apiKeyLength: c.env.OPENAI_API_KEY?.length,
+      baseUrl: c.env.OPENAI_API_BASE
+    });
+
     const { mode, level, userId } = await c.req.json();
 
     // Validate input
@@ -260,10 +275,20 @@ aiPrompts.post('/generate', async (c) => {
     });
 
   } catch (error) {
-    console.error('AI prompt generation error:', error);
+    console.error('❌ AI prompt generation error:', error);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      type: typeof error
+    });
+    
     return c.json({ 
       success: false, 
-      error: error instanceof Error ? error.message : 'Failed to generate prompt'
+      error: error instanceof Error ? error.message : 'Failed to generate prompt',
+      debug: {
+        hasApiKey: !!c.env.OPENAI_API_KEY,
+        hasBaseUrl: !!c.env.OPENAI_API_BASE
+      }
     }, 500);
   }
 });
