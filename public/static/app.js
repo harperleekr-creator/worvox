@@ -8958,6 +8958,30 @@ Proceed to payment?
                               </td>
                             </tr>
                             <tr>
+                              <td class="py-3 text-gray-700">⏱️ 타이머 모드</td>
+                              <td class="py-3 text-right">
+                                <span class="text-gray-600">Free: 미제공</span><br>
+                                <span class="text-blue-600">Core: 30회/일</span><br>
+                                <span class="text-purple-600 font-semibold">Premium+: 무제한</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">🎬 시나리오 모드</td>
+                              <td class="py-3 text-right">
+                                <span class="text-gray-600">Free: 미제공</span><br>
+                                <span class="text-blue-600">Core: 30회/일</span><br>
+                                <span class="text-purple-600 font-semibold">Premium+: 무제한</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">🎓 시험 모드</td>
+                              <td class="py-3 text-right">
+                                <span class="text-gray-600">Free: 미제공</span><br>
+                                <span class="text-blue-600">Core: 10회/일</span><br>
+                                <span class="text-purple-600 font-semibold">Premium+: 무제한</span>
+                              </td>
+                            </tr>
+                            <tr>
                               <td class="py-3 text-gray-700">대화 히스토리</td>
                               <td class="py-3 text-right">
                                 <span class="text-gray-600">Free: 7일</span><br>
@@ -9137,6 +9161,13 @@ Proceed to payment?
                               <td class="py-3 text-gray-700">시나리오 개수</td>
                               <td class="py-3 text-right">
                                 <span class="text-blue-600 font-semibold">Core+: 30개</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-3 text-gray-700">시험 모드 (OPIC 스타일)</td>
+                              <td class="py-3 text-right">
+                                <span class="text-blue-600">Core: 10회/일</span><br>
+                                <span class="text-purple-600 font-semibold">Premium: 무제한</span>
                               </td>
                             </tr>
                             <tr>
