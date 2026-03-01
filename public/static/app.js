@@ -6802,11 +6802,17 @@ Proceed to payment?
       topicDescription = 'OPIC 스타일 말하기 시험';
     }
     
+    // Determine click handler based on mode
+    const isSpecialMode = [997, 998, 999].includes(session.topic_id);
+    const clickHandler = isSpecialMode 
+      ? `worvox.showSessionReportById(${session.id})`
+      : `worvox.showConversation(${session.id})`;
+    
     return `
       <div class="border-2 border-gray-200 rounded-xl p-3 md:p-4 hover:border-indigo-500 transition-all">
         <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
           <!-- Main content area -->
-          <div class="flex-1 cursor-pointer" onclick="worvox.showConversation(${session.id})">
+          <div class="flex-1 cursor-pointer" onclick="${clickHandler}">
             <div class="flex items-center gap-2 mb-2 flex-wrap">
               <span class="text-2xl">${topicIcon}</span>
               <h4 class="text-base md:text-lg font-bold text-gray-800">${topicName}</h4>
@@ -6827,7 +6833,7 @@ Proceed to payment?
           
           <!-- Button area - full width on mobile, right side on desktop -->
           <div class="flex flex-row md:flex-col items-center md:items-end justify-between md:justify-start gap-2 w-full md:w-auto">
-            ${session.has_report ? `
+            ${(session.has_report || isSpecialMode) ? `
               <button 
                 onclick="event.stopPropagation(); worvox.showSessionReportById(${session.id})"
                 class="flex-1 md:flex-none px-3 md:px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs md:text-sm font-semibold transition-all whitespace-nowrap">
@@ -10045,8 +10051,7 @@ Proceed to payment?
     try {
       const response = await axios.get(`/api/mode-reports/session/${sessionId}`);
       if (!response.data.success) {
-        alert('리포트를 찾을 수 없습니다.');
-        this.showHistory();
+        this.showNoReportMessage(sessionId);
         return;
       }
       
@@ -10063,9 +10068,39 @@ Proceed to payment?
       }
     } catch (error) {
       console.error('Failed to load mode report:', error);
-      alert('리포트를 불러오는 데 실패했습니다.');
-      this.showHistory();
+      // Show friendly message instead of alert
+      this.showNoReportMessage(sessionId);
     }
+  }
+  
+  showNoReportMessage(sessionId) {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        ${this.getSidebar('history')}
+        
+        <div class="flex-1 flex items-center justify-center">
+          <div class="max-w-md mx-auto text-center p-8">
+            <div class="text-8xl mb-6">📊</div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">리포트를 찾을 수 없습니다</h2>
+            <p class="text-gray-600 mb-8">
+              이 세션에는 아직 분석 리포트가 생성되지 않았습니다.<br>
+              연습을 완료하면 자동으로 리포트가 생성됩니다.
+            </p>
+            <div class="flex gap-4 justify-center">
+              <button onclick="worvox.showHistory()" 
+                class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold transition-all">
+                <i class="fas fa-arrow-left mr-2"></i>히스토리로 돌아가기
+              </button>
+              <button onclick="worvox.showTopicSelection()" 
+                class="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl font-semibold transition-all">
+                <i class="fas fa-home mr-2"></i>홈으로
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
   }
   
   displayTimerReport(reportData) {
