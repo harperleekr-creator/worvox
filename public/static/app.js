@@ -4084,6 +4084,24 @@ Proceed to payment?
                 
                 <div class="flex items-center gap-2">
                   <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
+                    🎓
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-xs">시험 모드</h3>
+                  </div>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                  <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
+                    📚
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-xs">단어 학습</h3>
+                  </div>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                  <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
                     📊
                   </div>
                   <div>
@@ -4132,7 +4150,7 @@ Proceed to payment?
                 </div>
                 
                 <div class="flex items-start gap-4">
-                  <div class="flex-shrink-0 w-8 h-12 bg-white/20 rounded-lg flex items-center justify-center text-2xl">
+                  <div class="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center text-2xl">
                     ⏱️
                   </div>
                   <div>
@@ -4148,6 +4166,26 @@ Proceed to payment?
                   <div>
                     <h3 class="font-semibold text-lg mb-1">시나리오 모드</h3>
                     <p class="text-indigo-100 text-sm">공항, 레스토랑, 비즈니스 등 30가지 실생활 상황 연습</p>
+                  </div>
+                </div>
+                
+                <div class="flex items-start gap-4">
+                  <div class="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center text-2xl">
+                    🎓
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-lg mb-1">시험 모드</h3>
+                    <p class="text-indigo-100 text-sm">OPIC 스타일 말하기 시험으로 실전 대비 연습</p>
+                  </div>
+                </div>
+                
+                <div class="flex items-start gap-4">
+                  <div class="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center text-2xl">
+                    📚
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-lg mb-1">단어 학습</h3>
+                    <p class="text-indigo-100 text-sm">토익, 토플 등 수준별 어휘 학습과 암기 체크</p>
                   </div>
                 </div>
                 
@@ -5097,8 +5135,24 @@ Proceed to payment?
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
                   ${this.topics.filter(topic => 
                     topic.name === 'Vocabulary' || topic.name === 'AI English Conversation'
-                  ).map(topic => `
-                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-lg hover:border-emerald-400 transition-all cursor-pointer relative"
+                  ).map(topic => {
+                    const isConversation = topic.name === 'AI English Conversation';
+                    const isVocabulary = topic.name === 'Vocabulary';
+                    const bgColor = isConversation 
+                      ? 'bg-gradient-to-br from-emerald-50 to-teal-50' 
+                      : isVocabulary 
+                        ? 'bg-gradient-to-br from-blue-50 to-indigo-50' 
+                        : 'bg-white';
+                    const borderColor = isConversation 
+                      ? 'border-2 border-emerald-200 hover:border-emerald-400' 
+                      : isVocabulary 
+                        ? 'border-2 border-blue-200 hover:border-blue-400' 
+                        : 'border border-gray-200 hover:border-emerald-400';
+                    const iconBg = isConversation ? 'emerald' : 'blue';
+                    const textColor = isConversation ? 'emerald' : 'blue';
+                    
+                    return `
+                    <div class="${bgColor} rounded-2xl p-6 shadow-sm ${borderColor} hover:shadow-lg transition-all cursor-pointer relative"
                       data-topic-id="${topic.id}" 
                       data-topic-name="${this.escapeHtml(topic.name)}" 
                       data-topic-level="${topic.level}"
@@ -5108,17 +5162,18 @@ Proceed to payment?
                         <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-bold">CORE</span>
                         <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-bold">PREMIUM</span>
                       </div>
-                      <div class="w-12 h-12 bg-${topic.name === 'AI English Conversation' ? 'emerald' : 'blue'}-100 rounded-xl flex items-center justify-center mb-4">
+                      <div class="w-12 h-12 bg-${iconBg}-100 rounded-xl flex items-center justify-center mb-4">
                         <span class="text-2xl">${topic.icon}</span>
                       </div>
                       <h3 class="text-xl font-semibold text-gray-900 mb-2">${topic.name}</h3>
                       <p class="text-gray-600 mb-4">${topic.description}</p>
                       <div class="flex items-center justify-between">
-                        <span class="text-sm text-${topic.name === 'AI English Conversation' ? 'emerald' : 'blue'}-600 font-medium">Start learning →</span>
+                        <span class="text-sm text-${textColor}-600 font-medium">Start learning →</span>
                         <span class="text-xs bg-gray-100 px-2 py-1 rounded">${topic.level}</span>
                       </div>
                     </div>
-                  `).join('')}
+                  `;
+                  }).join('')}
                   
                   <!-- Timer Mode Card (Core/Premium Feature) -->
                   <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 shadow-sm border-2 border-purple-200 hover:shadow-lg hover:border-purple-400 transition-all cursor-pointer relative"
