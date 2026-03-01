@@ -21,6 +21,7 @@ import admin from './routes/admin';
 import attendance from './routes/attendance';
 import pronunciationAnalysis from './routes/pronunciation-analysis';
 import modeReports from './routes/mode-reports';
+import aiPrompts from './routes/ai-prompts';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -60,6 +61,7 @@ app.route('/api/admin', admin);
 app.route('/api/attendance', attendance);
 app.route('/api/pronunciation', pronunciationAnalysis);
 app.route('/api/mode-reports', modeReports);
+app.route('/api/ai-prompts', aiPrompts);
 
 // Preview routes
 app.route('/preview', preview);

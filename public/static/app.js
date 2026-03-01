@@ -897,7 +897,39 @@ class WorVox {
   }
 
   // Start Timer Challenge
-  startTimerChallenge(seconds) {
+  async startTimerChallenge(seconds) {
+    let randomSentence, translation;
+
+    // Check if AI prompts are enabled
+    if (this.currentUser.use_ai_prompts && this.isPremiumUser()) {
+      try {
+        const response = await axios.post('/api/ai-prompts/generate', {
+          mode: 'timer',
+          level: this.currentUser.level,
+          userId: this.currentUser.id
+        });
+
+        if (response.data.success) {
+          randomSentence = response.data.data.sentence;
+          translation = ''; // AI generated, no translation available
+          console.log('Using AI-generated prompt:', randomSentence);
+        } else {
+          throw new Error('AI generation failed');
+        }
+      } catch (error) {
+        console.error('AI prompt generation failed, using default pool:', error);
+        // Fall back to default sentences
+        ({ randomSentence, translation } = this.getDefaultTimerSentence());
+      }
+    } else {
+      // Use default sentences pool
+      ({ randomSentence, translation } = this.getDefaultTimerSentence());
+    }
+    
+    this.renderTimerChallenge(seconds, randomSentence, translation);
+  }
+
+  getDefaultTimerSentence() {
     // Sample sentences for timer challenge (50 intermediate-advanced level sentences)
     const sentences = [
       "I believe that consistent practice is the key to mastering any skill.",
@@ -955,7 +987,7 @@ class WorVox {
     const randomIndex = Math.floor(Math.random() * sentences.length);
     const randomSentence = sentences[randomIndex];
     
-    // Translation map for sentences
+    // Translation map for sentences (partial coverage)
     const translations = [
       "일관된 연습이 어떤 기술이든 마스터하는 핵심이라고 믿습니다.",
       "일기예보에 따르면 주말 내내 많은 비가 예상됩니다.",
@@ -970,6 +1002,10 @@ class WorVox {
     ];
     const translation = translations[randomIndex] || '';
     
+    return { randomSentence, translation };
+  }
+
+  renderTimerChallenge(seconds, randomSentence, translation) {
     const app = document.getElementById('app');
     app.innerHTML = `
       <div class="flex h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-pink-900">
@@ -11243,6 +11279,85 @@ Proceed to payment?
                 </div>
                 `}
 
+                <!-- AI Prompt Settings (Premium only) -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                  <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-robot text-purple-600 mr-2"></i>AI 프롬프트 생성
+                  </h3>
+                  
+                  <div class="space-y-4">
+                    <!-- AI Toggle -->
+                    <div class="flex items-start justify-between">
+                      <div class="flex-1 pr-4">
+                        <div class="flex items-center gap-2 mb-2">
+                          <h4 class="font-semibold text-gray-900">🤖 AI 맞춤형 프롬프트</h4>
+                          ${this.isPremiumUser() ? '' : `
+                            <span class="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full font-bold">
+                              <i class="fas fa-crown mr-1"></i>PREMIUM
+                            </span>
+                          `}
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">
+                          매번 새로운 맞춤형 문장과 시나리오를 AI가 생성합니다
+                        </p>
+                        <div class="flex items-center gap-2">
+                          <span class="text-xs px-2 py-1 rounded-full ${
+                            this.currentUser.level === 'beginner' ? 'bg-green-100 text-green-700' :
+                            this.currentUser.level === 'intermediate' ? 'bg-blue-100 text-blue-700' :
+                            'bg-purple-100 text-purple-700'
+                          }">
+                            현재 레벨: ${
+                              this.currentUser.level === 'beginner' ? '🌱 Beginner' :
+                              this.currentUser.level === 'intermediate' ? '🌿 Intermediate' :
+                              '🌳 Advanced'
+                            }
+                          </span>
+                        </div>
+                      </div>
+                      <label class="relative inline-flex items-center cursor-pointer ${this.isPremiumUser() ? '' : 'opacity-50 cursor-not-allowed'}">
+                        <input type="checkbox" 
+                               id="aiPromptsToggle"
+                               ${this.isPremiumUser() ? '' : 'disabled'}
+                               ${this.currentUser.use_ai_prompts ? 'checked' : ''}
+                               onchange="worvox.toggleAIPrompts(this.checked)"
+                               class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-purple-500 peer-checked:to-pink-500"></div>
+                      </label>
+                    </div>
+
+                    ${!this.isPremiumUser() ? `
+                    <!-- Upgrade Notice -->
+                    <div class="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-4">
+                      <div class="flex items-start gap-3">
+                        <i class="fas fa-info-circle text-purple-600 text-xl mt-0.5"></i>
+                        <div class="flex-1">
+                          <h4 class="font-semibold text-purple-900 mb-1">Premium 기능</h4>
+                          <p class="text-sm text-purple-700 mb-3">
+                            AI 프롬프트 생성은 Premium 플랜 이상에서 사용 가능합니다.<br>
+                            여러분의 영어 레벨에 맞춰 무한대의 새로운 문장과 시나리오가 생성됩니다.
+                          </p>
+                          <button onclick="worvox.showPaymentPage()" 
+                            class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg font-semibold text-sm transition-all">
+                            <i class="fas fa-crown mr-2"></i>Premium 구독하기
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    ` : `
+                    <!-- AI Features Info -->
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
+                      <h4 class="font-semibold text-gray-900 mb-2">✨ AI 생성 기능</h4>
+                      <ul class="text-sm text-gray-700 space-y-1">
+                        <li>• <strong>타이머 모드:</strong> 레벨별 맞춤 문장 생성</li>
+                        <li>• <strong>시나리오 모드:</strong> 실전 대화 시나리오 생성</li>
+                        <li>• <strong>시험 모드:</strong> 레벨별 맞춤 질문 생성</li>
+                        <li class="text-xs text-gray-500 mt-2">* 생성된 프롬프트는 자동으로 저장되어 오프라인에서도 사용 가능합니다</li>
+                      </ul>
+                    </div>
+                    `}
+                  </div>
+                </div>
+
                 <!-- Attendance Calendar -->
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
                   <h3 class="text-lg font-bold text-gray-900 mb-4">
@@ -11661,6 +11776,37 @@ Proceed to payment?
       } else {
         alert('비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
       }
+    }
+  }
+
+  // Toggle AI prompts
+  async toggleAIPrompts(enabled) {
+    if (!this.isPremiumUser()) {
+      alert('AI 프롬프트 생성은 Premium 플랜 이상에서 사용 가능합니다.');
+      document.getElementById('aiPromptsToggle').checked = false;
+      return;
+    }
+
+    try {
+      console.log('Toggling AI prompts:', enabled);
+
+      const response = await axios.patch(`/api/users/${this.currentUser.id}`, {
+        use_ai_prompts: enabled ? 1 : 0
+      });
+
+      this.currentUser.use_ai_prompts = enabled;
+      localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
+
+      if (enabled) {
+        alert('✨ AI 프롬프트 생성이 활성화되었습니다!\n\n타이머/시나리오/시험 모드에서 매번 새로운 맞춤형 문장이 생성됩니다.');
+      } else {
+        alert('AI 프롬프트 생성이 비활성화되었습니다.\n기본 문장 풀을 사용합니다.');
+      }
+
+    } catch (error) {
+      console.error('AI prompts toggle error:', error);
+      alert('설정 변경에 실패했습니다. 다시 시도해주세요.');
+      document.getElementById('aiPromptsToggle').checked = !enabled;
     }
   }
 
