@@ -3676,43 +3676,10 @@ class WorVox {
 
     const { answers } = this.currentExam;
 
-    // Generate improved answers in batch (more efficient, single API call)
-    console.log('🎯 Generating improved answer examples in batch...');
+    // Temporarily disabled: Generate improved answers
+    // TODO: Re-enable after debugging performance issues
+    console.log('ℹ️ Improved answer generation temporarily disabled');
     let answersWithImprovement = [...answers];
-    
-    try {
-      const response = await axios.post('/api/pronunciation/generate-improved-answers-batch', {
-        questions: answers.map(answer => ({
-          question: answer.question,
-          questionKR: answer.questionKR,
-          userAnswer: answer.transcription
-        })),
-        userLevel: this.currentUser?.level || 'intermediate'
-      });
-      
-      if (response.data.success && response.data.answers) {
-        // Merge improved answers with original answers
-        answersWithImprovement = answers.map((answer, index) => {
-          const improvedData = response.data.answers[index];
-          if (improvedData) {
-            console.log('✅ Generated improved answer for question:', answer.questionId);
-            return {
-              ...answer,
-              improvedAnswer: improvedData.improvedAnswer,
-              improvedAnswerKR: improvedData.improvedAnswerKR,
-              keyPoints: improvedData.keyPoints || []
-            };
-          }
-          return answer;
-        });
-        console.log('✅ All improved answers generated:', answersWithImprovement);
-      } else {
-        console.warn('⚠️ Batch generation failed, continuing without improved answers');
-      }
-    } catch (error) {
-      console.warn('⚠️ Failed to generate improved answers in batch:', error);
-      // Continue with original answers if batch fails
-    }
 
     // Calculate average scores (use answersWithImprovement instead of answers)
     const totalAccuracy = answersWithImprovement.reduce((sum, a) => sum + a.accuracy, 0);
