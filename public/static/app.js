@@ -3656,6 +3656,24 @@ class WorVox {
   }
 
   async showExamResults() {
+    // Show loading screen
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex h-screen bg-gradient-to-br from-orange-50 to-red-50">
+        ${this.getSidebar('exam-mode')}
+        <div class="flex-1 flex items-center justify-center">
+          <div class="text-center">
+            <div class="text-6xl mb-4">🎓</div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">시험 결과 분석 중...</h2>
+            <div class="flex items-center justify-center gap-2 text-gray-600">
+              <i class="fas fa-spinner fa-spin"></i>
+              <span>AI가 더 나은 답변 예시를 생성하고 있습니다</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
     const { answers } = this.currentExam;
 
     // Generate improved answers for each question
@@ -3671,6 +3689,7 @@ class WorVox {
           });
           
           if (response.data.success) {
+            console.log('✅ Generated improved answer for question:', answer.questionId);
             return {
               ...answer,
               improvedAnswer: response.data.improvedAnswer,
@@ -3685,17 +3704,16 @@ class WorVox {
       })
     );
 
-    // Update answers with improved examples
-    this.currentExam.answers = answersWithImprovement;
+    console.log('✅ All improved answers generated:', answersWithImprovement);
 
-    // Calculate average scores
-    const totalAccuracy = answers.reduce((sum, a) => sum + a.accuracy, 0);
-    const totalPronunciation = answers.reduce((sum, a) => sum + a.pronunciation, 0);
-    const totalFluency = answers.reduce((sum, a) => sum + a.fluency, 0);
+    // Calculate average scores (use answersWithImprovement instead of answers)
+    const totalAccuracy = answersWithImprovement.reduce((sum, a) => sum + a.accuracy, 0);
+    const totalPronunciation = answersWithImprovement.reduce((sum, a) => sum + a.pronunciation, 0);
+    const totalFluency = answersWithImprovement.reduce((sum, a) => sum + a.fluency, 0);
 
-    const avgAccuracy = Math.round(totalAccuracy / answers.length);
-    const avgPronunciation = Math.round(totalPronunciation / answers.length);
-    const avgFluency = Math.round(totalFluency / answers.length);
+    const avgAccuracy = Math.round(totalAccuracy / answersWithImprovement.length);
+    const avgPronunciation = Math.round(totalPronunciation / answersWithImprovement.length);
+    const avgFluency = Math.round(totalFluency / answersWithImprovement.length);
     const overallAverage = Math.round((avgAccuracy + avgPronunciation + avgFluency) / 3);
 
     // Determine OPIC level
@@ -3735,14 +3753,14 @@ class WorVox {
     if (this.currentExam.sessionId && this.currentUser) {
       try {
         const reportData = {
-          answers: answers,
+          answers: answersWithImprovement,
           avgAccuracy,
           avgPronunciation,
           avgFluency,
           overallAverage,
           opicLevel,
           opicDescription,
-          totalQuestions: answers.length,
+          totalQuestions: answersWithImprovement.length,
           completedAt: new Date().toISOString()
         };
         
@@ -3850,7 +3868,7 @@ class WorVox {
                   </h3>
                   
                   <div class="space-y-4">
-                    ${answers.map((answer, index) => `
+                    ${answersWithImprovement.map((answer, index) => `
                       <div class="border border-gray-200 rounded-lg p-4">
                         <div class="flex items-center justify-between mb-3">
                           <span class="text-sm font-semibold text-gray-700">문제 ${answer.questionId}</span>
