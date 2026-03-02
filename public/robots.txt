@@ -1,0 +1,7 @@
+# robots.txt for WorVox
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+Sitemap: https://worvox.com/sitemap.xml

@@ -44,6 +44,10 @@ app.use('/favicon-*', serveStatic({ root: './' }));
 app.use('/apple-touch-icon.png', serveStatic({ root: './' }));
 app.use('/android-chrome-*', serveStatic({ root: './' }));
 
+// SEO files
+app.use('/robots.txt', serveStatic({ root: './public' }));
+app.use('/sitemap.xml', serveStatic({ root: './public' }));
+
 // API routes
 app.route('/api/stt', stt);
 app.route('/api/tts', tts);
@@ -348,7 +352,33 @@ app.get('/', (c) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>WorVox - AI English Learning</title>
+        <title>WorVox - AI 영어 학습 플랫폼 | 실시간 발음 교정 & 맞춤형 학습</title>
+        
+        <!-- SEO Meta Tags -->
+        <meta name="description" content="AI 기반 영어 학습 플랫폼 WorVox. 실시간 발음 교정, 맞춤형 학습 콘텐츠, AI 대화 연습으로 영어 실력을 향상시키세요. 타이머 모드, 시나리오 모드, OPIC 스타일 시험 모드 제공.">
+        <meta name="keywords" content="영어 학습, AI 영어, 발음 교정, 영어 회화, OPIC, 영어 공부, 온라인 영어, AI 튜터">
+        <meta name="author" content="WorVox">
+        <meta name="robots" content="index, follow">
+        
+        <!-- Open Graph (Facebook, LinkedIn) -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://worvox.com">
+        <meta property="og:title" content="WorVox - AI 영어 학습 플랫폼">
+        <meta property="og:description" content="AI 기반 실시간 발음 교정과 맞춤형 학습으로 영어 실력 향상. 타이머 모드, 시나리오 모드, OPIC 스타일 시험 제공.">
+        <meta property="og:image" content="https://worvox.com/logo.png">
+        <meta property="og:site_name" content="WorVox">
+        <meta property="og:locale" content="ko_KR">
+        
+        <!-- Twitter Card -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:url" content="https://worvox.com">
+        <meta name="twitter:title" content="WorVox - AI 영어 학습 플랫폼">
+        <meta name="twitter:description" content="AI 기반 실시간 발음 교정과 맞춤형 학습으로 영어 실력 향상">
+        <meta name="twitter:image" content="https://worvox.com/logo.png">
+        
+        <!-- Canonical URL -->
+        <link rel="canonical" href="https://worvox.com">
+        
         <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
         <meta http-equiv="Pragma" content="no-cache">
         <meta http-equiv="Expires" content="0">
@@ -364,6 +394,19 @@ app.get('/', (c) => {
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
         <link href="/static/style.css?v=${version}" rel="stylesheet">
+        
+        <!-- Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XXXXXXXXXX', {
+            page_path: window.location.pathname,
+            send_page_view: true
+          });
+        </script>
+        
         <!-- Toss Payments SDK -->
         <script src="https://js.tosspayments.com/v2/standard"></script>
         <!-- Google Sign-In -->
