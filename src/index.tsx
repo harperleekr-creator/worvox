@@ -25,6 +25,15 @@ import aiPrompts from './routes/ai-prompts';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
+// Redirect www to non-www
+app.use('*', async (c, next) => {
+  const url = new URL(c.req.url);
+  if (url.hostname === 'www.worvox.com') {
+    return c.redirect(`https://worvox.com${url.pathname}${url.search}`, 301);
+  }
+  await next();
+});
+
 // Enable CORS for API routes
 app.use('/api/*', cors());
 
