@@ -243,7 +243,7 @@ aiPrompts.post('/generate', async (c) => {
       userPrompt = `Generate a realistic 5-sentence conversation scenario about: "${topic}". Description: ${description || 'A typical situation'}. Make it appropriate for ${level} level English learners.`;
     }
 
-    // Call OpenAI API
+    // Call OpenAI API for English content
     const client = getOpenAIClient(c.env);
     const completion = await client.chat.completions.create({
       model: 'gpt-3.5-turbo',
@@ -257,10 +257,32 @@ aiPrompts.post('/generate', async (c) => {
 
     const generatedContent = completion.choices[0].message.content?.trim() || '';
 
+    // Generate Korean translation
+    const translationCompletion = await client.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { 
+          role: 'system', 
+          content: 'You are a professional English-to-Korean translator. Translate the given English text to natural Korean. Only provide the translation, no explanations.'
+        },
+        { 
+          role: 'user', 
+          content: generatedContent
+        }
+      ],
+      temperature: 0.3,
+      max_completion_tokens: 500
+    });
+
+    const koreanTranslation = translationCompletion.choices[0].message.content?.trim() || '';
+
     // Parse content based on mode
     let result;
     if (mode === 'timer') {
-      result = { sentence: generatedContent };
+      result = { 
+        sentence: generatedContent,
+        translation: koreanTranslation
+      };
     } else if (mode === 'scenario') {
       // Parse numbered sentences
       const sentences = generatedContent
@@ -269,7 +291,17 @@ aiPrompts.post('/generate', async (c) => {
         .map(line => line.replace(/^\d+\.\s*/, '').trim())
         .filter(s => s.length > 0);
       
-      result = { sentences: sentences.slice(0, 5) };
+      // Parse Korean translations
+      const translations = koreanTranslation
+        .split('\n')
+        .filter(line => line.trim())
+        .map(line => line.replace(/^\d+\.\s*/, '').trim())
+        .filter(s => s.length > 0);
+      
+      result = { 
+        sentences: sentences.slice(0, 5),
+        translations: translations.slice(0, 5)
+      };
     } else if (mode === 'exam') {
       // Parse numbered questions
       const questions = generatedContent
@@ -278,7 +310,17 @@ aiPrompts.post('/generate', async (c) => {
         .map(line => line.replace(/^\d+\.\s*/, '').trim())
         .filter(q => q.length > 0);
       
-      result = { questions: questions.slice(0, 5) };
+      // Parse Korean translations
+      const translations = koreanTranslation
+        .split('\n')
+        .filter(line => line.trim())
+        .map(line => line.replace(/^\d+\.\s*/, '').trim())
+        .filter(q => q.length > 0);
+      
+      result = { 
+        questions: questions.slice(0, 5),
+        translations: translations.slice(0, 5)
+      };
     }
 
     // Cache the generated prompt in database

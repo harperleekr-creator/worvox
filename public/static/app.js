@@ -973,8 +973,9 @@ class WorVox {
 
         if (response.data.success && response.data.data.sentence) {
           randomSentence = response.data.data.sentence;
-          translation = '✨ AI가 생성한 맞춤형 문장'; // AI generated indicator
+          translation = response.data.data.translation || '✨ AI가 생성한 맞춤형 문장'; // Use AI translation
           console.log('✅ Using AI-generated prompt:', randomSentence);
+          console.log('✅ Korean translation:', translation);
         } else {
           throw new Error('AI generation failed: ' + JSON.stringify(response.data));
         }
@@ -1912,15 +1913,17 @@ class WorVox {
         console.log('🤖 AI Response:', response.data);
         
         if (response.data.success && response.data.data) {
-          // AI returns { sentences: [...] } directly
+          // AI returns { sentences: [...], translations: [...] }
           const sentences = response.data.data.sentences || [];
+          const translations = response.data.data.translations || [];
           
           if (sentences.length >= 3) {
             console.log('✅ Using AI-generated scenario:', sentences);
+            console.log('✅ Korean translations:', translations);
             finalScenario = {
               ...scenario,
               sentences: sentences,
-              translations: [], // AI doesn't provide translations yet
+              translations: translations,
               isAiGenerated: true
             };
           } else {
@@ -1937,7 +1940,7 @@ class WorVox {
     let shuffledSentences, shuffledTranslations;
     if (finalScenario.isAiGenerated) {
       shuffledSentences = finalScenario.sentences;
-      shuffledTranslations = [];
+      shuffledTranslations = finalScenario.translations || [];
     } else {
       shuffledSentences = [...finalScenario.sentences];
       shuffledTranslations = [...(finalScenario.translations || [])];
@@ -3058,16 +3061,18 @@ class WorVox {
         console.log('🤖 AI Response:', response.data);
         
         if (response.data.success && response.data.data) {
-          // AI returns { questions: [...] } directly
+          // AI returns { questions: [...], translations: [...] }
           const questions = response.data.data.questions || [];
+          const translations = response.data.data.translations || [];
           
           if (questions.length >= 5) {
             console.log('✅ Using AI-generated exam questions:', questions);
+            console.log('✅ Korean translations:', translations);
             examQuestions = questions.map((q, idx) => ({
               id: idx + 1,
               difficulty: idx < 2 ? 'easy' : idx < 4 ? 'medium' : 'hard',
               question: q,
-              questionKR: '', // AI doesn't provide Korean translations yet
+              questionKR: translations[idx] || '', // Use AI-generated Korean translation
               timeLimit: idx === 4 ? seconds * 3 : seconds, // Last question gets 3x time
               isAiGenerated: true
             }));
