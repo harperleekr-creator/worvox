@@ -159,4 +159,131 @@ FEEDBACK GUIDELINES:
   }
 });
 
+// Generate improved answer example for exam mode
+pronunciationAnalysis.post('/generate-improved-answer', async (c) => {
+  try {
+    const { 
+      question,
+      questionKR,
+      userAnswer,
+      userLevel = 'intermediate'
+    } = await c.req.json();
+
+    if (!question || !userAnswer) {
+      return c.json({ error: 'Question and user answer are required' }, 400);
+    }
+
+    const openaiApiKey = c.env.OPENAI_API_KEY;
+    const openaiApiBase = c.env.OPENAI_API_BASE || 'https://api.openai.com/v1';
+
+    if (!openaiApiKey) {
+      return c.json({ error: 'OpenAI API key not configured' }, 500);
+    }
+
+    // Set appropriate level for example answer
+    let levelGuidance = '';
+    if (userLevel === 'beginner') {
+      levelGuidance = 'Use simple vocabulary and short sentences (10-15 words). Focus on basic grammar and common expressions.';
+    } else if (userLevel === 'intermediate') {
+      levelGuidance = 'Use intermediate vocabulary with some descriptive words. Use compound sentences (15-25 words). Include transitional phrases.';
+    } else {
+      levelGuidance = 'Use advanced vocabulary and complex sentence structures (20-35 words). Include idioms, nuanced expressions, and varied grammar patterns.';
+    }
+
+    const prompt = `You are an OPIC/TOEFL speaking expert. Given a question and a user's answer, provide an IMPROVED answer example that the user can learn from.
+
+QUESTION:
+"${question}"
+${questionKR ? `(Korean: ${questionKR})` : ''}
+
+USER'S ANSWER:
+"${userAnswer}"
+
+LEVEL: ${userLevel}
+
+Generate an improved answer that:
+1. Directly addresses the question
+2. Is appropriate for ${userLevel} level: ${levelGuidance}
+3. Uses natural, conversational English
+4. Is more complete and well-structured than the user's answer
+5. Includes specific details and examples
+6. Demonstrates good speaking patterns (transition words, varied sentence structures)
+
+Respond ONLY with valid JSON:
+{
+  "improvedAnswer": "<the improved answer in English>",
+  "improvedAnswerKR": "<Korean translation of the improved answer>",
+  "keyPoints": [
+    "<key improvement 1>",
+    "<key improvement 2>",
+    "<key improvement 3>"
+  ]
+}
+
+KEY POINTS should explain in Korean what makes this answer better (e.g., "구체적인 예시 추가", "자연스러운 연결어 사용", "다양한 문장 구조").`;
+
+    const response = await fetch(`${openaiApiBase}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openaiApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert English speaking coach specializing in OPIC and TOEFL speaking tests. Provide practical, improved answer examples.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 800,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('GPT improved answer error:', error);
+      return c.json({ error: 'Failed to generate improved answer' }, 500);
+    }
+
+    const result = await response.json() as any;
+    const answerText = result.choices[0].message.content;
+
+    // Extract JSON from response
+    const jsonMatch = answerText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.error('Failed to parse improved answer:', answerText);
+      return c.json({ 
+        error: 'Failed to parse improved answer',
+        fallback: {
+          improvedAnswer: 'Failed to generate improved answer.',
+          improvedAnswerKR: '개선된 답변 생성 실패',
+          keyPoints: []
+        }
+      }, 500);
+    }
+
+    const improvedData = JSON.parse(jsonMatch[0]);
+
+    return c.json({
+      success: true,
+      improvedAnswer: improvedData.improvedAnswer || '',
+      improvedAnswerKR: improvedData.improvedAnswerKR || '',
+      keyPoints: improvedData.keyPoints || [],
+    });
+
+  } catch (error) {
+    console.error('Improved answer generation error:', error);
+    return c.json({ 
+      error: 'Internal server error during answer generation',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
 export default pronunciationAnalysis;

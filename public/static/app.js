@@ -3658,6 +3658,36 @@ class WorVox {
   async showExamResults() {
     const { answers } = this.currentExam;
 
+    // Generate improved answers for each question
+    console.log('🎯 Generating improved answer examples...');
+    const answersWithImprovement = await Promise.all(
+      answers.map(async (answer) => {
+        try {
+          const response = await axios.post('/api/pronunciation/generate-improved-answer', {
+            question: answer.question,
+            questionKR: answer.questionKR,
+            userAnswer: answer.transcription,
+            userLevel: this.currentUser?.level || 'intermediate'
+          });
+          
+          if (response.data.success) {
+            return {
+              ...answer,
+              improvedAnswer: response.data.improvedAnswer,
+              improvedAnswerKR: response.data.improvedAnswerKR,
+              keyPoints: response.data.keyPoints || []
+            };
+          }
+        } catch (error) {
+          console.warn('⚠️ Failed to generate improved answer for question:', error);
+        }
+        return answer;
+      })
+    );
+
+    // Update answers with improved examples
+    this.currentExam.answers = answersWithImprovement;
+
     // Calculate average scores
     const totalAccuracy = answers.reduce((sum, a) => sum + a.accuracy, 0);
     const totalPronunciation = answers.reduce((sum, a) => sum + a.pronunciation, 0);
@@ -3863,6 +3893,25 @@ class WorVox {
                           </div>
                           <div class="bg-blue-50 rounded p-2 text-sm text-gray-900">${answer.transcription || '(인식되지 않음)'}</div>
                         </div>
+                        
+                        ${answer.improvedAnswer ? `
+                        <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 border-2 border-green-200">
+                          <div class="flex items-center gap-2 mb-2">
+                            <i class="fas fa-lightbulb text-yellow-500"></i>
+                            <div class="text-xs font-semibold text-green-700">더 나은 답변 예시</div>
+                          </div>
+                          <div class="bg-white rounded p-3 mb-2">
+                            <div class="text-sm text-gray-900 mb-2">${answer.improvedAnswer}</div>
+                            <div class="text-xs text-gray-500 italic border-t pt-2">${answer.improvedAnswerKR || ''}</div>
+                          </div>
+                          ${answer.keyPoints && answer.keyPoints.length > 0 ? `
+                            <div class="text-xs text-green-700 space-y-1">
+                              <div class="font-semibold mb-1">💡 개선 포인트:</div>
+                              ${answer.keyPoints.map(point => `<div class="flex items-start gap-1"><span>•</span><span>${point}</span></div>`).join('')}
+                            </div>
+                          ` : ''}
+                        </div>
+                        ` : ''}
                       </div>
                     `).join('')}
                   </div>
