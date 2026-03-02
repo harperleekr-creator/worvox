@@ -1628,6 +1628,19 @@ class WorVox {
                   </div>
                 </div>
                 
+                <!-- AI Feedback -->
+                ${feedback ? `
+                <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 shadow-lg mb-6 border-2 border-blue-200">
+                  <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <i class="fas fa-robot text-blue-600"></i>
+                    AI 코치 분석
+                  </h3>
+                  <div class="bg-white rounded-xl p-5 text-gray-700 leading-relaxed whitespace-pre-line">
+                    ${feedback}
+                  </div>
+                </div>
+                ` : ''}
+                
                 <!-- Actions -->
                 <div class="grid md:grid-cols-2 gap-4">
                   <button onclick="worvox.startTimerChallenge(${timeLimit})" 

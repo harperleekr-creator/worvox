@@ -75,8 +75,20 @@ Respond ONLY with valid JSON:
   "accuracy": <number>,
   "pronunciation": <number>,
   "fluency": <number>,
-  "feedback": "<brief constructive feedback in Korean, 2-3 sentences>"
-}`;
+  "feedback": "<detailed constructive feedback in Korean, 1-2 paragraphs>",
+  "strengths": ["<specific strength 1>", "<specific strength 2>"],
+  "improvements": ["<specific area to improve 1>", "<specific area to improve 2>"],
+  "nextSteps": "<practical advice for next practice in Korean>"
+}
+
+FEEDBACK GUIDELINES:
+- Start with what they did well (positive reinforcement)
+- Point out 2-3 specific pronunciation issues with examples from their speech
+- Explain WHY these issues matter (comprehension, natural flow, etc.)
+- Give concrete improvement tips (tongue position, stress patterns, etc.)
+- End with encouraging next steps
+- Write in friendly, supportive Korean tone
+- Length: 1-2 paragraphs (3-6 sentences)`;
 
     const response = await fetch(`${openaiApiBase}/chat/completions`, {
       method: 'POST',
@@ -133,6 +145,9 @@ Respond ONLY with valid JSON:
       pronunciation: Math.round(scores.pronunciation),
       fluency: Math.round(scores.fluency),
       feedback: scores.feedback || '',
+      strengths: scores.strengths || [],
+      improvements: scores.improvements || [],
+      nextSteps: scores.nextSteps || '',
     });
 
   } catch (error) {
