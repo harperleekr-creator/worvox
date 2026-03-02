@@ -3676,10 +3676,47 @@ class WorVox {
 
     const { answers } = this.currentExam;
 
-    // Temporarily disabled: Generate improved answers
-    // TODO: Re-enable after debugging performance issues
-    console.log('ℹ️ Improved answer generation temporarily disabled');
+    // Generate improved answers (Premium feature only)
     let answersWithImprovement = [...answers];
+    
+    if (this.currentUser?.plan === 'premium') {
+      console.log('🎯 Generating improved answer examples (Premium feature)...');
+      try {
+        const response = await axios.post('/api/pronunciation/generate-improved-answers-batch', {
+          questions: answers.map(answer => ({
+            question: answer.question,
+            questionKR: answer.questionKR,
+            userAnswer: answer.transcription
+          })),
+          userLevel: this.currentUser?.level || 'intermediate'
+        });
+        
+        if (response.data.success && response.data.answers) {
+          // Merge improved answers with original answers
+          answersWithImprovement = answers.map((answer, index) => {
+            const improvedData = response.data.answers[index];
+            if (improvedData) {
+              console.log('✅ Generated improved answer for question:', answer.questionId);
+              return {
+                ...answer,
+                improvedAnswer: improvedData.improvedAnswer,
+                improvedAnswerKR: improvedData.improvedAnswerKR,
+                keyPoints: improvedData.keyPoints || []
+              };
+            }
+            return answer;
+          });
+          console.log('✅ All improved answers generated:', answersWithImprovement);
+        } else {
+          console.warn('⚠️ Batch generation failed, continuing without improved answers');
+        }
+      } catch (error) {
+        console.warn('⚠️ Failed to generate improved answers in batch:', error);
+        // Continue with original answers if batch fails
+      }
+    } else {
+      console.log('ℹ️ Improved answer generation is a Premium feature');
+    }
 
     // Calculate average scores (use answersWithImprovement instead of answers)
     const totalAccuracy = answersWithImprovement.reduce((sum, a) => sum + a.accuracy, 0);
@@ -3891,7 +3928,7 @@ class WorVox {
                         <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 border-2 border-green-200">
                           <div class="flex items-center gap-2 mb-2">
                             <i class="fas fa-lightbulb text-yellow-500"></i>
-                            <div class="text-xs font-semibold text-green-700">더 나은 답변 예시</div>
+                            <div class="text-xs font-semibold text-green-700">💎 더 나은 답변 예시 (Premium)</div>
                           </div>
                           <div class="bg-white rounded p-3 mb-2">
                             <div class="text-sm text-gray-900 mb-2">${answer.improvedAnswer}</div>
@@ -3904,7 +3941,27 @@ class WorVox {
                             </div>
                           ` : ''}
                         </div>
+                        ` : `
+                        ${this.currentUser?.plan !== 'premium' ? `
+                        <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4 border-2 border-purple-200">
+                          <div class="flex items-center gap-2 mb-2">
+                            <i class="fas fa-crown text-yellow-500"></i>
+                            <div class="text-xs font-semibold text-purple-700">더 나은 답변 예시 (Premium 전용)</div>
+                          </div>
+                          <div class="bg-white rounded p-3 text-sm text-gray-600">
+                            <p class="mb-2">🎓 AI가 분석한 <strong>개선된 답변 예시</strong>를 받아보세요!</p>
+                            <ul class="text-xs space-y-1 mb-3">
+                              <li>✓ 더 나은 답변 구조와 표현</li>
+                              <li>✓ 한글 번역 제공</li>
+                              <li>✓ 구체적인 개선 포인트 3가지</li>
+                            </ul>
+                            <button onclick="worvox.showPlan()" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white text-xs font-semibold py-2 px-4 rounded transition-all">
+                              <i class="fas fa-crown mr-1"></i>Premium 구독하기
+                            </button>
+                          </div>
+                        </div>
                         ` : ''}
+                        `}
                       </div>
                     `).join('')}
                   </div>
