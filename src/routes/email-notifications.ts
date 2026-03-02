@@ -4,6 +4,16 @@ import type { Bindings } from '../types';
 
 const emailNotifications = new Hono<{ Bindings: Bindings }>();
 
+// Debug endpoint to check environment variables
+emailNotifications.get('/debug', async (c) => {
+  return c.json({
+    hasResendKey: !!c.env.RESEND_API_KEY,
+    resendKeyLength: c.env.RESEND_API_KEY?.length || 0,
+    resendKeyPrefix: c.env.RESEND_API_KEY?.substring(0, 8) || 'not found',
+    allEnvKeys: Object.keys(c.env)
+  });
+});
+
 // Send trial expiration email via Resend API
 async function sendTrialExpirationEmail(
   env: Bindings,
