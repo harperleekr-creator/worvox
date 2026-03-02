@@ -159,7 +159,138 @@ FEEDBACK GUIDELINES:
   }
 });
 
-// Generate improved answer example for exam mode
+// Generate improved answers in batch (more efficient)
+pronunciationAnalysis.post('/generate-improved-answers-batch', async (c) => {
+  try {
+    const { questions, userLevel = 'intermediate' } = await c.req.json();
+
+    if (!questions || !Array.isArray(questions) || questions.length === 0) {
+      return c.json({ error: 'Questions array is required' }, 400);
+    }
+
+    const openaiApiKey = c.env.OPENAI_API_KEY;
+    const openaiApiBase = c.env.OPENAI_API_BASE || 'https://api.openai.com/v1';
+
+    if (!openaiApiKey) {
+      return c.json({ error: 'OpenAI API key not configured' }, 500);
+    }
+
+    // Set appropriate level for example answer
+    let levelGuidance = '';
+    if (userLevel === 'beginner') {
+      levelGuidance = 'Use simple vocabulary and short sentences (10-15 words). Focus on basic grammar and common expressions.';
+    } else if (userLevel === 'intermediate') {
+      levelGuidance = 'Use intermediate vocabulary with some descriptive words. Use compound sentences (15-25 words). Include transitional phrases.';
+    } else {
+      levelGuidance = 'Use advanced vocabulary and complex sentence structures (20-35 words). Include idioms, nuanced expressions, and varied grammar patterns.';
+    }
+
+    // Build batch prompt for all questions
+    const questionsText = questions.map((q, i) => 
+      `QUESTION ${i + 1}:
+"${q.question}"
+${q.questionKR ? `(Korean: ${q.questionKR})` : ''}
+
+USER'S ANSWER ${i + 1}:
+"${q.userAnswer}"
+`
+    ).join('\n---\n\n');
+
+    const prompt = `You are an OPIC/TOEFL speaking expert. Given multiple questions and user answers, provide IMPROVED answer examples for each.
+
+${questionsText}
+
+LEVEL: ${userLevel}
+${levelGuidance}
+
+For each question, generate an improved answer that:
+1. Directly addresses the question
+2. Is appropriate for ${userLevel} level
+3. Uses natural, conversational English
+4. Is more complete and well-structured than the user's answer
+5. Includes specific details and examples
+6. Demonstrates good speaking patterns
+
+Respond ONLY with valid JSON array:
+[
+  {
+    "questionId": 1,
+    "improvedAnswer": "<the improved answer in English>",
+    "improvedAnswerKR": "<Korean translation>",
+    "keyPoints": ["<key improvement 1>", "<key improvement 2>", "<key improvement 3>"]
+  },
+  {
+    "questionId": 2,
+    ...
+  }
+]
+
+KEY POINTS should explain in Korean what makes each answer better.`;
+
+    const response = await fetch(`${openaiApiBase}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openaiApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert English speaking coach specializing in OPIC and TOEFL speaking tests. Provide practical, improved answer examples.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 2500, // Increased for multiple answers
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('GPT batch improved answer error:', error);
+      return c.json({ error: 'Failed to generate improved answers' }, 500);
+    }
+
+    const result = await response.json() as any;
+    const answerText = result.choices[0].message.content;
+
+    // Extract JSON array from response
+    const jsonMatch = answerText.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) {
+      console.error('Failed to parse batch improved answers:', answerText);
+      return c.json({ 
+        error: 'Failed to parse improved answers',
+        fallback: questions.map((_, i) => ({
+          questionId: i + 1,
+          improvedAnswer: 'Failed to generate improved answer.',
+          improvedAnswerKR: '개선된 답변 생성 실패',
+          keyPoints: []
+        }))
+      }, 500);
+    }
+
+    const improvedAnswers = JSON.parse(jsonMatch[0]);
+
+    return c.json({
+      success: true,
+      answers: improvedAnswers
+    });
+
+  } catch (error) {
+    console.error('Batch improved answer generation error:', error);
+    return c.json({ 
+      error: 'Internal server error during batch answer generation',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
+// Generate improved answer example for exam mode (single)
 pronunciationAnalysis.post('/generate-improved-answer', async (c) => {
   try {
     const { 

@@ -3676,35 +3676,43 @@ class WorVox {
 
     const { answers } = this.currentExam;
 
-    // Generate improved answers for each question
-    console.log('🎯 Generating improved answer examples...');
-    const answersWithImprovement = await Promise.all(
-      answers.map(async (answer) => {
-        try {
-          const response = await axios.post('/api/pronunciation/generate-improved-answer', {
-            question: answer.question,
-            questionKR: answer.questionKR,
-            userAnswer: answer.transcription,
-            userLevel: this.currentUser?.level || 'intermediate'
-          });
-          
-          if (response.data.success) {
+    // Generate improved answers in batch (more efficient, single API call)
+    console.log('🎯 Generating improved answer examples in batch...');
+    let answersWithImprovement = [...answers];
+    
+    try {
+      const response = await axios.post('/api/pronunciation/generate-improved-answers-batch', {
+        questions: answers.map(answer => ({
+          question: answer.question,
+          questionKR: answer.questionKR,
+          userAnswer: answer.transcription
+        })),
+        userLevel: this.currentUser?.level || 'intermediate'
+      });
+      
+      if (response.data.success && response.data.answers) {
+        // Merge improved answers with original answers
+        answersWithImprovement = answers.map((answer, index) => {
+          const improvedData = response.data.answers[index];
+          if (improvedData) {
             console.log('✅ Generated improved answer for question:', answer.questionId);
             return {
               ...answer,
-              improvedAnswer: response.data.improvedAnswer,
-              improvedAnswerKR: response.data.improvedAnswerKR,
-              keyPoints: response.data.keyPoints || []
+              improvedAnswer: improvedData.improvedAnswer,
+              improvedAnswerKR: improvedData.improvedAnswerKR,
+              keyPoints: improvedData.keyPoints || []
             };
           }
-        } catch (error) {
-          console.warn('⚠️ Failed to generate improved answer for question:', error);
-        }
-        return answer;
-      })
-    );
-
-    console.log('✅ All improved answers generated:', answersWithImprovement);
+          return answer;
+        });
+        console.log('✅ All improved answers generated:', answersWithImprovement);
+      } else {
+        console.warn('⚠️ Batch generation failed, continuing without improved answers');
+      }
+    } catch (error) {
+      console.warn('⚠️ Failed to generate improved answers in batch:', error);
+      // Continue with original answers if batch fails
+    }
 
     // Calculate average scores (use answersWithImprovement instead of answers)
     const totalAccuracy = answersWithImprovement.reduce((sum, a) => sum + a.accuracy, 0);
