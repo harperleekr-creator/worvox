@@ -13,5 +13,8 @@
   ],
   "vars": {
     "TOSS_CLIENT_KEY": "test_ck_d26DlbXAaV0eR7QxP00rqY50Q9RB"
+  },
+  "triggers": {
+    "crons": ["0 9 * * *"]
   }
 }

@@ -22,6 +22,8 @@ import attendance from './routes/attendance';
 import pronunciationAnalysis from './routes/pronunciation-analysis';
 import modeReports from './routes/mode-reports';
 import aiPrompts from './routes/ai-prompts';
+import emailNotifications from './routes/email-notifications';
+import scheduled from './scheduled';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -103,6 +105,7 @@ app.route('/api/attendance', attendance);
 app.route('/api/pronunciation', pronunciationAnalysis);
 app.route('/api/mode-reports', modeReports);
 app.route('/api/ai-prompts', aiPrompts);
+app.route('/api/email-notifications', emailNotifications);
 
 // Preview routes
 app.route('/preview', preview);
@@ -511,4 +514,8 @@ app.get('/', (c) => {
   });
 });
 
-export default app;
+// Export both app and scheduled job
+export default {
+  fetch: app.fetch,
+  scheduled: scheduled.scheduled
+};
