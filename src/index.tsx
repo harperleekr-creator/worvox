@@ -53,9 +53,37 @@ app.use('/favicon-*', serveStatic({ root: './' }));
 app.use('/apple-touch-icon.png', serveStatic({ root: './' }));
 app.use('/android-chrome-*', serveStatic({ root: './' }));
 
-// SEO files
-app.use('/robots.txt', serveStatic({ root: './public' }));
-app.use('/sitemap.xml', serveStatic({ root: './public' }));
+// SEO files - serve from root directory
+app.get('/robots.txt', async (c) => {
+  return c.text(`# robots.txt for WorVox
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Sitemap: https://worvox.com/sitemap.xml`, 200, {
+    'Content-Type': 'text/plain'
+  });
+});
+
+app.get('/sitemap.xml', async (c) => {
+  return c.text(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://worvox.com/</loc>
+    <lastmod>2026-03-02</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://worvox.com/pricing</loc>
+    <lastmod>2026-03-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>`, 200, {
+    'Content-Type': 'application/xml'
+  });
+});
 
 // API routes
 app.route('/api/stt', stt);
