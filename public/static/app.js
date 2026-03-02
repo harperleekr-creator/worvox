@@ -3788,7 +3788,7 @@ class WorVox {
       }
     }
 
-    const app = document.getElementById('app');
+    // Render final results (reuse app variable from above)
     app.innerHTML = `
       <div class="flex h-screen bg-gradient-to-br from-orange-50 to-red-50">
         ${this.getSidebar('exam-mode')}
