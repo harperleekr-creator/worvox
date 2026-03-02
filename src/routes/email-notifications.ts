@@ -165,6 +165,71 @@ emailNotifications.post('/send-test-email', async (c) => {
   }
 });
 
+// Manual trigger for sending reminders (admin only)
+emailNotifications.post('/send-reminders', async (c) => {
+  try {
+    // Calculate target date (3 days from now)
+    const threeDaysLater = new Date();
+    threeDaysLater.setDate(threeDaysLater.getDate() + 3);
+    const targetDate = threeDaysLater.toISOString().split('T')[0];
+
+    console.log(`📅 Checking for trials ending on: ${targetDate}`);
+
+    // Get users whose trial ends in 3 days and haven't been notified
+    const users = await c.env.DB.prepare(`
+      SELECT id, email, username, subscription_end_date, plan
+      FROM users
+      WHERE is_trial = 1
+        AND DATE(subscription_end_date) = ?
+        AND trial_reminder_sent = 0
+        AND email IS NOT NULL
+    `).bind(targetDate).all();
+
+    console.log(`📧 Found ${users.results.length} users to notify`);
+
+    let successCount = 0;
+    let failCount = 0;
+    const results = [];
+
+    // Send emails to each user
+    for (const user of users.results) {
+      try {
+        const sent = await sendTrialExpirationEmail(c.env, user as any);
+        
+        if (sent) {
+          // Mark as sent in database
+          await c.env.DB.prepare(`
+            UPDATE users
+            SET trial_reminder_sent = 1
+            WHERE id = ?
+          `).bind(user.id).run();
+          
+          successCount++;
+          results.push({ email: user.email, status: 'success' });
+        } else {
+          failCount++;
+          results.push({ email: user.email, status: 'failed', error: 'Email send failed' });
+        }
+      } catch (error: any) {
+        failCount++;
+        results.push({ email: user.email, status: 'error', error: error.message });
+      }
+    }
+
+    return c.json({
+      success: true,
+      targetDate,
+      totalUsers: users.results.length,
+      successCount,
+      failCount,
+      results
+    });
+  } catch (error: any) {
+    console.error('Send reminders error:', error);
+    return c.json({ success: false, error: error.message }, 500);
+  }
+});
+
 // Get users needing trial reminder
 emailNotifications.get('/pending-reminders', async (c) => {
   try {
