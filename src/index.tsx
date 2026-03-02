@@ -80,11 +80,7 @@ app.get('/payment/success', (c) => {
     <!DOCTYPE html>
     <html lang="ko">
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>결제 성공 - WorVox</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <!-- Google tag (gtag.js) -->
+        <!-- Google tag (gtag.js) - MUST BE FIRST -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-1W0YMPPVH7"></script>
         <script>
           window.dataLayer = window.dataLayer || [];
@@ -92,6 +88,11 @@ app.get('/payment/success', (c) => {
           gtag('js', new Date());
           gtag('config', 'G-1W0YMPPVH7');
         </script>
+        
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>결제 성공 - WorVox</title>
+        <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body class="bg-gray-50">
         <div class="min-h-screen flex items-center justify-center p-4">
@@ -172,11 +173,7 @@ app.get('/payment/fail', (c) => {
     <!DOCTYPE html>
     <html lang="ko">
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>결제 실패 - WorVox</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <!-- Google tag (gtag.js) -->
+        <!-- Google tag (gtag.js) - MUST BE FIRST -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-1W0YMPPVH7"></script>
         <script>
           window.dataLayer = window.dataLayer || [];
@@ -184,6 +181,11 @@ app.get('/payment/fail', (c) => {
           gtag('js', new Date());
           gtag('config', 'G-1W0YMPPVH7');
         </script>
+        
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>결제 실패 - WorVox</title>
+        <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body class="bg-gray-50">
         <div class="min-h-screen flex items-center justify-center p-4">
@@ -229,11 +231,7 @@ app.get('/trial-success', (c) => {
     <!DOCTYPE html>
     <html lang="ko">
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>무료 체험 시작 - WorVox</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <!-- Google tag (gtag.js) -->
+        <!-- Google tag (gtag.js) - MUST BE FIRST -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-1W0YMPPVH7"></script>
         <script>
           window.dataLayer = window.dataLayer || [];
@@ -241,6 +239,11 @@ app.get('/trial-success', (c) => {
           gtag('js', new Date());
           gtag('config', 'G-1W0YMPPVH7');
         </script>
+        
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>무료 체험 시작 - WorVox</title>
+        <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body class="bg-gradient-to-br from-green-50 to-emerald-50">
         <div id="content" class="min-h-screen flex items-center justify-center p-4">
@@ -331,11 +334,7 @@ app.get('/trial-fail', (c) => {
     <!DOCTYPE html>
     <html lang="ko">
     <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>무료 체험 실패 - WorVox</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <!-- Google tag (gtag.js) -->
+        <!-- Google tag (gtag.js) - MUST BE FIRST -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-1W0YMPPVH7"></script>
         <script>
           window.dataLayer = window.dataLayer || [];
@@ -343,6 +342,11 @@ app.get('/trial-fail', (c) => {
           gtag('js', new Date());
           gtag('config', 'G-1W0YMPPVH7');
         </script>
+        
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>무료 체험 실패 - WorVox</title>
+        <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body class="bg-gray-50">
         <div class="min-h-screen flex items-center justify-center p-4">
@@ -382,6 +386,17 @@ app.get('/', (c) => {
     <!DOCTYPE html>
     <html lang="en">
     <head>
+        <!-- Google tag (gtag.js) - MUST BE FIRST -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-1W0YMPPVH7"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-1W0YMPPVH7', {
+            'send_page_view': true
+          });
+        </script>
+        
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>WorVox - AI 영어 학습 플랫폼 | 실시간 발음 교정 & 맞춤형 학습</title>
@@ -426,15 +441,6 @@ app.get('/', (c) => {
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
         <link href="/static/style.css?v=${version}" rel="stylesheet">
-        
-        <!-- Google tag (gtag.js) -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-1W0YMPPVH7"></script>
-        <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-1W0YMPPVH7');
-        </script>
         
         <!-- Toss Payments SDK -->
         <script src="https://js.tosspayments.com/v2/standard"></script>
