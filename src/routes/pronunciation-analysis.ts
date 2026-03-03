@@ -1,7 +1,14 @@
 import { Hono } from 'hono';
 import type { Bindings } from '../types';
+import crypto from 'crypto';
 
 const pronunciationAnalysis = new Hono<{ Bindings: Bindings }>();
+
+// Helper function to generate cache key
+function generateCacheKey(type: string, referenceText: string, userTranscription: string): string {
+  const input = `${type}:${referenceText.toLowerCase().trim()}:${userTranscription.toLowerCase().trim()}`;
+  return crypto.createHash('md5').update(input).digest('hex');
+}
 
 // Analyze pronunciation quality by comparing reference text with user transcription
 pronunciationAnalysis.post('/analyze', async (c) => {
@@ -21,6 +28,42 @@ pronunciationAnalysis.post('/analyze', async (c) => {
 
     if (!openaiApiKey) {
       return c.json({ error: 'OpenAI API key not configured' }, 500);
+    }
+
+    // 🚀 CACHE: Check if we have cached analysis
+    const cacheKey = generateCacheKey('pronunciation', referenceText, userTranscription);
+    
+    try {
+      const cached = await c.env.DB.prepare(
+        'SELECT analysis_data, hit_count FROM ai_analysis_cache WHERE cache_key = ?'
+      ).bind(cacheKey).first();
+
+      if (cached) {
+        // Update hit count and last used
+        await c.env.DB.prepare(
+          'UPDATE ai_analysis_cache SET hit_count = hit_count + 1, last_used_at = CURRENT_TIMESTAMP WHERE cache_key = ?'
+        ).bind(cacheKey).run();
+
+        // Update cache stats
+        await c.env.DB.prepare(`
+          INSERT INTO ai_cache_stats (date, cache_hits, api_calls_saved, cost_saved_usd)
+          VALUES (DATE('now'), 1, 1, 0.001)
+          ON CONFLICT(date) DO UPDATE SET
+            cache_hits = cache_hits + 1,
+            api_calls_saved = api_calls_saved + 1,
+            cost_saved_usd = cost_saved_usd + 0.001
+        `).run();
+
+        console.log(`✅ Cache HIT for pronunciation analysis (${cached.hit_count + 1} hits)`);
+        const cachedData = JSON.parse(cached.analysis_data as string);
+        return c.json({
+          success: true,
+          ...cachedData,
+          cached: true
+        });
+      }
+    } catch (error) {
+      console.warn('⚠️ Cache lookup failed, proceeding with API call:', error);
     }
 
     // Use GPT-4o-mini for detailed pronunciation analysis
@@ -139,8 +182,7 @@ FEEDBACK GUIDELINES:
 
     const scores = JSON.parse(jsonMatch[0]);
 
-    return c.json({
-      success: true,
+    const resultData = {
       accuracy: Math.round(scores.accuracy),
       pronunciation: Math.round(scores.pronunciation),
       fluency: Math.round(scores.fluency),
@@ -148,6 +190,39 @@ FEEDBACK GUIDELINES:
       strengths: scores.strengths || [],
       improvements: scores.improvements || [],
       nextSteps: scores.nextSteps || '',
+    };
+
+    // 🚀 CACHE: Store result in cache for future use
+    try {
+      await c.env.DB.prepare(`
+        INSERT INTO ai_analysis_cache (cache_key, cache_type, input_hash, analysis_data)
+        VALUES (?, ?, ?, ?)
+        ON CONFLICT(cache_key) DO UPDATE SET
+          analysis_data = excluded.analysis_data,
+          last_used_at = CURRENT_TIMESTAMP
+      `).bind(
+        cacheKey,
+        'pronunciation',
+        cacheKey,
+        JSON.stringify(resultData)
+      ).run();
+
+      // Update cache stats
+      await c.env.DB.prepare(`
+        INSERT INTO ai_cache_stats (date, cache_misses)
+        VALUES (DATE('now'), 1)
+        ON CONFLICT(date) DO UPDATE SET cache_misses = cache_misses + 1
+      `).run();
+
+      console.log('✅ Analysis result cached for future use');
+    } catch (error) {
+      console.warn('⚠️ Failed to cache result:', error);
+    }
+
+    return c.json({
+      success: true,
+      ...resultData,
+      cached: false
     });
 
   } catch (error) {
