@@ -693,10 +693,13 @@ app.get('/landing', (c) => {
                         
                         <!-- Timer Challenge Demo Image -->
                         <div class="aspect-video bg-gray-100 relative group cursor-pointer overflow-hidden">
-                            <img src="/static/demo-timer-challenge.png" 
-                                 alt="타이머 챌린지 모드 - 실시간 발음 분석 데모" 
-                                 class="w-full h-full object-cover"
-                                 loading="lazy">
+                            <picture>
+                                <source srcset="/static/demo-timer-challenge.webp" type="image/webp">
+                                <img src="/static/demo-timer-challenge.png" 
+                                     alt="타이머 챌린지 모드 - 실시간 발음 분석 데모" 
+                                     class="w-full h-full object-cover"
+                                     loading="lazy">
+                            </picture>
                             <div class="absolute inset-0 bg-gradient-to-t from-purple-900/80 via-purple-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
                                 <div class="text-white text-center transform translate-y-4 group-hover:translate-y-0 transition-transform">
                                     <i class="fas fa-search-plus text-5xl mb-3"></i>
@@ -740,10 +743,13 @@ app.get('/landing', (c) => {
                         
                         <!-- Scenario Mode Demo Image -->
                         <div class="aspect-video bg-gray-100 relative group cursor-pointer overflow-hidden">
-                            <img src="/static/demo-scenario-mode.png" 
-                                 alt="시나리오 모드 - 실전 회화 연습 데모" 
-                                 class="w-full h-full object-cover"
-                                 loading="lazy">
+                            <picture>
+                                <source srcset="/static/demo-scenario-mode.webp" type="image/webp">
+                                <img src="/static/demo-scenario-mode.png" 
+                                     alt="시나리오 모드 - 실전 회화 연습 데모" 
+                                     class="w-full h-full object-cover"
+                                     loading="lazy">
+                            </picture>
                             <div class="absolute inset-0 bg-gradient-to-t from-blue-900/80 via-blue-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
                                 <div class="text-white text-center transform translate-y-4 group-hover:translate-y-0 transition-transform">
                                     <i class="fas fa-search-plus text-5xl mb-3"></i>
@@ -787,10 +793,13 @@ app.get('/landing', (c) => {
                         
                         <!-- Exam Mode Demo Image -->
                         <div class="aspect-video bg-gray-100 relative group cursor-pointer overflow-hidden">
-                            <img src="/static/demo-ai-analysis.png" 
-                                 alt="시험 모드 - OPIC 준비 및 분석 데모" 
-                                 class="w-full h-full object-cover"
-                                 loading="lazy">
+                            <picture>
+                                <source srcset="/static/demo-ai-analysis.webp" type="image/webp">
+                                <img src="/static/demo-ai-analysis.png" 
+                                     alt="시험 모드 - OPIC 준비 및 분석 데모" 
+                                     class="w-full h-full object-cover"
+                                     loading="lazy">
+                            </picture>
                             <div class="absolute inset-0 bg-gradient-to-t from-green-900/80 via-green-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
                                 <div class="text-white text-center transform translate-y-4 group-hover:translate-y-0 transition-transform">
                                     <i class="fas fa-search-plus text-5xl mb-3"></i>
