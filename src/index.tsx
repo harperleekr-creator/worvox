@@ -521,19 +521,20 @@ app.get('/landing', (c) => {
         <!-- Hero Section -->
         <section class="pt-20 pb-16 px-4">
             <div class="max-w-4xl mx-auto text-center">
-                <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+                <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
                     <span class="bg-gradient-to-r from-purple-600 to-blue-600 text-transparent bg-clip-text">
                         AI 영어 학습 플랫폼
                     </span>
                     <br/>
-                    실시간 발음 교정 & 맞춤형 회화 연습
+                    <span class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl">실시간 발음 교정 & 맞춤형 회화 연습</span>
                 </h1>
-                <p class="text-xl text-gray-600 mb-8 leading-relaxed">
-                    GPT-4 기반 AI로 <strong>영어 회화 실력 3배 향상</strong>!<br/>
-                    실시간 발음 분석, 30가지 실전 시나리오, OPIC 준비까지 - 월 1.9만원으로 24시간 무제한 학습
+                <p class="text-base sm:text-lg md:text-xl text-gray-600 mb-8 leading-relaxed px-2">
+                    GPT-4 기반 AI로 <strong>영어 회화 실력 3배 향상</strong>!<br class="hidden sm:block"/>
+                    <span class="block sm:inline">실시간 발음 분석, 30가지 실전 시나리오,</span>
+                    <span class="block sm:inline">OPIC 준비까지 - 월 1.9만원</span>
                 </p>
                 <a href="/app" 
-                   class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-xl transition transform hover:scale-105"
+                   class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:shadow-xl transition transform hover:scale-105"
                    onclick="gtag('event', 'cta_click', { 'event_category': 'engagement', 'event_label': 'hero_cta_start_trial', 'value': 1 })">
                     <i class="fas fa-rocket mr-2"></i>2주 무료 체험 시작
                 </a>
@@ -544,7 +545,7 @@ app.get('/landing', (c) => {
         <section class="py-16 px-4 bg-white">
             <div class="max-w-6xl mx-auto">
                 <div class="text-center mb-16">
-                    <h2 class="text-4xl font-bold text-gray-900 mb-4">우리의 미션</h2>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">우리의 미션</h2>
                     <p class="text-xl text-gray-600 max-w-3xl mx-auto">
                         누구나 쉽고 효과적으로 영어를 마스터할 수 있도록,<br/>
                         AI 기술로 학습 장벽을 허물고 있습니다.
@@ -586,7 +587,7 @@ app.get('/landing', (c) => {
         <section class="py-16 px-4">
             <div class="max-w-6xl mx-auto">
                 <div class="text-center mb-16">
-                    <h2 class="text-4xl font-bold text-gray-900 mb-4">WorVox와 함께 얻는 것</h2>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">WorVox와 함께 얻는 것</h2>
                     <p class="text-xl text-gray-600">AI 기술이 선사하는 차별화된 학습 경험</p>
                 </div>
 
@@ -675,7 +676,7 @@ app.get('/landing', (c) => {
         <section class="py-16 px-4 bg-gradient-to-br from-purple-50 via-white to-blue-50">
             <div class="max-w-6xl mx-auto">
                 <div class="text-center mb-16">
-                    <h2 class="text-4xl font-bold text-gray-900 mb-4">실제 사용 모습을 확인하세요</h2>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">실제 사용 모습을 확인하세요</h2>
                     <p class="text-xl text-gray-600">WorVox의 핵심 기능을 직접 체험해보세요</p>
                 </div>
 
@@ -851,7 +852,7 @@ app.get('/landing', (c) => {
         <section class="py-16 px-4 bg-gradient-to-br from-gray-50 to-gray-100">
             <div class="max-w-6xl mx-auto">
                 <div class="text-center mb-16">
-                    <h2 class="text-4xl font-bold text-gray-900 mb-4">최첨단 AI 기술</h2>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">최첨단 AI 기술</h2>
                     <p class="text-xl text-gray-600">세계 최고 수준의 AI 기술로 구축된 학습 플랫폼</p>
                 </div>
 
@@ -917,67 +918,73 @@ app.get('/landing', (c) => {
         <section class="py-16 px-4 bg-white">
             <div class="max-w-6xl mx-auto">
                 <div class="text-center mb-16">
-                    <h2 class="text-4xl font-bold text-gray-900 mb-4">왜 WorVox를 선택해야 할까요?</h2>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">왜 WorVox를 선택해야 할까요?</h2>
                     <p class="text-xl text-gray-600">일반 영어 학원 및 다른 플랫폼과의 비교</p>
                 </div>
 
-                <div class="overflow-x-auto">
-                    <table class="w-full bg-white rounded-2xl shadow-xl overflow-hidden">
-                        <thead>
-                            <tr class="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
-                                <th class="py-6 px-6 text-left font-bold text-lg">항목</th>
-                                <th class="py-6 px-6 text-center font-bold text-lg">
-                                    <div class="flex flex-col items-center">
-                                        <span class="text-2xl mb-2">🏢</span>
-                                        <span>일반 영어 학원</span>
-                                    </div>
-                                </th>
-                                <th class="py-6 px-6 text-center font-bold text-lg">
-                                    <div class="flex flex-col items-center">
-                                        <span class="text-2xl mb-2">💻</span>
-                                        <span>일반 온라인 강의</span>
-                                    </div>
-                                </th>
-                                <th class="py-6 px-6 text-center font-bold text-lg bg-yellow-400 text-purple-900">
-                                    <div class="flex flex-col items-center">
-                                        <span class="text-2xl mb-2">👑</span>
-                                        <span>WorVox</span>
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                <!-- Comparison Table -->
+                <div class="mb-16">
+                    <p class="text-center text-sm text-gray-500 mb-4 md:hidden">
+                        <i class="fas fa-arrows-alt-h mr-2"></i>좌우로 스크롤하여 전체 비교표를 확인하세요
+                    </p>
+                    <div class="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+                        <div class="inline-block min-w-full">
+                            <table class="w-full bg-white rounded-2xl shadow-xl overflow-hidden" style="min-width: 600px;">
+                                <thead>
+                                    <tr class="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+                                        <th class="py-4 sm:py-6 px-3 sm:px-6 text-left font-bold text-sm sm:text-lg">항목</th>
+                                        <th class="py-4 sm:py-6 px-3 sm:px-6 text-center font-bold text-sm sm:text-lg">
+                                            <div class="flex flex-col items-center">
+                                                <span class="text-xl sm:text-2xl mb-2">🏢</span>
+                                                <span class="text-xs sm:text-base">일반 영어 학원</span>
+                                            </div>
+                                        </th>
+                                        <th class="py-4 sm:py-6 px-3 sm:px-6 text-center font-bold text-sm sm:text-lg">
+                                            <div class="flex flex-col items-center">
+                                                <span class="text-xl sm:text-2xl mb-2">💻</span>
+                                                <span class="text-xs sm:text-base">일반 온라인 강의</span>
+                                            </div>
+                                        </th>
+                                        <th class="py-4 sm:py-6 px-3 sm:px-6 text-center font-bold text-sm sm:text-lg bg-yellow-400 text-purple-900">
+                                            <div class="flex flex-col items-center">
+                                                <span class="text-xl sm:text-2xl mb-2">👑</span>
+                                                <span class="text-xs sm:text-base">WorVox</span>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                             <!-- 가격 -->
                             <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
-                                <td class="py-6 px-6 font-semibold text-gray-900">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 font-semibold text-gray-900 text-sm sm:text-base">
                                     <i class="fas fa-won-sign text-purple-600 mr-2"></i>가격
                                 </td>
-                                <td class="py-6 px-6 text-center text-red-600 font-semibold">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center text-red-600 font-semibold text-sm sm:text-base">
                                     월 20-40만원
                                 </td>
-                                <td class="py-6 px-6 text-center text-orange-600 font-semibold">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center text-orange-600 font-semibold text-sm sm:text-base">
                                     월 5-15만원
                                 </td>
-                                <td class="py-6 px-6 text-center bg-green-50">
-                                    <div class="text-green-600 font-bold text-lg">월 1.9만원</div>
-                                    <div class="text-sm text-gray-600">연간 할인 18%</div>
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center bg-green-50">
+                                    <div class="text-green-600 font-bold text-base sm:text-lg">월 1.9만원</div>
+                                    <div class="text-xs sm:text-sm text-gray-600">연간 할인 18%</div>
                                 </td>
                             </tr>
                             
                             <!-- 시간 제약 -->
                             <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
-                                <td class="py-6 px-6 font-semibold text-gray-900">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 font-semibold text-gray-900 text-sm sm:text-base">
                                     <i class="fas fa-clock text-purple-600 mr-2"></i>시간 제약
                                 </td>
-                                <td class="py-6 px-6 text-center">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center">
                                     <span class="text-red-600">정해진 시간</span><br/>
                                     <span class="text-sm text-gray-600">(주 2-3회)</span>
                                 </td>
-                                <td class="py-6 px-6 text-center">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center">
                                     <span class="text-orange-600">일부 제한</span><br/>
                                     <span class="text-sm text-gray-600">(강의 스케줄)</span>
                                 </td>
-                                <td class="py-6 px-6 text-center bg-green-50">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center bg-green-50">
                                     <div class="text-green-600 font-bold">24시간 무제한</div>
                                     <div class="text-sm text-gray-600">언제 어디서나</div>
                                 </td>
@@ -985,18 +992,18 @@ app.get('/landing', (c) => {
                             
                             <!-- 개인화 학습 -->
                             <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
-                                <td class="py-6 px-6 font-semibold text-gray-900">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 font-semibold text-gray-900 text-sm sm:text-base">
                                     <i class="fas fa-user-cog text-purple-600 mr-2"></i>개인화 학습
                                 </td>
-                                <td class="py-6 px-6 text-center">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center">
                                     <span class="text-orange-600">제한적</span><br/>
                                     <span class="text-sm text-gray-600">(그룹 수업)</span>
                                 </td>
-                                <td class="py-6 px-6 text-center">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center">
                                     <span class="text-red-600">없음</span><br/>
                                     <span class="text-sm text-gray-600">(일방향 강의)</span>
                                 </td>
-                                <td class="py-6 px-6 text-center bg-green-50">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center bg-green-50">
                                     <div class="text-green-600 font-bold">GPT-4 AI 맞춤</div>
                                     <div class="text-sm text-gray-600">수준별 완벽 대응</div>
                                 </td>
@@ -1004,18 +1011,18 @@ app.get('/landing', (c) => {
                             
                             <!-- 실시간 피드백 -->
                             <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
-                                <td class="py-6 px-6 font-semibold text-gray-900">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 font-semibold text-gray-900 text-sm sm:text-base">
                                     <i class="fas fa-comments text-purple-600 mr-2"></i>실시간 피드백
                                 </td>
-                                <td class="py-6 px-6 text-center">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center">
                                     <span class="text-orange-600">간헐적</span><br/>
                                     <span class="text-sm text-gray-600">(수업 중만)</span>
                                 </td>
-                                <td class="py-6 px-6 text-center">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center">
                                     <span class="text-red-600">없음</span><br/>
                                     <span class="text-sm text-gray-600">(녹화 강의)</span>
                                 </td>
-                                <td class="py-6 px-6 text-center bg-green-50">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center bg-green-50">
                                     <div class="text-green-600 font-bold">즉각 분석</div>
                                     <div class="text-sm text-gray-600">AI 발음·유창성 평가</div>
                                 </td>
@@ -1023,17 +1030,17 @@ app.get('/landing', (c) => {
                             
                             <!-- 발음 교정 -->
                             <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
-                                <td class="py-6 px-6 font-semibold text-gray-900">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 font-semibold text-gray-900 text-sm sm:text-base">
                                     <i class="fas fa-microphone-alt text-purple-600 mr-2"></i>발음 교정
                                 </td>
-                                <td class="py-6 px-6 text-center">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center">
                                     <span class="text-orange-600">주관적</span><br/>
                                     <span class="text-sm text-gray-600">(강사 재량)</span>
                                 </td>
-                                <td class="py-6 px-6 text-center">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center">
                                     <span class="text-red-600">불가능</span>
                                 </td>
-                                <td class="py-6 px-6 text-center bg-green-50">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center bg-green-50">
                                     <div class="text-green-600 font-bold">정밀 AI 분석</div>
                                     <div class="text-sm text-gray-600">정확도 수치화</div>
                                 </td>
@@ -1041,17 +1048,17 @@ app.get('/landing', (c) => {
                             
                             <!-- 학습 기록 -->
                             <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
-                                <td class="py-6 px-6 font-semibold text-gray-900">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 font-semibold text-gray-900 text-sm sm:text-base">
                                     <i class="fas fa-chart-line text-purple-600 mr-2"></i>학습 기록 관리
                                 </td>
-                                <td class="py-6 px-6 text-center">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center">
                                     <span class="text-red-600">수동 관리</span>
                                 </td>
-                                <td class="py-6 px-6 text-center">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center">
                                     <span class="text-orange-600">기본 수준</span><br/>
                                     <span class="text-sm text-gray-600">(진도율만)</span>
                                 </td>
-                                <td class="py-6 px-6 text-center bg-green-50">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center bg-green-50">
                                     <div class="text-green-600 font-bold">자동 상세 분석</div>
                                     <div class="text-sm text-gray-600">성장 그래프 제공</div>
                                 </td>
@@ -1059,17 +1066,17 @@ app.get('/landing', (c) => {
                             
                             <!-- OPIC 준비 -->
                             <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
-                                <td class="py-6 px-6 font-semibold text-gray-900">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 font-semibold text-gray-900 text-sm sm:text-base">
                                     <i class="fas fa-graduation-cap text-purple-600 mr-2"></i>OPIC 준비
                                 </td>
-                                <td class="py-6 px-6 text-center">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center">
                                     <span class="text-orange-600">별도 비용</span><br/>
                                     <span class="text-sm text-gray-600">(특강 추가)</span>
                                 </td>
-                                <td class="py-6 px-6 text-center">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center">
                                     <span class="text-red-600">제한적</span>
                                 </td>
-                                <td class="py-6 px-6 text-center bg-green-50">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center bg-green-50">
                                     <div class="text-green-600 font-bold">무료 포함</div>
                                     <div class="text-sm text-gray-600">실전 시험 모드</div>
                                 </td>
@@ -1077,17 +1084,17 @@ app.get('/landing', (c) => {
                             
                             <!-- 편의성 -->
                             <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
-                                <td class="py-6 px-6 font-semibold text-gray-900">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 font-semibold text-gray-900 text-sm sm:text-base">
                                     <i class="fas fa-map-marker-alt text-purple-600 mr-2"></i>장소/이동
                                 </td>
-                                <td class="py-6 px-6 text-center">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center">
                                     <span class="text-red-600">학원 방문 필수</span><br/>
                                     <span class="text-sm text-gray-600">(교통비·시간)</span>
                                 </td>
-                                <td class="py-6 px-6 text-center">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center">
                                     <span class="text-green-600">온라인</span>
                                 </td>
-                                <td class="py-6 px-6 text-center bg-green-50">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center bg-green-50">
                                     <div class="text-green-600 font-bold">완전 온라인</div>
                                     <div class="text-sm text-gray-600">모바일 지원</div>
                                 </td>
@@ -1095,18 +1102,18 @@ app.get('/landing', (c) => {
                             
                             <!-- 학습 효율 -->
                             <tr class="hover:bg-gray-50 transition">
-                                <td class="py-6 px-6 font-semibold text-gray-900">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 font-semibold text-gray-900 text-sm sm:text-base">
                                     <i class="fas fa-rocket text-purple-600 mr-2"></i>학습 효율
                                 </td>
-                                <td class="py-6 px-6 text-center">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center">
                                     <span class="text-orange-600">보통</span><br/>
                                     <span class="text-sm text-gray-600">(주 2-3시간)</span>
                                 </td>
-                                <td class="py-6 px-6 text-center">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center">
                                     <span class="text-orange-600">느림</span><br/>
                                     <span class="text-sm text-gray-600">(일방향 학습)</span>
                                 </td>
-                                <td class="py-6 px-6 text-center bg-green-50">
+                                <td class="py-4 sm:py-6 px-3 sm:px-6 text-center bg-green-50">
                                     <div class="text-green-600 font-bold">3배 빠름</div>
                                     <div class="text-sm text-gray-600">AI 집중 학습</div>
                                 </td>
@@ -1395,7 +1402,7 @@ app.get('/about', (c) => {
         <section class="py-16 px-4 bg-white">
             <div class="max-w-6xl mx-auto">
                 <div class="text-center mb-16">
-                    <h2 class="text-4xl font-bold text-gray-900 mb-4">우리의 미션</h2>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">우리의 미션</h2>
                     <p class="text-xl text-gray-600 max-w-3xl mx-auto">
                         누구나 쉽고 효과적으로 영어를 마스터할 수 있도록,<br/>
                         AI 기술로 학습 장벽을 허물고 있습니다.
@@ -1437,7 +1444,7 @@ app.get('/about', (c) => {
         <section class="py-16 px-4">
             <div class="max-w-6xl mx-auto">
                 <div class="text-center mb-16">
-                    <h2 class="text-4xl font-bold text-gray-900 mb-4">WorVox와 함께 얻는 것</h2>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">WorVox와 함께 얻는 것</h2>
                     <p class="text-xl text-gray-600">AI 기술이 선사하는 차별화된 학습 경험</p>
                 </div>
 
@@ -1525,7 +1532,7 @@ app.get('/about', (c) => {
         <section class="py-16 px-4 bg-gradient-to-br from-gray-50 to-gray-100">
             <div class="max-w-6xl mx-auto">
                 <div class="text-center mb-16">
-                    <h2 class="text-4xl font-bold text-gray-900 mb-4">최첨단 AI 기술</h2>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">최첨단 AI 기술</h2>
                     <p class="text-xl text-gray-600">세계 최고 수준의 AI 기술로 구축된 학습 플랫폼</p>
                 </div>
 
