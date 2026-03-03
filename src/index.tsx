@@ -55,6 +55,13 @@ app.use('/favicon-*', serveStatic({ root: './' }));
 app.use('/apple-touch-icon.png', serveStatic({ root: './' }));
 app.use('/android-chrome-*', serveStatic({ root: './' }));
 
+// Naver Webmaster verification file
+app.get('/naver2b8cc0248abdd5b43e205955b8ef7247.html', async (c) => {
+  return c.text('naver-site-verification: naver2b8cc0248abdd5b43e205955b8ef7247.html', 200, {
+    'Content-Type': 'text/html; charset=utf-8'
+  });
+});
+
 // SEO files - serve from root directory
 app.get('/robots.txt', async (c) => {
   return c.text(`# robots.txt for WorVox - AI English Learning Platform
