@@ -726,6 +726,235 @@ app.get('/landing', (c) => {
         </section>
 
         <!-- CTA Section -->
+
+        <!-- Comparison Table Section -->
+        <section class="py-16 px-4 bg-white">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-gray-900 mb-4">왜 WorVox를 선택해야 할까요?</h2>
+                    <p class="text-xl text-gray-600">일반 영어 학원 및 다른 플랫폼과의 비교</p>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full bg-white rounded-2xl shadow-xl overflow-hidden">
+                        <thead>
+                            <tr class="bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+                                <th class="py-6 px-6 text-left font-bold text-lg">항목</th>
+                                <th class="py-6 px-6 text-center font-bold text-lg">
+                                    <div class="flex flex-col items-center">
+                                        <span class="text-2xl mb-2">🏢</span>
+                                        <span>일반 영어 학원</span>
+                                    </div>
+                                </th>
+                                <th class="py-6 px-6 text-center font-bold text-lg">
+                                    <div class="flex flex-col items-center">
+                                        <span class="text-2xl mb-2">💻</span>
+                                        <span>일반 온라인 강의</span>
+                                    </div>
+                                </th>
+                                <th class="py-6 px-6 text-center font-bold text-lg bg-yellow-400 text-purple-900">
+                                    <div class="flex flex-col items-center">
+                                        <span class="text-2xl mb-2">👑</span>
+                                        <span>WorVox</span>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 가격 -->
+                            <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
+                                <td class="py-6 px-6 font-semibold text-gray-900">
+                                    <i class="fas fa-won-sign text-purple-600 mr-2"></i>가격
+                                </td>
+                                <td class="py-6 px-6 text-center text-red-600 font-semibold">
+                                    월 20-40만원
+                                </td>
+                                <td class="py-6 px-6 text-center text-orange-600 font-semibold">
+                                    월 5-15만원
+                                </td>
+                                <td class="py-6 px-6 text-center bg-green-50">
+                                    <div class="text-green-600 font-bold text-lg">월 1.9만원</div>
+                                    <div class="text-sm text-gray-600">연간 할인 18%</div>
+                                </td>
+                            </tr>
+                            
+                            <!-- 시간 제약 -->
+                            <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
+                                <td class="py-6 px-6 font-semibold text-gray-900">
+                                    <i class="fas fa-clock text-purple-600 mr-2"></i>시간 제약
+                                </td>
+                                <td class="py-6 px-6 text-center">
+                                    <span class="text-red-600">정해진 시간</span><br/>
+                                    <span class="text-sm text-gray-600">(주 2-3회)</span>
+                                </td>
+                                <td class="py-6 px-6 text-center">
+                                    <span class="text-orange-600">일부 제한</span><br/>
+                                    <span class="text-sm text-gray-600">(강의 스케줄)</span>
+                                </td>
+                                <td class="py-6 px-6 text-center bg-green-50">
+                                    <div class="text-green-600 font-bold">24시간 무제한</div>
+                                    <div class="text-sm text-gray-600">언제 어디서나</div>
+                                </td>
+                            </tr>
+                            
+                            <!-- 개인화 학습 -->
+                            <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
+                                <td class="py-6 px-6 font-semibold text-gray-900">
+                                    <i class="fas fa-user-cog text-purple-600 mr-2"></i>개인화 학습
+                                </td>
+                                <td class="py-6 px-6 text-center">
+                                    <span class="text-orange-600">제한적</span><br/>
+                                    <span class="text-sm text-gray-600">(그룹 수업)</span>
+                                </td>
+                                <td class="py-6 px-6 text-center">
+                                    <span class="text-red-600">없음</span><br/>
+                                    <span class="text-sm text-gray-600">(일방향 강의)</span>
+                                </td>
+                                <td class="py-6 px-6 text-center bg-green-50">
+                                    <div class="text-green-600 font-bold">GPT-4 AI 맞춤</div>
+                                    <div class="text-sm text-gray-600">수준별 완벽 대응</div>
+                                </td>
+                            </tr>
+                            
+                            <!-- 실시간 피드백 -->
+                            <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
+                                <td class="py-6 px-6 font-semibold text-gray-900">
+                                    <i class="fas fa-comments text-purple-600 mr-2"></i>실시간 피드백
+                                </td>
+                                <td class="py-6 px-6 text-center">
+                                    <span class="text-orange-600">간헐적</span><br/>
+                                    <span class="text-sm text-gray-600">(수업 중만)</span>
+                                </td>
+                                <td class="py-6 px-6 text-center">
+                                    <span class="text-red-600">없음</span><br/>
+                                    <span class="text-sm text-gray-600">(녹화 강의)</span>
+                                </td>
+                                <td class="py-6 px-6 text-center bg-green-50">
+                                    <div class="text-green-600 font-bold">즉각 분석</div>
+                                    <div class="text-sm text-gray-600">AI 발음·유창성 평가</div>
+                                </td>
+                            </tr>
+                            
+                            <!-- 발음 교정 -->
+                            <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
+                                <td class="py-6 px-6 font-semibold text-gray-900">
+                                    <i class="fas fa-microphone-alt text-purple-600 mr-2"></i>발음 교정
+                                </td>
+                                <td class="py-6 px-6 text-center">
+                                    <span class="text-orange-600">주관적</span><br/>
+                                    <span class="text-sm text-gray-600">(강사 재량)</span>
+                                </td>
+                                <td class="py-6 px-6 text-center">
+                                    <span class="text-red-600">불가능</span>
+                                </td>
+                                <td class="py-6 px-6 text-center bg-green-50">
+                                    <div class="text-green-600 font-bold">정밀 AI 분석</div>
+                                    <div class="text-sm text-gray-600">정확도 수치화</div>
+                                </td>
+                            </tr>
+                            
+                            <!-- 학습 기록 -->
+                            <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
+                                <td class="py-6 px-6 font-semibold text-gray-900">
+                                    <i class="fas fa-chart-line text-purple-600 mr-2"></i>학습 기록 관리
+                                </td>
+                                <td class="py-6 px-6 text-center">
+                                    <span class="text-red-600">수동 관리</span>
+                                </td>
+                                <td class="py-6 px-6 text-center">
+                                    <span class="text-orange-600">기본 수준</span><br/>
+                                    <span class="text-sm text-gray-600">(진도율만)</span>
+                                </td>
+                                <td class="py-6 px-6 text-center bg-green-50">
+                                    <div class="text-green-600 font-bold">자동 상세 분석</div>
+                                    <div class="text-sm text-gray-600">성장 그래프 제공</div>
+                                </td>
+                            </tr>
+                            
+                            <!-- OPIC 준비 -->
+                            <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
+                                <td class="py-6 px-6 font-semibold text-gray-900">
+                                    <i class="fas fa-graduation-cap text-purple-600 mr-2"></i>OPIC 준비
+                                </td>
+                                <td class="py-6 px-6 text-center">
+                                    <span class="text-orange-600">별도 비용</span><br/>
+                                    <span class="text-sm text-gray-600">(특강 추가)</span>
+                                </td>
+                                <td class="py-6 px-6 text-center">
+                                    <span class="text-red-600">제한적</span>
+                                </td>
+                                <td class="py-6 px-6 text-center bg-green-50">
+                                    <div class="text-green-600 font-bold">무료 포함</div>
+                                    <div class="text-sm text-gray-600">실전 시험 모드</div>
+                                </td>
+                            </tr>
+                            
+                            <!-- 편의성 -->
+                            <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
+                                <td class="py-6 px-6 font-semibold text-gray-900">
+                                    <i class="fas fa-map-marker-alt text-purple-600 mr-2"></i>장소/이동
+                                </td>
+                                <td class="py-6 px-6 text-center">
+                                    <span class="text-red-600">학원 방문 필수</span><br/>
+                                    <span class="text-sm text-gray-600">(교통비·시간)</span>
+                                </td>
+                                <td class="py-6 px-6 text-center">
+                                    <span class="text-green-600">온라인</span>
+                                </td>
+                                <td class="py-6 px-6 text-center bg-green-50">
+                                    <div class="text-green-600 font-bold">완전 온라인</div>
+                                    <div class="text-sm text-gray-600">모바일 지원</div>
+                                </td>
+                            </tr>
+                            
+                            <!-- 학습 효율 -->
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="py-6 px-6 font-semibold text-gray-900">
+                                    <i class="fas fa-rocket text-purple-600 mr-2"></i>학습 효율
+                                </td>
+                                <td class="py-6 px-6 text-center">
+                                    <span class="text-orange-600">보통</span><br/>
+                                    <span class="text-sm text-gray-600">(주 2-3시간)</span>
+                                </td>
+                                <td class="py-6 px-6 text-center">
+                                    <span class="text-orange-600">느림</span><br/>
+                                    <span class="text-sm text-gray-600">(일방향 학습)</span>
+                                </td>
+                                <td class="py-6 px-6 text-center bg-green-50">
+                                    <div class="text-green-600 font-bold">3배 빠름</div>
+                                    <div class="text-sm text-gray-600">AI 집중 학습</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Highlight Box -->
+                <div class="mt-12 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-8 text-white text-center">
+                    <h3 class="text-3xl font-bold mb-4">💰 비용 절감 효과</h3>
+                    <div class="grid md:grid-cols-3 gap-6 mb-6">
+                        <div>
+                            <div class="text-4xl font-bold mb-2">1/20</div>
+                            <div class="text-purple-100">일반 학원 대비</div>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-bold mb-2">3배</div>
+                            <div class="text-purple-100">빠른 학습 속도</div>
+                        </div>
+                        <div>
+                            <div class="text-4xl font-bold mb-2">24/7</div>
+                            <div class="text-purple-100">무제한 이용</div>
+                        </div>
+                    </div>
+                    <p class="text-xl text-purple-100 mb-6">
+                        연간 약 <span class="text-yellow-300 font-bold">240만원 절약</span> 가능!
+                    </p>
+                    <a href="/app" class="inline-block bg-white text-purple-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition transform hover:scale-105 shadow-xl">
+                        <i class="fas fa-gift mr-2"></i>2주 무료로 체험하기
+                    </a>
+                </div>
+            </div>
+        </section>
         <section class="py-20 px-4 bg-gradient-to-r from-purple-600 to-blue-600">
             <div class="max-w-4xl mx-auto text-center">
                 <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
