@@ -1181,8 +1181,7 @@ app.get('/landing', (c) => {
                 <div class="grid md:grid-cols-4 gap-8 mb-12">
                     <!-- Company Info -->
                     <div class="md:col-span-2">
-                        <div class="flex items-center gap-2 mb-4">
-                            <img src="/static/logo.webp" alt="WorVox Logo" class="h-10 w-10">
+                        <div class="mb-4">
                             <span class="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">WorVox</span>
                         </div>
                         <p class="text-gray-400 mb-4 leading-relaxed">
