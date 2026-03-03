@@ -512,9 +512,14 @@ app.get('/about', (c) => {
                         <img src="/static/logo.webp" alt="WorVox Logo" class="h-8 w-8">
                         <span class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 text-transparent bg-clip-text">WorVox</span>
                     </a>
-                    <a href="/" class="text-gray-700 hover:text-purple-600 font-medium transition">
-                        <i class="fas fa-home mr-2"></i>홈으로
-                    </a>
+                    <div class="flex items-center gap-4">
+                        <a href="/pricing" class="text-gray-700 hover:text-purple-600 font-medium transition">
+                            <i class="fas fa-tag mr-2"></i>요금제
+                        </a>
+                        <a href="/" class="text-gray-700 hover:text-purple-600 font-medium transition">
+                            <i class="fas fa-home mr-2"></i>홈으로
+                        </a>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -743,7 +748,7 @@ app.get('/about', (c) => {
                     <a href="/" class="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition transform hover:scale-105 shadow-xl">
                         <i class="fas fa-rocket mr-2"></i>무료 체험 시작
                     </a>
-                    <a href="/#pricing" class="bg-purple-700 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-purple-800 transition transform hover:scale-105 shadow-xl border-2 border-white/30">
+                    <a href="/pricing" class="bg-purple-700 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-purple-800 transition transform hover:scale-105 shadow-xl border-2 border-white/30">
                         <i class="fas fa-tag mr-2"></i>요금제 보기
                     </a>
                 </div>
@@ -766,7 +771,7 @@ app.get('/about', (c) => {
                 <div class="mt-6 flex justify-center gap-6">
                     <a href="/" class="hover:text-purple-400 transition">홈</a>
                     <a href="/about" class="hover:text-purple-400 transition">소개</a>
-                    <a href="/#pricing" class="hover:text-purple-400 transition">요금제</a>
+                    <a href="/pricing" class="hover:text-purple-400 transition">요금제</a>
                 </div>
             </div>
         </footer>
@@ -775,6 +780,391 @@ app.get('/about', (c) => {
         <script>
           gtag('event', 'page_view', {
             page_title: 'About Page',
+            page_location: window.location.href,
+            page_path: window.location.pathname
+          });
+        </script>
+    </body>
+    </html>
+  `);
+});
+
+// Pricing page - Standalone pricing information
+app.get('/pricing', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-1W0YMPPVH7"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-1W0YMPPVH7');
+        </script>
+        
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+        <meta name="theme-color" content="#a855f7">
+        <title>요금제 - WorVox AI 영어 학습</title>
+        
+        <!-- SEO Meta Tags -->
+        <meta name="description" content="WorVox 요금제 안내. Core 플랜 월 9,900원, Premium 플랜 월 19,000원. 2주 무료 체험으로 시작하세요. AI 영어 학습, 발음 교정, OPIC 준비까지 모두 가능합니다.">
+        <meta name="keywords" content="WorVox 요금제, AI 영어 학습 가격, 영어 학습 구독, 영어 앱 가격, OPIC 준비 비용, 영어 회화 가격">
+        <meta name="robots" content="index, follow">
+        
+        <!-- Open Graph -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://worvox.com/pricing">
+        <meta property="og:title" content="요금제 - WorVox AI 영어 학습">
+        <meta property="og:description" content="Core 플랜 월 9,900원, Premium 플랜 월 19,000원. 2주 무료 체험으로 AI 영어 학습을 시작하세요.">
+        <meta property="og:image" content="https://worvox.com/logo.png">
+        
+        <link rel="canonical" href="https://worvox.com/pricing">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+        
+        <!-- JSON-LD for Pricing -->
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Product",
+          "name": "WorVox Premium",
+          "description": "AI 기반 영어 학습 플랫폼 프리미엄 플랜",
+          "brand": {
+            "@type": "Brand",
+            "name": "WorVox"
+          },
+          "offers": [
+            {
+              "@type": "Offer",
+              "name": "Core 월간",
+              "price": "9900",
+              "priceCurrency": "KRW",
+              "availability": "https://schema.org/InStock",
+              "url": "https://worvox.com/pricing"
+            },
+            {
+              "@type": "Offer",
+              "name": "Premium 월간",
+              "price": "19000",
+              "priceCurrency": "KRW",
+              "availability": "https://schema.org/InStock",
+              "url": "https://worvox.com/pricing"
+            },
+            {
+              "@type": "Offer",
+              "name": "Core 연간",
+              "price": "97416",
+              "priceCurrency": "KRW",
+              "availability": "https://schema.org/InStock",
+              "url": "https://worvox.com/pricing"
+            },
+            {
+              "@type": "Offer",
+              "name": "Premium 연간",
+              "price": "186960",
+              "priceCurrency": "KRW",
+              "availability": "https://schema.org/InStock",
+              "url": "https://worvox.com/pricing"
+            }
+          ]
+        }
+        </script>
+    </head>
+    <body class="bg-gradient-to-br from-purple-50 via-white to-blue-50">
+        <!-- Navigation -->
+        <nav class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <a href="/" class="flex items-center space-x-2">
+                        <img src="/static/logo.webp" alt="WorVox Logo" class="h-8 w-8">
+                        <span class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 text-transparent bg-clip-text">WorVox</span>
+                    </a>
+                    <div class="flex items-center gap-4">
+                        <a href="/about" class="text-gray-700 hover:text-purple-600 font-medium transition">
+                            <i class="fas fa-info-circle mr-2"></i>소개
+                        </a>
+                        <a href="/" class="text-gray-700 hover:text-purple-600 font-medium transition">
+                            <i class="fas fa-home mr-2"></i>홈
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="pt-20 pb-16 px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+                    <span class="bg-gradient-to-r from-purple-600 to-blue-600 text-transparent bg-clip-text">
+                        간단하고 명확한 요금제
+                    </span>
+                </h1>
+                <p class="text-xl text-gray-600 mb-4">
+                    2주 무료 체험으로 시작하세요
+                </p>
+                <p class="text-gray-500">
+                    💳 신용카드 등록 없이 바로 시작 • ✨ 언제든 취소 가능
+                </p>
+            </div>
+        </section>
+
+        <!-- Pricing Cards -->
+        <section class="py-16 px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="grid md:grid-cols-3 gap-8 mb-12">
+                    <!-- Free Plan -->
+                    <div class="bg-white rounded-2xl shadow-lg p-8 border-2 border-gray-200">
+                        <div class="text-center mb-6">
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Free</h3>
+                            <div class="text-4xl font-bold text-gray-900 mb-2">₩0</div>
+                            <p class="text-gray-600">무료 체험</p>
+                        </div>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-green-600 mt-1"></i>
+                                <span class="text-gray-700">AI 대화 5회/일</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-green-600 mt-1"></i>
+                                <span class="text-gray-700">발음 연습 10회/일</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-green-600 mt-1"></i>
+                                <span class="text-gray-700">단어 검색 10회/일</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-times text-gray-400 mt-1"></i>
+                                <span class="text-gray-400">타이머 모드 ❌</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-times text-gray-400 mt-1"></i>
+                                <span class="text-gray-400">시나리오 모드 ❌</span>
+                            </li>
+                        </ul>
+                        <a href="/" class="block w-full bg-gray-600 text-white text-center py-3 rounded-lg font-semibold hover:bg-gray-700 transition">
+                            체험 시작
+                        </a>
+                    </div>
+
+                    <!-- Core Plan -->
+                    <div class="bg-white rounded-2xl shadow-lg p-8 border-2 border-blue-500">
+                        <div class="text-center mb-6">
+                            <div class="inline-block bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-semibold mb-2">
+                                인기
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Core</h3>
+                            <div class="text-4xl font-bold text-gray-900 mb-2">₩9,900</div>
+                            <p class="text-gray-600">월 / 연 ₩97,416 (18% 할인)</p>
+                        </div>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-green-600 mt-1"></i>
+                                <span class="text-gray-700"><strong>무제한</strong> AI 대화</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-green-600 mt-1"></i>
+                                <span class="text-gray-700"><strong>무제한</strong> 발음 연습</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-green-600 mt-1"></i>
+                                <span class="text-gray-700">타이머 모드 30회/일</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-green-600 mt-1"></i>
+                                <span class="text-gray-700">시나리오 모드 30회/일</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-green-600 mt-1"></i>
+                                <span class="text-gray-700">시험 모드 10회/일</span>
+                            </li>
+                        </ul>
+                        <a href="/" class="block w-full bg-blue-600 text-white text-center py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                            시작하기
+                        </a>
+                    </div>
+
+                    <!-- Premium Plan -->
+                    <div class="bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl shadow-xl p-8 border-2 border-purple-500 text-white transform scale-105">
+                        <div class="text-center mb-6">
+                            <div class="inline-block bg-white/20 text-white px-3 py-1 rounded-full text-sm font-semibold mb-2">
+                                💎 추천
+                            </div>
+                            <h3 class="text-2xl font-bold mb-2">Premium</h3>
+                            <div class="text-4xl font-bold mb-2">₩19,000</div>
+                            <p class="text-purple-100">월 / 연 ₩186,960 (18% 할인)</p>
+                        </div>
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-yellow-300 mt-1"></i>
+                                <span><strong>모든 Core 기능</strong></span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-yellow-300 mt-1"></i>
+                                <span><strong>무제한</strong> 모든 모드 이용</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-yellow-300 mt-1"></i>
+                                <span><strong>AI 상세 분석</strong> 리포트</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-yellow-300 mt-1"></i>
+                                <span><strong>개선 답변 예시</strong> 생성</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-yellow-300 mt-1"></i>
+                                <span><strong>무제한</strong> AI 프롬프트</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-yellow-300 mt-1"></i>
+                                <span>개인화 학습 경로</span>
+                            </li>
+                        </ul>
+                        <a href="/" class="block w-full bg-white text-purple-600 text-center py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                            Premium 시작
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Feature Comparison Table -->
+                <div class="bg-white rounded-2xl shadow-lg p-8">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">기능 비교</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b-2 border-gray-200">
+                                    <th class="text-left py-4 px-4 font-semibold text-gray-900">기능</th>
+                                    <th class="text-center py-4 px-4 font-semibold text-gray-900">Free</th>
+                                    <th class="text-center py-4 px-4 font-semibold text-blue-600">Core</th>
+                                    <th class="text-center py-4 px-4 font-semibold text-purple-600">Premium</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-gray-100">
+                                    <td class="py-4 px-4 text-gray-700">AI 실시간 대화</td>
+                                    <td class="text-center py-4 px-4 text-gray-600">5회/일</td>
+                                    <td class="text-center py-4 px-4 text-blue-600">무제한</td>
+                                    <td class="text-center py-4 px-4 text-purple-600">무제한</td>
+                                </tr>
+                                <tr class="border-b border-gray-100">
+                                    <td class="py-4 px-4 text-gray-700">발음 교정 연습</td>
+                                    <td class="text-center py-4 px-4 text-gray-600">10회/일</td>
+                                    <td class="text-center py-4 px-4 text-blue-600">무제한</td>
+                                    <td class="text-center py-4 px-4 text-purple-600">무제한</td>
+                                </tr>
+                                <tr class="border-b border-gray-100">
+                                    <td class="py-4 px-4 text-gray-700">타이머 모드</td>
+                                    <td class="text-center py-4 px-4 text-gray-400">❌</td>
+                                    <td class="text-center py-4 px-4 text-blue-600">30회/일</td>
+                                    <td class="text-center py-4 px-4 text-purple-600">무제한</td>
+                                </tr>
+                                <tr class="border-b border-gray-100">
+                                    <td class="py-4 px-4 text-gray-700">시나리오 모드</td>
+                                    <td class="text-center py-4 px-4 text-gray-400">❌</td>
+                                    <td class="text-center py-4 px-4 text-blue-600">30회/일</td>
+                                    <td class="text-center py-4 px-4 text-purple-600">무제한</td>
+                                </tr>
+                                <tr class="border-b border-gray-100">
+                                    <td class="py-4 px-4 text-gray-700">OPIC 스타일 시험</td>
+                                    <td class="text-center py-4 px-4 text-gray-400">❌</td>
+                                    <td class="text-center py-4 px-4 text-blue-600">10회/일</td>
+                                    <td class="text-center py-4 px-4 text-purple-600">무제한</td>
+                                </tr>
+                                <tr class="border-b border-gray-100">
+                                    <td class="py-4 px-4 text-gray-700">AI 상세 분석 리포트</td>
+                                    <td class="text-center py-4 px-4 text-gray-400">❌</td>
+                                    <td class="text-center py-4 px-4 text-gray-400">❌</td>
+                                    <td class="text-center py-4 px-4 text-purple-600">✅</td>
+                                </tr>
+                                <tr class="border-b border-gray-100">
+                                    <td class="py-4 px-4 text-gray-700">개선 답변 예시</td>
+                                    <td class="text-center py-4 px-4 text-gray-400">❌</td>
+                                    <td class="text-center py-4 px-4 text-gray-400">❌</td>
+                                    <td class="text-center py-4 px-4 text-purple-600">✅</td>
+                                </tr>
+                                <tr class="border-b border-gray-100">
+                                    <td class="py-4 px-4 text-gray-700">AI 프롬프트 생성</td>
+                                    <td class="text-center py-4 px-4 text-gray-400">❌</td>
+                                    <td class="text-center py-4 px-4 text-gray-400">❌</td>
+                                    <td class="text-center py-4 px-4 text-purple-600">✅</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-4 px-4 text-gray-700">학습 기록 보관</td>
+                                    <td class="text-center py-4 px-4 text-gray-600">7일</td>
+                                    <td class="text-center py-4 px-4 text-blue-600">30일</td>
+                                    <td class="text-center py-4 px-4 text-purple-600">무제한</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="py-16 px-4 bg-white">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">자주 묻는 질문</h2>
+                <div class="space-y-4">
+                    <details class="bg-gray-50 rounded-lg p-6">
+                        <summary class="font-semibold text-gray-900 cursor-pointer">무료 체험은 어떻게 이용하나요?</summary>
+                        <p class="mt-3 text-gray-600">회원가입 후 자동으로 2주 무료 체험이 시작됩니다. 신용카드 등록 없이 바로 이용 가능합니다.</p>
+                    </details>
+                    <details class="bg-gray-50 rounded-lg p-6">
+                        <summary class="font-semibold text-gray-900 cursor-pointer">언제든 취소할 수 있나요?</summary>
+                        <p class="mt-3 text-gray-600">네, 언제든 내 정보 페이지에서 구독을 취소할 수 있습니다. 남은 기간까지는 계속 이용 가능합니다.</p>
+                    </details>
+                    <details class="bg-gray-50 rounded-lg p-6">
+                        <summary class="font-semibold text-gray-900 cursor-pointer">연간 요금제의 혜택은 무엇인가요?</summary>
+                        <p class="mt-3 text-gray-600">연간 요금제는 월간 대비 18% 할인된 가격으로 이용하실 수 있습니다. Core는 ₩21,384, Premium은 ₩41,040을 절약할 수 있습니다.</p>
+                    </details>
+                    <details class="bg-gray-50 rounded-lg p-6">
+                        <summary class="font-semibold text-gray-900 cursor-pointer">플랜 변경은 어떻게 하나요?</summary>
+                        <p class="mt-3 text-gray-600">내 정보 페이지에서 언제든 플랜을 변경할 수 있습니다. 업그레이드 시 즉시 적용되며, 다운그레이드 시 현재 기간 종료 후 적용됩니다.</p>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="py-20 px-4 bg-gradient-to-r from-purple-600 to-blue-600">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
+                    지금 바로 시작하세요
+                </h2>
+                <p class="text-xl text-purple-100 mb-8">
+                    2주 무료 체험으로 WorVox의 모든 기능을 경험해보세요
+                </p>
+                <a href="/" class="inline-block bg-white text-purple-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition transform hover:scale-105 shadow-xl">
+                    <i class="fas fa-rocket mr-2"></i>무료 체험 시작
+                </a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-gray-900 text-gray-300 py-12 px-4">
+            <div class="max-w-6xl mx-auto text-center">
+                <div class="mb-6">
+                    <span class="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">WorVox</span>
+                </div>
+                <p class="mb-4">AI 기반 영어 학습의 새로운 기준</p>
+                <p class="text-sm text-gray-500">
+                    © 2026 WorVox. All rights reserved.
+                </p>
+                <div class="mt-6 flex justify-center gap-6">
+                    <a href="/" class="hover:text-purple-400 transition">홈</a>
+                    <a href="/about" class="hover:text-purple-400 transition">소개</a>
+                    <a href="/pricing" class="hover:text-purple-400 transition">요금제</a>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Google Analytics -->
+        <script>
+          gtag('event', 'page_view', {
+            page_title: 'Pricing Page',
             page_location: window.location.href,
             page_path: window.location.pathname
           });
