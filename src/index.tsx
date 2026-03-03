@@ -1242,15 +1242,42 @@ app.get('/landing', (c) => {
 
                 <!-- Bottom Bar -->
                 <div class="border-t border-gray-800 pt-8">
-                    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                        <p class="text-sm text-gray-500">
-                            © 2026 WorVox. All rights reserved.
-                        </p>
-                        <div class="flex gap-6 text-sm">
+                    <!-- Business Info -->
+                    <div class="mb-6 text-sm text-gray-500">
+                        <div class="flex flex-col md:flex-row md:items-center gap-2 mb-2">
+                            <span class="font-medium text-gray-300">위아솔루션즈</span>
+                            <span class="text-gray-600 hidden md:inline">|</span>
+                            <span>대표자: 이강돈</span>
+                            <span class="text-gray-600 hidden md:inline">|</span>
+                            <span>사업자번호: 542-07-02097</span>
+                        </div>
+                        <div class="mb-2">
+                            <span>주소: 대전광역시 서구 대덕대로241번길 20, 5층 548-2호</span>
+                        </div>
+                        <div class="flex flex-col md:flex-row md:items-center gap-2">
+                            <span>통신판매: 제 2021-대전동구-0501호</span>
+                            <span class="text-gray-600 hidden md:inline">|</span>
+                            <span>문의전화: 070-8064-0485</span>
+                            <span class="text-gray-600 hidden md:inline">|</span>
                             <span class="flex items-center gap-2">
                                 <i class="fas fa-envelope text-purple-400"></i>
                                 support@worvox.com
                             </span>
+                        </div>
+                    </div>
+
+                    <!-- Copyright & Links -->
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pt-6 border-t border-gray-800">
+                        <p class="text-sm text-gray-500">
+                            © 2026 WorVox. All rights reserved.
+                        </p>
+                        <div class="flex flex-wrap items-center gap-4 text-sm">
+                            <a href="#" class="hover:text-purple-400 transition">이용약관</a>
+                            <span class="text-gray-700">|</span>
+                            <a href="#" class="hover:text-purple-400 transition">개인정보처리방침</a>
+                            <span class="text-gray-700">|</span>
+                            <a href="#" class="hover:text-purple-400 transition">환불정책</a>
+                            <span class="text-gray-700 hidden md:inline">|</span>
                             <span class="flex items-center gap-2">
                                 <i class="fas fa-globe text-purple-400"></i>
                                 한국어 🇰🇷
