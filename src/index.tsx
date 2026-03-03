@@ -692,7 +692,8 @@ app.get('/landing', (c) => {
                         </div>
                         
                         <!-- Timer Challenge Demo Image -->
-                        <div class="aspect-video bg-gray-100 relative group cursor-pointer overflow-hidden">
+                        <div class="aspect-video bg-gray-100 relative group cursor-pointer overflow-hidden"
+                             onclick="gtag('event', 'demo_image_click', { 'event_category': 'engagement', 'event_label': 'timer_challenge_demo', 'value': 1 })">
                             <picture>
                                 <source srcset="/static/demo-timer-challenge.webp" type="image/webp">
                                 <img src="/static/demo-timer-challenge.png" 
@@ -742,7 +743,8 @@ app.get('/landing', (c) => {
                         </div>
                         
                         <!-- Scenario Mode Demo Image -->
-                        <div class="aspect-video bg-gray-100 relative group cursor-pointer overflow-hidden">
+                        <div class="aspect-video bg-gray-100 relative group cursor-pointer overflow-hidden"
+                             onclick="gtag('event', 'demo_image_click', { 'event_category': 'engagement', 'event_label': 'scenario_mode_demo', 'value': 1 })">
                             <picture>
                                 <source srcset="/static/demo-scenario-mode.webp" type="image/webp">
                                 <img src="/static/demo-scenario-mode.png" 
@@ -792,7 +794,8 @@ app.get('/landing', (c) => {
                         </div>
                         
                         <!-- Exam Mode Demo Image -->
-                        <div class="aspect-video bg-gray-100 relative group cursor-pointer overflow-hidden">
+                        <div class="aspect-video bg-gray-100 relative group cursor-pointer overflow-hidden"
+                             onclick="gtag('event', 'demo_image_click', { 'event_category': 'engagement', 'event_label': 'exam_mode_demo', 'value': 1 })">
                             <picture>
                                 <source srcset="/static/demo-ai-analysis.webp" type="image/webp">
                                 <img src="/static/demo-ai-analysis.png" 
@@ -834,7 +837,9 @@ app.get('/landing', (c) => {
                     <p class="text-gray-600 mb-6 text-lg">
                         💡 실제 GIF 애니메이션은 곧 추가됩니다
                     </p>
-                    <a href="/app" class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-xl transition transform hover:scale-105">
+                    <a href="/app" 
+                       class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-xl transition transform hover:scale-105"
+                       onclick="gtag('event', 'cta_click', { 'event_category': 'engagement', 'event_label': 'demo_section_cta', 'value': 1 })">
                         <i class="fas fa-rocket mr-2"></i>지금 바로 체험하기
                     </a>
                 </div>
@@ -1143,10 +1148,14 @@ app.get('/landing', (c) => {
                     2주 무료 체험으로 WorVox의 모든 기능을 경험해보세요
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="/app" class="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition transform hover:scale-105 shadow-xl">
+                    <a href="/app" 
+                       class="bg-white text-purple-600 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition transform hover:scale-105 shadow-xl"
+                       onclick="gtag('event', 'cta_click', { 'event_category': 'engagement', 'event_label': 'main_cta_start_trial', 'value': 1 })">
                         <i class="fas fa-rocket mr-2"></i>무료 체험 시작
                     </a>
-                    <a href="/pricing" class="bg-purple-700 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-purple-800 transition transform hover:scale-105 shadow-xl border-2 border-white/30">
+                    <a href="/pricing" 
+                       class="bg-purple-700 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-purple-800 transition transform hover:scale-105 shadow-xl border-2 border-white/30"
+                       onclick="gtag('event', 'navigation_click', { 'event_category': 'engagement', 'event_label': 'pricing_link', 'value': 1 })">
                         <i class="fas fa-tag mr-2"></i>요금제 보기
                     </a>
                 </div>
