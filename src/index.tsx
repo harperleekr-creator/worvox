@@ -438,7 +438,11 @@ app.get('/', (c) => {
         </script>
         
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+        <meta name="theme-color" content="#a855f7">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
         <title>WorVox - AI 영어 학습 플랫폼 | 실시간 발음 교정 & 맞춤형 학습</title>
         
         <!-- SEO Meta Tags -->
@@ -477,6 +481,13 @@ app.get('/', (c) => {
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
         <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
         <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
+        
+        <!-- Preconnect to CDNs for faster loading -->
+        <link rel="preconnect" href="https://cdn.tailwindcss.com">
+        <link rel="preconnect" href="https://cdn.jsdelivr.net">
+        <link rel="preconnect" href="https://www.googletagmanager.com">
+        <link rel="dns-prefetch" href="https://js.tosspayments.com">
+        <link rel="dns-prefetch" href="https://accounts.google.com">
         
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
