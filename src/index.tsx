@@ -502,16 +502,16 @@ app.get('/landing', (c) => {
         <nav class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
-                    <a href="/landing" class="flex items-center space-x-2">
-                        <img src="/static/logo.webp" alt="WorVox Logo" class="h-8 w-8">
-                        <span class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 text-transparent bg-clip-text">WorVox</span>
+                    <a href="/landing" class="flex items-center space-x-1 sm:space-x-2">
+                        <img src="/static/logo.webp" alt="WorVox Logo" class="h-6 w-6 sm:h-8 sm:w-8">
+                        <span class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 text-transparent bg-clip-text">WorVox</span>
                     </a>
-                    <div class="flex items-center gap-4">
-                        <a href="/pricing" class="text-gray-700 hover:text-purple-600 font-medium transition">
-                            <i class="fas fa-tag mr-2"></i>요금제
+                    <div class="flex items-center gap-2 sm:gap-4">
+                        <a href="/pricing" class="text-gray-700 hover:text-purple-600 font-medium transition text-sm sm:text-base">
+                            <i class="fas fa-tag mr-1 sm:mr-2"></i><span class="hidden xs:inline">요금제</span><span class="xs:hidden">요금</span>
                         </a>
-                        <a href="/app" class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition transform hover:scale-105">
-                            <i class="fas fa-sign-in-alt mr-2"></i>로그인 / 시작하기
+                        <a href="/app" class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-3 sm:px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition transform hover:scale-105 text-sm sm:text-base whitespace-nowrap">
+                            <i class="fas fa-sign-in-alt mr-1 sm:mr-2"></i><span class="hidden sm:inline">로그인 / 시작하기</span><span class="sm:hidden">로그인</span>
                         </a>
                     </div>
                 </div>
@@ -519,7 +519,7 @@ app.get('/landing', (c) => {
         </nav>
 
         <!-- Hero Section -->
-        <section class="pt-20 pb-16 px-4">
+        <section class="pt-24 sm:pt-28 md:pt-32 pb-16 px-4">
             <div class="max-w-4xl mx-auto text-center">
                 <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
                     <span class="bg-gradient-to-r from-purple-600 to-blue-600 text-transparent bg-clip-text">
