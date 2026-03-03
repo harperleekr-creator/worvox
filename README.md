@@ -4,10 +4,12 @@
 **WorVox**는 AI 음성 대화 기반 영어 학습 플랫폼입니다. 실시간 음성 인식(STT), AI 대화, 음성 합성(TTS)을 활용하여 사용자가 자연스럽게 영어 회화를 연습할 수 있습니다.
 
 ## 🌐 배포 URL
-- **Production**: https://worvox.com
+- **Production**: https://worvox.com (자동으로 /landing으로 리다이렉트)
+- **Landing Page**: https://worvox.com/landing (비로그인 사용자용 브랜딩 페이지)
+- **App**: https://worvox.com/app (로그인 사용자용 앱)
 - **About**: https://worvox.com/about
-- **Pricing**: https://worvox.com/#pricing
-- **Preview**: https://efb3f62c.worvox.pages.dev
+- **Pricing**: https://worvox.com/pricing
+- **Preview**: https://5a0a6847.worvox.pages.dev
 - **GitHub**: https://github.com/harperleekr-creator/worvox
 
 ## 🔍 SEO & 검색 최적화
