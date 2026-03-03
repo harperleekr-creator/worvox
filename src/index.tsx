@@ -504,7 +504,7 @@ app.get('/', (c) => {
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
         <script src="/static/gamification.js?v=${version}"></script>
-        <script src="/static/app.js?v=${version}"></script>
+        <script src="/static/app.min.js?v=${version}"></script>
     </body>
     </html>
   `, 200, {
