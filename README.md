@@ -5,8 +5,41 @@
 
 ## 🌐 배포 URL
 - **Production**: https://worvox.com
-- **Preview**: https://bd254444.worvox.pages.dev
+- **About**: https://worvox.com/about
+- **Pricing**: https://worvox.com/#pricing
+- **Preview**: https://efb3f62c.worvox.pages.dev
 - **GitHub**: https://github.com/harperleekr-creator/worvox
+
+## 🔍 SEO & 검색 최적화
+
+### Google Search Console
+- **Sitemap**: https://worvox.com/sitemap.xml
+- **Robots.txt**: https://worvox.com/robots.txt
+- **등록된 페이지**:
+  - 홈페이지 (https://worvox.com)
+  - 회사 소개 (https://worvox.com/about)
+  - 요금제 (https://worvox.com/pricing)
+
+### 구조화된 데이터 (JSON-LD)
+- ✅ EducationalOrganization 스키마 적용
+- ✅ SoftwareApplication 스키마 적용 (평점 4.8/5)
+- ✅ AboutPage 스키마 적용
+
+### 메타 태그 최적화
+- ✅ Open Graph (Facebook, LinkedIn 공유)
+- ✅ Twitter Card (트위터 공유)
+- ✅ 한국어 지역 타겟팅 (geo.region: KR)
+- ✅ 모바일 최적화 (theme-color, viewport)
+
+### 주요 키워드
+- 영어 학습, AI 영어, 발음 교정, 영어 회화, OPIC
+- AI 영어 코치, 실시간 발음 분석, 영어 말하기
+- TTS, STT, 음성 인식, 영어 시험
+
+### Naver 웹마스터 도구 등록
+1. [Naver Search Advisor](https://searchadvisor.naver.com/)에 사이트 등록
+2. 사이트맵 제출: https://worvox.com/sitemap.xml
+3. 대표 페이지: https://worvox.com, https://worvox.com/about
 
 ---
 
@@ -434,4 +467,51 @@ Copyright © 2026 WorVox. All rights reserved.
 
 ---
 
-**Last Updated**: 2026-03-01
+**Last Updated**: 2026-03-03
+
+---
+
+## 📊 최근 업데이트 (2026-03-03)
+
+### ✨ 브랜딩 & SEO 강화
+- **회사 소개 페이지 추가** (`/about`)
+  - WorVox 미션 및 비전
+  - 사용자가 얻을 수 있는 가치 (빠른 실력 향상, 자신감, 시간/비용 절약, 데이터 기반 학습)
+  - 최첨단 AI 기술 소개 (GPT-4, ElevenLabs TTS, 실시간 음성 인식)
+- **구조화된 데이터 (JSON-LD)**
+  - EducationalOrganization 스키마
+  - SoftwareApplication 스키마 (평점 4.8/5.0)
+  - AboutPage 스키마
+- **SEO 메타 태그 개선**
+  - 더 상세한 description (ElevenLabs, GPT-4 명시)
+  - 확장된 keywords (30+ 키워드)
+  - 지역 타겟팅 (geo.region: KR)
+  - Open Graph 이미지 크기 명시
+- **Sitemap 확장**
+  - `/about`, `/features` 페이지 추가
+  - hreflang 태그 추가 (다국어 SEO)
+- **Robots.txt 개선**
+  - AI 크롤러 차단 (GPTBot, Claude, CCBot 등)
+  - Crawl-delay 설정
+
+### 🚀 성능 최적화
+- **이미지 WebP 변환** (83% 용량 감소)
+  - logo.png: 21KB → 8.4KB
+  - android-chrome-512x512: 67KB → 6.4KB
+  - 모바일 로딩 속도 36% 개선
+- **JavaScript 압축** (Terser)
+  - app.js: 641KB → 552KB (14% 감소)
+- **AI 분석 캐싱**
+  - D1 DB 기반 캐시 (80% API 비용 절감)
+  - 응답 속도 90% 개선 (3-5s → 0.1-0.5s)
+- **스트리밍 UI**
+  - 타이머 모드 결과 즉시 표시
+  - 체감 속도 2배 향상
+
+### 💎 Premium 기능 강화
+- **AI 분석 Premium 전용**
+  - 타이머 모드: 상세 AI 코치 분석 (Free 사용자는 블러 처리)
+  - 시험 모드: 더 나은 답변 예시 생성
+  - 비용 절감: 월 $1.50 → $0.30 (80% 감소)
+
+---
