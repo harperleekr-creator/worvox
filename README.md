@@ -9,8 +9,16 @@
 - **App**: https://worvox.com/app (로그인 사용자용 앱)
 - **About**: https://worvox.com/about
 - **Pricing**: https://worvox.com/pricing
-- **Preview**: https://5a0a6847.worvox.pages.dev
+- **Preview**: https://59c48544.worvox.pages.dev
 - **GitHub**: https://github.com/harperleekr-creator/worvox
+
+## 🎬 데모 섹션
+Landing 페이지에 3가지 핵심 기능을 시각적으로 보여주는 **AI 생성 데모 이미지** 추가:
+- ✅ **타이머 챌린지** - 실시간 발음 분석 데모 (4.72 MB)
+- ✅ **시나리오 모드** - 실전 회화 연습 데모 (5.34 MB)
+- ✅ **시험 모드** - OPIC 준비 및 분석 데모 (5.37 MB)
+- ✨ Hover 효과: 확대 및 오버레이 전환 애니메이션
+- ⚡ Lazy loading으로 페이지 로딩 성능 최적화
 
 ## 🔍 SEO & 검색 최적화
 
