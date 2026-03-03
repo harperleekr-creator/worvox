@@ -479,18 +479,18 @@ app.get('/landing', (c) => {
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <title>WorVox - AI 영어 학습의 새로운 기준</title>
+        <title>WorVox | AI 영어 학습 플랫폼 - 실시간 발음 교정 & 맞춤형 회화 연습</title>
         
         <!-- SEO Meta Tags -->
-        <meta name="description" content="WorVox는 최첨단 AI 기술로 영어 학습의 패러다임을 바꿉니다. ElevenLabs 음성 합성, GPT-4 기반 맞춤형 대화, 실시간 발음 분석으로 누구나 쉽고 효과적으로 영어를 마스터할 수 있습니다.">
-        <meta name="keywords" content="WorVox 소개, AI 영어 학습 회사, 영어 교육 기술, AI 발음 교정, 영어 학습 플랫폼, ElevenLabs, GPT-4, 영어 코치">
+        <meta name="description" content="WorVox AI 영어 학습 플랫폼 - GPT-4 기반 실시간 발음 교정, ElevenLabs TTS 음성 합성, 30가지 실전 시나리오로 영어 회화 실력 3배 향상. 월 1.9만원으로 24시간 무제한 학습. 2주 무료 체험 시작!">
+        <meta name="keywords" content="AI 영어 학습, 영어 발음 교정, 영어 회화 연습, OPIC 준비, 영어 말하기, GPT-4 영어, ElevenLabs, 실시간 피드백, 영어 학원 대체, 온라인 영어 과외, AI 영어 코치, 영어 공부 앱, 영어 스피킹, 발음 분석, 맞춤형 영어 학습">
         <meta name="robots" content="index, follow">
         
         <!-- Open Graph -->
         <meta property="og:type" content="website">
         <meta property="og:url" content="https://worvox.com">
-        <meta property="og:title" content="WorVox - AI 영어 학습의 새로운 기준">
-        <meta property="og:description" content="최첨단 AI 기술로 영어 학습의 패러다임을 바꾸는 WorVox. 실시간 발음 교정, 맞춤형 학습, OPIC 준비까지.">
+        <meta property="og:title" content="WorVox - AI 영어 학습 플랫폼 | 실시간 발음 교정 & 회화 연습">
+        <meta property="og:description" content="GPT-4 기반 AI로 영어 회화 실력 3배 향상! 실시간 발음 교정, 30가지 실전 시나리오, OPIC 준비. 월 1.9만원, 2주 무료 체험!">
         <meta property="og:image" content="https://worvox.com/logo.png">
         
         <link rel="canonical" href="https://worvox.com">
@@ -523,16 +523,18 @@ app.get('/landing', (c) => {
             <div class="max-w-4xl mx-auto text-center">
                 <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
                     <span class="bg-gradient-to-r from-purple-600 to-blue-600 text-transparent bg-clip-text">
-                        AI가 만드는
+                        AI 영어 학습 플랫폼
                     </span>
                     <br/>
-                    영어 학습의 새로운 기준
+                    실시간 발음 교정 & 맞춤형 회화 연습
                 </h1>
                 <p class="text-xl text-gray-600 mb-8 leading-relaxed">
-                    WorVox는 최첨단 AI 기술로 영어 학습의 패러다임을 바꿉니다.<br/>
-                    실시간 발음 교정부터 개인화된 학습까지, 당신만의 AI 영어 코치를 경험하세요.
+                    GPT-4 기반 AI로 <strong>영어 회화 실력 3배 향상</strong>!<br/>
+                    실시간 발음 분석, 30가지 실전 시나리오, OPIC 준비까지 - 월 1.9만원으로 24시간 무제한 학습
                 </p>
-                <a href="/app" class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-xl transition transform hover:scale-105">
+                <a href="/app" 
+                   class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-xl transition transform hover:scale-105"
+                   onclick="gtag('event', 'cta_click', { 'event_category': 'engagement', 'event_label': 'hero_cta_start_trial', 'value': 1 })">
                     <i class="fas fa-rocket mr-2"></i>2주 무료 체험 시작
                 </a>
             </div>
