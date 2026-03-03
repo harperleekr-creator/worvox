@@ -1420,89 +1420,180 @@ class WorVox {
     const spokenWords = transcription.toLowerCase().split(' ').length;
     const completeness = Math.min(100, Math.round((spokenWords / originalWords) * 100));
     
-    // 🎯 Get analysis scores (accuracy, pronunciation, fluency)
+    // 🎯 Initial scores (STT-based, instant)
     let accuracyScore = completeness; // Default based on word count
     let pronunciationScore = audioAnalysis?.pronunciationScore || 75; // From STT analysis
     let fluencyScore = audioAnalysis?.fluencyScore || 70; // From STT analysis
     let feedback = ''
     let isPremiumAnalysis = false;
     
-    // Get detailed AI pronunciation analysis (Premium feature only)
-    if (transcription && transcription !== '(인식되지 않음)' && this.currentUser?.plan === 'premium') {
-      try {
-        console.log('🎯 Requesting detailed pronunciation analysis (Premium feature)...');
-        const analysisResponse = await axios.post('/api/pronunciation/analyze', {
-          referenceText: originalSentence,
-          userTranscription: transcription,
-          audioAnalysis: audioAnalysis
-        });
-        
-        if (analysisResponse.data.success) {
-          accuracyScore = analysisResponse.data.accuracy;
-          pronunciationScore = analysisResponse.data.pronunciation;
-          fluencyScore = analysisResponse.data.fluency;
-          feedback = analysisResponse.data.feedback || '';
-          isPremiumAnalysis = true;
-          console.log('✅ Detailed analysis:', {accuracyScore, pronunciationScore, fluencyScore, feedback});
-        }
-      } catch (error) {
-        console.warn('⚠️ Failed to get detailed analysis, using STT-based scores:', error);
-      }
-    } else if (transcription && transcription !== '(인식되지 않음)') {
-      console.log('ℹ️ Detailed AI analysis is a Premium feature');
-    }
+    // Calculate initial average score for rating
+    const initialAverageScore = Math.round((accuracyScore + pronunciationScore + fluencyScore) / 3);
     
-    // Calculate average score for rating
-    const averageScore = Math.round((accuracyScore + pronunciationScore + fluencyScore) / 3);
-    
-    // Determine rating based on average
+    // Determine initial rating
     let rating, ratingColor, ratingIcon;
-    if (averageScore >= 80) {
-      rating = '훌륭해요!';
+    if (initialAverageScore >= 90) {
+      rating = '완벽해요!';
       ratingColor = 'text-green-600';
       ratingIcon = '🌟';
-    } else if (averageScore >= 60) {
-      rating = '좋아요!';
+    } else if (initialAverageScore >= 80) {
+      rating = '훌륭해요!';
       ratingColor = 'text-blue-600';
+      ratingIcon = '🎉';
+    } else if (initialAverageScore >= 70) {
+      rating = '잘했어요!';
+      ratingColor = 'text-purple-600';
       ratingIcon = '👍';
-    } else if (averageScore >= 40) {
-      rating = '괜찮아요';
+    } else if (initialAverageScore >= 60) {
+      rating = '괜찮아요!';
       ratingColor = 'text-yellow-600';
       ratingIcon = '😊';
     } else {
-      rating = '다시 도전!';
-      ratingColor = 'text-red-600';
+      rating = '연습이 필요해요';
+      ratingColor = 'text-orange-600';
       ratingIcon = '💪';
     }
     
-    // 💾 Save timer report to database
-    if (sessionId && this.currentUser) {
-      try {
-        const reportData = {
-          originalSentence,
-          transcription,
-          timeLimit,
-          accuracyScore,
-          pronunciationScore,
-          fluencyScore,
-          averageScore,
-          rating,
-          feedback,
-          isPremiumAnalysis,
-          completedAt: new Date().toISOString()
-        };
-        
-        await axios.post('/api/mode-reports/save', {
-          sessionId: sessionId,
-          userId: this.currentUser.id,
-          modeType: 'timer',
-          reportData: reportData
-        });
-        console.log('✅ Timer report saved successfully');
-      } catch (error) {
-        console.warn('⚠️ Failed to save timer report:', error);
-      }
+    // 🚀 STEP 1: Show results immediately with STT-based scores
+    this.renderTimerResults({
+      originalSentence,
+      transcription,
+      timeLimit,
+      accuracyScore,
+      pronunciationScore,
+      fluencyScore,
+      averageScore: initialAverageScore,
+      rating,
+      ratingColor,
+      ratingIcon,
+      feedback: '', // No feedback yet
+      isPremiumAnalysis: false,
+      originalWords,
+      spokenWords,
+      isLoading: this.currentUser?.plan === 'premium' && transcription && transcription !== '(인식되지 않음)'
+    });
+    
+    // 🚀 STEP 2: Load AI analysis in background (Premium only)
+    if (transcription && transcription !== '(인식되지 않음)' && this.currentUser?.plan === 'premium') {
+      // Background AI analysis
+      setTimeout(async () => {
+        try {
+          console.log('🎯 Loading detailed AI analysis in background...');
+          const analysisResponse = await axios.post('/api/pronunciation/analyze', {
+            referenceText: originalSentence,
+            userTranscription: transcription,
+            audioAnalysis: audioAnalysis
+          });
+          
+          if (analysisResponse.data.success) {
+            accuracyScore = analysisResponse.data.accuracy;
+            pronunciationScore = analysisResponse.data.pronunciation;
+            fluencyScore = analysisResponse.data.fluency;
+            feedback = analysisResponse.data.feedback || '';
+            isPremiumAnalysis = true;
+            
+            const finalAverageScore = Math.round((accuracyScore + pronunciationScore + fluencyScore) / 3);
+            
+            // Update rating based on AI analysis
+            if (finalAverageScore >= 90) {
+              rating = '완벽해요!';
+              ratingColor = 'text-green-600';
+              ratingIcon = '🌟';
+            } else if (finalAverageScore >= 80) {
+              rating = '훌륭해요!';
+              ratingColor = 'text-blue-600';
+              ratingIcon = '🎉';
+            } else if (finalAverageScore >= 70) {
+              rating = '잘했어요!';
+              ratingColor = 'text-purple-600';
+              ratingIcon = '👍';
+            } else if (finalAverageScore >= 60) {
+              rating = '괜찮아요!';
+              ratingColor = 'text-yellow-600';
+              ratingIcon = '😊';
+            } else {
+              rating = '연습이 필요해요';
+              ratingColor = 'text-orange-600';
+              ratingIcon = '💪';
+            }
+            
+            console.log('✅ AI analysis complete, updating results...');
+            
+            // Re-render with AI-enhanced scores
+            this.renderTimerResults({
+              originalSentence,
+              transcription,
+              timeLimit,
+              accuracyScore,
+              pronunciationScore,
+              fluencyScore,
+              averageScore: finalAverageScore,
+              rating,
+              ratingColor,
+              ratingIcon,
+              feedback,
+              isPremiumAnalysis,
+              originalWords,
+              spokenWords,
+              isLoading: false
+            });
+            
+            // Save report with AI analysis
+            if (sessionId && this.currentUser) {
+              try {
+                const reportData = {
+                  originalSentence,
+                  transcription,
+                  timeLimit,
+                  accuracyScore,
+                  pronunciationScore,
+                  fluencyScore,
+                  averageScore: finalAverageScore,
+                  rating,
+                  feedback,
+                  isPremiumAnalysis,
+                  completedAt: new Date().toISOString()
+                };
+                
+                await axios.post('/api/mode-reports/save', {
+                  sessionId: sessionId,
+                  userId: this.currentUser.id,
+                  modeType: 'timer',
+                  reportData: reportData
+                });
+                console.log('✅ Timer report saved with AI analysis');
+              } catch (error) {
+                console.warn('⚠️ Failed to save timer report:', error);
+              }
+            }
+          }
+        } catch (error) {
+          console.warn('⚠️ Failed to get AI analysis:', error);
+          // Keep showing STT-based results
+        }
+      }, 100); // Start after 100ms
     }
+  }
+  
+  // Render timer results (can be called multiple times for streaming updates)
+  renderTimerResults(data) {
+    const {
+      originalSentence,
+      transcription,
+      timeLimit,
+      accuracyScore,
+      pronunciationScore,
+      fluencyScore,
+      averageScore,
+      rating,
+      ratingColor,
+      ratingIcon,
+      feedback,
+      isPremiumAnalysis,
+      originalWords,
+      spokenWords,
+      isLoading = false
+    } = data;
     
     const app = document.getElementById('app');
     app.innerHTML = `
@@ -1634,7 +1725,18 @@ class WorVox {
                 </div>
                 
                 <!-- AI Feedback -->
-                ${isPremiumAnalysis && feedback ? `
+                ${isLoading ? `
+                <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 shadow-lg mb-6 border-2 border-blue-200">
+                  <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <i class="fas fa-robot text-blue-600"></i>
+                    💎 AI 코치 분석 (Premium)
+                  </h3>
+                  <div class="bg-white rounded-xl p-5 flex items-center justify-center">
+                    <i class="fas fa-spinner fa-spin text-purple-600 text-2xl mr-3"></i>
+                    <span class="text-gray-600">AI가 상세 분석 중입니다...</span>
+                  </div>
+                </div>
+                ` : isPremiumAnalysis && feedback ? `
                 <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 shadow-lg mb-6 border-2 border-blue-200">
                   <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <i class="fas fa-robot text-blue-600"></i>
