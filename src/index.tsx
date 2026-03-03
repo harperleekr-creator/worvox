@@ -1168,19 +1168,95 @@ app.get('/landing', (c) => {
         </section>
 
         <!-- Footer -->
-        <footer class="bg-gray-900 text-gray-300 py-12 px-4">
-            <div class="max-w-6xl mx-auto text-center">
-                <div class="mb-6">
-                    <span class="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">WorVox</span>
+        <!-- Footer -->
+        <footer class="bg-gray-900 text-gray-300 py-16 px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="grid md:grid-cols-4 gap-8 mb-12">
+                    <!-- Company Info -->
+                    <div class="md:col-span-2">
+                        <div class="flex items-center gap-2 mb-4">
+                            <img src="/static/logo.webp" alt="WorVox Logo" class="h-10 w-10">
+                            <span class="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">WorVox</span>
+                        </div>
+                        <p class="text-gray-400 mb-4 leading-relaxed">
+                            AI 기반 영어 학습 플랫폼 - GPT-4와 ElevenLabs 기술로<br/>
+                            실시간 발음 교정과 맞춤형 회화 연습을 제공합니다.
+                        </p>
+                        <div class="flex gap-4">
+                            <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-purple-600 transition">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-purple-600 transition">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-purple-600 transition">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-purple-600 transition">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Quick Links -->
+                    <div>
+                        <h3 class="text-white font-bold text-lg mb-4">서비스</h3>
+                        <ul class="space-y-3">
+                            <li><a href="/landing" class="hover:text-purple-400 transition flex items-center gap-2">
+                                <i class="fas fa-home text-xs"></i> 홈
+                            </a></li>
+                            <li><a href="/about" class="hover:text-purple-400 transition flex items-center gap-2">
+                                <i class="fas fa-info-circle text-xs"></i> 회사 소개
+                            </a></li>
+                            <li><a href="/pricing" class="hover:text-purple-400 transition flex items-center gap-2">
+                                <i class="fas fa-tag text-xs"></i> 요금제
+                            </a></li>
+                            <li><a href="/app" class="hover:text-purple-400 transition flex items-center gap-2">
+                                <i class="fas fa-sign-in-alt text-xs"></i> 로그인
+                            </a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Support -->
+                    <div>
+                        <h3 class="text-white font-bold text-lg mb-4">지원</h3>
+                        <ul class="space-y-3">
+                            <li><a href="#" class="hover:text-purple-400 transition flex items-center gap-2">
+                                <i class="fas fa-question-circle text-xs"></i> FAQ
+                            </a></li>
+                            <li><a href="#" class="hover:text-purple-400 transition flex items-center gap-2">
+                                <i class="fas fa-book text-xs"></i> 사용 가이드
+                            </a></li>
+                            <li><a href="#" class="hover:text-purple-400 transition flex items-center gap-2">
+                                <i class="fas fa-envelope text-xs"></i> 문의하기
+                            </a></li>
+                            <li><a href="#" class="hover:text-purple-400 transition flex items-center gap-2">
+                                <i class="fas fa-shield-alt text-xs"></i> 개인정보처리방침
+                            </a></li>
+                            <li><a href="#" class="hover:text-purple-400 transition flex items-center gap-2">
+                                <i class="fas fa-file-contract text-xs"></i> 이용약관
+                            </a></li>
+                        </ul>
+                    </div>
                 </div>
-                <p class="mb-4">AI 기반 영어 학습의 새로운 기준</p>
-                <p class="text-sm text-gray-500">
-                    © 2026 WorVox. All rights reserved.
-                </p>
-                <div class="mt-6 flex justify-center gap-6">
-                    <a href="/landing" class="hover:text-purple-400 transition">홈</a>
-                    <a href="/about" class="hover:text-purple-400 transition">소개</a>
-                    <a href="/pricing" class="hover:text-purple-400 transition">요금제</a>
+
+                <!-- Bottom Bar -->
+                <div class="border-t border-gray-800 pt-8">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                        <p class="text-sm text-gray-500">
+                            © 2026 WorVox. All rights reserved.
+                        </p>
+                        <div class="flex gap-6 text-sm">
+                            <span class="flex items-center gap-2">
+                                <i class="fas fa-envelope text-purple-400"></i>
+                                support@worvox.com
+                            </span>
+                            <span class="flex items-center gap-2">
+                                <i class="fas fa-globe text-purple-400"></i>
+                                한국어 🇰🇷
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </footer>
