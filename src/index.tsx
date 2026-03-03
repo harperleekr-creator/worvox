@@ -661,6 +661,169 @@ app.get('/landing', (c) => {
             </div>
         </section>
 
+
+        <!-- Feature Demo GIF Section -->
+        <section class="py-16 px-4 bg-gradient-to-br from-purple-50 via-white to-blue-50">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-gray-900 mb-4">실제 사용 모습을 확인하세요</h2>
+                    <p class="text-xl text-gray-600">WorVox의 핵심 기능을 직접 체험해보세요</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Demo 1: Timer Mode -->
+                    <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform transition hover:scale-105 hover:shadow-2xl">
+                        <div class="relative bg-gradient-to-br from-purple-500 to-purple-600 p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-2xl font-bold text-white">타이머 모드</h3>
+                                <span class="text-4xl">⏱️</span>
+                            </div>
+                            <p class="text-purple-100 mb-4">압박 상황에서 빠른 반응력 훈련</p>
+                            <div class="bg-white/20 backdrop-blur-sm rounded-lg p-3 text-white text-sm">
+                                <i class="fas fa-check mr-2"></i>5초/10초 시간 제한
+                            </div>
+                        </div>
+                        
+                        <!-- Timer Challenge Demo Image -->
+                        <div class="aspect-video bg-gray-100 relative group cursor-pointer overflow-hidden">
+                            <img src="/static/demo-timer-challenge.png" 
+                                 alt="타이머 챌린지 모드 - 실시간 발음 분석 데모" 
+                                 class="w-full h-full object-cover"
+                                 loading="lazy">
+                            <div class="absolute inset-0 bg-gradient-to-t from-purple-900/80 via-purple-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+                                <div class="text-white text-center transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                                    <i class="fas fa-search-plus text-5xl mb-3"></i>
+                                    <p class="text-lg font-semibold">자세히 보기</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6">
+                            <div class="space-y-3">
+                                <div class="flex items-start gap-3">
+                                    <i class="fas fa-bolt text-purple-600 mt-1"></i>
+                                    <div>
+                                        <div class="font-semibold text-gray-900">즉각적인 피드백</div>
+                                        <div class="text-sm text-gray-600">발음·유창성 실시간 분석</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <i class="fas fa-chart-bar text-purple-600 mt-1"></i>
+                                    <div>
+                                        <div class="font-semibold text-gray-900">상세 점수</div>
+                                        <div class="text-sm text-gray-600">정확도·발음·유창성 측정</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Demo 2: Scenario Mode -->
+                    <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform transition hover:scale-105 hover:shadow-2xl">
+                        <div class="relative bg-gradient-to-br from-blue-500 to-blue-600 p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-2xl font-bold text-white">시나리오 모드</h3>
+                                <span class="text-4xl">🎭</span>
+                            </div>
+                            <p class="text-blue-100 mb-4">30가지 실생활 상황 연습</p>
+                            <div class="bg-white/20 backdrop-blur-sm rounded-lg p-3 text-white text-sm">
+                                <i class="fas fa-check mr-2"></i>공항·호텔·레스토랑 등
+                            </div>
+                        </div>
+                        
+                        <!-- Scenario Mode Demo Image -->
+                        <div class="aspect-video bg-gray-100 relative group cursor-pointer overflow-hidden">
+                            <img src="/static/demo-scenario-mode.png" 
+                                 alt="시나리오 모드 - 실전 회화 연습 데모" 
+                                 class="w-full h-full object-cover"
+                                 loading="lazy">
+                            <div class="absolute inset-0 bg-gradient-to-t from-blue-900/80 via-blue-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+                                <div class="text-white text-center transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                                    <i class="fas fa-search-plus text-5xl mb-3"></i>
+                                    <p class="text-lg font-semibold">자세히 보기</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6">
+                            <div class="space-y-3">
+                                <div class="flex items-start gap-3">
+                                    <i class="fas fa-globe text-blue-600 mt-1"></i>
+                                    <div>
+                                        <div class="font-semibold text-gray-900">실전 대화</div>
+                                        <div class="text-sm text-gray-600">여행·비즈니스·일상</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <i class="fas fa-language text-blue-600 mt-1"></i>
+                                    <div>
+                                        <div class="font-semibold text-gray-900">자연스러운 표현</div>
+                                        <div class="text-sm text-gray-600">원어민 수준 문장</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Demo 3: Exam Mode -->
+                    <div class="bg-white rounded-2xl shadow-xl overflow-hidden transform transition hover:scale-105 hover:shadow-2xl">
+                        <div class="relative bg-gradient-to-br from-green-500 to-green-600 p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-2xl font-bold text-white">시험 모드</h3>
+                                <span class="text-4xl">🎓</span>
+                            </div>
+                            <p class="text-green-100 mb-4">OPIC 스타일 실전 모의고사</p>
+                            <div class="bg-white/20 backdrop-blur-sm rounded-lg p-3 text-white text-sm">
+                                <i class="fas fa-check mr-2"></i>5문항 종합 평가
+                            </div>
+                        </div>
+                        
+                        <!-- Exam Mode Demo Image -->
+                        <div class="aspect-video bg-gray-100 relative group cursor-pointer overflow-hidden">
+                            <img src="/static/demo-ai-analysis.png" 
+                                 alt="시험 모드 - OPIC 준비 및 분석 데모" 
+                                 class="w-full h-full object-cover"
+                                 loading="lazy">
+                            <div class="absolute inset-0 bg-gradient-to-t from-green-900/80 via-green-900/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+                                <div class="text-white text-center transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                                    <i class="fas fa-search-plus text-5xl mb-3"></i>
+                                    <p class="text-lg font-semibold">자세히 보기</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6">
+                            <div class="space-y-3">
+                                <div class="flex items-start gap-3">
+                                    <i class="fas fa-medal text-green-600 mt-1"></i>
+                                    <div>
+                                        <div class="font-semibold text-gray-900">레벨 평가</div>
+                                        <div class="text-sm text-gray-600">Novice ~ Advanced</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <i class="fas fa-lightbulb text-green-600 mt-1"></i>
+                                    <div>
+                                        <div class="font-semibold text-gray-900">개선 답변 예시</div>
+                                        <div class="text-sm text-gray-600">Premium 전용</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CTA -->
+                <div class="mt-16 text-center">
+                    <p class="text-gray-600 mb-6 text-lg">
+                        💡 실제 GIF 애니메이션은 곧 추가됩니다
+                    </p>
+                    <a href="/app" class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-xl transition transform hover:scale-105">
+                        <i class="fas fa-rocket mr-2"></i>지금 바로 체험하기
+                    </a>
+                </div>
+            </div>
+        </section>
         <!-- Technology Section -->
         <section class="py-16 px-4 bg-gradient-to-br from-gray-50 to-gray-100">
             <div class="max-w-6xl mx-auto">
