@@ -949,14 +949,88 @@ app.get('/landing', (c) => {
             </div>
         </section>
 
+        <!-- Statistics Section -->
+        <section class="py-16 px-4 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-600">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+                        <i class="fas fa-chart-line mr-3"></i>숫자로 보는 WorVox
+                    </h2>
+                    <p class="text-xl text-white/90">실제 데이터가 증명하는 학습 효과</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Stat 1: 학습 효율 -->
+                    <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 text-center border border-white/20 hover:bg-white/20 transition">
+                        <div class="text-5xl font-bold text-yellow-300 mb-3">3배</div>
+                        <div class="text-xl font-semibold text-white mb-2">빠른 학습 속도</div>
+                        <div class="text-sm text-white/80">일반 학습 대비</div>
+                    </div>
+
+                    <!-- Stat 2: 발음 정확도 -->
+                    <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 text-center border border-white/20 hover:bg-white/20 transition">
+                        <div class="text-5xl font-bold text-yellow-300 mb-3">95%+</div>
+                        <div class="text-xl font-semibold text-white mb-2">발음 정확도</div>
+                        <div class="text-sm text-white/80">3개월 학습 후 평균</div>
+                    </div>
+
+                    <!-- Stat 3: 비용 절감 -->
+                    <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 text-center border border-white/20 hover:bg-white/20 transition">
+                        <div class="text-5xl font-bold text-yellow-300 mb-3">90%</div>
+                        <div class="text-xl font-semibold text-white mb-2">비용 절감</div>
+                        <div class="text-sm text-white/80">학원 대비 월 비용</div>
+                    </div>
+
+                    <!-- Stat 4: 24시간 학습 -->
+                    <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-8 text-center border border-white/20 hover:bg-white/20 transition">
+                        <div class="text-5xl font-bold text-yellow-300 mb-3">24/7</div>
+                        <div class="text-xl font-semibold text-white mb-2">언제든 학습</div>
+                        <div class="text-sm text-white/80">시간 제약 없음</div>
+                    </div>
+                </div>
+
+                <!-- Additional Stats -->
+                <div class="mt-12 grid md:grid-cols-3 gap-6">
+                    <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 text-center border border-white/20">
+                        <div class="text-3xl font-bold text-white mb-2">1.9만원</div>
+                        <div class="text-sm text-white/80">월 구독료 (무제한 학습)</div>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 text-center border border-white/20">
+                        <div class="text-3xl font-bold text-white mb-2">30+</div>
+                        <div class="text-sm text-white/80">실전 시나리오</div>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-lg rounded-xl p-6 text-center border border-white/20">
+                        <div class="text-3xl font-bold text-white mb-2">2주</div>
+                        <div class="text-sm text-white/80">무료 체험 기간</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- CTA Section -->
 
         <!-- Comparison Table Section -->
         <section class="py-16 px-4 bg-white">
             <div class="max-w-6xl mx-auto">
                 <div class="text-center mb-16">
-                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">왜 WorVox를 선택해야 할까요?</h2>
-                    <p class="text-xl text-gray-600">일반 영어 학원 및 다른 플랫폼과의 비교</p>
+                    <div class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-full text-sm font-bold mb-4">
+                        <i class="fas fa-trophy mr-2"></i>압도적인 차이
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                        왜 WorVox를 선택해야 할까요?
+                    </h2>
+                    <p class="text-xl text-gray-600 mb-6">일반 영어 학원 및 다른 플랫폼과의 비교</p>
+                    <div class="flex flex-wrap justify-center gap-3">
+                        <span class="px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold">
+                            <i class="fas fa-check-circle mr-1"></i>비용 90% 절감
+                        </span>
+                        <span class="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+                            <i class="fas fa-check-circle mr-1"></i>학습 속도 3배
+                        </span>
+                        <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-semibold">
+                            <i class="fas fa-check-circle mr-1"></i>24시간 이용
+                        </span>
+                    </div>
                 </div>
 
                 <!-- Comparison Table -->
@@ -1997,26 +2071,149 @@ app.get('/pricing', (c) => {
         </section>
 
         <!-- FAQ Section -->
-        <section class="py-16 px-4 bg-white">
+        <section class="py-16 px-4 bg-gradient-to-br from-gray-50 to-white">
             <div class="max-w-4xl mx-auto">
-                <h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">자주 묻는 질문</h2>
+                <div class="text-center mb-12">
+                    <div class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-full text-sm font-bold mb-4">
+                        <i class="fas fa-question-circle mr-2"></i>궁금한 점을 해결하세요
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">자주 묻는 질문</h2>
+                    <p class="text-gray-600">WorVox 이용에 대한 모든 궁금증을 해결해 드립니다</p>
+                </div>
                 <div class="space-y-4">
-                    <details class="bg-gray-50 rounded-lg p-6">
-                        <summary class="font-semibold text-gray-900 cursor-pointer">무료 체험은 어떻게 이용하나요?</summary>
-                        <p class="mt-3 text-gray-600">회원가입 후 자동으로 2주 무료 체험이 시작됩니다. 신용카드 등록 없이 바로 이용 가능합니다.</p>
+                    <!-- FAQ 1 -->
+                    <details class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition border border-gray-100">
+                        <summary class="font-semibold text-gray-900 cursor-pointer text-lg flex items-center">
+                            <i class="fas fa-gift text-purple-600 mr-3"></i>
+                            무료 체험은 어떻게 이용하나요?
+                        </summary>
+                        <p class="mt-4 text-gray-600 pl-8 leading-relaxed">
+                            회원가입 후 자동으로 <strong class="text-purple-600">2주 무료 체험</strong>이 시작됩니다. 
+                            <strong>신용카드 등록 없이</strong> 바로 이용 가능하며, 모든 프리미엄 기능을 체험하실 수 있습니다.
+                        </p>
                     </details>
-                    <details class="bg-gray-50 rounded-lg p-6">
-                        <summary class="font-semibold text-gray-900 cursor-pointer">언제든 취소할 수 있나요?</summary>
-                        <p class="mt-3 text-gray-600">네, 언제든 내 정보 페이지에서 구독을 취소할 수 있습니다. 남은 기간까지는 계속 이용 가능합니다.</p>
+
+                    <!-- FAQ 2 -->
+                    <details class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition border border-gray-100">
+                        <summary class="font-semibold text-gray-900 cursor-pointer text-lg flex items-center">
+                            <i class="fas fa-times-circle text-blue-600 mr-3"></i>
+                            언제든 취소할 수 있나요?
+                        </summary>
+                        <p class="mt-4 text-gray-600 pl-8 leading-relaxed">
+                            네, <strong>언제든</strong> 내 정보 페이지에서 구독을 취소할 수 있습니다. 
+                            위약금이나 추가 비용 없이 즉시 취소되며, 남은 기간까지는 계속 이용 가능합니다.
+                        </p>
                     </details>
-                    <details class="bg-gray-50 rounded-lg p-6">
-                        <summary class="font-semibold text-gray-900 cursor-pointer">연간 요금제의 혜택은 무엇인가요?</summary>
-                        <p class="mt-3 text-gray-600">연간 요금제는 월간 대비 18% 할인된 가격으로 이용하실 수 있습니다. Core는 ₩21,384, Premium은 ₩41,040을 절약할 수 있습니다.</p>
+
+                    <!-- FAQ 3 -->
+                    <details class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition border border-gray-100">
+                        <summary class="font-semibold text-gray-900 cursor-pointer text-lg flex items-center">
+                            <i class="fas fa-percentage text-green-600 mr-3"></i>
+                            연간 요금제의 혜택은 무엇인가요?
+                        </summary>
+                        <p class="mt-4 text-gray-600 pl-8 leading-relaxed">
+                            연간 요금제는 월간 대비 <strong class="text-green-600">18% 할인</strong>된 가격으로 이용하실 수 있습니다. 
+                            Core는 ₩21,384, Premium은 ₩41,040을 절약할 수 있어 <strong>2개월 이상 무료</strong>로 이용하는 효과입니다.
+                        </p>
                     </details>
-                    <details class="bg-gray-50 rounded-lg p-6">
-                        <summary class="font-semibold text-gray-900 cursor-pointer">플랜 변경은 어떻게 하나요?</summary>
-                        <p class="mt-3 text-gray-600">내 정보 페이지에서 언제든 플랜을 변경할 수 있습니다. 업그레이드 시 즉시 적용되며, 다운그레이드 시 현재 기간 종료 후 적용됩니다.</p>
+
+                    <!-- FAQ 4 -->
+                    <details class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition border border-gray-100">
+                        <summary class="font-semibold text-gray-900 cursor-pointer text-lg flex items-center">
+                            <i class="fas fa-exchange-alt text-orange-600 mr-3"></i>
+                            플랜 변경은 어떻게 하나요?
+                        </summary>
+                        <p class="mt-4 text-gray-600 pl-8 leading-relaxed">
+                            내 정보 페이지에서 언제든 플랜을 변경할 수 있습니다. 
+                            <strong>업그레이드 시 즉시 적용</strong>되며, 다운그레이드 시 현재 기간 종료 후 적용됩니다. 
+                            차액은 자동으로 정산됩니다.
+                        </p>
                     </details>
+
+                    <!-- FAQ 5: NEW -->
+                    <details class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition border border-gray-100">
+                        <summary class="font-semibold text-gray-900 cursor-pointer text-lg flex items-center">
+                            <i class="fas fa-mobile-alt text-purple-600 mr-3"></i>
+                            모바일에서도 사용할 수 있나요?
+                        </summary>
+                        <p class="mt-4 text-gray-600 pl-8 leading-relaxed">
+                            네! WorVox는 <strong>PC, 태블릿, 스마트폰</strong> 모두에서 최적화되어 있습니다. 
+                            브라우저만 있으면 어디서든 학습할 수 있으며, 별도의 앱 설치가 필요 없습니다.
+                        </p>
+                    </details>
+
+                    <!-- FAQ 6: NEW -->
+                    <details class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition border border-gray-100">
+                        <summary class="font-semibold text-gray-900 cursor-pointer text-lg flex items-center">
+                            <i class="fas fa-brain text-blue-600 mr-3"></i>
+                            초보자도 사용할 수 있나요?
+                        </summary>
+                        <p class="mt-4 text-gray-600 pl-8 leading-relaxed">
+                            물론입니다! GPT-4 AI가 <strong>당신의 수준을 자동 파악</strong>하고 맞춤형 학습을 제공합니다. 
+                            초급부터 고급까지 모든 레벨에 적합하며, 쉬운 인터페이스로 누구나 쉽게 시작할 수 있습니다.
+                        </p>
+                    </details>
+
+                    <!-- FAQ 7: NEW -->
+                    <details class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition border border-gray-100">
+                        <summary class="font-semibold text-gray-900 cursor-pointer text-lg flex items-center">
+                            <i class="fas fa-clock text-green-600 mr-3"></i>
+                            하루에 얼마나 학습해야 효과가 있나요?
+                        </summary>
+                        <p class="mt-4 text-gray-600 pl-8 leading-relaxed">
+                            <strong>하루 15~30분</strong>만 꾸준히 학습하셔도 효과를 볼 수 있습니다. 
+                            AI가 학습 패턴을 분석하여 짧은 시간에도 효율적인 학습이 가능하도록 최적화합니다. 
+                            <strong class="text-green-600">일일 학습 알림</strong> 기능도 제공합니다.
+                        </p>
+                    </details>
+
+                    <!-- FAQ 8: NEW -->
+                    <details class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition border border-gray-100">
+                        <summary class="font-semibold text-gray-900 cursor-pointer text-lg flex items-center">
+                            <i class="fas fa-graduation-cap text-orange-600 mr-3"></i>
+                            OPIC 시험 준비도 가능한가요?
+                        </summary>
+                        <p class="mt-4 text-gray-600 pl-8 leading-relaxed">
+                            네! <strong>OPIC 전용 시험 모드</strong>를 제공합니다. 
+                            실제 OPIC 시험과 동일한 형식으로 연습할 수 있으며, AI가 답변을 분석하여 
+                            <strong class="text-orange-600">예상 등급과 개선 방향</strong>을 제시합니다.
+                        </p>
+                    </details>
+
+                    <!-- FAQ 9: NEW -->
+                    <details class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition border border-gray-100">
+                        <summary class="font-semibold text-gray-900 cursor-pointer text-lg flex items-center">
+                            <i class="fas fa-shield-alt text-indigo-600 mr-3"></i>
+                            개인정보는 안전한가요?
+                        </summary>
+                        <p class="mt-4 text-gray-600 pl-8 leading-relaxed">
+                            모든 데이터는 <strong>암호화되어 안전하게 보관</strong>됩니다. 
+                            음성 녹음은 분석 후 즉시 삭제되며, 학습 데이터만 익명화되어 저장됩니다. 
+                            개인정보 보호법을 철저히 준수합니다.
+                        </p>
+                    </details>
+
+                    <!-- FAQ 10: NEW -->
+                    <details class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition border border-gray-100">
+                        <summary class="font-semibold text-gray-900 cursor-pointer text-lg flex items-center">
+                            <i class="fas fa-headset text-purple-600 mr-3"></i>
+                            문의사항이 있으면 어떻게 하나요?
+                        </summary>
+                        <p class="mt-4 text-gray-600 pl-8 leading-relaxed">
+                            이메일 <strong class="text-purple-600">support@worvox.com</strong>으로 문의하시면 
+                            <strong>24시간 내</strong>에 답변 드립니다. 
+                            또는 전화 <strong>070-8064-0485</strong>로 직접 상담하실 수도 있습니다.
+                        </p>
+                    </details>
+                </div>
+
+                <!-- FAQ CTA -->
+                <div class="mt-12 text-center bg-gradient-to-r from-purple-50 to-blue-50 rounded-2xl p-8">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">더 궁금한 점이 있으신가요?</h3>
+                    <p class="text-gray-600 mb-6">언제든 문의하세요. 친절하게 답변 드리겠습니다.</p>
+                    <a href="mailto:support@worvox.com" class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition transform hover:scale-105">
+                        <i class="fas fa-envelope mr-2"></i>문의하기
+                    </a>
                 </div>
             </div>
         </section>
