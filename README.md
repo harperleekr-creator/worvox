@@ -352,7 +352,20 @@ Cloudflare Pages 대시보드에서 설정:
 ```
 OPENAI_API_KEY=your_openai_key
 OPENAI_API_BASE=https://api.openai.com/v1
+RESEND_API_KEY=your_resend_api_key (optional, for welcome emails)
 ```
+
+**Resend 설정 (환영 이메일)**:
+1. [Resend](https://resend.com)에서 계정 생성
+2. API 키 발급
+3. 도메인 인증 (noreply@worvox.com)
+4. Cloudflare Pages에 `RESEND_API_KEY` 환경 변수 추가
+
+환영 이메일이 활성화되면:
+- 회원가입 시 자동 발송
+- WorVox 소개 및 주요 기능 안내
+- Premium 플랜 홍보
+- 시작 가이드 제공
 
 ---
 
@@ -485,6 +498,15 @@ Copyright © 2026 WorVox. All rights reserved.
 ## 📊 최근 업데이트 (2026-03-04)
 
 ### ✨ 기능 개선
+- **환영 이메일 자동 발송**
+  - 회원가입 시 환영 이메일 자동 발송 (이메일/Google OAuth 모두 지원)
+  - WorVox 주요 기능 4가지 소개 (AI 대화, 발음 교정, 시나리오, OPIC)
+  - Premium 플랜 가치 제안 및 업그레이드 유도
+  - 시작 가이드 및 학습 팁 제공
+  - 모바일 반응형 HTML 이메일 템플릿
+  - Resend 이메일 서비스 통합
+  - 비차단 방식 (이메일 실패 시에도 회원가입 성공)
+
 - **시나리오 모드 AI 발음 피드백 추가**
   - 각 문장별로 AI가 발음과 억양을 중심으로 분석
   - 발음 정확도, 억양, 연음, 원어민다운 특징 등을 상세히 코칭
