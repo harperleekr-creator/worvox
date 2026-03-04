@@ -541,6 +541,43 @@ app.get('/landing', (c) => {
             </div>
         </section>
 
+        <!-- Brand Story Section -->
+        <section class="py-12 px-4 bg-gradient-to-r from-purple-600 to-blue-600">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
+                        <span class="text-4xl md:text-5xl">📦</span> WorVox의 의미
+                    </h2>
+                    <div class="text-lg md:text-xl text-white/95 leading-relaxed space-y-4">
+                        <p class="font-semibold text-xl md:text-2xl">
+                            <span class="text-yellow-300">Word</span> + <span class="text-yellow-300">Box</span> + <span class="text-yellow-300">Voice</span> = <span class="text-yellow-400">WorVox</span>
+                        </p>
+                        <p class="text-white/90">
+                            <strong class="text-yellow-300">단어(Word)</strong>를 담은 <strong class="text-yellow-300">상자(Box)</strong>에서<br class="sm:hidden"/>
+                            <strong class="text-yellow-300">음성(Voice)</strong>으로 배우는 새로운 영어 학습 경험
+                        </p>
+                        <div class="mt-6 grid sm:grid-cols-3 gap-4 text-sm md:text-base">
+                            <div class="bg-white/10 rounded-xl p-4">
+                                <div class="text-2xl mb-2">📚</div>
+                                <div class="font-semibold text-yellow-300 mb-1">Word</div>
+                                <div class="text-white/80">풍부한 어휘와 표현</div>
+                            </div>
+                            <div class="bg-white/10 rounded-xl p-4">
+                                <div class="text-2xl mb-2">📦</div>
+                                <div class="font-semibold text-yellow-300 mb-1">Box</div>
+                                <div class="text-white/80">체계적인 학습 시스템</div>
+                            </div>
+                            <div class="bg-white/10 rounded-xl p-4">
+                                <div class="text-2xl mb-2">🎤</div>
+                                <div class="font-semibold text-yellow-300 mb-1">Voice</div>
+                                <div class="text-white/80">실전 음성 연습</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Mission Section -->
         <section class="py-16 px-4 bg-white">
             <div class="max-w-6xl mx-auto">
