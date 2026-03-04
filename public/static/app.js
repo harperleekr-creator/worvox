@@ -1,5 +1,5 @@
-// WorVox - AI English Learning App - v2.2.0 - REVERTED TO ORIGINAL
-// Restored original history tabs with full text + horizontal scroll
+// WorVox - AI English Learning App - v2.3.0 - MOBILE OPTIMIZED
+// Mobile: Icon + number only | Desktop: Full text with icon
 class WorVox {
   constructor() {
     this.currentUser = null;
@@ -7187,23 +7187,23 @@ Proceed to payment?
             </div>
 
             <!-- Tabs -->
-            <div class="bg-white border-b border-gray-200 px-4 md:px-6">
-              <div class="flex gap-4 overflow-x-auto scrollbar-hide">
+            <div class="bg-white border-b border-gray-200 px-2 md:px-6">
+              <div class="flex gap-2 md:gap-4 overflow-x-auto scrollbar-hide">
                 <button onclick="worvox.showHistoryTab('ai', event)" 
-                  class="history-tab active px-4 py-3 font-semibold border-b-2 border-blue-600 text-blue-600 whitespace-nowrap">
-                  <i class="fas fa-comment mr-2"></i>AI 대화 (${aiConversations.length})
+                  class="history-tab active px-3 md:px-4 py-2 md:py-3 text-sm md:text-base font-semibold border-b-2 border-blue-600 text-blue-600 whitespace-nowrap">
+                  <i class="fas fa-comment mr-1 md:mr-2"></i><span class="hidden md:inline">AI 대화 </span>(${aiConversations.length})
                 </button>
                 <button onclick="worvox.showHistoryTab('timer', event)" 
-                  class="history-tab px-4 py-3 font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap">
-                  <i class="fas fa-stopwatch mr-2"></i>타이머 모드 (${timerSessions.length})
+                  class="history-tab px-3 md:px-4 py-2 md:py-3 text-sm md:text-base font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap">
+                  <i class="fas fa-stopwatch mr-1 md:mr-2"></i><span class="hidden md:inline">타이머 모드 </span>(${timerSessions.length})
                 </button>
                 <button onclick="worvox.showHistoryTab('scenario', event)" 
-                  class="history-tab px-4 py-3 font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap">
-                  <i class="fas fa-film mr-2"></i>시나리오 모드 (${scenarioSessions.length})
+                  class="history-tab px-3 md:px-4 py-2 md:py-3 text-sm md:text-base font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap">
+                  <i class="fas fa-film mr-1 md:mr-2"></i><span class="hidden md:inline">시나리오 모드 </span>(${scenarioSessions.length})
                 </button>
                 <button onclick="worvox.showHistoryTab('exam', event)" 
-                  class="history-tab px-4 py-3 font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap">
-                  <i class="fas fa-graduation-cap mr-2"></i>시험 모드 (${examSessions.length})
+                  class="history-tab px-3 md:px-4 py-2 md:py-3 text-sm md:text-base font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap">
+                  <i class="fas fa-graduation-cap mr-1 md:mr-2"></i><span class="hidden md:inline">시험 모드 </span>(${examSessions.length})
                 </button>
               </div>
             </div>
