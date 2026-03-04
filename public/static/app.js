@@ -11039,8 +11039,8 @@ Proceed to payment?
                             <span class="text-xs px-2 py-1 rounded bg-green-100 text-green-700">유창성 ${answer.fluency}</span>
                           </div>
                         </div>
-                        <div class="text-sm text-gray-900 mb-1"><strong>Q:</strong> ${answer.questionEn}</div>
-                        ${answer.questionKr ? `<div class="text-xs text-gray-500 mb-2">${answer.questionKr}</div>` : ''}
+                        <div class="text-sm text-gray-900 mb-1"><strong>Q:</strong> ${answer.question || answer.questionEn}</div>
+                        ${(answer.questionKR || answer.questionKr) ? `<div class="text-xs text-gray-500 mb-2">${answer.questionKR || answer.questionKr}</div>` : ''}
                         <div class="text-sm text-gray-700"><strong>A:</strong> ${answer.transcription || '(답변 없음)'}</div>
                       </div>
                     `).join('')}
