@@ -1,4 +1,4 @@
-// WorVox - AI English Learning App
+// WorVox - AI English Learning App - v2.0.3
 class WorVox {
   constructor() {
     this.currentUser = null;
