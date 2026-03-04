@@ -521,6 +521,12 @@ app.get('/landing', (c) => {
         <!-- Hero Section -->
         <section class="pt-24 sm:pt-28 md:pt-32 pb-16 px-4">
             <div class="max-w-4xl mx-auto text-center">
+                <!-- Quick Identity Badge -->
+                <div class="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-semibold mb-6 animate-pulse">
+                    <span class="text-lg">🎯</span>
+                    <span>영어 말하기가 두려운 당신을 위한</span>
+                </div>
+                
                 <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
                     <span class="bg-gradient-to-r from-purple-600 to-blue-600 text-transparent bg-clip-text">
                         AI 영어 학습 플랫폼
@@ -533,11 +539,105 @@ app.get('/landing', (c) => {
                     <span class="block sm:inline">실시간 발음 분석, 30가지 실전 시나리오,</span>
                     <span class="block sm:inline">OPIC 준비까지 - 월 1.9만원</span>
                 </p>
+                
+                <!-- Social Proof -->
+                <div class="flex flex-wrap justify-center gap-4 mb-8 text-sm text-gray-600">
+                    <div class="flex items-center gap-2">
+                        <span class="text-yellow-500">★★★★★</span>
+                        <span class="font-semibold">4.8/5</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-users text-purple-600"></i>
+                        <span>3,000+ 학습자</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-clock text-blue-600"></i>
+                        <span>평균 30일 만에 효과</span>
+                    </div>
+                </div>
+
                 <a href="/app" 
                    class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:shadow-xl transition transform hover:scale-105"
                    onclick="gtag('event', 'cta_click', { 'event_category': 'engagement', 'event_label': 'hero_cta_start_trial', 'value': 1 })">
                     <i class="fas fa-rocket mr-2"></i>2주 무료 체험 시작
                 </a>
+                <p class="mt-4 text-sm text-gray-500">
+                    <i class="fas fa-check-circle text-green-600 mr-1"></i>신용카드 등록 없이 바로 시작
+                </p>
+            </div>
+        </section>
+
+        <!-- Quick Target Audience (3초 안에 이해) -->
+        <section class="py-12 px-4 bg-white border-b-4 border-purple-200">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+                        <span class="text-purple-600">이런 분들</span>을 위해 만들었어요
+                    </h2>
+                    <p class="text-gray-600">3초 만에 확인하세요 - 당신을 위한 솔루션인가요?</p>
+                </div>
+
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Target 1: 영어 말문 막힘 -->
+                    <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-6 text-center hover:shadow-lg transition transform hover:scale-105 cursor-pointer border-2 border-transparent hover:border-red-300">
+                        <div class="text-5xl mb-3">😰</div>
+                        <div class="font-bold text-gray-900 mb-2">영어만 들으면<br/>말문이 막혀요</div>
+                        <div class="text-sm text-gray-600 mb-3">"무슨 말을 해야 할지<br/>생각이 안 나요"</div>
+                        <div class="inline-block bg-red-200 text-red-800 px-3 py-1 rounded-full text-xs font-bold">
+                            ✓ WorVox로 해결
+                        </div>
+                    </div>
+
+                    <!-- Target 2: 발음 자신 없음 -->
+                    <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6 text-center hover:shadow-lg transition transform hover:scale-105 cursor-pointer border-2 border-transparent hover:border-orange-300">
+                        <div class="text-5xl mb-3">🤐</div>
+                        <div class="font-bold text-gray-900 mb-2">발음이 창피해서<br/>말을 못해요</div>
+                        <div class="text-sm text-gray-600 mb-3">"틀린 발음으로<br/>말하기 두려워요"</div>
+                        <div class="inline-block bg-orange-200 text-orange-800 px-3 py-1 rounded-full text-xs font-bold">
+                            ✓ WorVox로 해결
+                        </div>
+                    </div>
+
+                    <!-- Target 3: 시험 준비 -->
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 text-center hover:shadow-lg transition transform hover:scale-105 cursor-pointer border-2 border-transparent hover:border-blue-300">
+                        <div class="text-5xl mb-3">📝</div>
+                        <div class="font-bold text-gray-900 mb-2">OPIC/토스<br/>고득점 필요해요</div>
+                        <div class="text-sm text-gray-600 mb-3">"실전처럼 연습할<br/>방법이 없어요"</div>
+                        <div class="inline-block bg-blue-200 text-blue-800 px-3 py-1 rounded-full text-xs font-bold">
+                            ✓ WorVox로 해결
+                        </div>
+                    </div>
+
+                    <!-- Target 4: 바쁜 직장인 -->
+                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 text-center hover:shadow-lg transition transform hover:scale-105 cursor-pointer border-2 border-transparent hover:border-purple-300">
+                        <div class="text-5xl mb-3">⏰</div>
+                        <div class="font-bold text-gray-900 mb-2">학원 다닐<br/>시간이 없어요</div>
+                        <div class="text-sm text-gray-600 mb-3">"출퇴근 시간에<br/>공부하고 싶어요"</div>
+                        <div class="inline-block bg-purple-200 text-purple-800 px-3 py-1 rounded-full text-xs font-bold">
+                            ✓ WorVox로 해결
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Value Prop -->
+                <div class="mt-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-6 text-center">
+                    <div class="flex flex-wrap justify-center items-center gap-3 md:gap-6 text-white">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-yellow-300 text-xl"></i>
+                            <span class="font-semibold">24시간 AI 영어 선생님</span>
+                        </div>
+                        <div class="hidden md:block text-white/50">|</div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-yellow-300 text-xl"></i>
+                            <span class="font-semibold">실시간 발음 교정</span>
+                        </div>
+                        <div class="hidden md:block text-white/50">|</div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-yellow-300 text-xl"></i>
+                            <span class="font-semibold">월 1.9만원</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
