@@ -388,4 +388,97 @@ aiPrompts.get('/cached/:mode/:level', async (c) => {
   }
 });
 
+// Generate pronunciation feedback (Premium feature)
+aiPrompts.post('/generate-pronunciation-feedback', async (c) => {
+  try {
+    const { 
+      originalSentence, 
+      userTranscription, 
+      pronunciation, 
+      fluency, 
+      accuracy,
+      context 
+    } = await c.req.json();
+
+    if (!originalSentence || !userTranscription) {
+      return c.json({ 
+        success: false, 
+        error: 'Missing required fields' 
+      }, 400);
+    }
+
+    const openai = getOpenAIClient(c.env);
+
+    // Focus on pronunciation and intonation for scenario mode
+    const systemPrompt = context?.includes('시나리오') ? `
+You are an expert English pronunciation coach specializing in real-life conversation scenarios.
+
+Analyze the user's pronunciation focusing on:
+1. **Pronunciation accuracy** (발음 정확도): Individual sound accuracy, stress patterns
+2. **Intonation** (억양): Natural rhythm, pitch variation, emphasis
+3. **Connected speech** (연음): Linking words naturally
+4. **Native-like qualities** (원어민다운 특징): Natural flow, reduction, weak forms
+
+Provide feedback in Korean (한글) with:
+- What they did well (긍정적인 부분)
+- Specific pronunciation/intonation issues (구체적 문제점)
+- How to improve with examples (개선 방법 + 예시)
+
+Keep it concise (3-5 sentences), encouraging, and actionable.
+` : `
+You are an expert English pronunciation coach.
+
+Analyze the user's pronunciation and provide feedback in Korean (한글) focusing on:
+1. Pronunciation accuracy
+2. Fluency and rhythm
+3. Areas to improve
+4. Encouragement
+
+Keep it concise (3-4 sentences) and actionable.
+`;
+
+    const userPrompt = `
+원문: "${originalSentence}"
+사용자 발화: "${userTranscription}"
+
+점수:
+- 정확도: ${accuracy}%
+- 발음: ${pronunciation}%
+- 유창성: ${fluency}%
+
+${context || ''}
+
+한글로 발음과 억양을 중심으로 피드백을 제공해주세요.
+`;
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ],
+      temperature: 0.7,
+      max_tokens: 300
+    });
+
+    const feedback = completion.choices[0]?.message?.content?.trim();
+
+    if (!feedback) {
+      throw new Error('No feedback generated');
+    }
+
+    return c.json({ 
+      success: true, 
+      feedback 
+    });
+
+  } catch (error) {
+    console.error('❌ Pronunciation feedback generation error:', error);
+    return c.json({ 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to generate feedback'
+    }, 500);
+  }
+});
+
 export default aiPrompts;

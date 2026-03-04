@@ -2862,7 +2862,48 @@ class WorVox {
       }
     }
     
-    const averageAccuracy = Math.round(results.reduce((sum, r) => sum + r.accuracy, 0) / results.length);
+    // 🤖 Generate AI feedback for each sentence (Premium feature)
+    let resultsWithFeedback = [...results];
+    if (this.currentUser?.plan === 'premium') {
+      try {
+        console.log('🤖 Generating AI feedback for scenario results...');
+        
+        // Batch generate AI feedback for all sentences
+        const feedbackPromises = results.map(async (result, index) => {
+          try {
+            const response = await axios.post('/api/ai-prompts/generate-pronunciation-feedback', {
+              originalSentence: result.original,
+              userTranscription: result.transcription,
+              pronunciation: result.pronunciation,
+              fluency: result.fluency,
+              accuracy: result.accuracy,
+              context: `시나리오 실습: ${scenario.title}. 발음과 억양을 중심으로 분석해주세요.`
+            });
+            
+            if (response.data.success && response.data.feedback) {
+              console.log(`✅ Generated AI feedback for sentence ${index + 1}`);
+              return {
+                ...result,
+                aiFeedback: response.data.feedback
+              };
+            }
+            return result;
+          } catch (error) {
+            console.warn(`⚠️ Failed to generate AI feedback for sentence ${index + 1}:`, error);
+            return result;
+          }
+        });
+        
+        resultsWithFeedback = await Promise.all(feedbackPromises);
+        console.log('✅ All AI feedbacks generated:', resultsWithFeedback);
+      } catch (error) {
+        console.warn('⚠️ Failed to generate AI feedbacks:', error);
+      }
+    } else {
+      console.log('ℹ️ AI feedback is a Premium feature');
+    }
+    
+    const averageAccuracy = Math.round(resultsWithFeedback.reduce((sum, r) => sum + r.accuracy, 0) / resultsWithFeedback.length);
     
     let rating, ratingColor, ratingIcon;
     if (averageAccuracy >= 80) {
@@ -2886,20 +2927,20 @@ class WorVox {
     // 💾 Save scenario report to database
     if (sessionId && this.currentUser) {
       try {
-        const avgPronunciation = Math.round(results.reduce((sum, r) => sum + (r.pronunciation || 0), 0) / results.length);
-        const avgFluency = Math.round(results.reduce((sum, r) => sum + (r.fluency || 0), 0) / results.length);
+        const avgPronunciation = Math.round(resultsWithFeedback.reduce((sum, r) => sum + (r.pronunciation || 0), 0) / resultsWithFeedback.length);
+        const avgFluency = Math.round(resultsWithFeedback.reduce((sum, r) => sum + (r.fluency || 0), 0) / resultsWithFeedback.length);
         
         const reportData = {
           scenario: {
             title: scenario.title,
             icon: scenario.icon
           },
-          results: results,
+          results: resultsWithFeedback,  // Save with AI feedback
           averageAccuracy,
           averagePronunciation: avgPronunciation,
           averageFluency: avgFluency,
           rating,
-          totalSentences: results.length,
+          totalSentences: resultsWithFeedback.length,
           completedAt: new Date().toISOString()
         };
         
@@ -2948,7 +2989,7 @@ class WorVox {
                   </h3>
                   
                   <div class="space-y-4">
-                    ${results.map((result, index) => `
+                    ${resultsWithFeedback.map((result, index) => `
                       <div class="border border-gray-200 rounded-lg p-4">
                         <div class="flex items-center justify-between mb-3">
                           <span class="text-sm font-semibold text-gray-700">문장 ${index + 1}</span>
@@ -2991,8 +3032,42 @@ class WorVox {
                               </button>
                             ` : ''}
                           </div>
-                          <div class="bg-blue-50 rounded p-2 text-sm text-gray-900">${result.transcription || '(인식되지 않음)'}</div>
+                          <div class="bg-blue-50 rounded p-2 text-sm text-gray-900 mb-3">${result.transcription || '(인식되지 않음)'}</div>
                         </div>
+                        
+                        <!-- AI Feedback (Premium) -->
+                        ${result.aiFeedback ? `
+                          <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-4 border-2 border-blue-200">
+                            <div class="flex items-center gap-2 mb-2">
+                              <i class="fas fa-robot text-blue-600"></i>
+                              <span class="text-sm font-bold text-gray-900">💎 AI 발음 코칭</span>
+                            </div>
+                            <div class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                              ${result.aiFeedback}
+                            </div>
+                          </div>
+                        ` : this.currentUser?.plan === 'premium' ? `
+                          <div class="bg-gray-100 rounded-lg p-3 text-center">
+                            <span class="text-xs text-gray-600">AI 피드백 생성 중...</span>
+                          </div>
+                        ` : `
+                          <div class="relative bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-4 border-2 border-blue-200">
+                            <div class="blur-sm select-none pointer-events-none">
+                              <div class="text-sm font-bold text-gray-900 mb-2">💎 AI 발음 코칭</div>
+                              <div class="text-sm text-gray-700">발음과 억양에 대한 상세한 분석과 개선 방법을 AI가 알려드립니다. 자연스러운 원어민 발음에 가까워지는 팁을 받아보세요!</div>
+                            </div>
+                            <div class="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg">
+                              <div class="text-center px-4">
+                                <i class="fas fa-crown text-yellow-500 text-2xl mb-2"></i>
+                                <div class="text-sm font-bold text-gray-900 mb-1">Premium 전용</div>
+                                <p class="text-xs text-gray-600 mb-2">발음/억양 중심 AI 분석</p>
+                                <button onclick="worvox.showPlan()" class="text-xs bg-purple-500 hover:bg-purple-600 text-white px-3 py-1.5 rounded-lg font-semibold transition-all">
+                                  업그레이드
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        `}
                       </div>
                     `).join('')}
                   </div>
@@ -10925,8 +11000,48 @@ Proceed to payment?
                             ${result.pronunciation ? `<span class="text-xs px-2 py-1 rounded bg-purple-100 text-purple-700">발음 ${result.pronunciation}점</span>` : ''}
                           </div>
                         </div>
-                        <div class="text-sm text-gray-600 mb-1">원문: ${result.original}</div>
-                        <div class="text-sm text-blue-600">답변: ${result.transcription}</div>
+                        <div class="mb-2">
+                          <div class="text-xs text-gray-600 mb-1">원문:</div>
+                          <div class="bg-gray-50 rounded p-2 text-sm text-gray-900">${result.original}</div>
+                        </div>
+                        <div class="mb-3">
+                          <div class="text-xs text-gray-600 mb-1">당신의 답변:</div>
+                          <div class="bg-blue-50 rounded p-2 text-sm text-blue-900">${result.transcription}</div>
+                        </div>
+                        
+                        <!-- AI Feedback (Premium) -->
+                        ${result.aiFeedback ? `
+                          <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-4 border-2 border-blue-200">
+                            <div class="flex items-center gap-2 mb-2">
+                              <i class="fas fa-robot text-blue-600"></i>
+                              <span class="text-sm font-bold text-gray-900">💎 AI 발음 코칭</span>
+                            </div>
+                            <div class="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                              ${result.aiFeedback}
+                            </div>
+                          </div>
+                        ` : this.currentUser?.plan === 'premium' ? `
+                          <div class="bg-gray-100 rounded-lg p-3 text-center">
+                            <span class="text-xs text-gray-600">AI 피드백 생성 중...</span>
+                          </div>
+                        ` : `
+                          <div class="relative bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-4 border-2 border-blue-200">
+                            <div class="blur-sm select-none pointer-events-none">
+                              <div class="text-sm font-bold text-gray-900 mb-2">💎 AI 발음 코칭</div>
+                              <div class="text-sm text-gray-700">발음과 억양에 대한 상세한 분석과 개선 방법을 AI가 알려드립니다.</div>
+                            </div>
+                            <div class="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg">
+                              <div class="text-center px-4">
+                                <i class="fas fa-crown text-yellow-500 text-2xl mb-2"></i>
+                                <div class="text-sm font-bold text-gray-900 mb-1">Premium 전용</div>
+                                <p class="text-xs text-gray-600 mb-2">발음/억양 중심 AI 분석</p>
+                                <button onclick="worvox.showPlan()" class="text-xs bg-purple-500 hover:bg-purple-600 text-white px-3 py-1.5 rounded-lg font-semibold transition-all">
+                                  업그레이드
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        `}
                       </div>
                     `).join('')}
                   </div>
