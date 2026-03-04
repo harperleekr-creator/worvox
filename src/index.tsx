@@ -708,6 +708,311 @@ app.get('/landing', (c) => {
             </div>
         </section>
 
+        <!-- Results-Focused Benefits Section -->
+        <section class="py-16 px-4 bg-white">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <div class="inline-block bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-2 rounded-full text-sm font-bold mb-4">
+                        <i class="fas fa-star mr-2"></i>실제 변화
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                        WorVox가 바꾸는 3가지
+                    </h2>
+                    <p class="text-xl text-gray-600">학습자들이 경험하는 실질적인 변화</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Benefit 1: 말문이 트임 -->
+                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-8 hover:shadow-xl transition transform hover:-translate-y-2">
+                        <div class="text-6xl mb-6 text-center">💬</div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-4 text-center">말문이 트임</h3>
+                        <p class="text-gray-700 leading-relaxed text-center mb-6">
+                            "무슨 말을 해야 할지 몰라 멈추는 시간이 줄어듭니다."
+                        </p>
+                        <div class="bg-white rounded-xl p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm text-gray-600">학습 전</span>
+                                <span class="text-sm font-bold text-red-600">3초+ 멈춤</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+                                <div class="bg-red-500 h-2 rounded-full" style="width: 30%"></div>
+                            </div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm text-gray-600">학습 후</span>
+                                <span class="text-sm font-bold text-green-600">즉시 응답</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: 90%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Benefit 2: 발음이 정리됨 -->
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-8 hover:shadow-xl transition transform hover:-translate-y-2">
+                        <div class="text-6xl mb-6 text-center">🎯</div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-4 text-center">발음이 정리됨</h3>
+                        <p class="text-gray-700 leading-relaxed text-center mb-6">
+                            "틀린 발음을 그 자리에서 잡아, 나쁜 습관을 쌓지 않습니다."
+                        </p>
+                        <div class="bg-white rounded-xl p-4">
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm">실시간 교정</span>
+                                    <i class="fas fa-check-circle text-green-600"></i>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm">정확도 분석</span>
+                                    <i class="fas fa-check-circle text-green-600"></i>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm">억양 피드백</span>
+                                    <i class="fas fa-check-circle text-green-600"></i>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm">유창성 측정</span>
+                                    <i class="fas fa-check-circle text-green-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Benefit 3: 표현이 자연스러워짐 -->
+                    <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-8 hover:shadow-xl transition transform hover:-translate-y-2">
+                        <div class="text-6xl mb-6 text-center">✨</div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-4 text-center">표현이 자연스러워짐</h3>
+                        <p class="text-gray-700 leading-relaxed text-center mb-6">
+                            "같은 의미라도 더 자연스러운 표현으로 업그레이드됩니다."
+                        </p>
+                        <div class="bg-white rounded-xl p-4">
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="text-xs text-red-600 mb-1">❌ 어색한 표현</div>
+                                    <div class="text-sm text-gray-600 line-through">"I want to say..."</div>
+                                </div>
+                                <div class="border-t pt-4">
+                                    <div class="text-xs text-green-600 mb-1">✅ 자연스러운 표현</div>
+                                    <div class="text-sm font-semibold text-gray-900">"I'd like to mention..."</div>
+                                </div>
+                                <div class="text-xs text-center text-gray-500 bg-green-50 rounded-lg py-2">
+                                    AI가 더 나은 표현 제안
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Use Cases Section (Target Audience) -->
+        <section class="py-16 px-4 bg-gradient-to-br from-gray-50 via-white to-blue-50">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-16">
+                    <div class="inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2 rounded-full text-sm font-bold mb-4">
+                        <i class="fas fa-users mr-2"></i>타겟별 솔루션
+                    </div>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                        이런 분들에게 특히 잘 맞아요
+                    </h2>
+                    <p class="text-xl text-gray-600">당신의 목표에 딱 맞는 학습 시나리오</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Use Case 1: 직장인 -->
+                    <div class="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition border-2 border-purple-100">
+                        <div class="flex items-center mb-6">
+                            <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-3xl mr-4">
+                                💼
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-900">직장인</h3>
+                                <p class="text-sm text-gray-600">업무 영어 완벽 대응</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mb-6">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-check-circle text-purple-600 mt-1"></i>
+                                <div>
+                                    <div class="font-semibold text-gray-900">화상 미팅</div>
+                                    <div class="text-sm text-gray-600">해외 파트너와의 실시간 커뮤니케이션</div>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-check-circle text-purple-600 mt-1"></i>
+                                <div>
+                                    <div class="font-semibold text-gray-900">영문 이메일</div>
+                                    <div class="text-sm text-gray-600">비즈니스 상황별 이메일 작성법</div>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-check-circle text-purple-600 mt-1"></i>
+                                <div>
+                                    <div class="font-semibold text-gray-900">전화 응대</div>
+                                    <div class="text-sm text-gray-600">긴급 전화 상황 대응 연습</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-purple-50 rounded-xl p-4">
+                            <div class="text-sm text-purple-900 font-semibold mb-2">
+                                <i class="fas fa-lightbulb mr-2"></i>추천 모드
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-3 py-1 bg-white text-purple-700 rounded-full text-xs font-medium">시나리오 모드</span>
+                                <span class="px-3 py-1 bg-white text-purple-700 rounded-full text-xs font-medium">AI 대화</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Use Case 2: OPIC 준비 -->
+                    <div class="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition border-2 border-blue-100">
+                        <div class="flex items-center mb-6">
+                            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-3xl mr-4">
+                                🎓
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-900">OPIC 준비생</h3>
+                                <p class="text-sm text-gray-600">고득점 목표 달성</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mb-6">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-check-circle text-blue-600 mt-1"></i>
+                                <div>
+                                    <div class="font-semibold text-gray-900">롤플레이 연습</div>
+                                    <div class="text-sm text-gray-600">15개 주제별 심화 대화 훈련</div>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-check-circle text-blue-600 mt-1"></i>
+                                <div>
+                                    <div class="font-semibold text-gray-900">돌발 질문 대비</div>
+                                    <div class="text-sm text-gray-600">예측 불가 상황 즉시 응답 연습</div>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-check-circle text-blue-600 mt-1"></i>
+                                <div>
+                                    <div class="font-semibold text-gray-900">시간 압박 훈련</div>
+                                    <div class="text-sm text-gray-600">제한 시간 내 답변 완성도 향상</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-blue-50 rounded-xl p-4">
+                            <div class="text-sm text-blue-900 font-semibold mb-2">
+                                <i class="fas fa-lightbulb mr-2"></i>추천 모드
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-3 py-1 bg-white text-blue-700 rounded-full text-xs font-medium">시험 모드</span>
+                                <span class="px-3 py-1 bg-white text-blue-700 rounded-full text-xs font-medium">타이머 모드</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Use Case 3: 여행/워홀 -->
+                    <div class="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition border-2 border-green-100">
+                        <div class="flex items-center mb-6">
+                            <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center text-3xl mr-4">
+                                ✈️
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-900">여행 / 워홀 준비</h3>
+                                <p class="text-sm text-gray-600">해외 생활 필수 영어</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mb-6">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-check-circle text-green-600 mt-1"></i>
+                                <div>
+                                    <div class="font-semibold text-gray-900">공항 체크인</div>
+                                    <div class="text-sm text-gray-600">항공권·수하물 관련 필수 표현</div>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-check-circle text-green-600 mt-1"></i>
+                                <div>
+                                    <div class="font-semibold text-gray-900">식당 주문</div>
+                                    <div class="text-sm text-gray-600">메뉴 선택부터 계산까지</div>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-check-circle text-green-600 mt-1"></i>
+                                <div>
+                                    <div class="font-semibold text-gray-900">호텔 / 병원</div>
+                                    <div class="text-sm text-gray-600">긴급 상황 대응 회화</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-green-50 rounded-xl p-4">
+                            <div class="text-sm text-green-900 font-semibold mb-2">
+                                <i class="fas fa-lightbulb mr-2"></i>추천 모드
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-3 py-1 bg-white text-green-700 rounded-full text-xs font-medium">시나리오 모드</span>
+                                <span class="px-3 py-1 bg-white text-green-700 rounded-full text-xs font-medium">AI 대화</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Use Case 4: 영어 울렁증 -->
+                    <div class="bg-white rounded-2xl shadow-lg p-8 hover:shadow-2xl transition border-2 border-orange-100">
+                        <div class="flex items-center mb-6">
+                            <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center text-3xl mr-4">
+                                💪
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-bold text-gray-900">영어 울렁증</h3>
+                                <p class="text-sm text-gray-600">자신감 회복 프로그램</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mb-6">
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-check-circle text-orange-600 mt-1"></i>
+                                <div>
+                                    <div class="font-semibold text-gray-900">완벽주의 극복</div>
+                                    <div class="text-sm text-gray-600">"틀려도 괜찮다"는 마인드셋 훈련</div>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-check-circle text-orange-600 mt-1"></i>
+                                <div>
+                                    <div class="font-semibold text-gray-900">부담 없는 연습</div>
+                                    <div class="text-sm text-gray-600">AI 상대로 실수해도 부끄럽지 않음</div>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <i class="fas fa-check-circle text-orange-600 mt-1"></i>
+                                <div>
+                                    <div class="font-semibold text-gray-900">점진적 난이도</div>
+                                    <div class="text-sm text-gray-600">쉬운 문장부터 차근차근 시작</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-orange-50 rounded-xl p-4">
+                            <div class="text-sm text-orange-900 font-semibold mb-2">
+                                <i class="fas fa-lightbulb mr-2"></i>추천 모드
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-3 py-1 bg-white text-orange-700 rounded-full text-xs font-medium">AI 대화</span>
+                                <span class="px-3 py-1 bg-white text-orange-700 rounded-full text-xs font-medium">타이머 모드</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Use Case CTA -->
+                <div class="mt-12 text-center bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">
+                        당신에게 맞는 학습 방법을 찾으셨나요?
+                    </h3>
+                    <p class="text-gray-600 mb-6">
+                        2주 무료 체험으로 직접 경험해보세요. 신용카드 등록 없이 바로 시작!
+                    </p>
+                    <a href="/app" class="inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-xl transition transform hover:scale-105">
+                        <i class="fas fa-play-circle mr-2"></i>지금 바로 시작하기
+                    </a>
+                </div>
+            </div>
+        </section>
+
 
         <!-- Feature Demo GIF Section -->
         <section class="py-16 px-4 bg-gradient-to-br from-purple-50 via-white to-blue-50">
