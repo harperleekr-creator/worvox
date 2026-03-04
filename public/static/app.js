@@ -1,5 +1,6 @@
-// WorVox - AI English Learning App - v2.3.0 - MOBILE OPTIMIZED
+// WorVox - AI English Learning App - v2.3.1 - FORCE REFRESH 2026-03-04T06:00
 // Mobile: Icon + number only | Desktop: Full text with icon
+// CRITICAL: Browser cache must refresh NOW
 class WorVox {
   constructor() {
     this.currentUser = null;
