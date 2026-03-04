@@ -7186,23 +7186,23 @@ Proceed to payment?
             </div>
 
             <!-- Tabs -->
-            <div class="bg-white border-b border-gray-200 px-2 md:px-6">
-              <div class="flex gap-1 md:gap-4 overflow-x-auto scrollbar-hide -mx-2 px-2 md:mx-0 md:px-0">
+            <div class="bg-white border-b border-gray-200 px-1 md:px-6">
+              <div class="flex gap-1 md:gap-4 overflow-x-auto scrollbar-hide">
                 <button onclick="worvox.showHistoryTab('ai', event)" 
-                  class="history-tab active px-2 md:px-4 py-2 md:py-3 text-xs md:text-base font-semibold border-b-2 border-blue-600 text-blue-600 whitespace-nowrap flex-shrink-0 min-w-0">
-                  <i class="fas fa-comment mr-1"></i><span class="hidden md:inline">AI 대화 </span>(${aiConversations.length})
+                  class="history-tab active px-2 py-2 text-xs font-medium border-b-2 border-blue-600 text-blue-600 whitespace-nowrap flex-shrink-0">
+                  <i class="fas fa-comment text-sm"></i><span class="ml-1">(${aiConversations.length})</span>
                 </button>
                 <button onclick="worvox.showHistoryTab('timer', event)" 
-                  class="history-tab px-2 md:px-4 py-2 md:py-3 text-xs md:text-base font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap flex-shrink-0 min-w-0">
-                  <i class="fas fa-stopwatch mr-1"></i><span class="hidden md:inline">타이머 </span>(${timerSessions.length})
+                  class="history-tab px-2 py-2 text-xs font-medium border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap flex-shrink-0">
+                  <i class="fas fa-stopwatch text-sm"></i><span class="ml-1">(${timerSessions.length})</span>
                 </button>
                 <button onclick="worvox.showHistoryTab('scenario', event)" 
-                  class="history-tab px-2 md:px-4 py-2 md:py-3 text-xs md:text-base font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap flex-shrink-0 min-w-0">
-                  <i class="fas fa-film mr-1"></i><span class="hidden md:inline">시나리오 </span>(${scenarioSessions.length})
+                  class="history-tab px-2 py-2 text-xs font-medium border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap flex-shrink-0">
+                  <i class="fas fa-film text-sm"></i><span class="ml-1">(${scenarioSessions.length})</span>
                 </button>
                 <button onclick="worvox.showHistoryTab('exam', event)" 
-                  class="history-tab px-2 md:px-4 py-2 md:py-3 text-xs md:text-base font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap flex-shrink-0 min-w-0">
-                  <i class="fas fa-graduation-cap mr-1"></i><span class="hidden md:inline">시험 </span>(${examSessions.length})
+                  class="history-tab px-2 py-2 text-xs font-medium border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap flex-shrink-0">
+                  <i class="fas fa-graduation-cap text-sm"></i><span class="ml-1">(${examSessions.length})</span>
                 </button>
               </div>
             </div>
