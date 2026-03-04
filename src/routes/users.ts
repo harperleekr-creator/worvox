@@ -153,6 +153,21 @@ users.post('/google-login', async (c) => {
       'SELECT id, username, email, google_id, google_email, google_picture, level, auth_provider, plan, user_level, xp, total_xp, coins, current_streak, longest_streak, created_at FROM users WHERE id = ?'
     ).bind(userId).first();
 
+    // Send welcome email for new Google users (async, non-blocking)
+    try {
+      await fetch(`${new URL(c.req.url).origin}/api/emails/send-welcome`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          name: username
+        })
+      });
+      console.log('📧 Welcome email sent to:', email);
+    } catch (emailError) {
+      console.warn('⚠️ Failed to send welcome email (non-critical):', emailError);
+    }
+
     console.log('🎉 Google login successful!');
     console.log('📊 New user plan:', newUser.plan || 'free');
 
@@ -371,6 +386,22 @@ users.post('/signup', async (c) => {
     const newUser = await c.env.DB.prepare(
       'SELECT id, username, email, level, auth_provider, plan, user_level, xp, total_xp, coins, current_streak, longest_streak, created_at FROM users WHERE id = ?'
     ).bind(userId).first();
+
+    // Send welcome email (async, non-blocking)
+    try {
+      await fetch(`${new URL(c.req.url).origin}/api/emails/send-welcome`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          name: name
+        })
+      });
+      console.log('📧 Welcome email sent to:', email);
+    } catch (emailError) {
+      console.warn('⚠️ Failed to send welcome email (non-critical):', emailError);
+      // Don't fail signup if email fails
+    }
 
     return c.json({
       user: newUser,

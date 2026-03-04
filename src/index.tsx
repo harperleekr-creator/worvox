@@ -23,6 +23,7 @@ import pronunciationAnalysis from './routes/pronunciation-analysis';
 import modeReports from './routes/mode-reports';
 import aiPrompts from './routes/ai-prompts';
 import emailNotifications from './routes/email-notifications';
+import emails from './routes/emails';
 import scheduled from './scheduled';
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -156,6 +157,7 @@ app.route('/api/pronunciation', pronunciationAnalysis);
 app.route('/api/mode-reports', modeReports);
 app.route('/api/ai-prompts', aiPrompts);
 app.route('/api/email-notifications', emailNotifications);
+app.route('/api/emails', emails);
 
 // Preview routes
 app.route('/preview', preview);
