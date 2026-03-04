@@ -91,6 +91,7 @@ Landing 페이지에 3가지 핵심 기능을 시각적으로 보여주는 **AI 
 - **Learning History**: 과거 대화 세션 기록 및 조회
   - 모드별 리포트 보기 (타이머, 시나리오, 시험 모드)
   - 세션별 상세 분석 및 점수
+  - ✅ **시험 모드 히스토리 개선** (2026-03-04): 필드명 불일치 해결로 정상 표시
 - **Statistics**: 학습 통계 및 진도 시각화
 
 ### 🎮 게임화 (Gamification)
@@ -477,11 +478,21 @@ Copyright © 2026 WorVox. All rights reserved.
 
 ---
 
-**Last Updated**: 2026-03-03
+**Last Updated**: 2026-03-04
 
 ---
 
-## 📊 최근 업데이트 (2026-03-03)
+## 📊 최근 업데이트 (2026-03-04)
+
+### 🐛 버그 수정
+- **시험 모드 히스토리 수정**
+  - 문제: 시험 모드 완료 후 History 탭에서 리포트가 제대로 표시되지 않음
+  - 원인: 답변 저장 시 `question`/`questionKR` 필드를 사용했지만, 리포트 표시 시 `questionEn`/`questionKr` 필드를 참조
+  - 해결: `displayExamReport` 함수에서 두 가지 필드명을 모두 지원하도록 수정 (`answer.question || answer.questionEn`)
+  - 영향: 과거 저장된 시험 리포트와 새로 생성되는 리포트 모두 정상 표시
+  - 배포: https://worvox.com
+
+### 📊 최근 업데이트 (2026-03-03)
 
 ### ✨ 브랜딩 & SEO 강화
 - **회사 소개 페이지 추가** (`/about`)
