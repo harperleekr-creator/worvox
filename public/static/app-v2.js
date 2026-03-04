@@ -1,5 +1,4 @@
-// WorVox - AI English Learning App - v2.1.0 - CACHE BUST 2026-03-04T05:50:00Z
-// CRITICAL UPDATE: History tabs mobile optimization complete
+// WorVox - AI English Learning App - v2.0.3
 class WorVox {
   constructor() {
     this.currentUser = null;
