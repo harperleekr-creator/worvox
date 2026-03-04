@@ -11030,7 +11030,7 @@ Proceed to payment?
                   <h3 class="font-bold text-gray-900 mb-4">답변 상세</h3>
                   <div class="space-y-6">
                     ${answers.map((answer, index) => `
-                      <div class="border-l-4 border-orange-500 pl-4">
+                      <div class="border-l-4 border-orange-500 pl-4 pb-4">
                         <div class="flex items-center justify-between mb-2">
                           <span class="font-semibold text-gray-800">문제 ${index + 1}</span>
                           <div class="flex gap-2">
@@ -11039,9 +11039,60 @@ Proceed to payment?
                             <span class="text-xs px-2 py-1 rounded bg-green-100 text-green-700">유창성 ${answer.fluency}</span>
                           </div>
                         </div>
+                        
+                        <!-- Question -->
                         <div class="text-sm text-gray-900 mb-1"><strong>Q:</strong> ${answer.question || answer.questionEn}</div>
                         ${(answer.questionKR || answer.questionKr) ? `<div class="text-xs text-gray-500 mb-2">${answer.questionKR || answer.questionKr}</div>` : ''}
-                        <div class="text-sm text-gray-700"><strong>A:</strong> ${answer.transcription || '(답변 없음)'}</div>
+                        
+                        <!-- User Answer -->
+                        <div class="bg-gray-50 rounded-lg p-3 mb-3">
+                          <div class="text-xs text-gray-600 mb-1">당신의 답변:</div>
+                          <div class="text-sm text-gray-700">${answer.transcription || '(답변 없음)'}</div>
+                        </div>
+                        
+                        <!-- AI Feedback (Premium) -->
+                        ${answer.improvedAnswer ? `
+                          <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-4 border-2 border-blue-200">
+                            <div class="flex items-center gap-2 mb-2">
+                              <i class="fas fa-lightbulb text-yellow-500"></i>
+                              <span class="text-sm font-bold text-gray-900">💡 AI 피드백</span>
+                            </div>
+                            <div class="text-xs text-gray-600 mb-2">더 나은 답변 (예시):</div>
+                            <div class="text-sm text-blue-900 font-medium mb-1">${answer.improvedAnswer}</div>
+                            ${answer.improvedAnswerKR ? `<div class="text-xs text-gray-600 mb-2">${answer.improvedAnswerKR}</div>` : ''}
+                            ${answer.keyPoints && answer.keyPoints.length > 0 ? `
+                              <div class="mt-3 space-y-1">
+                                <div class="text-xs font-semibold text-gray-700">핵심 포인트:</div>
+                                ${answer.keyPoints.map(point => `
+                                  <div class="flex items-start gap-2">
+                                    <i class="fas fa-check-circle text-green-500 text-xs mt-0.5"></i>
+                                    <span class="text-xs text-gray-700">${point}</span>
+                                  </div>
+                                `).join('')}
+                              </div>
+                            ` : ''}
+                          </div>
+                        ` : this.currentUser?.plan === 'premium' ? `
+                          <div class="bg-gray-100 rounded-lg p-3 text-center">
+                            <span class="text-xs text-gray-600">AI 피드백 생성 중...</span>
+                          </div>
+                        ` : `
+                          <div class="relative bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-4 border-2 border-blue-200">
+                            <div class="blur-sm select-none pointer-events-none">
+                              <div class="text-xs font-bold text-gray-900 mb-2">💡 AI 피드백</div>
+                              <div class="text-xs text-gray-700">더 나은 표현과 핵심 포인트를 AI가 분석해드립니다.</div>
+                            </div>
+                            <div class="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-lg">
+                              <div class="text-center px-4">
+                                <i class="fas fa-crown text-yellow-500 text-2xl mb-2"></i>
+                                <div class="text-xs font-bold text-gray-900 mb-1">Premium 전용</div>
+                                <button onclick="worvox.showPlan()" class="text-xs bg-purple-500 hover:bg-purple-600 text-white px-3 py-1.5 rounded-lg font-semibold transition-all">
+                                  업그레이드
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        `}
                       </div>
                     `).join('')}
                   </div>
