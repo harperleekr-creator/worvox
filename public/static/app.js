@@ -11983,9 +11983,9 @@ Proceed to payment?
                   </h3>
                   
                   <div class="space-y-4">
-                    <!-- AI Toggle -->
-                    <div class="flex items-start justify-between">
-                      <div class="flex-1 pr-4">
+                    <!-- AI Toggle - Enhanced Button Style -->
+                    <div class="flex flex-col gap-4">
+                      <div class="flex-1">
                         <div class="flex items-center gap-2 mb-2">
                           <h4 class="font-semibold text-gray-900">🤖 AI 맞춤형 프롬프트</h4>
                           ${this.isPremiumUser() ? '' : `
@@ -12011,15 +12011,25 @@ Proceed to payment?
                           </span>
                         </div>
                       </div>
-                      <label class="relative inline-flex items-center cursor-pointer ${this.isPremiumUser() ? '' : 'opacity-50 cursor-not-allowed'}">
-                        <input type="checkbox" 
-                               id="aiPromptsToggle"
-                               ${this.isPremiumUser() ? '' : 'disabled'}
-                               ${this.currentUser.use_ai_prompts ? 'checked' : ''}
-                               onchange="worvox.toggleAIPrompts(this.checked)"
-                               class="sr-only peer">
-                        <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-400 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-purple-600 peer-checked:to-pink-600 shadow-md"></div>
-                      </label>
+                      
+                      <!-- Large Toggle Button -->
+                      <button 
+                        onclick="worvox.toggleAIPrompts(!worvox.currentUser.use_ai_prompts)"
+                        ${this.isPremiumUser() ? '' : 'disabled'}
+                        class="w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 flex items-center justify-between shadow-lg ${
+                          this.currentUser.use_ai_prompts 
+                            ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 shadow-purple-300' 
+                            : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                        } ${this.isPremiumUser() ? '' : 'opacity-50 cursor-not-allowed'}">
+                        <span class="flex items-center gap-3">
+                          <i class="fas fa-robot text-2xl"></i>
+                          <span>AI 프롬프트 생성</span>
+                        </span>
+                        <span class="flex items-center gap-2">
+                          <span class="text-sm font-semibold">${this.currentUser.use_ai_prompts ? 'ON' : 'OFF'}</span>
+                          <i class="fas ${this.currentUser.use_ai_prompts ? 'fa-toggle-on text-3xl' : 'fa-toggle-off text-3xl'}"></i>
+                        </span>
+                      </button>
                     </div>
 
                     ${!this.isPremiumUser() ? `
@@ -12494,7 +12504,6 @@ Proceed to payment?
   async toggleAIPrompts(enabled) {
     if (!this.isPremiumUser()) {
       alert('AI 프롬프트 생성은 Premium 플랜 이상에서 사용 가능합니다.');
-      document.getElementById('aiPromptsToggle').checked = false;
       return;
     }
 
@@ -12513,6 +12522,9 @@ Proceed to payment?
       } else {
         alert('AI 프롬프트 생성이 비활성화되었습니다.\n기본 문장 풀을 사용합니다.');
       }
+      
+      // Refresh profile page to show updated button state
+      this.showProfile();
 
     } catch (error) {
       console.error('AI prompts toggle error:', error);
