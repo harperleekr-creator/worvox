@@ -6031,16 +6031,16 @@ Proceed to payment?
                 <div id="latestReportCard" class="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-200 mb-6 md:mb-8">
                   <div class="flex items-center justify-between mb-4">
                     <h3 class="text-base md:text-lg font-semibold text-gray-900">
-                      <i class="fas fa-chart-line text-purple-600 mr-2"></i>최근 학습 리포트
+                      <i class="fas fa-chart-line text-purple-600 mr-2"></i>Recent Report
                     </h3>
                     <button onclick="worvox.showHistory()" class="text-purple-600 hover:text-purple-700 text-xs md:text-sm font-medium">
-                      전체 보기 →
+                      View All →
                     </button>
                   </div>
                   <div id="latestReportContent">
                     <div class="text-center py-8 text-gray-400">
                       <i class="fas fa-spinner fa-spin text-4xl mb-3"></i>
-                      <p class="text-sm">리포트를 불러오는 중...</p>
+                      <p class="text-sm">Loading report...</p>
                     </div>
                   </div>
                 </div>
@@ -6171,8 +6171,8 @@ Proceed to payment?
         reportContainer.innerHTML = `
           <div class="text-center py-8 md:py-12">
             <i class="fas fa-chart-line text-gray-300 text-4xl md:text-5xl mb-3"></i>
-            <p class="text-sm md:text-base text-gray-500 font-medium mb-2">최근 리포트 없음</p>
-            <p class="text-xs md:text-sm text-gray-400">AI 대화를 시작하고 리포트를 받아보세요</p>
+            <p class="text-sm md:text-base text-gray-500 font-medium mb-2">No recent reports</p>
+            <p class="text-xs md:text-sm text-gray-400">Start an AI conversation to get your report</p>
           </div>
         `;
         return;
@@ -6208,27 +6208,27 @@ Proceed to payment?
                   <span class="text-3xl md:text-4xl ${scoreColor} font-bold">${avgScore}</span>
                 </div>
                 <div>
-                  <div class="text-base md:text-lg font-bold text-gray-900">평균 점수</div>
-                  <div class="text-xs md:text-sm text-gray-500">${new Date(report.analyzed_at).toLocaleDateString('ko-KR')}</div>
+                  <div class="text-base md:text-lg font-bold text-gray-900">Average Score</div>
+                  <div class="text-xs md:text-sm text-gray-500">${new Date(report.analyzed_at).toLocaleDateString('en-US')}</div>
                 </div>
               </div>
               <button onclick="worvox.showSessionReportById(${report.session_id})" 
                 class="text-purple-600 hover:text-purple-700 text-sm md:text-base font-semibold whitespace-nowrap">
-                상세보기 →
+                View Details →
               </button>
             </div>
             
             <div class="grid grid-cols-3 gap-3 md:gap-4 mb-4">
               <div class="text-center p-3 md:p-4 bg-white rounded-lg shadow-sm border border-blue-100">
-                <div class="text-xs md:text-sm text-gray-500 mb-1 font-medium">문법</div>
+                <div class="text-xs md:text-sm text-gray-500 mb-1 font-medium">Grammar</div>
                 <div class="text-xl md:text-2xl font-bold text-blue-600">${report.grammar_score}</div>
               </div>
               <div class="text-center p-3 md:p-4 bg-white rounded-lg shadow-sm border border-purple-100">
-                <div class="text-xs md:text-sm text-gray-500 mb-1 font-medium">어휘</div>
+                <div class="text-xs md:text-sm text-gray-500 mb-1 font-medium">Vocabulary</div>
                 <div class="text-xl md:text-2xl font-bold text-purple-600">${report.vocabulary_score}</div>
               </div>
               <div class="text-center p-3 md:p-4 bg-white rounded-lg shadow-sm border border-green-100">
-                <div class="text-xs md:text-sm text-gray-500 mb-1 font-medium">유창성</div>
+                <div class="text-xs md:text-sm text-gray-500 mb-1 font-medium">Fluency</div>
                 <div class="text-xl md:text-2xl font-bold text-green-600">${report.fluency_score}</div>
               </div>
             </div>
@@ -6236,9 +6236,9 @@ Proceed to payment?
             ${report.total_messages ? `
               <div class="pt-3 border-t border-gray-200">
                 <div class="flex items-center justify-between text-xs md:text-sm text-gray-600">
-                  <span class="flex items-center gap-1"><i class="fas fa-comments"></i>${report.total_messages}개 대화</span>
-                  <span class="flex items-center gap-1"><i class="fas fa-font"></i>${report.total_words}단어</span>
-                  <span class="flex items-center gap-1"><i class="fas fa-clock"></i>${Math.ceil(report.total_messages * 0.5)}분</span>
+                  <span class="flex items-center gap-1"><i class="fas fa-comments"></i>${report.total_messages} conversations</span>
+                  <span class="flex items-center gap-1"><i class="fas fa-font"></i>${report.total_words} words</span>
+                  <span class="flex items-center gap-1"><i class="fas fa-clock"></i>${Math.ceil(report.total_messages * 0.5)} min</span>
                 </div>
               </div>
             ` : ''}
@@ -6249,8 +6249,8 @@ Proceed to payment?
         reportContainer.innerHTML = `
           <div class="text-center py-8 md:py-12">
             <i class="fas fa-chart-line text-gray-300 text-4xl md:text-5xl mb-3"></i>
-            <p class="text-sm md:text-base text-gray-500 font-medium mb-2">최근 리포트 없음</p>
-            <p class="text-xs md:text-sm text-gray-400">AI 대화를 시작하고 리포트를 받아보세요</p>
+            <p class="text-sm md:text-base text-gray-500 font-medium mb-2">No recent reports</p>
+            <p class="text-xs md:text-sm text-gray-400">Start an AI conversation to get your report</p>
           </div>
         `;
       }
