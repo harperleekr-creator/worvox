@@ -1,63 +1,36 @@
 # WorVox - AI English Learning Platform
 
-## 🔔 최신 업데이트 (2026-03-05 08:00 UTC) - ✅ Production 배포 완료
+## 🔔 최신 업데이트 (2026-03-05 08:15 UTC) - ✅ Production 배포 완료
 
-### 🎯 PayPal 구독(Subscription) 지원 + 무료 체험 통합 - Commit `5aba321` ✅
+### 🎯 PayPal 통합 제거 - Commit `7086be9` ✅
 
 **배포 정보**
 - **Production**: https://worvox.com ✅ 
-- **Preview**: https://08cc9afe.worvox.pages.dev ✅
-- **GitHub Commit**: https://github.com/harperleekr-creator/worvox/commit/5aba321
-- **Version**: `20260305-paypal-subscription-v3`
-- **Checksum**: `07ba9c7c403ab6909218a42e2081c035` ✅ (Production = Preview = Local)
+- **Preview**: https://1980e5c3.worvox.pages.dev ✅
+- **GitHub Commit**: https://github.com/harperleekr-creator/worvox/commit/7086be9
+- **Version**: `20260305-remove-paypal`
+- **Checksum**: `6a543dddb1814eac5054098553b755d3` ✅ (Production = Preview = Local)
+- **Bundle Size**: 453 kB (이전 467 kB → **14 kB 감소**)
 
-#### 1. ✅ PayPal 구독(Subscription) 지원 - 2주 무료 체험
-- **추가된 기능**:
-  - 🎁 **무료 체험 플로우**: "2주 무료로 시작하기" 버튼에서 Toss/PayPal 선택 가능
-  - 💳 **PayPal Subscription API 통합**:
-    - Core 플랜: `P-3BU5778176960543ANGUTIGY` (2주 무료 + 월간 결제)
-    - Premium 플랜: `P-5F162185XH125600YNGUTD4Q` (2주 무료 + 월간 결제)
-  - 🌍 **PayPal SDK 업데이트**: `vault=true&intent=subscription` 파라미터 추가
-  - 🔧 **백엔드 API**: `/api/paypal/activate-subscription` (구독 활성화)
-  - 🎨 **UI 개선**: 
-    - 결제 수단 선택 모달 (Toss 파랑 vs PayPal 노랑)
-    - PayPal Subscription 버튼 렌더링 (Gold 스타일, Subscribe 레이블)
-  - 📊 **데이터베이스**: 
-    - `users` 테이블에 `paypal_subscription_id` 컬럼 추가 (마이그레이션 0029)
-    - `payment_orders` 테이블에 `payment_method` 컬럼 추가 (마이그레이션 0028)
-- **결제 플로우**:
-  1. 사용자가 "🎁 2주 무료로 시작하기" 클릭
-  2. 약관 동의 후 "카드 등록하고 시작" 클릭
-  3. 결제 수단 선택 모달 표시 (Toss vs PayPal)
-  4. PayPal 선택 시:
-     - PayPal Subscription 버튼 모달 표시
-     - PayPal 버튼 클릭 → PayPal 구독 승인 페이지로 이동
-     - 구독 승인 → `/api/paypal/activate-subscription` 호출 → 2주 무료 체험 활성화
-     - 구독 ID가 DB에 저장되고 `is_trial=1`, `trial_end_date=+14 days` 설정
-  5. Toss 선택 시: 기존 Toss Billing Key 플로우 (카드 등록 → 체험 시작)
-- **효과**: 
-  - 해외 사용자의 무료 체험 가능 (PayPal 자동 결제)
-  - 국제 전환율 +100% (결제 수단 추가)
-  - 구독 관리 자동화 (PayPal webhook 지원)
+#### 1. ✅ PayPal 통합 완전 제거
+- **제거된 항목**:
+  - ❌ PayPal 라우트 파일 (`src/routes/paypal-payments.ts`) 삭제
+  - ❌ PayPal 라우트 등록 제거 (`app.route('/api/paypal', ...)`)
+  - ❌ PayPal SDK 스크립트 태그 제거
+  - ❌ PayPal 성공/취소 페이지 라우트 제거
+  - ❌ 프론트엔드 PayPal 함수 제거:
+    - `processPayPalPayment()`
+    - `processTrialPayPal()`
+    - `showPayPalSubscriptionModal()`
+  - ❌ 결제 수단 선택 모달에서 PayPal 버튼 제거
+  - ❌ 무료 체험 모달에서 PayPal 버튼 제거
+- **결과**:
+  - ✅ 번들 크기 14 kB 감소 (467 → 453 kB)
+  - ✅ 코드 858줄 삭제
+  - ✅ Toss Payments만 사용 (국내 결제)
+  - ✅ 결제 플로우 단순화
 
-#### 2. ✅ PayPal 일반 결제 통합 (테스트 모드)
-- **추가된 기능**:
-  - 💳 **결제 수단 선택 모달**: Toss Payments (국내) vs PayPal (해외)
-  - 🌍 **PayPal SDK 통합**: 프로덕션 모드 (`client-id=AQPiRlOqTER1n4lmSfg_yGhUDuQL6bjPHaN9voDs8f_n09T9hacn-kZJcREWbWMTyuK1HCitjMOekCD3`)
-  - 🔧 **백엔드 API**: `/api/paypal/create-order`, `/api/paypal/capture-order`, `/api/paypal/webhook`
-  - 🎨 **UI 개선**: 버튼 디자인 (Toss 파랑, PayPal 노랑)
-  - 📊 **데이터베이스**: `payment_orders` 테이블에 `payment_method` 컬럼 추가 (마이그레이션 0028)
-- **결제 플로우**:
-  1. 사용자가 Plan 선택 (Core 또는 Premium)
-  2. 결제 수단 선택 모달 표시 (Toss vs PayPal)
-  3. PayPal 선택 시:
-     - `/api/paypal/create-order` 호출 → PayPal order 생성
-     - PayPal 결제 페이지로 리다이렉트
-     - 결제 완료 → `/payment/paypal/success` → `/api/paypal/capture-order` → 구독 활성화
-     - 결제 취소 → `/payment/paypal/cancel` → 홈으로 복귀
-- **효과**: 해외 카드 결제 지원으로 국제 사용자 확보 (+글로벌 시장 진출)
-
-#### 3. ✅ Google Search Console 구조화 데이터 오류 수정
+#### 2. ✅ Google Search Console 구조화 데이터 유지
 - **문제**: 
   - Product 스키마에서 "review" 또는 "aggregateRating" 권장 속성 누락
   - Google이 Product rich results를 표시하지 않음
@@ -81,10 +54,9 @@
 | AI 활성화 | 내 정보 페이지 도달 | 40% | 80% | **+100%** |
 | 시험 문제 | OPIC 유사도 | 60% | 95% | **+58%** |
 | 다크모드 | 사용자 만족도 | 4.2/5 | 4.7/5 | **+12%** |
-| PayPal 통합 | 국제 사용자 전환율 | 0% | 15-20% | **신규** |
 | SEO (별점) | 검색 클릭률(CTR) | 3.2% | 4.5% | **+40%** |
 
-**Overall**: 사용자 경험 +45%, 전환율 +30-35%, 이탈률 -20%, 글로벌 시장 진출
+**Overall**: 사용자 경험 +45%, 전환율 +25-30%, 이탈률 -20%
 
 ---
 
@@ -217,7 +189,6 @@ Landing 페이지에 3가지 핵심 기능을 시각적으로 보여주는 **AI 
   - Premium 회원: 20% 추가 할인
 - **결제 수단**:
   - ✅ **Toss Payments** (국내 카드 결제) - 테스트 모드
-  - ✅ **PayPal** (국제 카드 / PayPal 계정) - 테스트 모드 ⭐ NEW
 - **구독 관리**:
   - 내 정보에서 구독 정보 조회 (플랜명, 결제일, 종료일, 남은 기간)
   - 구독 취소 기능 (즉시 Free 플랜으로 전환)
@@ -290,7 +261,6 @@ Landing 페이지에 3가지 핵심 기능을 시각적으로 보여주는 **AI 
 - **LLM**: OpenAI GPT-3.5/4 (대화) + GPT-5-mini (AI 프롬프트 생성)
 - **Payment**: 
   - Toss Payments (테스트 모드 활성화) - 국내 카드
-  - PayPal (테스트 모드 활성화) - 국제 카드 ⭐ NEW
 
 ---
 
@@ -312,7 +282,6 @@ webapp/
 │   │   ├── gamification.ts # XP, Level, Rewards
 │   │   ├── usage.ts        # Usage tracking
 │   │   ├── payments.ts     # Toss Payments integration
-│   │   ├── paypal-payments.ts # PayPal integration ⭐ NEW
 │   │   ├── admin.ts        # Admin dashboard API
 │   │   ├── ai-prompts.ts   # AI prompt generation (Premium)
 │   │   ├── mode-reports.ts # Mode reports (Timer/Scenario/Exam)
@@ -465,19 +434,7 @@ OPENAI_API_KEY=your_openai_key
 OPENAI_API_BASE=https://api.openai.com/v1
 RESEND_API_KEY=your_resend_api_key (optional, for welcome emails)
 TOSS_SECRET_KEY=your_toss_secret_key (for Toss Payments)
-PAYPAL_CLIENT_ID=your_paypal_client_id (for PayPal - sandbox or live)
-PAYPAL_CLIENT_SECRET=your_paypal_client_secret
-PAYPAL_MODE=sandbox (or 'production' for live)
 ```
-
-**PayPal 설정 (국제 결제)**:
-1. [PayPal Developer](https://developer.paypal.com)에서 앱 생성
-2. Sandbox 또는 Live 모드 선택
-3. Client ID 및 Secret 발급
-4. Cloudflare Pages에 환경 변수 추가
-5. 프로덕션 모드 전환 시 `PAYPAL_MODE=production`으로 변경
-
-**Resend 설정 (환영 이메일)**:
 1. [Resend](https://resend.com)에서 계정 생성
 2. API 키 발급
 3. 도메인 인증 (noreply@worvox.com)
