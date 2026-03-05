@@ -2740,7 +2740,7 @@ app.get('/api/health', (c) => {
 // App page - Main application for logged users
 app.get('/app', (c) => {
   // Force COMPLETE cache busting - change this number to force refresh
-  const FORCE_VERSION = '20260305-grammar-feedback';
+  const FORCE_VERSION = '20260305-fast-analysis';
   const version = `${FORCE_VERSION}-${Date.now()}`;
   
   return c.html(`
