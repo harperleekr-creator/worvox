@@ -12914,6 +12914,64 @@ Proceed to payment?
       return;
     }
 
+    // Show payment method selection modal
+    this.showPaymentMethodModal(planName, amount, priceText, period);
+  }
+
+  // Show payment method selection modal
+  showPaymentMethodModal(planName, amount, priceText, period) {
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] backdrop-blur-sm';
+    overlay.innerHTML = `
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 p-8 transform transition-all">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <i class="fas fa-credit-card mr-2 text-purple-600"></i>결제 수단 선택
+        </h2>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
+          ${planName} 플랜 - ${priceText}
+        </p>
+        
+        <!-- Toss Payments (Domestic) -->
+        <button onclick="worvox.processTossPayment('${planName}', ${amount}, '${period}')" 
+                class="w-full mb-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-4 px-6 rounded-xl transition transform hover:scale-105 flex items-center justify-between group">
+          <div class="flex items-center">
+            <i class="fas fa-credit-card text-2xl mr-3"></i>
+            <div class="text-left">
+              <div class="text-base font-bold">Toss Payments</div>
+              <div class="text-xs opacity-90">국내 카드 결제 (신용/체크)</div>
+            </div>
+          </div>
+          <i class="fas fa-chevron-right opacity-70 group-hover:opacity-100 transition"></i>
+        </button>
+
+        <!-- PayPal (International) -->
+        <button onclick="worvox.processPayPalPayment('${planName}', ${amount}, '${period}')" 
+                class="w-full mb-6 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-gray-900 font-bold py-4 px-6 rounded-xl transition transform hover:scale-105 flex items-center justify-between group">
+          <div class="flex items-center">
+            <i class="fab fa-paypal text-2xl mr-3"></i>
+            <div class="text-left">
+              <div class="text-base font-bold">PayPal</div>
+              <div class="text-xs opacity-90">해외 카드 / PayPal 계정</div>
+            </div>
+          </div>
+          <i class="fas fa-chevron-right opacity-70 group-hover:opacity-100 transition"></i>
+        </button>
+
+        <button onclick="this.closest('[class*=fixed]').remove()" 
+                class="w-full text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium py-3 transition">
+          취소
+        </button>
+      </div>
+    `;
+    
+    document.body.appendChild(overlay);
+  }
+
+  // Process Toss Payment
+  async processTossPayment(planName, amount, period) {
+    // Close modal
+    document.querySelector('[class*="fixed inset-0"]')?.remove();
+
     try {
       // 1. Prepare order
       const prepareResponse = await axios.post('/api/payments/prepare', {
@@ -12933,7 +12991,6 @@ Proceed to payment?
       const clientKey = 'test_ck_d26DlbXAaV0eR7QxP00rqY50Q9RB';
       const tossPayments = TossPayments(clientKey);
       
-      // customerKey must include letters/special chars, not just numbers
       const customerKey = `customer_${this.currentUser.id}`;
       const payment = tossPayments.payment({ customerKey });
 
@@ -12953,8 +13010,53 @@ Proceed to payment?
       });
 
     } catch (error) {
-      console.error('Payment initiation error:', error);
-      alert('결제 시작 중 오류가 발생했습니다.\n' + (error.message || ''));
+      console.error('Toss payment error:', error);
+      alert('Toss 결제 시작 중 오류가 발생했습니다.\n' + (error.message || ''));
+    }
+  }
+
+  // Process PayPal Payment
+  async processPayPalPayment(planName, amount, period) {
+    // Close modal
+    document.querySelector('[class*="fixed inset-0"]')?.remove();
+
+    try {
+      // Show loading
+      const loadingDiv = document.createElement('div');
+      loadingDiv.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]';
+      loadingDiv.innerHTML = `
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 text-center">
+          <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-yellow-500 mx-auto mb-4"></div>
+          <p class="text-gray-900 dark:text-white font-semibold">PayPal 결제 준비 중...</p>
+        </div>
+      `;
+      document.body.appendChild(loadingDiv);
+
+      // Create PayPal order
+      const response = await axios.post('/api/paypal/create-order', {
+        planName,
+        price: amount,
+        period,
+        userId: this.currentUser.id
+      });
+
+      if (!response.data.success) {
+        throw new Error('PayPal 주문 생성 실패');
+      }
+
+      const { orderId, internalOrderId, approvalUrl } = response.data;
+
+      // Store internal order ID for later use
+      sessionStorage.setItem('paypalInternalOrderId', internalOrderId);
+      sessionStorage.setItem('paypalOrderId', orderId);
+
+      // Redirect to PayPal approval page
+      window.location.href = approvalUrl;
+
+    } catch (error) {
+      console.error('PayPal payment error:', error);
+      document.querySelector('[class*="fixed inset-0"]')?.remove();
+      alert('PayPal 결제 시작 중 오류가 발생했습니다.\n' + (error.message || ''));
     }
   }
 
