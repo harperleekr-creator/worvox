@@ -11966,9 +11966,12 @@ Proceed to payment?
                 `}
 
                 <!-- AI Prompt Settings (Premium only) -->
-                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                <div class="bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 rounded-2xl p-6 shadow-lg border-2 border-purple-300">
                   <h3 class="text-lg font-bold text-gray-900 mb-4">
                     <i class="fas fa-robot text-purple-600 mr-2"></i>AI 프롬프트 생성
+                    <span class="ml-2 text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full font-bold animate-pulse">
+                      <i class="fas fa-sparkles mr-1"></i>AI 기능
+                    </span>
                   </h3>
                   
                   <div class="space-y-4">
@@ -12007,7 +12010,7 @@ Proceed to payment?
                                ${this.currentUser.use_ai_prompts ? 'checked' : ''}
                                onchange="worvox.toggleAIPrompts(this.checked)"
                                class="sr-only peer">
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-purple-500 peer-checked:to-pink-500"></div>
+                        <div class="w-14 h-7 bg-gray-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-400 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-purple-600 peer-checked:to-pink-600 shadow-md"></div>
                       </label>
                     </div>
 
@@ -12031,13 +12034,27 @@ Proceed to payment?
                     </div>
                     ` : `
                     <!-- AI Features Info -->
-                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
-                      <h4 class="font-semibold text-gray-900 mb-2">✨ AI 생성 기능</h4>
-                      <ul class="text-sm text-gray-700 space-y-1">
-                        <li>• <strong>타이머 모드:</strong> 레벨별 맞춤 문장 생성</li>
-                        <li>• <strong>시나리오 모드:</strong> 실전 대화 시나리오 생성</li>
-                        <li>• <strong>시험 모드:</strong> 레벨별 맞춤 질문 생성</li>
-                        <li class="text-xs text-gray-500 mt-2">* 생성된 프롬프트는 자동으로 저장되어 오프라인에서도 사용 가능합니다</li>
+                    <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-300 rounded-lg p-4 shadow-sm">
+                      <h4 class="font-semibold text-emerald-900 mb-3 flex items-center gap-2">
+                        <i class="fas fa-check-circle text-emerald-600"></i>
+                        ✨ AI 생성 기능이 활성화되었습니다!
+                      </h4>
+                      <ul class="text-sm text-emerald-800 space-y-2">
+                        <li class="flex items-start gap-2">
+                          <i class="fas fa-stopwatch text-emerald-600 mt-0.5"></i>
+                          <span><strong>타이머 모드:</strong> 레벨별 맞춤 문장 생성</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                          <i class="fas fa-film text-emerald-600 mt-0.5"></i>
+                          <span><strong>시나리오 모드:</strong> 실전 대화 시나리오 생성</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                          <i class="fas fa-graduation-cap text-emerald-600 mt-0.5"></i>
+                          <span><strong>시험 모드:</strong> 레벨별 맞춤 질문 생성</span>
+                        </li>
+                        <li class="text-xs text-emerald-600 mt-3 bg-white/50 rounded px-2 py-1">
+                          <i class="fas fa-info-circle mr-1"></i>생성된 프롬프트는 자동으로 저장되어 오프라인에서도 사용 가능합니다
+                        </li>
                       </ul>
                     </div>
                     `}
