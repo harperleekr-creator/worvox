@@ -6128,8 +6128,8 @@ Proceed to payment?
                   </div>
                 </div>
                 
-                <!-- Feature Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
+                <!-- Feature Cards - Compact Design -->
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 mb-6 md:mb-8">
                   ${this.topics.filter(topic => 
                     topic.name === 'Vocabulary' || topic.name === 'AI English Conversation'
                   ).map(topic => {
@@ -6141,88 +6141,66 @@ Proceed to payment?
                         ? 'bg-gradient-to-br from-blue-50 to-indigo-50' 
                         : 'bg-white';
                     const borderColor = isConversation 
-                      ? 'border-2 border-emerald-200 hover:border-emerald-400' 
+                      ? 'border border-emerald-200 hover:border-emerald-400' 
                       : isVocabulary 
-                        ? 'border-2 border-blue-200 hover:border-blue-400' 
+                        ? 'border border-blue-200 hover:border-blue-400' 
                         : 'border border-gray-200 hover:border-emerald-400';
-                    const iconBg = isConversation ? 'emerald' : 'blue';
                     const textColor = isConversation ? 'emerald' : 'blue';
                     
                     return `
-                    <div class="${bgColor} rounded-2xl p-6 shadow-sm ${borderColor} hover:shadow-lg transition-all cursor-pointer relative"
+                    <div class="${bgColor} rounded-xl p-3 md:p-4 shadow-sm ${borderColor} hover:shadow-md transition-all cursor-pointer"
                       data-topic-id="${topic.id}" 
                       data-topic-name="${this.escapeHtml(topic.name)}" 
                       data-topic-level="${topic.level}"
                       onclick="worvox.startTopicById(${topic.id})">
-                      <div class="absolute top-3 right-3 flex gap-1">
-                        <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">FREE</span>
-                        <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-bold">CORE</span>
-                        <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-bold">PREMIUM</span>
-                      </div>
-                      <div class="w-12 h-12 bg-${iconBg}-100 rounded-xl flex items-center justify-center mb-4">
-                        <span class="text-2xl">${topic.icon}</span>
-                      </div>
-                      <h3 class="text-xl font-semibold text-gray-900 mb-2">${topic.name}</h3>
-                      <p class="text-gray-600 mb-4">${topic.description}</p>
-                      <div class="flex items-center justify-between">
-                        <span class="text-sm text-${textColor}-600 font-medium">Start learning →</span>
-                        <span class="text-xs bg-gray-100 px-2 py-1 rounded">${topic.level}</span>
+                      <div class="text-center">
+                        <div class="w-10 h-10 md:w-12 md:h-12 mx-auto mb-2 md:mb-3">
+                          <span class="text-3xl md:text-4xl">${topic.icon}</span>
+                        </div>
+                        <h3 class="text-sm md:text-base font-semibold text-gray-900 mb-1">${topic.name}</h3>
+                        <p class="text-xs text-gray-600 mb-2 line-clamp-2">${topic.description}</p>
+                        <span class="text-xs text-${textColor}-600 font-medium">Start →</span>
                       </div>
                     </div>
                   `;
                   }).join('')}
                   
-                  <!-- Timer Mode Card (Core/Premium Feature) -->
-                  <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 shadow-sm border-2 border-purple-200 hover:shadow-lg hover:border-purple-400 transition-all cursor-pointer relative"
+                  <!-- Timer Mode Card -->
+                  <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-3 md:p-4 shadow-sm border border-purple-200 hover:border-purple-400 hover:shadow-md transition-all cursor-pointer"
                     onclick="worvox.showTimerMode()">
-                    <div class="absolute top-3 right-3 flex gap-1">
-                      <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-bold">CORE</span>
-                      <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-bold">PREMIUM</span>
-                    </div>
-                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
-                      <span class="text-2xl">⏱️</span>
-                    </div>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-2">타이머 모드</h3>
-                    <p class="text-gray-600 mb-4">5초/10초 제한 안에 문장을 완성하는 압박 훈련</p>
-                    <div class="flex items-center justify-between">
-                      <span class="text-sm text-purple-600 font-medium">시작하기 →</span>
-                      <span class="text-xs bg-purple-100 px-2 py-1 rounded">Core+</span>
+                    <div class="text-center">
+                      <div class="w-10 h-10 md:w-12 md:h-12 mx-auto mb-2 md:mb-3">
+                        <span class="text-3xl md:text-4xl">⏱️</span>
+                      </div>
+                      <h3 class="text-sm md:text-base font-semibold text-gray-900 mb-1">Timer Mode</h3>
+                      <p class="text-xs text-gray-600 mb-2 line-clamp-2">Complete sentences in 5-10 seconds</p>
+                      <span class="text-xs text-purple-600 font-medium">Start →</span>
                     </div>
                   </div>
                   
-                  <!-- Scenario Mode Card (Core/Premium Feature) -->
-                  <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 shadow-sm border-2 border-blue-200 hover:shadow-lg hover:border-blue-400 transition-all cursor-pointer relative"
+                  <!-- Scenario Mode Card -->
+                  <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-3 md:p-4 shadow-sm border border-blue-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer"
                     onclick="worvox.showScenarioMode()">
-                    <div class="absolute top-3 right-3 flex gap-1">
-                      <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-bold">CORE</span>
-                      <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-bold">PREMIUM</span>
-                    </div>
-                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                      <span class="text-2xl">🎬</span>
-                    </div>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-2">시나리오 모드</h3>
-                    <p class="text-gray-600 mb-4">실제 상황 기반 30가지 실전 대화 연습</p>
-                    <div class="flex items-center justify-between">
-                      <span class="text-sm text-blue-600 font-medium">시작하기 →</span>
-                      <span class="text-xs bg-blue-100 px-2 py-1 rounded">Core+</span>
+                    <div class="text-center">
+                      <div class="w-10 h-10 md:w-12 md:h-12 mx-auto mb-2 md:mb-3">
+                        <span class="text-3xl md:text-4xl">🎬</span>
+                      </div>
+                      <h3 class="text-sm md:text-base font-semibold text-gray-900 mb-1">Scenario Mode</h3>
+                      <p class="text-xs text-gray-600 mb-2 line-clamp-2">Practice 30 real-life conversations</p>
+                      <span class="text-xs text-blue-600 font-medium">Start →</span>
                     </div>
                   </div>
                   
-                  <!-- Exam Mode Card (Core/Premium Feature) -->
-                  <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-6 shadow-sm border-2 border-orange-200 hover:shadow-lg hover:border-orange-400 transition-all cursor-pointer relative"
+                  <!-- Exam Mode Card -->
+                  <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 md:p-4 shadow-sm border border-orange-200 hover:border-orange-400 hover:shadow-md transition-all cursor-pointer"
                     onclick="worvox.showExamMode()">
-                    <div class="absolute top-3 right-3 flex gap-1">
-                      <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-bold">CORE</span>
-                      <span class="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-bold">PREMIUM</span>
-                    </div>
-                    <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-4">
-                      <span class="text-2xl">📝</span>
-                    </div>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-2">시험 모드</h3>
-                    <p class="text-gray-600 mb-4">OPIC 스타일 5문항 실전 스피킹 테스트</p>
-                    <div class="flex items-center justify-between">
-                      <span class="text-sm text-orange-600 font-medium">시작하기 →</span>
-                      <span class="text-xs bg-orange-100 px-2 py-1 rounded">Core+</span>
+                    <div class="text-center">
+                      <div class="w-10 h-10 md:w-12 md:h-12 mx-auto mb-2 md:mb-3">
+                        <span class="text-3xl md:text-4xl">📝</span>
+                      </div>
+                      <h3 class="text-sm md:text-base font-semibold text-gray-900 mb-1">Exam Mode</h3>
+                      <p class="text-xs text-gray-600 mb-2 line-clamp-2">OPIC-style 5-question speaking test</p>
+                      <span class="text-xs text-orange-600 font-medium">Start →</span>
                     </div>
                   </div>
                 </div>
