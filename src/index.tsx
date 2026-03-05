@@ -2909,7 +2909,7 @@ app.get('/api/health', (c) => {
 // App page - Main application for logged users
 app.get('/app', (c) => {
   // Force COMPLETE cache busting - change this number to force refresh
-  const FORCE_VERSION = '20260305-paypal-integration-v2';
+  const FORCE_VERSION = '20260305-paypal-subscription-v3';
   const version = `${FORCE_VERSION}-${Date.now()}`;
   
   return c.html(`
@@ -2968,8 +2968,8 @@ app.get('/app', (c) => {
         
         <!-- Toss Payments SDK -->
         <script src="https://js.tosspayments.com/v2/standard"></script>
-        <!-- PayPal SDK (Sandbox mode) -->
-        <script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
+        <!-- PayPal SDK (Live mode with Subscription support) -->
+        <script src="https://www.paypal.com/sdk/js?client-id=AQPiRlOqTER1n4lmSfg_yGhUDuQL6bjPHaN9voDs8f_n09T9hacn-kZJcREWbWMTyuK1HCitjMOekCD3&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
         <!-- Google Sign-In -->
         <script src="https://accounts.google.com/gsi/client" async defer></script>
         <meta name="google-signin-client_id" content="506018364729-ichplnfnqlk2hmh1bhblepm0un44ltdr.apps.googleusercontent.com">
@@ -3146,8 +3146,8 @@ app.get('/', (c) => {
         
         <!-- Toss Payments SDK -->
         <script src="https://js.tosspayments.com/v2/standard"></script>
-        <!-- PayPal SDK (Sandbox mode) -->
-        <script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
+        <!-- PayPal SDK (Live mode with Subscription support) -->
+        <script src="https://www.paypal.com/sdk/js?client-id=AQPiRlOqTER1n4lmSfg_yGhUDuQL6bjPHaN9voDs8f_n09T9hacn-kZJcREWbWMTyuK1HCitjMOekCD3&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
         <!-- Google Sign-In -->
         <script src="https://accounts.google.com/gsi/client" async defer></script>
         <meta name="google-signin-client_id" content="506018364729-ichplnfnqlk2hmh1bhblepm0un44ltdr.apps.googleusercontent.com">

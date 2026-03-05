@@ -224,6 +224,96 @@ paypalPayments.post('/capture-order', async (c) => {
   }
 });
 
+// Activate PayPal subscription after user approval
+paypalPayments.post('/activate-subscription', async (c) => {
+  try {
+    const { subscriptionId, userId, plan } = await c.req.json();
+
+    if (!subscriptionId || !userId || !plan) {
+      return c.json({ error: 'Missing required fields' }, 400);
+    }
+
+    console.log(`🎉 Activating PayPal subscription: ${subscriptionId} for user ${userId}`);
+
+    // Get PayPal access token
+    const accessToken = await getPayPalAccessToken(c.env);
+    const baseURL = getPayPalBaseURL(c.env);
+
+    // Get subscription details from PayPal
+    const response = await fetch(`${baseURL}/v1/billing/subscriptions/${subscriptionId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('PayPal subscription fetch failed:', error);
+      return c.json({ error: 'Failed to fetch subscription details', details: error }, response.status);
+    }
+
+    const subscription = await response.json();
+    console.log('PayPal subscription details:', subscription);
+
+    // Extract plan info
+    const planType = plan.toLowerCase();
+    const planName = plan.charAt(0).toUpperCase() + plan.slice(1).toLowerCase();
+
+    try {
+      const db = c.env.DB;
+
+      // Update user subscription (2 weeks free trial, then monthly billing)
+      await db.prepare(`
+        UPDATE users 
+        SET plan = ?,
+            billing_period = 'monthly',
+            subscription_start_date = datetime('now'),
+            subscription_end_date = datetime('now', '+14 days'),
+            is_trial = 1,
+            trial_start_date = datetime('now'),
+            trial_end_date = datetime('now', '+14 days'),
+            paypal_subscription_id = ?,
+            use_ai_prompts = 1,
+            auto_billing_enabled = 1
+        WHERE id = ?
+      `).bind(planType, subscriptionId, userId).run();
+
+      // Log subscription start
+      await db.prepare(`
+        INSERT INTO activity_logs (user_id, activity_type, description, created_at)
+        VALUES (?, 'paypal_subscription_start', ?, datetime('now'))
+      `).bind(
+        userId,
+        `Started ${planName} subscription via PayPal (2 weeks free trial)`
+      ).run();
+
+      console.log(`✅ User ${userId} subscription activated via PayPal`);
+
+    } catch (dbError) {
+      console.error('DB update failed:', dbError);
+    }
+
+    return c.json({
+      success: true,
+      subscription: {
+        id: subscriptionId,
+        status: subscription.status,
+        plan: planType,
+      },
+      message: '구독이 활성화되었습니다!'
+    });
+
+  } catch (error) {
+    console.error('PayPal subscription activation error:', error);
+    return c.json({ 
+      error: 'Failed to activate subscription',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
 // Handle PayPal webhook events (optional, for production)
 paypalPayments.post('/webhook', async (c) => {
   try {
