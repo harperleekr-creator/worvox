@@ -12985,7 +12985,6 @@ Proceed to payment?
       alert('PayPal 무료 체험 시작 중 오류가 발생했습니다: ' + (error.message || ''));
     }
   }
-  }
 
   async selectPlan(planName) {
     if (!this.currentUser) {
