@@ -5025,62 +5025,66 @@ Proceed to payment?
           <div class="lg:hidden w-full bg-gradient-to-br from-indigo-600 to-purple-700 p-6 text-white">
             <div class="space-y-4">
               <div class="text-center">
-                <h2 class="text-2xl font-bold mb-2 leading-snug">AI와 함께하는 영어 학습의 새로운 시작</h2>
-                <p class="text-indigo-100 text-sm">WorVox는 인공지능 기술을 활용한 혁신적인 영어 학습 플랫폼입니다</p>
+                <h2 class="text-xl font-bold mb-2 leading-snug">Speak Confidently, Master English Fluently</h2>
+                <p class="text-indigo-100 text-sm mb-3">Created by global educators for maximum speaking practice</p>
+                <div class="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
+                  <p class="text-white font-semibold text-sm mb-1">One Platform. Complete Mastery.</p>
+                  <p class="text-indigo-100 text-xs">Everything you need to speak English fluently</p>
+                </div>
               </div>
               
               <div class="grid grid-cols-2 gap-3">
                 <div class="flex items-center gap-2">
                   <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
+                    💬
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-xs">AI Conversations</h3>
+                  </div>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                  <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
+                    🎬
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-xs">30+ Scenarios</h3>
+                  </div>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                  <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
+                    ⚡
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-xs">Instant Feedback</h3>
+                  </div>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                  <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
+                    📈
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-xs">Progress Tracking</h3>
+                  </div>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                  <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
                     🎯
                   </div>
                   <div>
-                    <h3 class="font-semibold text-xs">AI 실시간 대화</h3>
+                    <h3 class="font-semibold text-xs">Built for Fluency</h3>
                   </div>
                 </div>
                 
                 <div class="flex items-center gap-2">
                   <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
-                    ⏱️
+                    🌏
                   </div>
                   <div>
-                    <h3 class="font-semibold text-xs">타이머 챌린지</h3>
-                  </div>
-                </div>
-                
-                <div class="flex items-center gap-2">
-                  <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
-                    🎭
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-xs">시나리오 모드</h3>
-                  </div>
-                </div>
-                
-                <div class="flex items-center gap-2">
-                  <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
-                    🎓
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-xs">시험 모드</h3>
-                  </div>
-                </div>
-                
-                <div class="flex items-center gap-2">
-                  <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
-                    📚
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-xs">단어 학습</h3>
-                  </div>
-                </div>
-                
-                <div class="flex items-center gap-2">
-                  <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
-                    📊
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-xs">분석 리포트</h3>
+                    <h3 class="font-semibold text-xs">Global Team</h3>
                   </div>
                 </div>
               </div>
@@ -5109,82 +5113,74 @@ Proceed to payment?
           <div class="hidden lg:flex w-full lg:w-1/2 bg-gradient-to-br from-indigo-600 to-purple-700 p-12 flex-col justify-center text-white">
             <div class="space-y-8">
               <div>
-                <h2 class="text-4xl font-bold mb-4 leading-snug">AI와 함께하는<br/>영어 학습의 새로운 시작</h2>
-                <p class="text-indigo-100 text-lg leading-relaxed">WorVox는 인공지능 기술을 활용한<br/>혁신적인 영어 학습 플랫폼입니다</p>
+                <h2 class="text-4xl font-bold mb-4 leading-snug">Speak Confidently,<br/>Master English Fluently</h2>
+                <p class="text-indigo-100 text-lg leading-relaxed mb-4">Created by global educators who understand the power of conversation</p>
+                <p class="text-indigo-200 text-base leading-relaxed">WorVox isn't just another learning app—it's your complete English speaking solution. Master vocabulary and grammar while building real confidence through diverse scenarios and AI-powered feedback.</p>
+                <div class="mt-6 pt-6 border-t border-white/20">
+                  <p class="text-white font-semibold text-xl">One Platform. Complete Mastery.</p>
+                  <p class="text-indigo-100 text-sm mt-2">Everything you need to speak English fluently, all in one place.</p>
+                </div>
               </div>
               
               <div class="space-y-6">
                 <div class="flex items-start gap-4">
                   <div class="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center text-2xl">
+                    💬
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-lg mb-1">Speak More, Fear Less</h3>
+                    <p class="text-indigo-100 text-sm">Practice real conversations with AI—no judgment, just progress</p>
+                  </div>
+                </div>
+                
+                <div class="flex items-start gap-4">
+                  <div class="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center text-2xl">
+                    🎬
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-lg mb-1">30+ Real-Life Scenarios</h3>
+                    <p class="text-indigo-100 text-sm">Airport, restaurant, business—practice every situation you'll face</p>
+                  </div>
+                </div>
+                
+                <div class="flex items-start gap-4">
+                  <div class="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center text-2xl">
+                    ⚡
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-lg mb-1">Instant AI Feedback</h3>
+                    <p class="text-indigo-100 text-sm">Get pronunciation and fluency scores in seconds, not days</p>
+                  </div>
+                </div>
+                
+                <div class="flex items-start gap-4">
+                  <div class="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center text-2xl">
+                    📈
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-lg mb-1">Track Your Growth</h3>
+                    <p class="text-indigo-100 text-sm">Watch your confidence soar with detailed progress analytics</p>
+                  </div>
+                </div>
+                
+                <div class="flex items-start gap-4">
+                  <div class="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center text-2xl">
                     🎯
                   </div>
                   <div>
-                    <h3 class="font-semibold text-lg mb-1">AI 실시간 대화</h3>
-                    <p class="text-indigo-100 text-sm">실시간 음성 인식과 AI 응답으로 자연스러운 영어 회화 연습</p>
-                  </div>
-                </div>
-                
-                <div class="flex items-start gap-4">
-                  <div class="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center text-2xl">
-                    ⏱️
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-lg mb-1">타이머 챌린지</h3>
-                    <p class="text-indigo-100 text-sm">제한 시간 안에 문장을 말하는 스피드 훈련</p>
-                  </div>
-                </div>
-                
-                <div class="flex items-start gap-4">
-                  <div class="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center text-2xl">
-                    🎭
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-lg mb-1">시나리오 모드</h3>
-                    <p class="text-indigo-100 text-sm">공항, 레스토랑, 비즈니스 등 30가지 실생활 상황 연습</p>
-                  </div>
-                </div>
-                
-                <div class="flex items-start gap-4">
-                  <div class="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center text-2xl">
-                    🎓
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-lg mb-1">시험 모드</h3>
-                    <p class="text-indigo-100 text-sm">OPIC 스타일 말하기 시험으로 실전 대비 연습</p>
-                  </div>
-                </div>
-                
-                <div class="flex items-start gap-4">
-                  <div class="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center text-2xl">
-                    📚
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-lg mb-1">단어 학습</h3>
-                    <p class="text-indigo-100 text-sm">토익, 토플 등 수준별 어휘 학습과 암기 체크</p>
-                  </div>
-                </div>
-                
-                <div class="flex items-start gap-4">
-                  <div class="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center text-2xl">
-                    📊
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-lg mb-1">상세한 분석 리포트</h3>
-                    <p class="text-indigo-100 text-sm">문법, 어휘, 유창성을 분석한 개인 맞춤 피드백 제공</p>
+                    <h3 class="font-semibold text-lg mb-1">Built for Fluency</h3>
+                    <p class="text-indigo-100 text-sm">Vocabulary and grammar matter, but speaking builds confidence</p>
                   </div>
                 </div>
               </div>
               
               <div class="pt-6 border-t border-white/20">
-                <p class="text-sm text-indigo-200">
-                  <i class="fas fa-check-circle mr-2"></i>무료로 시작하기
-                </p>
-                <p class="text-sm text-indigo-200 mt-2">
-                  <i class="fas fa-check-circle mr-2"></i>언제 어디서나 학습 가능
-                </p>
-                <p class="text-sm text-indigo-200 mt-2">
-                  <i class="fas fa-check-circle mr-2"></i>개인 맞춤형 학습 경험
-                </p>
+                <div class="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
+                  <p class="text-white font-semibold mb-3">🌏 Created by Global Educators</p>
+                  <p class="text-indigo-100 text-sm leading-relaxed">
+                    Designed by international team members who know exactly what it takes to speak English confidently. We built WorVox to maximize speaking practice—because fluency comes from conversation, not textbooks.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
