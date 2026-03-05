@@ -650,37 +650,83 @@ app.get('/landing', (c) => {
         </section>
 
         <!-- Brand Story Section -->
-        <section class="py-12 px-4 bg-gradient-to-r from-purple-600 to-blue-600">
-            <div class="max-w-4xl mx-auto text-center">
-                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
-                        <span class="text-4xl md:text-5xl">📦</span> WorVox의 의미
+        <section class="py-16 px-4 bg-gradient-to-r from-purple-600 to-blue-600">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-5xl font-bold text-white mb-4">
+                        Speak Confidently, Master English Fluently
                     </h2>
-                    <div class="text-lg md:text-xl text-white/95 leading-relaxed space-y-4">
-                        <p class="font-semibold text-xl md:text-2xl">
-                            <span class="text-yellow-300">Word</span> + <span class="text-yellow-300">Box</span> + <span class="text-yellow-300">Voice</span> = <span class="text-yellow-400">WorVox</span>
+                    <p class="text-xl md:text-2xl text-white/90 mb-2">
+                        One Platform. Complete Mastery.
+                    </p>
+                    <p class="text-lg text-white/80">
+                        WorVox 하나로 영어 말하기 공부의 끝!
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 mb-12">
+                    <!-- Global Team Story -->
+                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+                        <div class="text-5xl mb-4 text-center">🌏</div>
+                        <h3 class="text-2xl font-bold text-white mb-4 text-center">Created by Global Educators</h3>
+                        <p class="text-white/90 leading-relaxed text-center mb-4">
+                            해외 출신 운영진들이 직접 설계한 플랫폼
                         </p>
-                        <p class="text-white/90">
-                            <strong class="text-yellow-300">단어(Word)</strong>를 담은 <strong class="text-yellow-300">상자(Box)</strong>에서<br class="sm:hidden"/>
-                            <strong class="text-yellow-300">음성(Voice)</strong>으로 배우는 새로운 영어 학습 경험
+                        <p class="text-white/80 leading-relaxed">
+                            우리는 영어를 유창하게 말하는 것이 얼마나 중요한지 알고 있습니다. 
+                            그래서 WorVox를 만들었습니다 - <strong class="text-yellow-300">대화의 힘</strong>을 이해하는 
+                            글로벌 교육자들이 최대한 많이 말할 수 있도록 설계한 플랫폼입니다.
                         </p>
-                        <div class="mt-6 grid sm:grid-cols-3 gap-4 text-sm md:text-base">
-                            <div class="bg-white/10 rounded-xl p-4">
-                                <div class="text-2xl mb-2">📚</div>
-                                <div class="font-semibold text-yellow-300 mb-1">Word</div>
-                                <div class="text-white/80">풍부한 어휘와 표현</div>
-                            </div>
-                            <div class="bg-white/10 rounded-xl p-4">
-                                <div class="text-2xl mb-2">📦</div>
-                                <div class="font-semibold text-yellow-300 mb-1">Box</div>
-                                <div class="text-white/80">체계적인 학습 시스템</div>
-                            </div>
-                            <div class="bg-white/10 rounded-xl p-4">
-                                <div class="text-2xl mb-2">🎤</div>
-                                <div class="font-semibold text-yellow-300 mb-1">Voice</div>
-                                <div class="text-white/80">실전 음성 연습</div>
-                            </div>
-                        </div>
+                    </div>
+
+                    <!-- Speaking Philosophy -->
+                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+                        <div class="text-5xl mb-4 text-center">💬</div>
+                        <h3 class="text-2xl font-bold text-white mb-4 text-center">Built for Fluency</h3>
+                        <p class="text-white/90 leading-relaxed text-center mb-4">
+                            말을 많이 하면 자신감이 생깁니다
+                        </p>
+                        <p class="text-white/80 leading-relaxed">
+                            어휘와 문법도 공부하지만, <strong class="text-yellow-300">결국 스피킹을 많이 함으로써</strong> 
+                            영어에 자신감을 가질 수 있습니다. 다양한 시나리오와 즉각적인 피드백으로 
+                            <strong class="text-yellow-300">실전 대화 능력</strong>을 키우세요.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Key Features Grid -->
+                <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-white/10 rounded-xl p-6 text-center backdrop-blur-sm">
+                        <div class="text-3xl mb-2">🎬</div>
+                        <div class="font-bold text-white text-lg mb-1">30+ Scenarios</div>
+                        <div class="text-white/80 text-sm">실생활 모든 상황 연습</div>
+                    </div>
+                    <div class="bg-white/10 rounded-xl p-6 text-center backdrop-blur-sm">
+                        <div class="text-3xl mb-2">⚡</div>
+                        <div class="font-bold text-white text-lg mb-1">Instant Feedback</div>
+                        <div class="text-white/80 text-sm">즉각적인 AI 피드백</div>
+                    </div>
+                    <div class="bg-white/10 rounded-xl p-6 text-center backdrop-blur-sm">
+                        <div class="text-3xl mb-2">📈</div>
+                        <div class="font-bold text-white text-lg mb-1">Track Progress</div>
+                        <div class="text-white/80 text-sm">성장 과정 추적</div>
+                    </div>
+                    <div class="bg-white/10 rounded-xl p-6 text-center backdrop-blur-sm">
+                        <div class="text-3xl mb-2">🎯</div>
+                        <div class="font-bold text-white text-lg mb-1">No Fear</div>
+                        <div class="text-white/80 text-sm">두려움 없이 연습</div>
+                    </div>
+                </div>
+
+                <!-- Bottom Message -->
+                <div class="mt-12 text-center">
+                    <div class="bg-white/20 backdrop-blur-md rounded-2xl p-8 border border-white/30 inline-block">
+                        <p class="text-2xl md:text-3xl font-bold text-white mb-3">
+                            "Fluency comes from conversation, not textbooks"
+                        </p>
+                        <p class="text-lg text-white/90">
+                            유창함은 교과서가 아닌 대화에서 나옵니다
+                        </p>
                     </div>
                 </div>
             </div>
