@@ -12851,11 +12851,83 @@ Proceed to payment?
     });
   }
 
-  // Confirm and proceed with trial
+  // Confirm and proceed with trial - Show payment method selection
   async confirmFreeTrial(plan) {
     try {
       console.log(`✅ User confirmed trial for ${plan}`);
       console.log(`👤 Current user:`, this.currentUser);
+
+      // Show payment method selection modal
+      this.showTrialPaymentMethodModal(plan);
+
+    } catch (error) {
+      console.error('Free trial confirmation error:', error);
+      alert('무료 체험 시작 중 오류가 발생했습니다: ' + (error.message || ''));
+    }
+  }
+
+  // Show payment method selection for free trial
+  showTrialPaymentMethodModal(plan) {
+    const planName = plan === 'core' ? 'Core' : 'Premium';
+    const planPrice = plan === 'core' ? '₩9,900' : '₩19,000';
+
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] backdrop-blur-sm';
+    overlay.innerHTML = `
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 p-8 transform transition-all">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          <i class="fas fa-credit-card mr-2 text-purple-600"></i>결제 수단 선택
+        </h2>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+          ${planName} 플랜 - 2주 무료 체험
+        </p>
+        <p class="text-xs text-gray-500 dark:text-gray-500 mb-6">
+          체험 종료 후 ${planPrice}/월 자동 결제
+        </p>
+        
+        <!-- Toss Payments (Domestic) -->
+        <button onclick="worvox.processTrialToss('${plan}')" 
+                class="w-full mb-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-4 px-6 rounded-xl transition transform hover:scale-105 flex items-center justify-between group">
+          <div class="flex items-center">
+            <i class="fas fa-credit-card text-2xl mr-3"></i>
+            <div class="text-left">
+              <div class="text-base font-bold">Toss Payments</div>
+              <div class="text-xs opacity-90">국내 카드 결제 (신용/체크)</div>
+            </div>
+          </div>
+          <i class="fas fa-chevron-right opacity-70 group-hover:opacity-100 transition"></i>
+        </button>
+
+        <!-- PayPal (International) -->
+        <button onclick="worvox.processTrialPayPal('${plan}')" 
+                class="w-full mb-6 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-gray-900 font-bold py-4 px-6 rounded-xl transition transform hover:scale-105 flex items-center justify-between group">
+          <div class="flex items-center">
+            <i class="fab fa-paypal text-2xl mr-3"></i>
+            <div class="text-left">
+              <div class="text-base font-bold">PayPal</div>
+              <div class="text-xs opacity-90">해외 카드 / PayPal 계정</div>
+            </div>
+          </div>
+          <i class="fas fa-chevron-right opacity-70 group-hover:opacity-100 transition"></i>
+        </button>
+
+        <button onclick="this.closest('[class*=fixed]').remove()" 
+                class="w-full text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium py-3 transition">
+          취소
+        </button>
+      </div>
+    `;
+    
+    document.body.appendChild(overlay);
+  }
+
+  // Process Toss free trial
+  async processTrialToss(plan) {
+    // Close modal
+    document.querySelector('[class*="fixed inset-0"]')?.remove();
+
+    try {
+      console.log(`🎁 Starting Toss free trial for ${plan}`);
 
       // Step 1: Start trial on backend (get customerKey)
       const startResponse = await axios.post('/api/payments/trial/start', {
@@ -12889,9 +12961,30 @@ Proceed to payment?
       });
 
     } catch (error) {
-      console.error('Free trial error:', error);
-      alert('무료 체험 시작 중 오류가 발생했습니다: ' + (error.response?.data?.error || error.message));
+      console.error('Toss free trial error:', error);
+      alert('Toss 무료 체험 시작 중 오류가 발생했습니다: ' + (error.response?.data?.error || error.message));
     }
+  }
+
+  // Process PayPal free trial
+  async processTrialPayPal(plan) {
+    // Close modal
+    document.querySelector('[class*="fixed inset-0"]')?.remove();
+
+    try {
+      console.log(`🎁 Starting PayPal free trial for ${plan}`);
+
+      // Show info modal - PayPal doesn't support billing agreements in the same way
+      alert('PayPal 무료 체험은 준비 중입니다.\n현재는 직접 구매만 가능합니다.\n\n대신 Toss Payments를 이용해주세요.');
+
+      // Alternative: Redirect to direct purchase
+      // this.selectPlan(plan === 'core' ? 'Core' : 'Premium');
+
+    } catch (error) {
+      console.error('PayPal free trial error:', error);
+      alert('PayPal 무료 체험 시작 중 오류가 발생했습니다: ' + (error.message || ''));
+    }
+  }
   }
 
   async selectPlan(planName) {
