@@ -198,43 +198,41 @@ Provide a detailed analysis with these scores (0-100):
    - 50-69: Frequent pauses, choppy delivery
    - Below 50: Very slow, many long pauses, broken speech
 
-4. **Grammar Score**: Grammatical correctness (NEW)
-   - 95-100: Perfect grammar, no errors
-   - 85-94: Very good, 1-2 minor grammar mistakes
-   - 70-84: Good but has several grammar errors (tense, articles, prepositions)
-   - 50-69: Multiple grammar errors that affect clarity
-   - Below 50: Serious grammar issues, difficult to understand meaning
-
 IMPORTANT: 
 - Be strict but fair - native-like performance should score 90+
 - Clear non-native accent with good comprehensibility should score 70-85
 - Significant pronunciation issues that affect understanding should score below 70
 - Consider that STT might misrecognize words due to pronunciation issues
-- Analyze grammar separately from pronunciation (grammar focuses on structure, not sound)
+- Focus ONLY on pronunciation quality, NOT grammar
 
 Respond ONLY with valid JSON:
 {
   "accuracy": <number>,
   "pronunciation": <number>,
   "fluency": <number>,
-  "grammar": <number>,
-  "feedback": "<detailed constructive feedback in Korean, including pronunciation AND grammar analysis, 2-3 paragraphs>",
-  "grammarFeedback": "<specific grammar analysis in Korean: list 2-3 grammar errors found with corrections>",
-  "strengths": ["<specific strength 1>", "<specific strength 2>"],
-  "improvements": ["<specific area to improve 1>", "<specific area to improve 2>"],
-  "grammarIssues": ["<grammar error 1 with correction>", "<grammar error 2 with correction>"],
-  "nextSteps": "<practical advice for next practice in Korean>"
+  "pronunciationFeedback": "<detailed pronunciation feedback in Korean: 2-3 paragraphs focusing on specific sounds, stress patterns, intonation>",
+  "strengths": ["<specific pronunciation strength 1>", "<specific pronunciation strength 2>"],
+  "improvements": ["<specific pronunciation area to improve 1>", "<specific pronunciation area to improve 2>"],
+  "pronunciationIssues": [
+    {
+      "word": "<problematic word>",
+      "issue": "<what's wrong>",
+      "tip": "<how to improve in Korean>"
+    }
+  ],
+  "nextSteps": "<practical pronunciation practice advice in Korean>"
 }
 
-FEEDBACK GUIDELINES:
-- Start with what they did well (positive reinforcement)
-- Point out 2-3 specific pronunciation issues with examples from their speech
-- Point out 2-3 specific grammar errors with corrections (e.g., "I go to school yesterday" → "I went to school yesterday")
-- Explain WHY these issues matter (comprehension, natural flow, etc.)
-- Give concrete improvement tips (tongue position, stress patterns, grammar rules)
+PRONUNCIATION FEEDBACK GUIDELINES:
+- Start with what they pronounced well (positive reinforcement)
+- Identify 2-3 specific problematic sounds with examples (e.g., /th/ sound, /r/ vs /l/, vowel length)
+- Explain WHY these pronunciation issues matter (comprehension, clarity, natural flow)
+- Give concrete pronunciation tips (tongue position, lip shape, stress patterns, intonation)
+- Provide practical exercises (minimal pairs, word stress drills, shadowing practice)
 - End with encouraging next steps
 - Write in friendly, supportive Korean tone
-- Length: 2-3 paragraphs (5-8 sentences total)`;
+- Length: 2-3 paragraphs (5-8 sentences total)
+- NO GRAMMAR ANALYSIS - pronunciation focus only`;
 
     const response = await fetch(`${openaiApiBase}/chat/completions`, {
       method: 'POST',
@@ -289,12 +287,10 @@ FEEDBACK GUIDELINES:
       accuracy: Math.round(scores.accuracy),
       pronunciation: Math.round(scores.pronunciation),
       fluency: Math.round(scores.fluency),
-      grammar: Math.round(scores.grammar || 70),
-      feedback: scores.feedback || '',
-      grammarFeedback: scores.grammarFeedback || '',
+      pronunciationFeedback: scores.pronunciationFeedback || '',
       strengths: scores.strengths || [],
       improvements: scores.improvements || [],
-      grammarIssues: scores.grammarIssues || [],
+      pronunciationIssues: scores.pronunciationIssues || [],
       nextSteps: scores.nextSteps || '',
     };
 

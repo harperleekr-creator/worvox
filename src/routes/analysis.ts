@@ -75,6 +75,7 @@ Analyze this conversation and provide:
 4. Fluency Score (0-100)
 5. Top 3 Errors: Identify the most important mistakes with corrections
 6. Top 2 Better Expressions: Suggest more natural or advanced alternatives
+7. Grammar Feedback: Detailed analysis of grammar issues in Korean
 
 IMPORTANT: Keep scores between 50-95. Be encouraging but honest.
 
@@ -102,9 +103,19 @@ Format your response as JSON:
       "priority": 2
     }
   ],
+  "grammar_feedback": "<detailed grammar analysis in Korean: 2-3 paragraphs explaining common patterns, what they did well, and what to improve>",
   "total_words": <number>,
   "avg_sentence_length": <number>
 }
+
+GRAMMAR FEEDBACK GUIDELINES:
+- Start with positive aspects of their grammar usage
+- Identify 2-3 recurring grammar patterns or errors
+- Explain why these grammar points are important
+- Provide practical tips for improvement
+- End with encouragement and next steps
+- Write in friendly, supportive Korean tone
+- Length: 2-3 paragraphs (5-8 sentences total)
 
 Return ONLY the JSON, no additional text.`;
 
