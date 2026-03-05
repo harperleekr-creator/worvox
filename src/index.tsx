@@ -2244,9 +2244,18 @@ app.get('/pricing', (c) => {
           "@type": "Product",
           "name": "WorVox Premium",
           "description": "AI 기반 영어 학습 플랫폼 프리미엄 플랜",
+          "image": "https://worvox.com/static/logo.webp",
           "brand": {
             "@type": "Brand",
             "name": "WorVox"
+          },
+          "hasMerchantReturnPolicy": {
+            "@type": "MerchantReturnPolicy",
+            "applicableCountry": "KR",
+            "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+            "merchantReturnDays": 7,
+            "returnMethod": "https://schema.org/ReturnByMail",
+            "returnFees": "https://schema.org/FreeReturn"
           },
           "offers": [
             {
@@ -2255,7 +2264,8 @@ app.get('/pricing', (c) => {
               "price": "9900",
               "priceCurrency": "KRW",
               "availability": "https://schema.org/InStock",
-              "url": "https://worvox.com/pricing"
+              "url": "https://worvox.com/pricing",
+              "priceValidUntil": "2026-12-31"
             },
             {
               "@type": "Offer",
@@ -2263,7 +2273,8 @@ app.get('/pricing', (c) => {
               "price": "19000",
               "priceCurrency": "KRW",
               "availability": "https://schema.org/InStock",
-              "url": "https://worvox.com/pricing"
+              "url": "https://worvox.com/pricing",
+              "priceValidUntil": "2026-12-31"
             },
             {
               "@type": "Offer",
@@ -2271,7 +2282,8 @@ app.get('/pricing', (c) => {
               "price": "97416",
               "priceCurrency": "KRW",
               "availability": "https://schema.org/InStock",
-              "url": "https://worvox.com/pricing"
+              "url": "https://worvox.com/pricing",
+              "priceValidUntil": "2026-12-31"
             },
             {
               "@type": "Offer",
@@ -2279,7 +2291,8 @@ app.get('/pricing', (c) => {
               "price": "186960",
               "priceCurrency": "KRW",
               "availability": "https://schema.org/InStock",
-              "url": "https://worvox.com/pricing"
+              "url": "https://worvox.com/pricing",
+              "priceValidUntil": "2026-12-31"
             }
           ]
         }
@@ -2896,6 +2909,7 @@ app.get('/', (c) => {
           "name": "WorVox",
           "applicationCategory": "EducationalApplication",
           "operatingSystem": "Web",
+          "image": "https://worvox.com/static/logo.webp",
           "offers": {
             "@type": "Offer",
             "price": "19000",
@@ -2912,7 +2926,7 @@ app.get('/', (c) => {
             "worstRating": "1"
           },
           "description": "AI 영어 학습 플랫폼 - 실시간 발음 교정, 맞춤형 대화 연습, OPIC 스타일 시험",
-          "screenshot": "https://worvox.com/logo.png",
+          "screenshot": "https://worvox.com/static/logo.webp",
           "creator": {
             "@type": "Organization",
             "name": "WorVox Team"
