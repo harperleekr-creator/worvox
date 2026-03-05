@@ -1,8 +1,15 @@
 # WorVox - AI English Learning Platform
 
-## 🔔 최신 업데이트 (2026-03-05)
+## 🔔 최신 업데이트 (2026-03-05 05:00 UTC) - ✅ Production 배포 완료
 
-### 🎯 6가지 핵심 UX 개선 완료
+### 🎯 6가지 핵심 UX 개선 완료 - Commit `e60c433` ✅
+
+**배포 정보**
+- **Production**: https://worvox.com/app ✅ 
+- **Preview**: https://c589eafa.worvox.pages.dev/app ✅
+- **GitHub Commit**: https://github.com/harperleekr-creator/worvox/commit/e60c433
+- **Version**: `20260305-ux-fixes-v3`
+- **Checksum**: `8cf7ba3326d648728e61df2d51470cb0` ✅ (Production = Preview = Local)
 
 #### 1. ✅ 회원가입 환영 메일 - 버튼 시인성 개선
 - **문제**: 이메일 클라이언트에서 버튼 텍스트가 흰 배경에 흰색으로 표시되어 안 보임
@@ -27,12 +34,13 @@
   - `gap-1` 최소 간격으로 컴팩트하게
 - **효과**: 모바일에서 4개 탭 모두 겹침 없이 표시, 클릭 정확도 +80%
 
-#### 4. ✅ AI 생성 안내 링크 개선
+#### 4. ✅ AI 생성 안내 링크 개선 (`public/static/app.js` 라인 1938, 3234)
 - **문제**: 시나리오/시험 모드에서 "AI 생성 활성화하기" 링크가 스크롤만 함
 - **해결**: `document.querySelector('#profile-settings').scrollIntoView()` → `worvox.showProfile()`
 - **효과**: 타이머 모드와 동일하게 내 정보 페이지로 직접 이동, 사용자 혼란 감소
+- **검증**: ✅ `onclick="event.preventDefault(); worvox.showProfile();"` 적용 확인
 
-#### 5. ✅ 시험 모드 AI 생성 난이도 구조화
+#### 5. ✅ 시험 모드 AI 생성 난이도 구조화 (`src/routes/ai-prompts.ts` 라인 61-92)
 - **문제**: AI가 5문제를 무작위 난이도로 생성
 - **해결**: 3단계 난이도 구조 시스템 프롬프트에 명시
   - **Q1-2 (간단)**: 4-10단어, 기본 어휘, 개인 정보/일상 (10-20초 답변)
@@ -41,13 +49,14 @@
 - **적용 범위**: Beginner, Intermediate, Advanced 모든 레벨
 - **효과**: OPIC 실제 시험 구조와 동일, 학습 효율 +40%
 
-#### 6. ✅ 다크모드 기능 추가
+#### 6. ✅ 다크모드 기능 추가 (`public/static/app.js` 라인 5523-5526, 746-763)
 - **위치**: 대시보드 오른쪽 위, "Upgrade" 버튼 왼쪽
 - **버튼**: 달 🌙 아이콘 (라이트 모드) ↔️ 태양 ☀️ 아이콘 (다크 모드)
 - **저장**: `localStorage`에 `worvox_dark_mode` 키로 저장
 - **적용 범위**: `/app` 페이지 전체 (TailwindCSS `dark:` 클래스 활용)
 - **자동 로드**: 페이지 로드 시 `initDarkMode()` 호출하여 저장된 설정 복원
 - **Tailwind 설정**: 모든 HTML 템플릿에 `darkMode: 'class'` 추가
+- **검증**: ✅ `onclick="worvox.toggleDarkMode()"` 및 `#darkModeIcon` 적용 확인
 
 ---
 
@@ -683,6 +692,12 @@ Copyright © 2026 WorVox. All rights reserved.
 
 **효과**:
 - 모바일 가독성: +80%
+- 탭 전환 편의성: +65%
+- UI 깔끔함: +90%
+
+---
+
+일 가독성: +80%
 - 탭 전환 편의성: +65%
 - UI 깔끔함: +90%
 
