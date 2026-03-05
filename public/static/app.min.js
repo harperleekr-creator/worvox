@@ -756,6 +756,8 @@ class WorVox {
       if (icon) {
         icon.className = 'fas fa-sun text-yellow-400';
       }
+      console.log('🌙 Dark mode enabled');
+      alert('🌙 다크모드가 활성화되었습니다!\n\n새로고침하면 더 많은 다크 테마가 적용됩니다.');
     } else {
       document.documentElement.classList.remove('dark');
       // Update icon
@@ -763,6 +765,8 @@ class WorVox {
       if (icon) {
         icon.className = 'fas fa-moon text-gray-600';
       }
+      console.log('☀️ Light mode enabled');
+      alert('☀️ 라이트모드가 활성화되었습니다!');
     }
   }
 
@@ -4237,7 +4241,7 @@ class WorVox {
   showRealConversation() {
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="flex h-screen bg-gray-50">
+      <div class="flex h-screen bg-gray-50 dark:bg-gray-900">
         ${this.getSidebar('live-speaking')}
         
         <div class="flex-1 flex flex-col overflow-hidden">
@@ -5496,19 +5500,19 @@ Proceed to payment?
 
       const app = document.getElementById('app');
       app.innerHTML = `
-        <div class="flex h-screen bg-gray-50">
+        <div class="flex h-screen bg-gray-50 dark:bg-gray-900 dark:bg-gray-900">
           <!-- Sidebar -->
           ${this.getSidebar('home')}
           
           <!-- Main Content -->
           <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Mobile Header with Upgrade -->
-            <div class="md:hidden bg-white border-b border-gray-200 px-4 py-3">
+            <div class="md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
               <div class="flex items-center justify-between">
-                <button onclick="worvox.toggleMobileSidebar()" class="text-gray-600">
+                <button onclick="worvox.toggleMobileSidebar()" class="text-gray-600 dark:text-gray-300">
                   <i class="fas fa-bars text-xl"></i>
                 </button>
-                <h1 class="text-lg font-semibold text-gray-800">Home</h1>
+                <h1 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Home</h1>
                 <button onclick="worvox.showPlan()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-all">
                   <i class="fas fa-crown"></i>
                 </button>
@@ -5516,14 +5520,14 @@ Proceed to payment?
             </div>
             
             <!-- Desktop Top Bar -->
-            <div class="hidden md:flex bg-white border-b border-gray-200 px-6 py-3 items-center justify-between">
-              <h2 class="text-lg font-semibold text-gray-800">Choose Your Learning Path</h2>
+            <div class="hidden md:flex bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-3 items-center justify-between">
+              <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Choose Your Learning Path</h2>
               <div class="flex items-center gap-3">
                 <!-- Dark Mode Toggle -->
                 <button onclick="worvox.toggleDarkMode()" 
-                  class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-all" 
+                  class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all" 
                   title="다크모드 전환">
-                  <i class="fas fa-moon text-gray-600" id="darkModeIcon"></i>
+                  <i class="fas fa-moon text-gray-600 dark:text-gray-300" id="darkModeIcon"></i>
                 </button>
                 
                 <button onclick="worvox.showPlan()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition-all">
@@ -5533,13 +5537,13 @@ Proceed to payment?
             </div>
             
             <!-- Content Area with Scrolling -->
-            <div class="flex-1 overflow-y-auto">
+            <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
               <div class="p-4 md:p-8">
                 <div class="max-w-4xl mx-auto">
                 <!-- Welcome Message -->
                 <div class="text-center mb-8 md:mb-12">
-                  <h1 class="text-2xl md:text-4xl font-bold text-gray-900 mb-2 md:mb-3">Welcome back, ${this.currentUser.username}!</h1>
-                  <p class="text-gray-600 text-base md:text-lg">What would you like to learn today?</p>
+                  <h1 class="text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 md:mb-3">Welcome back, ${this.currentUser.username}!</h1>
+                  <p class="text-gray-600 dark:text-gray-300 text-base md:text-lg">What would you like to learn today?</p>
                 </div>
                 
                 <!-- Word Search Section -->
@@ -5562,9 +5566,9 @@ Proceed to payment?
                 </div>
                 
                 <!-- Daily Usage Tracker (All Users) -->
-                <div class="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-200 mb-6 md:mb-8">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-4 md:p-6 shadow-sm border border-gray-200 dark:border-gray-700 mb-6 md:mb-8">
                   <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-base md:text-lg font-semibold text-gray-900">
+                    <h3 class="text-base md:text-lg font-semibold text-gray-900 dark:text-white">
                       <i class="fas fa-chart-bar mr-2"></i>오늘의 사용량
                     </h3>
                     ${this.currentUser?.plan === 'free' ? `
@@ -6117,7 +6121,7 @@ Proceed to payment?
   showChatInterface() {
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="flex h-screen bg-gray-50">
+      <div class="flex h-screen bg-gray-50 dark:bg-gray-900">
         <!-- Sidebar -->
         ${this.getSidebar('conversation')}
         
@@ -6594,7 +6598,7 @@ Proceed to payment?
   
       const app = document.getElementById('app');
       app.innerHTML = `
-        <div class="flex h-screen bg-gray-50">
+        <div class="flex h-screen bg-gray-50 dark:bg-gray-900">
           <!-- Sidebar -->
           ${this.getSidebar('vocabulary')}
           
@@ -7283,7 +7287,7 @@ Proceed to payment?
 
       const app = document.getElementById('app');
       app.innerHTML = `
-        <div class="flex h-screen bg-gray-50">
+        <div class="flex h-screen bg-gray-50 dark:bg-gray-900">
           <!-- Sidebar -->
           ${this.getSidebar('history')}
           
@@ -7775,7 +7779,7 @@ Proceed to payment?
   showPlan() {
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="flex h-screen bg-gray-50">
+      <div class="flex h-screen bg-gray-50 dark:bg-gray-900">
         <!-- Sidebar -->
         ${this.getSidebar('plan')}
         
@@ -8223,7 +8227,7 @@ Proceed to payment?
     
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="flex h-screen bg-gray-50">
+      <div class="flex h-screen bg-gray-50 dark:bg-gray-900">
         <!-- Sidebar -->
         ${this.getSidebar('plan')}
         
@@ -8917,7 +8921,7 @@ Proceed to payment?
 
       const app = document.getElementById('app');
       app.innerHTML = `
-        <div class="flex h-screen bg-gray-50">
+        <div class="flex h-screen bg-gray-50 dark:bg-gray-900">
           <!-- Sidebar -->
           ${this.getSidebar('stats')}
           
@@ -10601,7 +10605,7 @@ Proceed to payment?
       
       const app = document.getElementById('app');
       app.innerHTML = `
-        <div class="flex h-screen bg-gray-50">
+        <div class="flex h-screen bg-gray-50 dark:bg-gray-900">
           ${this.getSidebar('conversation')}
           
           <div class="flex-1 overflow-y-auto">
@@ -11296,7 +11300,7 @@ Proceed to payment?
   showTerms() {
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="flex h-screen bg-gray-50">
+      <div class="flex h-screen bg-gray-50 dark:bg-gray-900">
         ${this.getSidebar('home')}
         
         <div class="flex-1 flex flex-col overflow-hidden">
@@ -11461,7 +11465,7 @@ Proceed to payment?
   showPrivacy() {
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="flex h-screen bg-gray-50">
+      <div class="flex h-screen bg-gray-50 dark:bg-gray-900">
         ${this.getSidebar('home')}
         
         <div class="flex-1 flex flex-col overflow-hidden">
@@ -11676,7 +11680,7 @@ Proceed to payment?
   showRefund() {
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="flex h-screen bg-gray-50">
+      <div class="flex h-screen bg-gray-50 dark:bg-gray-900">
         ${this.getSidebar('home')}
         
         <div class="flex-1 flex flex-col overflow-hidden">
@@ -11870,7 +11874,7 @@ Proceed to payment?
     const isEmailAuth = authProvider === 'email';
     
     app.innerHTML = `
-      <div class="flex h-screen bg-gray-50">
+      <div class="flex h-screen bg-gray-50 dark:bg-gray-900">
         <!-- Sidebar -->
         ${this.getSidebar('profile')}
         
@@ -13042,7 +13046,7 @@ Proceed to payment?
   async showAdmin() {
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="flex h-screen bg-gray-50">
+      <div class="flex h-screen bg-gray-50 dark:bg-gray-900">
         ${this.getSidebar('admin')}
         
         <div class="flex-1 flex flex-col overflow-hidden">
