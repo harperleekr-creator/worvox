@@ -742,6 +742,38 @@ class WorVox {
     }
   }
 
+  // Toggle Dark Mode
+  toggleDarkMode() {
+    const currentMode = localStorage.getItem('worvox_dark_mode') || 'light';
+    const newMode = currentMode === 'light' ? 'dark' : 'light';
+    
+    localStorage.setItem('worvox_dark_mode', newMode);
+    
+    if (newMode === 'dark') {
+      document.documentElement.classList.add('dark');
+      // Update icon
+      const icon = document.getElementById('darkModeIcon');
+      if (icon) {
+        icon.className = 'fas fa-sun text-yellow-400';
+      }
+    } else {
+      document.documentElement.classList.remove('dark');
+      // Update icon
+      const icon = document.getElementById('darkModeIcon');
+      if (icon) {
+        icon.className = 'fas fa-moon text-gray-600';
+      }
+    }
+  }
+
+  // Initialize Dark Mode on page load
+  initDarkMode() {
+    const savedMode = localStorage.getItem('worvox_dark_mode') || 'light';
+    if (savedMode === 'dark') {
+      document.documentElement.classList.add('dark');
+    }
+  }
+
   getMobileHeader(title = 'WorVox') {
     return `
       <div class="md:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
@@ -1904,7 +1936,7 @@ class WorVox {
                       <h4 class="font-bold text-gray-900">기본 시나리오 사용</h4>
                       <p class="text-sm text-gray-600 mt-1">
                         30개의 실전 상황 시나리오로 연습합니다
-                        ${this.isPremiumUser() ? ' • <a href="#" onclick="event.preventDefault(); document.querySelector(\'#profile-settings\').scrollIntoView();" class="text-blue-600 hover:underline">AI 생성 활성화하기</a>' : ' • <a href="#" onclick="event.preventDefault(); worvox.showPlan();" class="text-blue-600 hover:underline">Premium으로 AI 생성 이용하기</a>'}
+                        ${this.isPremiumUser() ? ' • <a href="#" onclick="event.preventDefault(); worvox.showProfile();" class="text-blue-600 hover:underline font-semibold">내 정보에서 AI 생성 활성화하기</a>' : ' • <a href="#" onclick="event.preventDefault(); worvox.showPlan();" class="text-blue-600 hover:underline">Premium으로 AI 생성 이용하기</a>'}
                       </p>
                     </div>
                   </div>
@@ -3199,7 +3231,7 @@ class WorVox {
                         <h4 class="font-bold text-gray-900">기본 시험 문제 사용</h4>
                         <p class="text-sm text-gray-600 mt-1">
                           검증된 OPIC 스타일 시험 문제로 평가합니다
-                          ${this.isPremiumUser() ? ' • <a href="#" onclick="event.preventDefault(); document.querySelector(\'#profile-settings\').scrollIntoView();" class="text-blue-600 hover:underline">AI 생성 활성화하기</a>' : ' • <a href="#" onclick="event.preventDefault(); worvox.showPlan();" class="text-blue-600 hover:underline">Premium으로 AI 생성 이용하기</a>'}
+                          ${this.isPremiumUser() ? ' • <a href="#" onclick="event.preventDefault(); worvox.showProfile();" class="text-blue-600 hover:underline font-semibold">내 정보에서 AI 생성 활성화하기</a>' : ' • <a href="#" onclick="event.preventDefault(); worvox.showPlan();" class="text-blue-600 hover:underline">Premium으로 AI 생성 이용하기</a>'}
                         </p>
                       </div>
                     </div>
@@ -5486,9 +5518,18 @@ Proceed to payment?
             <!-- Desktop Top Bar -->
             <div class="hidden md:flex bg-white border-b border-gray-200 px-6 py-3 items-center justify-between">
               <h2 class="text-lg font-semibold text-gray-800">Choose Your Learning Path</h2>
-              <button onclick="worvox.showPlan()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition-all">
-                <i class="fas fa-crown mr-2"></i>Upgrade
-              </button>
+              <div class="flex items-center gap-3">
+                <!-- Dark Mode Toggle -->
+                <button onclick="worvox.toggleDarkMode()" 
+                  class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-all" 
+                  title="다크모드 전환">
+                  <i class="fas fa-moon text-gray-600" id="darkModeIcon"></i>
+                </button>
+                
+                <button onclick="worvox.showPlan()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg font-medium transition-all">
+                  <i class="fas fa-crown mr-2"></i>Upgrade
+                </button>
+              </div>
             </div>
             
             <!-- Content Area with Scrolling -->
@@ -7264,30 +7305,38 @@ Proceed to payment?
 
             <!-- Tabs -->
             <div class="bg-white border-b border-gray-200 px-2 md:px-6">
-              <div class="flex gap-2 md:gap-4 overflow-x-auto scrollbar-hide">
+              <div class="flex gap-1 overflow-x-auto scrollbar-hide">
                 <button onclick="worvox.showHistoryTab('ai', event)" 
-                  class="history-tab active px-3 md:px-4 py-2 text-xs md:text-sm font-semibold border-b-2 border-blue-600 text-blue-600 whitespace-nowrap">
-                  <i class="fas fa-comment text-sm md:text-base"></i>
-                  <span class="hidden sm:inline ml-1">AI 대화</span>
-                  <span class="ml-1">(${aiConversations.length})</span>
+                  class="history-tab active flex-shrink-0 px-2 md:px-4 py-3 text-xs md:text-sm font-semibold border-b-2 border-blue-600 text-blue-600">
+                  <div class="flex flex-col items-center gap-1">
+                    <i class="fas fa-comment text-lg md:text-base"></i>
+                    <span class="text-[10px] md:text-sm">AI 대화</span>
+                    <span class="text-[10px] md:text-xs text-gray-500">(${aiConversations.length})</span>
+                  </div>
                 </button>
                 <button onclick="worvox.showHistoryTab('timer', event)" 
-                  class="history-tab px-3 md:px-4 py-2 text-xs md:text-sm font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap">
-                  <i class="fas fa-stopwatch text-sm md:text-base"></i>
-                  <span class="hidden sm:inline ml-1">타이머 모드</span>
-                  <span class="ml-1">(${timerSessions.length})</span>
+                  class="history-tab flex-shrink-0 px-2 md:px-4 py-3 text-xs md:text-sm font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800">
+                  <div class="flex flex-col items-center gap-1">
+                    <i class="fas fa-stopwatch text-lg md:text-base"></i>
+                    <span class="text-[10px] md:text-sm">타이머</span>
+                    <span class="text-[10px] md:text-xs text-gray-500">(${timerSessions.length})</span>
+                  </div>
                 </button>
                 <button onclick="worvox.showHistoryTab('scenario', event)" 
-                  class="history-tab px-3 md:px-4 py-2 text-xs md:text-sm font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap">
-                  <i class="fas fa-film text-sm md:text-base"></i>
-                  <span class="hidden sm:inline ml-1">시나리오 모드</span>
-                  <span class="ml-1">(${scenarioSessions.length})</span>
+                  class="history-tab flex-shrink-0 px-2 md:px-4 py-3 text-xs md:text-sm font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800">
+                  <div class="flex flex-col items-center gap-1">
+                    <i class="fas fa-film text-lg md:text-base"></i>
+                    <span class="text-[10px] md:text-sm">시나리오</span>
+                    <span class="text-[10px] md:text-xs text-gray-500">(${scenarioSessions.length})</span>
+                  </div>
                 </button>
                 <button onclick="worvox.showHistoryTab('exam', event)" 
-                  class="history-tab px-3 md:px-4 py-2 text-xs md:text-sm font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap">
-                  <i class="fas fa-graduation-cap text-sm md:text-base"></i>
-                  <span class="hidden sm:inline ml-1">시험 모드</span>
-                  <span class="ml-1">(${examSessions.length})</span>
+                  class="history-tab flex-shrink-0 px-2 md:px-4 py-3 text-xs md:text-sm font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800">
+                  <div class="flex flex-col items-center gap-1">
+                    <i class="fas fa-graduation-cap text-lg md:text-base"></i>
+                    <span class="text-[10px] md:text-sm">시험</span>
+                    <span class="text-[10px] md:text-xs text-gray-500">(${examSessions.length})</span>
+                  </div>
                 </button>
               </div>
             </div>
@@ -12043,7 +12092,7 @@ Proceed to payment?
                             AI 프롬프트 생성은 Premium 플랜 이상에서 사용 가능합니다.<br>
                             여러분의 영어 레벨에 맞춰 무한대의 새로운 문장과 시나리오가 생성됩니다.
                           </p>
-                          <button onclick="worvox.showPaymentPage()" 
+                          <button onclick="worvox.showPlan()" 
                             class="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-lg font-semibold text-sm transition-all">
                             <i class="fas fa-crown mr-2"></i>Premium 구독하기
                           </button>
@@ -13586,6 +13635,9 @@ Proceed to payment?
 const worvox = new WorVox();
 // Backward compatibility alias
 const heyspeak = worvox;
+
+// Initialize dark mode on page load
+worvox.initDarkMode();
 
 // Google Sign-In callback
 window.handleGoogleLogin = async (response) => {

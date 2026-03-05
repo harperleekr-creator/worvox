@@ -129,8 +129,8 @@ const getWelcomeEmailHTML = (userName: string) => `
                 </table>
                 
                 <div style="text-align: center;">
-                  <a href="https://worvox.com/pricing" style="display: inline-block; background: linear-gradient(135deg, #a855f7 0%, #3b82f6 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 12px; font-size: 18px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-                    Premium 자세히 보기
+                  <a href="https://worvox.com/pricing" style="display: inline-block; background-color: #a855f7; background: linear-gradient(135deg, #a855f7 0%, #3b82f6 100%); color: #ffffff !important; text-decoration: none; padding: 16px 40px; border-radius: 12px; font-size: 18px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); border: 2px solid #a855f7;">
+                    <span style="color: #ffffff; font-weight: bold;">Premium 자세히 보기</span>
                   </a>
                 </div>
                 
@@ -147,8 +147,8 @@ const getWelcomeEmailHTML = (userName: string) => `
               <h2 style="margin: 0 0 20px 0; color: #1f2937; font-size: 24px; font-weight: bold;">
                 지금 바로 시작해보세요! 🎯
               </h2>
-              <a href="https://worvox.com/app" style="display: inline-block; background: linear-gradient(135deg, #a855f7 0%, #3b82f6 100%); color: #ffffff; text-decoration: none; padding: 18px 50px; border-radius: 12px; font-size: 20px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-                WorVox 시작하기
+              <a href="https://worvox.com/app" style="display: inline-block; background-color: #10b981; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff !important; text-decoration: none; padding: 18px 50px; border-radius: 12px; font-size: 20px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); border: 2px solid #10b981;">
+                <span style="color: #ffffff; font-weight: bold;">WorVox 시작하기</span>
               </a>
             </td>
           </tr>

@@ -497,6 +497,12 @@ app.get('/landing', (c) => {
         
         <link rel="canonical" href="https://worvox.com">
         <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+          // Configure Tailwind for dark mode
+          tailwind.config = {
+            darkMode: 'class'
+          }
+        </script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     </head>
     <body class="bg-gradient-to-br from-purple-50 via-white to-blue-50">
@@ -1879,6 +1885,12 @@ app.get('/about', (c) => {
         
         <link rel="canonical" href="https://worvox.com/about">
         <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+          // Configure Tailwind for dark mode
+          tailwind.config = {
+            darkMode: 'class'
+          }
+        </script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
         
         <!-- JSON-LD for About Page -->
@@ -2217,6 +2229,12 @@ app.get('/pricing', (c) => {
         
         <link rel="canonical" href="https://worvox.com/pricing">
         <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+          // Configure Tailwind for dark mode
+          tailwind.config = {
+            darkMode: 'class'
+          }
+        </script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
         
         <!-- JSON-LD for Pricing -->
@@ -2750,6 +2768,12 @@ app.get('/app', (c) => {
         <link rel="dns-prefetch" href="https://accounts.google.com">
         
         <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+          // Configure Tailwind for dark mode
+          tailwind.config = {
+            darkMode: 'class'
+          }
+        </script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
         <link href="/static/style.css?v=${version}" rel="stylesheet">
         
@@ -2919,6 +2943,12 @@ app.get('/', (c) => {
         <link rel="dns-prefetch" href="https://accounts.google.com">
         
         <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+          // Configure Tailwind for dark mode
+          tailwind.config = {
+            darkMode: 'class'
+          }
+        </script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
         <link href="/static/style.css?v=${version}" rel="stylesheet">
         

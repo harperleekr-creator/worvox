@@ -58,22 +58,38 @@ Example format:
 4. My name is John.
 5. Nice to meet you.`,
 
-    exam: `You are an English learning assistant. Generate 5 simple speaking test questions for beginner learners.
+    exam: `You are an English learning assistant. Generate 5 OPIC-style speaking test questions with SPECIFIC difficulty distribution:
 
-Requirements:
-- Create 5 simple questions
-- Use basic vocabulary (1000 most common words)
-- Questions should be 4-10 words each
-- Use simple question forms (What, Who, Where, When, Do you...?)
-- Topics: personal information, daily routine, family, hobbies, food
-- Format: Return ONLY 5 questions, one per line, numbered 1-5
+CRITICAL Requirements:
+- Question 1-2: SIMPLE QUESTIONS (easy difficulty)
+  * Use basic vocabulary (1000 most common words)
+  * 4-10 words each
+  * Simple question forms (What is, Do you, Where do you, etc.)
+  * Topics: personal info, daily routine, family, hobbies, food
+  * Should require 10-20 second simple answers
+
+- Question 3-4: INTERMEDIATE QUESTIONS (medium difficulty)
+  * Use everyday vocabulary with some advanced words
+  * 8-15 words each
+  * Require explanation or opinion
+  * Topics: work, education, travel, experiences, preferences
+  * Should require 30-60 second detailed answers
+
+- Question 5: ROLE-PLAYING SCENARIO (hard difficulty)
+  * 15-30 words complex situation
+  * Real-life scenario requiring natural conversation
+  * Must start with "Imagine you are..." or "You are at..." or "I'm calling to..."
+  * Examples: restaurant reservation, hotel complaint, job interview, customer service issue
+  * Should require 60-90 second response with multiple sentences
+
+Format: Return ONLY 5 questions, one per line, numbered 1-5
 
 Example format:
 1. What is your favorite food?
 2. Do you have any brothers or sisters?
-3. Where do you live?
-4. What do you do every day?
-5. What is your hobby?`
+3. Can you describe your typical day at work or school?
+4. What are your thoughts on learning English? Why is it important?
+5. Imagine you are at a restaurant and your order is wrong. The waiter brings you fish, but you ordered chicken. You're allergic to seafood. Explain the situation and ask for a solution politely.`
   },
 
   intermediate: {
@@ -107,23 +123,38 @@ Example format:
 4. Let me check my calendar and get back to you.
 5. That would work perfectly for me, thank you.`,
 
-    exam: `You are an English learning assistant. Generate 5 intermediate-level speaking test questions.
+    exam: `You are an English learning assistant. Generate 5 OPIC-style speaking test questions with SPECIFIC difficulty distribution:
 
-Requirements:
-- Create 5 thoughtful questions requiring detailed answers
-- Use everyday vocabulary with some advanced words
-- Questions should be 8-15 words each
-- Use various question forms (Why, How, Can you describe, What do you think about...?)
-- Topics: work experience, education, travel, opinions, problem-solving
-- Questions should encourage 30-60 second responses
-- Format: Return ONLY 5 questions, one per line, numbered 1-5
+CRITICAL Requirements:
+- Question 1-2: SIMPLE QUESTIONS (easy difficulty)
+  * Use basic vocabulary
+  * 5-10 words each
+  * Simple present/past tense
+  * Topics: background, daily life, preferences
+  * Should require 15-25 second answers
+
+- Question 3-4: INTERMEDIATE QUESTIONS (medium difficulty)
+  * Use everyday vocabulary with some advanced words
+  * 10-18 words each
+  * Require explanation, opinion, or detailed description
+  * Topics: work experience, education, travel, problem-solving, cultural topics
+  * Should require 45-75 second detailed answers
+
+- Question 5: ROLE-PLAYING SCENARIO (hard difficulty)
+  * 20-35 words complex situation
+  * Real-life professional or social scenario
+  * Must start with "Imagine you are..." or "You're in a situation where..." or "I'm calling because..."
+  * Examples: business negotiation, complaint handling, making arrangements, giving advice
+  * Should require 90-120 second response with natural conversation
+
+Format: Return ONLY 5 questions, one per line, numbered 1-5
 
 Example format:
-1. Can you describe a challenging situation you faced at work?
-2. What are your thoughts on working from home?
-3. How do you usually prepare for important meetings?
-4. Tell me about a memorable trip you've taken.
-5. What skills would you like to improve in the future?`
+1. What is your current job or field of study?
+2. What do you usually do on weekends?
+3. Can you describe a challenging project you worked on and how you handled it?
+4. What are your thoughts on the importance of work-life balance in modern society?
+5. Imagine you are meeting with a potential business partner who is 30 minutes late to an important presentation. You have another meeting scheduled right after. Call them to politely express your concern and discuss how to proceed with the shortened time. What would you say?`
   },
 
   advanced: {
@@ -157,23 +188,39 @@ Example format:
 4. I believe we should explore alternative solutions before making a final decision.
 5. Let's schedule a follow-up meeting to discuss the implementation timeline in greater detail.`,
 
-    exam: `You are an English learning assistant. Generate 5 advanced-level speaking test questions requiring analytical thinking.
+    exam: `You are an English learning assistant. Generate 5 OPIC-style speaking test questions with SPECIFIC difficulty distribution:
 
-Requirements:
-- Create 5 challenging questions requiring in-depth analysis
-- Use sophisticated vocabulary and complex question structures
-- Questions should be 12-25 words each
-- Use analytical question forms (To what extent, Analyze, Discuss, Evaluate, Compare and contrast...)
-- Topics: global issues, ethical dilemmas, business strategy, societal trends, innovation
-- Questions should encourage 1-2 minute detailed responses
-- Format: Return ONLY 5 questions, one per line, numbered 1-5
+CRITICAL Requirements:
+- Question 1-2: SIMPLE-TO-MODERATE QUESTIONS (easy difficulty)
+  * Use clear, straightforward vocabulary
+  * 6-12 words each
+  * Direct questions about experiences or preferences
+  * Topics: background, interests, daily life, career
+  * Should require 20-30 second answers
+
+- Question 3-4: ANALYTICAL QUESTIONS (medium difficulty)
+  * Use sophisticated vocabulary
+  * 12-20 words each
+  * Require critical thinking, comparison, or evaluation
+  * Topics: societal issues, technology impact, cultural differences, professional challenges
+  * Should require 60-90 second analytical responses
+
+- Question 5: COMPLEX ROLE-PLAYING SCENARIO (hard difficulty)
+  * 25-40 words multi-layered situation
+  * Professional, diplomatic, or complex social scenario
+  * Must start with "Imagine you are..." or "You're in a situation where..." or "You need to..."
+  * Include multiple constraints or conflicting requirements
+  * Examples: crisis management, diplomatic negotiation, ethical dilemma, strategic planning
+  * Should require 2-3 minute response with structured argumentation
+
+Format: Return ONLY 5 questions, one per line, numbered 1-5
 
 Example format:
-1. How has globalization impacted local cultures, and what strategies can preserve cultural identity?
-2. Discuss the ethical implications of artificial intelligence in decision-making processes.
-3. To what extent should companies prioritize sustainability over profitability?
-4. Analyze the advantages and disadvantages of remote work in modern organizations.
-5. What role does education play in addressing income inequality in society?`
+1. What field are you currently working in or studying?
+2. What are your long-term career aspirations?
+3. How has technology transformed workplace communication, and what are the implications for team dynamics?
+4. To what extent should companies prioritize employee well-being over productivity targets?
+5. Imagine you are the project manager of a critical product launch scheduled for next week. Your lead developer just informed you that a major bug was discovered that could compromise user data security. Your CEO is pressuring you to launch on time due to investor commitments, but your technical team recommends a two-week delay for proper fixes. Your company's reputation and customer trust are at stake. Explain how you would handle this situation, who you would consult, and what decision you would make. Justify your reasoning.`
   }
 };
 
