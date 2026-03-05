@@ -751,19 +751,29 @@ class WorVox {
     
     if (newMode === 'dark') {
       document.documentElement.classList.add('dark');
-      // Update icon
+      // Update desktop icon
       const icon = document.getElementById('darkModeIcon');
       if (icon) {
         icon.className = 'fas fa-sun text-yellow-400';
       }
+      // Update mobile icon
+      const iconMobile = document.getElementById('darkModeIconMobile');
+      if (iconMobile) {
+        iconMobile.className = 'fas fa-sun text-yellow-400';
+      }
       console.log('🌙 Dark mode enabled');
-      alert('🌙 다크모드가 활성화되었습니다!\n\n새로고침하면 더 많은 다크 테마가 적용됩니다.');
+      alert('🌙 다크모드가 활성화되었습니다!\n\n페이지 배경과 카드가 어두운 테마로 변경됩니다.');
     } else {
       document.documentElement.classList.remove('dark');
-      // Update icon
+      // Update desktop icon
       const icon = document.getElementById('darkModeIcon');
       if (icon) {
         icon.className = 'fas fa-moon text-gray-600';
+      }
+      // Update mobile icon
+      const iconMobile = document.getElementById('darkModeIconMobile');
+      if (iconMobile) {
+        iconMobile.className = 'fas fa-moon text-gray-600 dark:text-gray-300';
       }
       console.log('☀️ Light mode enabled');
       alert('☀️ 라이트모드가 활성화되었습니다!');
@@ -780,12 +790,16 @@ class WorVox {
 
   getMobileHeader(title = 'WorVox') {
     return `
-      <div class="md:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-        <button onclick="worvox.toggleMobileSidebar()" class="text-gray-600">
+      <div class="md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
+        <button onclick="worvox.toggleMobileSidebar()" class="text-gray-600 dark:text-gray-300">
           <i class="fas fa-bars text-xl"></i>
         </button>
-        <h1 class="text-lg font-semibold text-gray-800">${title}</h1>
-        <div class="w-6"></div>
+        <h1 class="text-lg font-semibold text-gray-800 dark:text-gray-200">${title}</h1>
+        <button onclick="worvox.toggleDarkMode()" 
+          class="flex items-center justify-center w-9 h-9 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all" 
+          title="다크모드 전환">
+          <i class="fas fa-moon text-gray-600 dark:text-gray-300" id="darkModeIconMobile"></i>
+        </button>
       </div>
     `;
   }
@@ -5506,16 +5520,24 @@ Proceed to payment?
           
           <!-- Main Content -->
           <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Mobile Header with Upgrade -->
+            <!-- Mobile Header with Dark Mode & Upgrade -->
             <div class="md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
               <div class="flex items-center justify-between">
                 <button onclick="worvox.toggleMobileSidebar()" class="text-gray-600 dark:text-gray-300">
                   <i class="fas fa-bars text-xl"></i>
                 </button>
                 <h1 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Home</h1>
-                <button onclick="worvox.showPlan()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-all">
-                  <i class="fas fa-crown"></i>
-                </button>
+                <div class="flex items-center gap-2">
+                  <!-- Dark Mode Toggle (Mobile) -->
+                  <button onclick="worvox.toggleDarkMode()" 
+                    class="flex items-center justify-center w-9 h-9 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all" 
+                    title="다크모드 전환">
+                    <i class="fas fa-moon text-gray-600 dark:text-gray-300" id="darkModeIconMobile"></i>
+                  </button>
+                  <button onclick="worvox.showPlan()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition-all">
+                    <i class="fas fa-crown"></i>
+                  </button>
+                </div>
               </div>
             </div>
             
