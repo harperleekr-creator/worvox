@@ -67,7 +67,7 @@ pronunciationAnalysis.post('/analyze', async (c) => {
     }
 
     // Use GPT-4o-mini for detailed pronunciation analysis
-    const prompt = `You are an expert English pronunciation coach. Analyze the following:
+    const prompt = `You are an expert English pronunciation and grammar coach. Analyze the following:
 
 REFERENCE TEXT (what user should say):
 "${referenceText}"
@@ -107,31 +107,43 @@ Provide a detailed analysis with these scores (0-100):
    - 50-69: Frequent pauses, choppy delivery
    - Below 50: Very slow, many long pauses, broken speech
 
+4. **Grammar Score**: Grammatical correctness (NEW)
+   - 95-100: Perfect grammar, no errors
+   - 85-94: Very good, 1-2 minor grammar mistakes
+   - 70-84: Good but has several grammar errors (tense, articles, prepositions)
+   - 50-69: Multiple grammar errors that affect clarity
+   - Below 50: Serious grammar issues, difficult to understand meaning
+
 IMPORTANT: 
 - Be strict but fair - native-like performance should score 90+
 - Clear non-native accent with good comprehensibility should score 70-85
 - Significant pronunciation issues that affect understanding should score below 70
 - Consider that STT might misrecognize words due to pronunciation issues
+- Analyze grammar separately from pronunciation (grammar focuses on structure, not sound)
 
 Respond ONLY with valid JSON:
 {
   "accuracy": <number>,
   "pronunciation": <number>,
   "fluency": <number>,
-  "feedback": "<detailed constructive feedback in Korean, 1-2 paragraphs>",
+  "grammar": <number>,
+  "feedback": "<detailed constructive feedback in Korean, including pronunciation AND grammar analysis, 2-3 paragraphs>",
+  "grammarFeedback": "<specific grammar analysis in Korean: list 2-3 grammar errors found with corrections>",
   "strengths": ["<specific strength 1>", "<specific strength 2>"],
   "improvements": ["<specific area to improve 1>", "<specific area to improve 2>"],
+  "grammarIssues": ["<grammar error 1 with correction>", "<grammar error 2 with correction>"],
   "nextSteps": "<practical advice for next practice in Korean>"
 }
 
 FEEDBACK GUIDELINES:
 - Start with what they did well (positive reinforcement)
 - Point out 2-3 specific pronunciation issues with examples from their speech
+- Point out 2-3 specific grammar errors with corrections (e.g., "I go to school yesterday" → "I went to school yesterday")
 - Explain WHY these issues matter (comprehension, natural flow, etc.)
-- Give concrete improvement tips (tongue position, stress patterns, etc.)
+- Give concrete improvement tips (tongue position, stress patterns, grammar rules)
 - End with encouraging next steps
 - Write in friendly, supportive Korean tone
-- Length: 1-2 paragraphs (3-6 sentences)`;
+- Length: 2-3 paragraphs (5-8 sentences total)`;
 
     const response = await fetch(`${openaiApiBase}/chat/completions`, {
       method: 'POST',
@@ -186,9 +198,12 @@ FEEDBACK GUIDELINES:
       accuracy: Math.round(scores.accuracy),
       pronunciation: Math.round(scores.pronunciation),
       fluency: Math.round(scores.fluency),
+      grammar: Math.round(scores.grammar || 70),
       feedback: scores.feedback || '',
+      grammarFeedback: scores.grammarFeedback || '',
       strengths: scores.strengths || [],
       improvements: scores.improvements || [],
+      grammarIssues: scores.grammarIssues || [],
       nextSteps: scores.nextSteps || '',
     };
 

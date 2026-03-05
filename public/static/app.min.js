@@ -1541,10 +1541,13 @@ class WorVox {
             accuracyScore = analysisResponse.data.accuracy;
             pronunciationScore = analysisResponse.data.pronunciation;
             fluencyScore = analysisResponse.data.fluency;
+            const grammarScore = analysisResponse.data.grammar || 70;
             feedback = analysisResponse.data.feedback || '';
+            const grammarFeedback = analysisResponse.data.grammarFeedback || '';
+            const grammarIssues = analysisResponse.data.grammarIssues || [];
             isPremiumAnalysis = true;
             
-            const finalAverageScore = Math.round((accuracyScore + pronunciationScore + fluencyScore) / 3);
+            const finalAverageScore = Math.round((accuracyScore + pronunciationScore + fluencyScore + grammarScore) / 4);
             
             // Update rating based on AI analysis
             if (finalAverageScore >= 90) {
@@ -1579,11 +1582,14 @@ class WorVox {
               accuracyScore,
               pronunciationScore,
               fluencyScore,
+              grammarScore,
               averageScore: finalAverageScore,
               rating,
               ratingColor,
               ratingIcon,
               feedback,
+              grammarFeedback,
+              grammarIssues,
               isPremiumAnalysis,
               originalWords,
               spokenWords,
@@ -1600,9 +1606,12 @@ class WorVox {
                   accuracyScore,
                   pronunciationScore,
                   fluencyScore,
+                  grammarScore,
                   averageScore: finalAverageScore,
                   rating,
                   feedback,
+                  grammarFeedback,
+                  grammarIssues,
                   isPremiumAnalysis,
                   completedAt: new Date().toISOString()
                 };
@@ -1679,7 +1688,7 @@ class WorVox {
                     상세 점수
                   </h3>
                   
-                  <div class="grid grid-cols-3 gap-4 mb-6">
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                     <div class="text-center">
                       <div class="text-gray-600 text-sm mb-2">정확성</div>
                       <div class="relative w-20 h-20 mx-auto">
@@ -1724,6 +1733,22 @@ class WorVox {
                         </svg>
                         <div class="absolute inset-0 flex items-center justify-center">
                           <span class="text-lg font-bold text-yellow-600">${fluencyScore}</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="text-center">
+                      <div class="text-gray-600 text-sm mb-2">문법</div>
+                      <div class="relative w-20 h-20 mx-auto">
+                        <svg class="transform -rotate-90 w-20 h-20">
+                          <circle cx="40" cy="40" r="30" stroke="#e5e7eb" stroke-width="8" fill="none" />
+                          <circle cx="40" cy="40" r="30" stroke="#8b5cf6" stroke-width="8" fill="none"
+                            stroke-dasharray="${2 * Math.PI * 30}" 
+                            stroke-dashoffset="${2 * Math.PI * 30 * (1 - (grammarScore || 70) / 100)}" 
+                            stroke-linecap="round" />
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                          <span class="text-lg font-bold text-purple-600">${grammarScore || 70}</span>
                         </div>
                       </div>
                     </div>
@@ -1794,8 +1819,43 @@ class WorVox {
                     <i class="fas fa-robot text-blue-600"></i>
                     💎 AI 코치 분석 (Premium)
                   </h3>
-                  <div class="bg-white rounded-xl p-5 text-gray-700 leading-relaxed whitespace-pre-line">
-                    ${feedback}
+                  <div class="space-y-4">
+                    <!-- Pronunciation & Overall Feedback -->
+                    <div class="bg-white rounded-xl p-5">
+                      <h4 class="font-bold text-gray-800 mb-2 flex items-center gap-2">
+                        <i class="fas fa-microphone text-blue-600"></i>
+                        발음 및 종합 피드백
+                      </h4>
+                      <div class="text-gray-700 leading-relaxed whitespace-pre-line">
+                        ${feedback}
+                      </div>
+                    </div>
+                    
+                    ${grammarFeedback ? `
+                    <!-- Grammar Feedback -->
+                    <div class="bg-white rounded-xl p-5 border-2 border-purple-200">
+                      <h4 class="font-bold text-gray-800 mb-2 flex items-center gap-2">
+                        <i class="fas fa-spell-check text-purple-600"></i>
+                        문법 분석
+                      </h4>
+                      <div class="text-gray-700 leading-relaxed whitespace-pre-line mb-3">
+                        ${grammarFeedback}
+                      </div>
+                      ${grammarIssues && grammarIssues.length > 0 ? `
+                      <div class="mt-3 pt-3 border-t border-purple-100">
+                        <div class="text-xs font-semibold text-purple-700 mb-2">주요 문법 오류:</div>
+                        <ul class="space-y-2">
+                          ${grammarIssues.map(issue => `
+                            <li class="text-sm text-gray-700 flex items-start gap-2">
+                              <i class="fas fa-arrow-right text-purple-500 mt-1"></i>
+                              <span>${issue}</span>
+                            </li>
+                          `).join('')}
+                        </ul>
+                      </div>
+                      ` : ''}
+                    </div>
+                    ` : ''}
                   </div>
                 </div>
                 ` : `
@@ -3784,7 +3844,8 @@ class WorVox {
       console.log('✅ Exam audio analysis:', audioAnalysis);
 
       // Get detailed pronunciation analysis
-      let accuracy = 70, pronunciation = 70, fluency = 70;
+      let accuracy = 70, pronunciation = 70, fluency = 70, grammar = 70;
+      let grammarFeedback = '', grammarIssues = [];
       
       if (transcription) {
         try {
@@ -3799,7 +3860,10 @@ class WorVox {
             accuracy = analysisResponse.data.accuracy;
             pronunciation = analysisResponse.data.pronunciation;
             fluency = analysisResponse.data.fluency;
-            console.log('✅ Exam detailed analysis:', {accuracy, pronunciation, fluency});
+            grammar = analysisResponse.data.grammar || 70;
+            grammarFeedback = analysisResponse.data.grammarFeedback || '';
+            grammarIssues = analysisResponse.data.grammarIssues || [];
+            console.log('✅ Exam detailed analysis:', {accuracy, pronunciation, fluency, grammar});
           }
         } catch (error) {
           console.warn('⚠️ Failed to get detailed analysis, using default scores:', error);
@@ -3819,7 +3883,10 @@ class WorVox {
         accuracy: accuracy,
         pronunciation: pronunciation,
         fluency: fluency,
-        averageScore: Math.round((accuracy + pronunciation + fluency) / 3)
+        grammar: grammar,
+        grammarFeedback: grammarFeedback,
+        grammarIssues: grammarIssues,
+        averageScore: Math.round((accuracy + pronunciation + fluency + grammar) / 4)
       });
 
       // Save to session messages
@@ -3985,11 +4052,13 @@ class WorVox {
     const totalAccuracy = answersWithImprovement.reduce((sum, a) => sum + a.accuracy, 0);
     const totalPronunciation = answersWithImprovement.reduce((sum, a) => sum + a.pronunciation, 0);
     const totalFluency = answersWithImprovement.reduce((sum, a) => sum + a.fluency, 0);
+    const totalGrammar = answersWithImprovement.reduce((sum, a) => sum + (a.grammar || 70), 0);
 
     const avgAccuracy = Math.round(totalAccuracy / answersWithImprovement.length);
     const avgPronunciation = Math.round(totalPronunciation / answersWithImprovement.length);
     const avgFluency = Math.round(totalFluency / answersWithImprovement.length);
-    const overallAverage = Math.round((avgAccuracy + avgPronunciation + avgFluency) / 3);
+    const avgGrammar = Math.round(totalGrammar / answersWithImprovement.length);
+    const overallAverage = Math.round((avgAccuracy + avgPronunciation + avgFluency + avgGrammar) / 4);
 
     // Determine OPIC level
     let opicLevel = 'Novice Low';
@@ -4032,6 +4101,7 @@ class WorVox {
           avgAccuracy,
           avgPronunciation,
           avgFluency,
+          avgGrammar,
           overallAverage,
           opicLevel,
           opicDescription,
@@ -4084,7 +4154,7 @@ class WorVox {
                   </div>
                   
                   <!-- Average Scores -->
-                  <div class="grid grid-cols-3 gap-4 mb-6">
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                     <div class="text-center">
                       <div class="text-gray-600 text-sm mb-2">평균 정확도</div>
                       <div class="relative w-20 h-20 mx-auto">
@@ -4132,6 +4202,22 @@ class WorVox {
                         </div>
                       </div>
                     </div>
+                    
+                    <div class="text-center">
+                      <div class="text-gray-600 text-sm mb-2">평균 문법</div>
+                      <div class="relative w-20 h-20 mx-auto">
+                        <svg class="transform -rotate-90 w-20 h-20">
+                          <circle cx="40" cy="40" r="30" stroke="#e5e7eb" stroke-width="8" fill="none" />
+                          <circle cx="40" cy="40" r="30" stroke="#8b5cf6" stroke-width="8" fill="none"
+                            stroke-dasharray="${2 * Math.PI * 30}" 
+                            stroke-dashoffset="${2 * Math.PI * 30 * (1 - avgGrammar / 100)}" 
+                            stroke-linecap="round" />
+                        </svg>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                          <span class="text-lg font-bold text-purple-600">${avgGrammar}</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 
@@ -4147,7 +4233,7 @@ class WorVox {
                       <div class="border border-gray-200 rounded-lg p-4">
                         <div class="flex items-center justify-between mb-3">
                           <span class="text-sm font-semibold text-gray-700">문제 ${answer.questionId}</span>
-                          <div class="flex gap-2">
+                          <div class="flex flex-wrap gap-2">
                             <span class="text-xs font-medium px-2 py-1 rounded ${
                               answer.accuracy >= 80 ? 'bg-green-100 text-green-700' :
                               answer.accuracy >= 60 ? 'bg-blue-100 text-blue-700' :
@@ -4163,6 +4249,11 @@ class WorVox {
                               answer.fluency >= 60 ? 'bg-blue-100 text-blue-700' :
                               answer.fluency >= 40 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
                             }">유창성 ${answer.fluency}</span>
+                            <span class="text-xs font-medium px-2 py-1 rounded ${
+                              (answer.grammar || 70) >= 80 ? 'bg-green-100 text-green-700' :
+                              (answer.grammar || 70) >= 60 ? 'bg-blue-100 text-blue-700' :
+                              (answer.grammar || 70) >= 40 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+                            }">문법 ${answer.grammar || 70}</span>
                           </div>
                         </div>
                         
