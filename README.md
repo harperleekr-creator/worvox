@@ -1,46 +1,51 @@
 # WorVox - AI English Learning Platform
 
-## 🔔 최신 업데이트 (2026-03-05 08:15 UTC) - ✅ Production 배포 완료
+## 🔔 최신 업데이트 (2026-03-05 09:30 UTC) - ✅ Production 배포 완료
 
-### 🎯 PayPal 통합 제거 - Commit `7086be9` ✅
+### 🎯 문법 피드백 추가 - Commit `9e87b91` ✅
 
 **배포 정보**
 - **Production**: https://worvox.com ✅ 
-- **Preview**: https://1980e5c3.worvox.pages.dev ✅
-- **GitHub Commit**: https://github.com/harperleekr-creator/worvox/commit/7086be9
-- **Version**: `20260305-remove-paypal`
-- **Checksum**: `6a543dddb1814eac5054098553b755d3` ✅ (Production = Preview = Local)
-- **Bundle Size**: 453 kB (이전 467 kB → **14 kB 감소**)
+- **Preview**: https://32840a62.worvox.pages.dev ✅
+- **GitHub Commit**: https://github.com/harperleekr-creator/worvox/commit/9e87b91
+- **Version**: `20260305-grammar-feedback`
+- **Checksum**: `3f998d06973013ba34c52eb0797b1847` ✅ (Production = Preview = Local)
+- **Bundle Size**: 454 kB
 
-#### 1. ✅ PayPal 통합 완전 제거
-- **제거된 항목**:
-  - ❌ PayPal 라우트 파일 (`src/routes/paypal-payments.ts`) 삭제
-  - ❌ PayPal 라우트 등록 제거 (`app.route('/api/paypal', ...)`)
-  - ❌ PayPal SDK 스크립트 태그 제거
-  - ❌ PayPal 성공/취소 페이지 라우트 제거
-  - ❌ 프론트엔드 PayPal 함수 제거:
-    - `processPayPalPayment()`
-    - `processTrialPayPal()`
-    - `showPayPalSubscriptionModal()`
-  - ❌ 결제 수단 선택 모달에서 PayPal 버튼 제거
-  - ❌ 무료 체험 모달에서 PayPal 버튼 제거
-- **결과**:
-  - ✅ 번들 크기 14 kB 감소 (467 → 453 kB)
-  - ✅ 코드 858줄 삭제
-  - ✅ Toss Payments만 사용 (국내 결제)
-  - ✅ 결제 플로우 단순화
+#### 1. ✅ 타이머 모드 & 시험 모드에 문법 피드백 추가
+- **추가된 기능**:
+  - ✅ **문법 점수 (Grammar Score)**: 0-100점 평가
+    - 95-100: 완벽한 문법, 오류 없음
+    - 85-94: 매우 좋음, 1-2개 사소한 오류
+    - 70-84: 좋음, 여러 문법 오류 (시제, 관사, 전치사 등)
+    - 50-69: 여러 문법 오류로 명확성 저하
+    - 50 미만: 심각한 문법 문제, 의미 파악 어려움
+  - ✅ **문법 피드백 (Grammar Feedback)**: 상세한 문법 분석 (한국어)
+  - ✅ **문법 오류 목록 (Grammar Issues)**: 2-3개 주요 문법 오류 + 교정 예시
+  - ✅ **평균 점수 계산**: (정확도 + 발음 + 유창성 + 문법) / 4
+  
+- **타이머 모드**:
+  - ✅ 4개 점수 원형 차트 표시: 정확도, 발음, 유창성, **문법** (보라색)
+  - ✅ 문법 분석 섹션: 상세 피드백 + 주요 문법 오류 리스트
+  - ✅ Premium 사용자만 문법 피드백 전체 조회 가능
+  - ✅ 무료 사용자는 블러 처리된 미리보기 제공
+  
+- **시험 모드**:
+  - ✅ 4개 평균 점수 원형 차트: 평균 정확도, 평균 발음, 평균 유창성, **평균 문법**
+  - ✅ 문제별 결과에 문법 점수 배지 추가 (정확도, 발음, 유창성, **문법**)
+  - ✅ 반응형 디자인: 모바일 2열, 데스크톱 4열 그리드
+  - ✅ OPIC 레벨 계산에 문법 점수 포함
+  
+- **백엔드 API** (`/api/pronunciation/analyze`):
+  - ✅ GPT-4o-mini 프롬프트에 문법 분석 추가
+  - ✅ 응답 JSON에 `grammar`, `grammarFeedback`, `grammarIssues` 필드 추가
+  - ✅ 캐싱 지원으로 동일 분석 재사용
 
-#### 2. ✅ Google Search Console 구조화 데이터 유지
-- **문제**: 
-  - Product 스키마에서 "review" 또는 "aggregateRating" 권장 속성 누락
-  - Google이 Product rich results를 표시하지 않음
-- **해결**: 
-  - `/pricing` 페이지 Product 스키마에 `aggregateRating` 추가
-  - `ratingValue: "4.8"`, `reviewCount: "127"`, `bestRating: "5"`, `worstRating: "1"`
-- **효과**: 
-  - Google 검색 결과에 별점 표시 예상
-  - Rich Results 표시로 클릭률(CTR) +15-25% 예상
-  - 신뢰도 향상 및 전환율 증가
+#### 2. ✅ 이전 업데이트: PayPal 통합 제거 (Commit `7086be9`)
+- ❌ PayPal 라우트, SDK, 함수, 버튼 모두 제거
+- ✅ Toss Payments만 사용 (국내 결제)
+- ✅ 번들 크기 467 kB → 453 kB (14 kB 감소)
+- ✅ 코드 858줄 삭제
 
 ---
 
