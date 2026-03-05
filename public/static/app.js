@@ -1709,8 +1709,8 @@ class WorVox {
                   console.warn('⚠️ Failed to save timer report:', error);
                 }
               }
-            }
-          }
+            } // ← End of if (analysisResponse.data.success)
+          } // ← End of if (quickResponse.data.success)
         } catch (error) {
           console.warn('⚠️ Failed to get AI analysis:', error);
           // Keep showing STT-based results
