@@ -10,6 +10,97 @@ function generateCacheKey(type: string, referenceText: string, userTranscription
   return crypto.createHash('md5').update(input).digest('hex');
 }
 
+// Helper function to calculate Levenshtein distance
+function levenshteinDistance(str1: string, str2: string): number {
+  const len1 = str1.length;
+  const len2 = str2.length;
+  const matrix: number[][] = [];
+
+  for (let i = 0; i <= len1; i++) {
+    matrix[i] = [i];
+  }
+
+  for (let j = 0; j <= len2; j++) {
+    matrix[0][j] = j;
+  }
+
+  for (let i = 1; i <= len1; i++) {
+    for (let j = 1; j <= len2; j++) {
+      const cost = str1[i - 1] === str2[j - 1] ? 0 : 1;
+      matrix[i][j] = Math.min(
+        matrix[i - 1][j] + 1,      // deletion
+        matrix[i][j - 1] + 1,      // insertion
+        matrix[i - 1][j - 1] + cost // substitution
+      );
+    }
+  }
+
+  return matrix[len1][len2];
+}
+
+// Helper function to calculate quick scores
+function calculateQuickScores(
+  referenceText: string,
+  userTranscription: string,
+  audioAnalysis?: { duration: number; wordCount: number; fluencyScore: number; pronunciationScore: number }
+) {
+  const refWords = referenceText.toLowerCase().trim().split(/\s+/);
+  const userWords = userTranscription.toLowerCase().trim().split(/\s+/);
+  
+  // 1. Accuracy Score (Levenshtein-based)
+  const distance = levenshteinDistance(
+    referenceText.toLowerCase().trim(),
+    userTranscription.toLowerCase().trim()
+  );
+  const maxLength = Math.max(referenceText.length, userTranscription.length);
+  const similarity = maxLength > 0 ? ((maxLength - distance) / maxLength) * 100 : 0;
+  const accuracy = Math.max(0, Math.min(100, Math.round(similarity)));
+  
+  // 2. Pronunciation Score (word matching + audio analysis)
+  const matchingWords = userWords.filter(word => refWords.includes(word)).length;
+  const wordMatchRate = refWords.length > 0 ? (matchingWords / refWords.length) * 100 : 0;
+  const pronunciation = audioAnalysis?.pronunciationScore || Math.round(wordMatchRate * 0.9);
+  
+  // 3. Fluency Score (use audio analysis or calculate from word count)
+  const fluency = audioAnalysis?.fluencyScore || (() => {
+    if (!audioAnalysis) return 70;
+    const wordsPerSecond = audioAnalysis.wordCount / audioAnalysis.duration;
+    // Optimal speech rate: 2-3 words/sec for English learners
+    if (wordsPerSecond >= 2 && wordsPerSecond <= 3) return 90;
+    if (wordsPerSecond >= 1.5 && wordsPerSecond <= 3.5) return 80;
+    if (wordsPerSecond >= 1 && wordsPerSecond <= 4) return 70;
+    return 60;
+  })();
+  
+  // 4. Grammar Score (basic rule check)
+  let grammarScore = 85; // Default good score
+  
+  // Check for common grammar issues
+  const userLower = userTranscription.toLowerCase();
+  
+  // Subject-verb agreement issues
+  if (/\b(he|she|it)\s+(go|do|have)\b/.test(userLower)) grammarScore -= 10;
+  
+  // Tense issues (simple detection)
+  if (/yesterday.*\b(go|come|see|do)\b/.test(userLower)) grammarScore -= 10;
+  if (/tomorrow.*\b(went|came|saw|did)\b/.test(userLower)) grammarScore -= 10;
+  
+  // Article issues (very basic)
+  if (/\bi am\s+(student|teacher|doctor)\b/.test(userLower)) grammarScore -= 5;
+  
+  // Missing articles before countable nouns (simplified check)
+  if (/\b(go to|at|in)\s+(school|university|hospital)\b/.test(userLower)) {
+    // These are actually correct (go to school, at school)
+  } else if (/\bhave\s+(car|house|dog|cat)\b/.test(userLower)) {
+    grammarScore -= 5;
+  }
+  
+  // Ensure score is within bounds
+  const grammar = Math.max(50, Math.min(100, grammarScore));
+
+  return { accuracy, pronunciation, fluency, grammar };
+}
+
 // Analyze pronunciation quality by comparing reference text with user transcription
 pronunciationAnalysis.post('/analyze', async (c) => {
   try {
@@ -502,6 +593,43 @@ KEY POINTS should explain in Korean what makes this answer better (e.g., "구체
     console.error('Improved answer generation error:', error);
     return c.json({ 
       error: 'Internal server error during answer generation',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
+// 🚀 NEW: Quick score calculation endpoint (returns in ~500ms)
+pronunciationAnalysis.post('/analyze-quick', async (c) => {
+  try {
+    const { 
+      referenceText, 
+      userTranscription, 
+      audioAnalysis 
+    } = await c.req.json();
+
+    if (!referenceText || !userTranscription) {
+      return c.json({ error: 'Reference text and user transcription are required' }, 400);
+    }
+
+    const startTime = Date.now();
+    
+    // Calculate quick scores using algorithms
+    const scores = calculateQuickScores(referenceText, userTranscription, audioAnalysis);
+    
+    console.log(`⚡ Quick scores calculated in ${Date.now() - startTime}ms`);
+
+    return c.json({
+      success: true,
+      ...scores,
+      cached: false,
+      quick: true,
+      processingTime: Date.now() - startTime
+    });
+
+  } catch (error) {
+    console.error('Quick analysis error:', error);
+    return c.json({ 
+      error: 'Failed to calculate quick scores',
       details: error instanceof Error ? error.message : 'Unknown error'
     }, 500);
   }
