@@ -7266,20 +7266,28 @@ Proceed to payment?
             <div class="bg-white border-b border-gray-200 px-2 md:px-6">
               <div class="flex gap-2 md:gap-4 overflow-x-auto scrollbar-hide">
                 <button onclick="worvox.showHistoryTab('ai', event)" 
-                  class="history-tab active px-2 py-2 text-xs font-semibold border-b-2 border-blue-600 text-blue-600 whitespace-nowrap">
-                  <i class="fas fa-comment text-sm"></i><span style="display:none !important;">AI 대화 </span> (${aiConversations.length})
+                  class="history-tab active px-3 md:px-4 py-2 text-xs md:text-sm font-semibold border-b-2 border-blue-600 text-blue-600 whitespace-nowrap">
+                  <i class="fas fa-comment text-sm md:text-base"></i>
+                  <span class="hidden sm:inline ml-1">AI 대화</span>
+                  <span class="ml-1">(${aiConversations.length})</span>
                 </button>
                 <button onclick="worvox.showHistoryTab('timer', event)" 
-                  class="history-tab px-2 py-2 text-xs font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap">
-                  <i class="fas fa-stopwatch text-sm"></i><span style="display:none !important;">타이머 모드 </span> (${timerSessions.length})
+                  class="history-tab px-3 md:px-4 py-2 text-xs md:text-sm font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap">
+                  <i class="fas fa-stopwatch text-sm md:text-base"></i>
+                  <span class="hidden sm:inline ml-1">타이머 모드</span>
+                  <span class="ml-1">(${timerSessions.length})</span>
                 </button>
                 <button onclick="worvox.showHistoryTab('scenario', event)" 
-                  class="history-tab px-2 py-2 text-xs font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap">
-                  <i class="fas fa-film text-sm"></i><span style="display:none !important;">시나리오 모드 </span> (${scenarioSessions.length})
+                  class="history-tab px-3 md:px-4 py-2 text-xs md:text-sm font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap">
+                  <i class="fas fa-film text-sm md:text-base"></i>
+                  <span class="hidden sm:inline ml-1">시나리오 모드</span>
+                  <span class="ml-1">(${scenarioSessions.length})</span>
                 </button>
                 <button onclick="worvox.showHistoryTab('exam', event)" 
-                  class="history-tab px-2 py-2 text-xs font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap">
-                  <i class="fas fa-graduation-cap text-sm"></i><span style="display:none !important;">시험 모드 </span> (${examSessions.length})
+                  class="history-tab px-3 md:px-4 py-2 text-xs md:text-sm font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-800 whitespace-nowrap">
+                  <i class="fas fa-graduation-cap text-sm md:text-base"></i>
+                  <span class="hidden sm:inline ml-1">시험 모드</span>
+                  <span class="ml-1">(${examSessions.length})</span>
                 </button>
               </div>
             </div>
