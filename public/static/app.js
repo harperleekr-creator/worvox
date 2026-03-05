@@ -10322,7 +10322,7 @@ Proceed to payment?
                     </div>
                     <div class="bg-white rounded-lg p-4 shadow-sm">
                       <h4 class="font-semibold text-gray-800 mb-2">❓ 환불 정책은 어떻게 되나요?</h4>
-                      <p class="text-sm text-gray-600">Core 및 Business 플랜은 2주(14일) 무료 체험 기간이 제공됩니다. 무료 체험 기간 내 취소 시 요금이 청구되지 않습니다. 자세한 내용은 환불정책을 참조해주세요.</p>
+                      <p class="text-sm text-gray-600">Core 및 Premium 플랜은 2주(14일) 무료 체험 기간이 제공됩니다. 무료 체험 기간 내 취소 시 요금이 청구되지 않습니다. 자세한 내용은 환불정책을 참조해주세요.</p>
                     </div>
                     <div class="bg-white rounded-lg p-4 shadow-sm">
                       <h4 class="font-semibold text-gray-800 mb-2">❓ B2B 플랜은 어떻게 신청하나요?</h4>
@@ -11831,11 +11831,11 @@ Proceed to payment?
                   </section>
                   
                   <section>
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">1. Core/Business 플랜 환불</h2>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">1. Core/Premium 플랜 환불</h2>
                     
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">가. 2주 무료 체험 기간</h3>
                     <ul class="list-disc pl-6 space-y-2 leading-relaxed mb-4">
-                      <li>Core 및 Business 플랜 가입 시 <strong>2주(14일) 무료 체험</strong>이 제공됩니다.</li>
+                      <li>Core 및 Premium 플랜 가입 시 <strong>2주(14일) 무료 체험</strong>이 제공됩니다.</li>
                       <li>무료 체험 기간 내 취소 시 <strong>요금이 청구되지 않습니다</strong>.</li>
                       <li>무료 체험 기간 종료 후 자동으로 정기결제가 시작됩니다.</li>
                       <li>체험 기간 중 카드 등록이 필요하며, 취소하지 않으면 체험 종료 시 자동 결제됩니다.</li>
