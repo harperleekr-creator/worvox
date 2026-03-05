@@ -1677,36 +1677,37 @@ class WorVox {
                 spokenWords,
                 isLoading: false
               });
-            
-            // Save report with AI analysis
-            if (sessionId && this.currentUser) {
-              try {
-                const reportData = {
-                  originalSentence,
-                  transcription,
-                  timeLimit,
-                  accuracyScore,
-                  pronunciationScore,
-                  fluencyScore,
-                  grammarScore,
-                  averageScore: finalAverageScore,
-                  rating,
-                  feedback,
-                  grammarFeedback,
-                  grammarIssues,
-                  isPremiumAnalysis,
-                  completedAt: new Date().toISOString()
-                };
-                
-                await axios.post('/api/mode-reports/save', {
-                  sessionId: sessionId,
-                  userId: this.currentUser.id,
-                  modeType: 'timer',
-                  reportData: reportData
-                });
-                console.log('✅ Timer report saved with AI analysis');
-              } catch (error) {
-                console.warn('⚠️ Failed to save timer report:', error);
+              
+              // Save report with AI analysis
+              if (sessionId && this.currentUser) {
+                try {
+                  const reportData = {
+                    originalSentence,
+                    transcription,
+                    timeLimit,
+                    accuracyScore,
+                    pronunciationScore,
+                    fluencyScore,
+                    grammarScore: finalGrammarScore,
+                    averageScore: finalAverageScore,
+                    rating,
+                    feedback,
+                    grammarFeedback,
+                    grammarIssues,
+                    isPremiumAnalysis,
+                    completedAt: new Date().toISOString()
+                  };
+                  
+                  await axios.post('/api/mode-reports/save', {
+                    sessionId: sessionId,
+                    userId: this.currentUser.id,
+                    modeType: 'timer',
+                    reportData: reportData
+                  });
+                  console.log('✅ Timer report saved with AI analysis');
+                } catch (error) {
+                  console.warn('⚠️ Failed to save timer report:', error);
+                }
               }
             }
           }
