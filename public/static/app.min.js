@@ -12898,19 +12898,6 @@ Proceed to payment?
           <i class="fas fa-chevron-right opacity-70 group-hover:opacity-100 transition"></i>
         </button>
 
-        <!-- PayPal (International) -->
-        <button onclick="worvox.processTrialPayPal('${plan}')" 
-                class="w-full mb-6 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-gray-900 font-bold py-4 px-6 rounded-xl transition transform hover:scale-105 flex items-center justify-between group">
-          <div class="flex items-center">
-            <i class="fab fa-paypal text-2xl mr-3"></i>
-            <div class="text-left">
-              <div class="text-base font-bold">PayPal</div>
-              <div class="text-xs opacity-90">해외 카드 / PayPal 계정</div>
-            </div>
-          </div>
-          <i class="fas fa-chevron-right opacity-70 group-hover:opacity-100 transition"></i>
-        </button>
-
         <button onclick="this.closest('[class*=fixed]').remove()" 
                 class="w-full text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium py-3 transition">
           취소
@@ -12966,123 +12953,6 @@ Proceed to payment?
     }
   }
 
-  // Process PayPal free trial (Subscription API)
-  async processTrialPayPal(plan) {
-    // Close modal
-    document.querySelector('[class*="fixed inset-0"]')?.remove();
-
-    try {
-      console.log(`🎁 Starting PayPal subscription for ${plan}`);
-
-      // Determine plan ID based on plan type
-      const planId = plan === 'core' 
-        ? 'P-3BU5778176960543ANGUTIGY'  // Core plan ID (2 weeks free trial)
-        : 'P-5F162185XH125600YNGUTD4Q'; // Premium plan ID (2 weeks free trial)
-
-      const planName = plan === 'core' ? 'Core' : 'Premium';
-
-      // Show PayPal subscription modal
-      this.showPayPalSubscriptionModal(plan, planId, planName);
-
-    } catch (error) {
-      console.error('PayPal subscription error:', error);
-      alert('PayPal 구독 시작 중 오류가 발생했습니다: ' + (error.message || ''));
-    }
-  }
-
-  // Show PayPal subscription button modal
-  showPayPalSubscriptionModal(plan, planId, planName) {
-    const modal = document.createElement('div');
-    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] backdrop-blur-sm';
-    modal.id = 'paypal-subscription-modal';
-    modal.innerHTML = `
-      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full mx-4 p-8">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          <i class="fab fa-paypal mr-2 text-yellow-500"></i>PayPal 구독
-        </h2>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
-          ${planName} 플랜 - 2주 무료 체험 후 자동 결제
-        </p>
-
-        <!-- PayPal subscription button container -->
-        <div id="paypal-subscription-button-${plan}" class="mb-4"></div>
-
-        <button onclick="this.closest('#paypal-subscription-modal').remove()" 
-                class="w-full text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white font-medium py-3 transition">
-          취소
-        </button>
-      </div>
-    `;
-    
-    document.body.appendChild(modal);
-
-    // Render PayPal subscription button
-    paypal.Buttons({
-      style: {
-        shape: 'rect',
-        color: 'gold',
-        layout: 'vertical',
-        label: 'subscribe'
-      },
-      createSubscription: (data, actions) => {
-        return actions.subscription.create({
-          plan_id: planId
-        });
-      },
-      onApprove: async (data, actions) => {
-        console.log('PayPal subscription approved:', data.subscriptionID);
-        
-        // Close modal
-        document.getElementById('paypal-subscription-modal')?.remove();
-
-        // Show success message and activate subscription
-        try {
-          // Call backend to activate subscription
-          const response = await axios.post('/api/paypal/activate-subscription', {
-            subscriptionId: data.subscriptionID,
-            userId: this.currentUser.id,
-            plan: plan
-          });
-
-          if (response.data.success) {
-            // Show success modal
-            const successModal = document.createElement('div');
-            successModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]';
-            successModal.innerHTML = `
-              <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md text-center">
-                <div class="text-6xl mb-4">🎉</div>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">구독 완료!</h2>
-                <p class="text-gray-600 dark:text-gray-400 mb-6">
-                  ${planName} 플랜이 활성화되었습니다.<br>
-                  <strong>2주간 무료</strong>로 모든 기능을 사용하세요!
-                </p>
-                <button onclick="window.location.reload()" 
-                        class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-900 px-8 py-3 rounded-xl font-bold hover:from-yellow-500 hover:to-yellow-600 transition">
-                  시작하기
-                </button>
-              </div>
-            `;
-            document.body.appendChild(successModal);
-          } else {
-            throw new Error(response.data.error || 'Subscription activation failed');
-          }
-        } catch (error) {
-          console.error('Subscription activation error:', error);
-          alert('구독 활성화 중 오류가 발생했습니다: ' + (error.response?.data?.error || error.message));
-        }
-      },
-      onError: (err) => {
-        console.error('PayPal subscription error:', err);
-        alert('PayPal 구독 중 오류가 발생했습니다.');
-        document.getElementById('paypal-subscription-modal')?.remove();
-      },
-      onCancel: (data) => {
-        console.log('PayPal subscription cancelled');
-        document.getElementById('paypal-subscription-modal')?.remove();
-      }
-    }).render(`#paypal-subscription-button-${plan}`);
-  }
-
   async selectPlan(planName) {
     if (!this.currentUser) {
       alert('로그인이 필요합니다.');
@@ -13128,19 +12998,6 @@ Proceed to payment?
             <div class="text-left">
               <div class="text-base font-bold">Toss Payments</div>
               <div class="text-xs opacity-90">국내 카드 결제 (신용/체크)</div>
-            </div>
-          </div>
-          <i class="fas fa-chevron-right opacity-70 group-hover:opacity-100 transition"></i>
-        </button>
-
-        <!-- PayPal (International) -->
-        <button onclick="worvox.processPayPalPayment('${planName}', ${amount}, '${period}')" 
-                class="w-full mb-6 bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-gray-900 font-bold py-4 px-6 rounded-xl transition transform hover:scale-105 flex items-center justify-between group">
-          <div class="flex items-center">
-            <i class="fab fa-paypal text-2xl mr-3"></i>
-            <div class="text-left">
-              <div class="text-base font-bold">PayPal</div>
-              <div class="text-xs opacity-90">해외 카드 / PayPal 계정</div>
             </div>
           </div>
           <i class="fas fa-chevron-right opacity-70 group-hover:opacity-100 transition"></i>
@@ -13201,31 +13058,6 @@ Proceed to payment?
     } catch (error) {
       console.error('Toss payment error:', error);
       alert('Toss 결제 시작 중 오류가 발생했습니다.\n' + (error.message || ''));
-    }
-  }
-
-  // Process PayPal Payment
-  // Process PayPal Payment (Subscription for direct purchase)
-  async processPayPalPayment(planName, amount, period) {
-    // Close modal
-    document.querySelector('[class*="fixed inset-0"]')?.remove();
-
-    try {
-      console.log(`💳 Starting PayPal subscription for ${planName} (${period})`);
-
-      // For direct purchase, we'll use the same subscription as free trial
-      // PayPal subscriptions always include the 2-week free trial period
-      const plan = planName.toLowerCase();
-      const planId = plan === 'core' 
-        ? 'P-3BU5778176960543ANGUTIGY'  // Core plan ID (2 weeks free trial)
-        : 'P-5F162185XH125600YNGUTD4Q'; // Premium plan ID (2 weeks free trial)
-
-      // Show PayPal subscription modal
-      this.showPayPalSubscriptionModal(plan, planId, planName);
-
-    } catch (error) {
-      console.error('PayPal payment error:', error);
-      alert('PayPal 결제 시작 중 오류가 발생했습니다.\n' + (error.message || ''));
     }
   }
 

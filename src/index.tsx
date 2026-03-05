@@ -17,7 +17,6 @@ import gamification from './routes/gamification';
 import usage from './routes/usage';
 import analysis from './routes/analysis';
 import payments from './routes/payments';
-import paypalPayments from './routes/paypal-payments';
 import admin from './routes/admin';
 import attendance from './routes/attendance';
 import pronunciationAnalysis from './routes/pronunciation-analysis';
@@ -152,7 +151,6 @@ app.route('/api/gamification', gamification);
 app.route('/api/usage', usage);
 app.route('/api/analysis', analysis);
 app.route('/api/payments', payments);
-app.route('/api/paypal', paypalPayments);
 app.route('/api/admin', admin);
 app.route('/api/attendance', attendance);
 app.route('/api/pronunciation', pronunciationAnalysis);
@@ -308,173 +306,6 @@ app.get('/payment/fail', (c) => {
               message: '${message}'
             }).catch(err => console.error('Failed to record payment failure:', err));
           }
-        </script>
-    </body>
-    </html>
-  `);
-});
-
-// PayPal Payment Success
-app.get('/payment/paypal/success', (c) => {
-  const token = c.req.query('token'); // PayPal order ID
-  const orderId = c.req.query('orderId'); // Our internal order ID
-  
-  return c.html(`
-    <!DOCTYPE html>
-    <html lang="ko">
-    <head>
-        <!-- Google tag (gtag.js) - MUST BE FIRST -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-1W0YMPPVH7"></script>
-        <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-1W0YMPPVH7');
-        </script>
-        
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>결제 처리 중 - WorVox</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-    </head>
-    <body class="bg-gray-50 dark:bg-gray-900">
-        <div class="min-h-screen flex items-center justify-center p-4">
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
-                <div class="text-6xl mb-4">💳</div>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">PayPal 결제 처리 중...</h1>
-                <p class="text-gray-600 dark:text-gray-400 mb-6">결제를 완료하는 중입니다. 잠시만 기다려주세요.</p>
-                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto"></div>
-            </div>
-        </div>
-        
-        <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
-        <script>
-          async function capturePayPalPayment() {
-            try {
-              const urlParams = new URLSearchParams(window.location.search);
-              const paypalOrderId = urlParams.get('token');
-              const internalOrderId = urlParams.get('orderId') || sessionStorage.getItem('paypalInternalOrderId');
-              
-              if (!paypalOrderId || !internalOrderId) {
-                throw new Error('Missing order information');
-              }
-
-              // Capture payment
-              const response = await axios.post('/api/paypal/capture-order', {
-                paypalOrderId,
-                internalOrderId
-              });
-              
-              if (response.data.success) {
-                // Clear session storage
-                sessionStorage.removeItem('paypalInternalOrderId');
-                sessionStorage.removeItem('paypalOrderId');
-
-                document.body.innerHTML = \`
-                  <div class="min-h-screen flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
-                      <div class="text-6xl mb-4">🎉</div>
-                      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">PayPal 결제 완료!</h1>
-                      <p class="text-gray-600 dark:text-gray-400 mb-6">결제가 성공적으로 완료되었습니다.<br>프리미엄 기능을 이용하실 수 있습니다.</p>
-                      <button 
-                        onclick="window.location.href='/app'"
-                        class="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-gray-900 px-8 py-3 rounded-xl font-bold transition transform hover:scale-105"
-                      >
-                        <i class="fas fa-rocket mr-2"></i>학습 시작하기
-                      </button>
-                    </div>
-                  </div>
-                \`;
-              } else {
-                throw new Error('Payment capture failed');
-              }
-            } catch (error) {
-              console.error('PayPal capture error:', error);
-              document.body.innerHTML = \`
-                <div class="min-h-screen flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-900">
-                  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
-                    <div class="text-6xl mb-4">❌</div>
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">결제 실패</h1>
-                    <p class="text-gray-600 dark:text-gray-400 mb-6">\${error.message || 'PayPal 결제 처리 중 오류가 발생했습니다.'}</p>
-                    <button 
-                      onclick="window.location.href='/pricing'"
-                      class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
-                    >
-                      요금제 페이지로 돌아가기
-                    </button>
-                  </div>
-                </div>
-              \`;
-            }
-          }
-          
-          capturePayPalPayment();
-        </script>
-    </body>
-    </html>
-  `);
-});
-
-// PayPal Payment Cancelled
-app.get('/payment/paypal/cancel', (c) => {
-  const orderId = c.req.query('orderId');
-  
-  return c.html(`
-    <!DOCTYPE html>
-    <html lang="ko">
-    <head>
-        <!-- Google tag (gtag.js) - MUST BE FIRST -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-1W0YMPPVH7"></script>
-        <script>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-1W0YMPPVH7');
-        </script>
-        
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>결제 취소 - WorVox</title>
-        <script src="https://cdn.tailwindcss.com"></script>
-    </head>
-    <body class="bg-gray-50 dark:bg-gray-900">
-        <div class="min-h-screen flex items-center justify-center p-4">
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
-                <div class="text-6xl mb-4">🚫</div>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">PayPal 결제 취소</h1>
-                <p class="text-gray-600 dark:text-gray-400 mb-6">결제가 취소되었습니다.<br>언제든 다시 시도하실 수 있습니다.</p>
-                <div class="flex gap-3 justify-center">
-                  <button 
-                    onclick="window.location.href='/pricing'"
-                    class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:opacity-90 transition"
-                  >
-                    요금제 보기
-                  </button>
-                  <button 
-                    onclick="window.location.href='/'"
-                    class="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition"
-                  >
-                    홈으로
-                  </button>
-                </div>
-            </div>
-        </div>
-        
-        <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
-        <script>
-          // Record cancellation
-          const orderId = '${orderId}';
-          if (orderId) {
-            axios.post('/api/payments/fail', {
-              orderId,
-              code: 'USER_CANCELLED_PAYPAL',
-              message: 'User cancelled PayPal payment'
-            }).catch(err => console.error('Failed to record cancellation:', err));
-          }
-          
-          // Clear session storage
-          sessionStorage.removeItem('paypalInternalOrderId');
-          sessionStorage.removeItem('paypalOrderId');
         </script>
     </body>
     </html>
@@ -2909,7 +2740,7 @@ app.get('/api/health', (c) => {
 // App page - Main application for logged users
 app.get('/app', (c) => {
   // Force COMPLETE cache busting - change this number to force refresh
-  const FORCE_VERSION = '20260305-paypal-subscription-v3';
+  const FORCE_VERSION = '20260305-remove-paypal';
   const version = `${FORCE_VERSION}-${Date.now()}`;
   
   return c.html(`
@@ -2968,8 +2799,6 @@ app.get('/app', (c) => {
         
         <!-- Toss Payments SDK -->
         <script src="https://js.tosspayments.com/v2/standard"></script>
-        <!-- PayPal SDK (Live mode with Subscription support) -->
-        <script src="https://www.paypal.com/sdk/js?client-id=AQPiRlOqTER1n4lmSfg_yGhUDuQL6bjPHaN9voDs8f_n09T9hacn-kZJcREWbWMTyuK1HCitjMOekCD3&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
         <!-- Google Sign-In -->
         <script src="https://accounts.google.com/gsi/client" async defer></script>
         <meta name="google-signin-client_id" content="506018364729-ichplnfnqlk2hmh1bhblepm0un44ltdr.apps.googleusercontent.com">
@@ -3146,8 +2975,6 @@ app.get('/', (c) => {
         
         <!-- Toss Payments SDK -->
         <script src="https://js.tosspayments.com/v2/standard"></script>
-        <!-- PayPal SDK (Live mode with Subscription support) -->
-        <script src="https://www.paypal.com/sdk/js?client-id=AQPiRlOqTER1n4lmSfg_yGhUDuQL6bjPHaN9voDs8f_n09T9hacn-kZJcREWbWMTyuK1HCitjMOekCD3&vault=true&intent=subscription" data-sdk-integration-source="button-factory"></script>
         <!-- Google Sign-In -->
         <script src="https://accounts.google.com/gsi/client" async defer></script>
         <meta name="google-signin-client_id" content="506018364729-ichplnfnqlk2hmh1bhblepm0un44ltdr.apps.googleusercontent.com">
