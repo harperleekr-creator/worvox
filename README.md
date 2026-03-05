@@ -49,14 +49,20 @@
 - **적용 범위**: Beginner, Intermediate, Advanced 모든 레벨
 - **효과**: OPIC 실제 시험 구조와 동일, 학습 효율 +40%
 
-#### 6. ✅ 다크모드 기능 추가 (`public/static/app.js` 라인 5523-5526, 746-763)
-- **위치**: 대시보드 오른쪽 위, "Upgrade" 버튼 왼쪽
+#### 6. ✅ 다크모드 기능 추가 (데스크톱 + 모바일) (`public/static/app.js`)
+- **위치**: 
+  - **데스크톱**: 대시보드 오른쪽 위, "Upgrade" 버튼 왼쪽 (라인 5523-5526)
+  - **모바일**: 헤더 오른쪽 위, 크라운 버튼 왼쪽 (라인 5516-5520, 791-800)
 - **버튼**: 달 🌙 아이콘 (라이트 모드) ↔️ 태양 ☀️ 아이콘 (다크 모드)
 - **저장**: `localStorage`에 `worvox_dark_mode` 키로 저장
-- **적용 범위**: `/app` 페이지 전체 (TailwindCSS `dark:` 클래스 활용)
+- **적용 범위**: 
+  - 15개 메인 컨테이너 (`bg-gray-50 dark:bg-gray-900`)
+  - 헤더/카드 (`bg-white dark:bg-gray-800`)
+  - 텍스트 (`text-gray-800 dark:text-gray-200`)
+  - 테두리 (`border-gray-200 dark:border-gray-700`)
 - **자동 로드**: 페이지 로드 시 `initDarkMode()` 호출하여 저장된 설정 복원
-- **Tailwind 설정**: 모든 HTML 템플릿에 `darkMode: 'class'` 추가
-- **검증**: ✅ `onclick="worvox.toggleDarkMode()"` 및 `#darkModeIcon` 적용 확인
+- **알림**: 토글 시 "🌙 다크모드가 활성화되었습니다!" 알림 표시
+- **검증**: ✅ 데스크톱 + 모바일 모두 `toggleDarkMode()` 작동 확인
 
 ---
 
