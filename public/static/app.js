@@ -14328,6 +14328,33 @@ Proceed to payment?
       if (response.data.success) {
         const { user, sessions, payments, lastPayment, loginSessions, usageSummary } = response.data;
         
+        // Fetch Live Speaking credits
+        let liveSpeakingCredits = { remaining: 0, total: 0, used: 0, purchases: [] };
+        try {
+          const creditsResponse = await axios.get(`/api/hiing/credits/${userId}`);
+          if (creditsResponse.data.success) {
+            liveSpeakingCredits = {
+              remaining: creditsResponse.data.remaining_credits || 0,
+              total: creditsResponse.data.total_credits || 0,
+              used: creditsResponse.data.used_credits || 0,
+              purchases: creditsResponse.data.recent_purchase ? [creditsResponse.data.recent_purchase] : []
+            };
+          }
+        } catch (err) {
+          console.error('Failed to load live speaking credits:', err);
+        }
+
+        // Fetch Live Speaking sessions
+        let liveSpeakingSessions = [];
+        try {
+          const sessionsResponse = await axios.get(`/api/hiing/sessions/${userId}`);
+          if (sessionsResponse.data.success) {
+            liveSpeakingSessions = sessionsResponse.data.sessions || [];
+          }
+        } catch (err) {
+          console.error('Failed to load live speaking sessions:', err);
+        }
+        
         // Format last payment date
         const lastPaymentDate = lastPayment 
           ? new Date(lastPayment.confirmed_at).toLocaleDateString('ko-KR') 
@@ -14345,23 +14372,23 @@ Proceed to payment?
         const modal = document.createElement('div');
         modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto';
         modal.innerHTML = `
-          <div class="bg-white rounded-lg p-6 max-w-4xl w-full my-8">
-            <div class="flex justify-between items-start mb-6">
+          <div class="bg-white rounded-lg p-6 max-w-5xl w-full my-8 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-start mb-6 sticky top-0 bg-white pb-4 border-b z-10">
               <h3 class="text-2xl font-semibold">${user.username} 상세 정보</h3>
-              <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700">
-                <i class="fas fa-times text-xl"></i>
+              <button onclick="this.closest('.fixed').remove()" class="text-gray-500 hover:text-gray-700 text-2xl leading-none">
+                <i class="fas fa-times"></i>
               </button>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
               <div>
                 <h4 class="font-semibold mb-3 text-lg border-b pb-2">📋 기본 정보</h4>
                 <div class="space-y-2 text-sm">
                   <p><strong>이메일:</strong> ${user.email || '-'}</p>
                   <p><strong>레벨:</strong> ${user.level}</p>
                   <p><strong>플랜:</strong> ${this.getPlanBadge(user.plan || 'free')}</p>
-                  <p><strong>가입일:</strong> ${new Date(user.created_at).toLocaleString('ko-KR')}</p>
-                  <p><strong>마지막 로그인:</strong> ${user.last_login_at ? new Date(user.last_login_at).toLocaleString('ko-KR') : '-'}</p>
+                  <p><strong>가입일:</strong> ${new Date(user.created_at).toLocaleDateString('ko-KR')}</p>
+                  <p><strong>마지막 로그인:</strong> ${user.last_login_at ? new Date(user.last_login_at).toLocaleDateString('ko-KR') : '-'}</p>
                 </div>
               </div>
               <div>
@@ -14374,11 +14401,21 @@ Proceed to payment?
                   <p><strong>총 결제 금액:</strong> ₩${payments.filter(p => p.status === 'completed').reduce((sum, p) => sum + p.amount, 0).toLocaleString()}</p>
                 </div>
               </div>
+              <div>
+                <h4 class="font-semibold mb-3 text-lg border-b pb-2">📞 1:1 전화영어</h4>
+                <div class="space-y-2 text-sm">
+                  <p><strong>남은 수업권:</strong> <span class="text-blue-600 font-bold">${liveSpeakingCredits.remaining}회</span></p>
+                  <p><strong>총 구매:</strong> ${liveSpeakingCredits.total}회</p>
+                  <p><strong>사용 완료:</strong> ${liveSpeakingCredits.used}회</p>
+                  <p><strong>예약 수업:</strong> ${liveSpeakingSessions.filter(s => s.status === 'scheduled').length}회</p>
+                  <p><strong>완료 수업:</strong> ${liveSpeakingSessions.filter(s => s.status === 'completed').length}회</p>
+                </div>
+              </div>
             </div>
 
             <div class="mb-6">
               <h4 class="font-semibold mb-3 text-lg border-b pb-2">📊 기능 사용 통계</h4>
-              <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
                 ${Object.entries(featureNames).map(([key, name]) => `
                   <div class="bg-blue-50 rounded-lg p-3 text-center">
                     <div class="text-2xl font-bold text-blue-600">${usageSummary[key] || 0}</div>
@@ -14410,9 +14447,29 @@ Proceed to payment?
               </div>
             </div>
 
+            ${liveSpeakingSessions.length > 0 ? `
+            <div class="mb-6">
+              <h4 class="font-semibold mb-3 text-lg border-b pb-2">📞 1:1 전화영어 예약 내역</h4>
+              <div class="max-h-64 overflow-y-auto">
+                ${liveSpeakingSessions.slice(0, 10).map(s => `
+                  <div class="border-b py-2 hover:bg-gray-50 flex justify-between items-center">
+                    <div class="flex-1">
+                      <p class="text-sm font-medium">${s.teacher_name || 'Unknown Teacher'}</p>
+                      <p class="text-xs text-gray-500">${new Date(s.scheduled_at).toLocaleString('ko-KR')} - ${s.duration}분</p>
+                      ${s.student_phone ? `<p class="text-xs text-gray-400">📱 ${s.student_phone}</p>` : ''}
+                    </div>
+                    <span class="px-2 py-1 text-xs rounded ${s.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}">
+                      ${s.status === 'completed' ? '✅ 완료' : '⏰ 예약'}
+                    </span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+            ` : ''}
+
             <div class="mb-6">
               <h4 class="font-semibold mb-3 text-lg border-b pb-2">🕒 최근 세션 (최대 10개)</h4>
-              <div class="max-h-48 overflow-y-auto">
+              <div class="max-h-64 overflow-y-auto">
                 ${sessions.slice(0, 10).map(s => `
                   <div class="border-b py-2 hover:bg-gray-50">
                     <p class="text-sm font-medium">${s.topic_name || 'Unknown'}</p>
@@ -14424,7 +14481,7 @@ Proceed to payment?
 
             <div>
               <h4 class="font-semibold mb-3 text-lg border-b pb-2">💰 결제 내역</h4>
-              <div class="max-h-48 overflow-y-auto">
+              <div class="max-h-64 overflow-y-auto">
                 ${payments.map(p => `
                   <div class="border-b py-2 flex justify-between hover:bg-gray-50">
                     <div>
