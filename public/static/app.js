@@ -5066,18 +5066,18 @@ class WorVox {
             <div class="px-6 pb-6">
               <!-- Title/Subtitle -->
               <div class="text-center mb-3">
-                <p class="text-sm text-gray-700 font-semibold whitespace-pre-line">${teacher.title || teacher.specialty.substring(0, 50)}</p>
+                <p class="text-sm text-gray-700 font-semibold" style="white-space: pre-line;">${teacher.title || teacher.specialty.substring(0, 50)}</p>
               </div>
               
               <!-- Main specialty/experience (scrollable if long) -->
               <div class="mb-4 max-h-24 overflow-y-auto">
-                <p class="text-xs text-gray-600 whitespace-pre-line leading-relaxed">${teacher.specialty}</p>
+                <p class="text-xs text-gray-600 leading-relaxed" style="white-space: pre-line;">${teacher.specialty}</p>
               </div>
               
               <!-- Bio/Message box (black background like screenshot) -->
               ${teacher.bio ? `
                 <div class="bg-black rounded-lg p-3 mb-4">
-                  <p class="text-xs text-yellow-300 whitespace-pre-line leading-relaxed">${teacher.bio}</p>
+                  <p class="text-xs text-yellow-300 leading-relaxed" style="white-space: pre-line;">${teacher.bio}</p>
                 </div>
               ` : ''}
               
