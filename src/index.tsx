@@ -2905,11 +2905,11 @@ app.get('/', (c) => {
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <title>WorVox - AI 영어 학습 플랫폼 | 실시간 발음 교정 & 맞춤형 학습</title>
+        <title>WorVox - 실전 영어회화 플랫폼 | AI 발음 분석 & 1:1 전화영어</title>
         
         <!-- SEO Meta Tags -->
-        <meta name="description" content="WorVox는 AI 기반 영어 학습 플랫폼으로 실시간 발음 교정, ElevenLabs TTS 음성 합성, GPT-4 기반 맞춤형 대화 연습을 제공합니다. 타이머 모드로 즉각적인 발음 피드백, 시나리오 모드로 실전 회화 연습, OPIC 스타일 시험 모드로 실력 평가까지. 2주 무료 체험으로 AI 영어 코치와 함께 시작하세요.">
-        <meta name="keywords" content="영어 학습, AI 영어, 발음 교정, 영어 회화, OPIC, OPIC 준비, 영어 스피킹, 영어 공부, 온라인 영어, AI 튜터, AI 영어 코치, 실시간 발음 분석, 영어 말하기, TTS, STT, 음성 인식, 영어 시험, 발음 연습, 유창성 향상, 영어 문법, 어휘 학습">
+        <meta name="description" content="WorVox는 AI 기반 발음 분석과 원어민급 강사진의 1:1 전화영어를 제공하는 실전 영어회화 플랫폼입니다. 실시간 발음 교정, 맞춤형 피드백, 6명의 전문 강사진. 무료 체험으로 시작하세요!">
+        <meta name="keywords" content="영어회화, 전화영어, 1:1 영어, AI 발음 분석, 영어 스피킹, 실전 영어, 영어 회화 학습, 원어민 영어, 발음 교정, 영어 공부, 온라인 영어, 영어 튜터, 영어 과외, 실시간 발음 분석, 영어 말하기 연습">
         <meta name="author" content="WorVox Team">
         <meta name="robots" content="index, follow">
         <meta name="language" content="Korean">
@@ -2919,20 +2919,20 @@ app.get('/', (c) => {
         <!-- Open Graph (Facebook, LinkedIn) -->
         <meta property="og:type" content="website">
         <meta property="og:url" content="https://worvox.com">
-        <meta property="og:title" content="WorVox - AI 영어 학습 플랫폼 | 실시간 발음 교정 & 맞춤형 학습">
-        <meta property="og:description" content="AI 기반 실시간 발음 교정과 맞춤형 학습으로 영어 실력 향상. 타이머/시나리오/OPIC 시험 모드 제공. 월 19,000원부터, 2주 무료 체험.">
-        <meta property="og:image" content="https://worvox.com/logo.png">
-        <meta property="og:image:width" content="1200">
-        <meta property="og:image:height" content="630">
-        <meta property="og:site_name" content="WorVox - AI 영어 학습">
+        <meta property="og:title" content="WorVox - 실전 영어회화 플랫폼 | AI 발음 분석 & 1:1 전화영어">
+        <meta property="og:description" content="AI 기반 실시간 발음 분석과 원어민급 강사진의 1:1 전화영어. 맞춤형 피드백으로 영어 실력 향상. 무료 체험 시작하세요!">
+        <meta property="og:image" content="https://worvox.com/og-image.jpg">
+        <meta property="og:image:width" content="2752">
+        <meta property="og:image:height" content="1536">
+        <meta property="og:site_name" content="WorVox - 실전 영어회화">
         <meta property="og:locale" content="ko_KR">
         
         <!-- Twitter Card -->
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:url" content="https://worvox.com">
-        <meta name="twitter:title" content="WorVox - AI 영어 학습 플랫폼">
-        <meta name="twitter:description" content="AI 기반 실시간 발음 교정과 맞춤형 학습으로 영어 실력 향상. 월 19,000원, 2주 무료 체험">
-        <meta name="twitter:image" content="https://worvox.com/logo.png">
+        <meta name="twitter:title" content="WorVox - 실전 영어회화 플랫폼">
+        <meta name="twitter:description" content="AI 발음 분석 + 1:1 전화영어로 영어 실력 향상. 무료 체험 가능!">
+        <meta name="twitter:image" content="https://worvox.com/og-image.jpg">
         
         <!-- JSON-LD Structured Data for Google -->
         <script type="application/ld+json">
