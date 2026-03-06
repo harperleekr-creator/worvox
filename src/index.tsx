@@ -57,6 +57,10 @@ app.use('/favicon-*', serveStatic({ root: './' }));
 app.use('/apple-touch-icon.png', serveStatic({ root: './' }));
 app.use('/android-chrome-*', serveStatic({ root: './' }));
 
+// Serve Open Graph image and logo
+app.use('/og-image.jpg', serveStatic({ root: './' }));
+app.use('/logo.png', serveStatic({ root: './' }));
+
 // Naver Webmaster verification file
 app.get('/naver2b8cc0248abdd5b43e205955b8ef7247.html', async (c) => {
   return c.text('naver-site-verification: naver2b8cc0248abdd5b43e205955b8ef7247.html', 200, {
