@@ -4587,10 +4587,10 @@ class WorVox {
                 <!-- My Lesson Credits -->
                 <div id="liveSpeakingCredits" class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 md:p-8 text-white mb-6 md:mb-8">
                   <div class="flex items-center justify-between">
-                    <div>
+                    <div class="flex-1">
                       <h2 class="text-xl md:text-2xl font-bold mb-2">내 수업권</h2>
                       <p class="text-emerald-100 mb-4">1:1 프리미엄 전화영어</p>
-                      <div class="flex items-center gap-4">
+                      <div class="flex items-center gap-4 mb-4">
                         <div>
                           <div id="remainingLessons" class="text-3xl md:text-4xl font-bold">
                             <i class="fas fa-spinner fa-spin"></i>
@@ -4604,6 +4604,14 @@ class WorVox {
                           </div>
                           <div class="text-emerald-100 text-sm">완료한 수업</div>
                         </div>
+                      </div>
+                      <!-- Book Lesson Button (shown when credits > 0) -->
+                      <div id="bookLessonButton" style="display: none;">
+                        <button onclick="worvox.showTeacherSelection()" 
+                          class="bg-white text-emerald-600 px-6 py-3 rounded-lg font-bold hover:bg-emerald-50 transition-all shadow-lg inline-flex items-center gap-2">
+                          <i class="fas fa-user-tie"></i>
+                          <span>강사 선택하고 수업 예약하기</span>
+                        </button>
                       </div>
                     </div>
                     <div class="hidden md:block">
@@ -4840,6 +4848,12 @@ class WorVox {
       if (creditsResponse.data.success) {
         const remaining = creditsResponse.data.remaining_credits || 0;
         document.getElementById('remainingLessons').textContent = remaining;
+        
+        // Show/hide book lesson button based on remaining credits
+        const bookButton = document.getElementById('bookLessonButton');
+        if (bookButton) {
+          bookButton.style.display = remaining > 0 ? 'block' : 'none';
+        }
       }
 
       // Load user's completed sessions
