@@ -3143,17 +3143,100 @@ app.get('/teacher/:teacherCode', (c) => {
                 </div>
             </div>
 
-            <!-- Sessions List (shown after login) -->
+            <!-- Dashboard (shown after login) -->
             <div id="sessionsContainer" class="hidden">
-                <div class="mb-6">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Your Scheduled Lessons</h2>
-                    <p class="text-gray-600">Mark lessons as completed after the call</p>
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <!-- Total Lessons -->
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-lg p-5 text-white">
+                        <div class="flex items-center justify-between mb-2">
+                            <i class="fas fa-calendar-check text-2xl opacity-80"></i>
+                            <span class="text-xs font-semibold bg-white/20 px-2 py-1 rounded-full">이번 달</span>
+                        </div>
+                        <p class="text-3xl font-bold" id="totalLessons">0</p>
+                        <p class="text-sm opacity-90 mt-1">완료된 수업</p>
+                    </div>
+
+                    <!-- 25-min Lessons -->
+                    <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-lg p-5 text-white">
+                        <div class="flex items-center justify-between mb-2">
+                            <i class="fas fa-clock text-2xl opacity-80"></i>
+                            <span class="text-xs font-semibold bg-white/20 px-2 py-1 rounded-full">25분</span>
+                        </div>
+                        <p class="text-3xl font-bold" id="lessons25">0</p>
+                        <p class="text-sm opacity-90 mt-1">25분 수업</p>
+                    </div>
+
+                    <!-- 50-min Lessons -->
+                    <div class="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl shadow-lg p-5 text-white">
+                        <div class="flex items-center justify-between mb-2">
+                            <i class="fas fa-hourglass-half text-2xl opacity-80"></i>
+                            <span class="text-xs font-semibold bg-white/20 px-2 py-1 rounded-full">50분</span>
+                        </div>
+                        <p class="text-3xl font-bold" id="lessons50">0</p>
+                        <p class="text-sm opacity-90 mt-1">50분 수업</p>
+                    </div>
+
+                    <!-- Total Revenue -->
+                    <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl shadow-lg p-5 text-white">
+                        <div class="flex items-center justify-between mb-2">
+                            <i class="fas fa-won-sign text-2xl opacity-80"></i>
+                            <span class="text-xs font-semibold bg-white/20 px-2 py-1 rounded-full">매출</span>
+                        </div>
+                        <p class="text-3xl font-bold" id="totalRevenue">0원</p>
+                        <p class="text-sm opacity-90 mt-1">이번 달 수익</p>
+                    </div>
                 </div>
 
-                <div id="sessionsList" class="space-y-4">
+                <!-- Tab Navigation -->
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 mb-6">
+                    <div class="flex border-b border-gray-200">
+                        <button onclick="switchTab('upcoming')" id="tab-upcoming" 
+                            class="flex-1 px-6 py-4 font-semibold text-blue-600 border-b-2 border-blue-600">
+                            <i class="fas fa-calendar-day mr-2"></i>예약 현황
+                        </button>
+                        <button onclick="switchTab('calendar')" id="tab-calendar" 
+                            class="flex-1 px-6 py-4 font-semibold text-gray-600 hover:text-blue-600 transition-colors">
+                            <i class="fas fa-calendar-alt mr-2"></i>월별 캘린더
+                        </button>
+                        <button onclick="switchTab('completed')" id="tab-completed" 
+                            class="flex-1 px-6 py-4 font-semibold text-gray-600 hover:text-blue-600 transition-colors">
+                            <i class="fas fa-check-circle mr-2"></i>완료 내역
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tab Content: Upcoming Lessons -->
+                <div id="content-upcoming" class="space-y-4">
                     <div class="text-center py-12">
                         <i class="fas fa-spinner fa-spin text-4xl text-gray-400 mb-4"></i>
                         <p class="text-gray-600">Loading sessions...</p>
+                    </div>
+                </div>
+
+                <!-- Tab Content: Calendar View -->
+                <div id="content-calendar" class="hidden">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+                        <div class="flex items-center justify-between mb-6">
+                            <button onclick="changeMonth(-1)" class="p-2 hover:bg-gray-100 rounded-lg">
+                                <i class="fas fa-chevron-left text-gray-600"></i>
+                            </button>
+                            <h3 class="text-xl font-bold text-gray-800" id="calendarMonth">2026년 3월</h3>
+                            <button onclick="changeMonth(1)" class="p-2 hover:bg-gray-100 rounded-lg">
+                                <i class="fas fa-chevron-right text-gray-600"></i>
+                            </button>
+                        </div>
+                        <div id="calendarGrid" class="grid grid-cols-7 gap-2">
+                            <!-- Calendar will be generated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Content: Completed Lessons -->
+                <div id="content-completed" class="hidden space-y-4">
+                    <div class="text-center py-12">
+                        <i class="fas fa-check-circle text-4xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-600">완료된 수업이 없습니다</p>
                     </div>
                 </div>
             </div>
@@ -3164,6 +3247,9 @@ app.get('/teacher/:teacherCode', (c) => {
             const teacherCode = '${teacherCode}';
             let teacherPin = null;
             let teacherData = null;
+            let allSessions = [];
+            let currentTab = 'upcoming';
+            let currentMonth = new Date();
 
             // Auto-focus PIN input
             document.getElementById('pinInput').focus();
@@ -3206,91 +3292,240 @@ app.get('/teacher/:teacherCode', (c) => {
             }
 
             function loadSessions(sessions) {
-                const list = document.getElementById('sessionsList');
+                allSessions = sessions || [];
+                updateStats();
+                renderCurrentTab();
+            }
+
+            function updateStats() {
+                const now = new Date();
+                const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+                const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+                // Filter this month's completed sessions
+                const thisMonthCompleted = allSessions.filter(s => {
+                    const sessionDate = new Date(s.scheduled_at);
+                    return s.status === 'completed' && 
+                           sessionDate >= currentMonthStart && 
+                           sessionDate <= currentMonthEnd;
+                });
+
+                const total = thisMonthCompleted.length;
+                const lessons25 = thisMonthCompleted.filter(s => s.duration === 25).length;
+                const lessons50 = thisMonthCompleted.filter(s => s.duration === 50).length;
                 
-                if (!sessions || sessions.length === 0) {
-                    list.innerHTML = \`
+                // Revenue calculation: 25분 = 10,500원, 50분 = 21,000원
+                const revenue = (lessons25 * 10500) + (lessons50 * 21000);
+
+                document.getElementById('totalLessons').textContent = total;
+                document.getElementById('lessons25').textContent = lessons25;
+                document.getElementById('lessons50').textContent = lessons50;
+                document.getElementById('totalRevenue').textContent = revenue.toLocaleString() + '원';
+            }
+
+            function switchTab(tab) {
+                currentTab = tab;
+                
+                // Update tab buttons
+                ['upcoming', 'calendar', 'completed'].forEach(t => {
+                    const btn = document.getElementById('tab-' + t);
+                    const content = document.getElementById('content-' + t);
+                    
+                    if (t === tab) {
+                        btn.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+                        btn.classList.remove('text-gray-600');
+                        content.classList.remove('hidden');
+                    } else {
+                        btn.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+                        btn.classList.add('text-gray-600');
+                        content.classList.add('hidden');
+                    }
+                });
+
+                renderCurrentTab();
+            }
+
+            function renderCurrentTab() {
+                if (currentTab === 'upcoming') {
+                    renderUpcoming();
+                } else if (currentTab === 'calendar') {
+                    renderCalendar();
+                } else if (currentTab === 'completed') {
+                    renderCompleted();
+                }
+            }
+
+            function renderUpcoming() {
+                const container = document.getElementById('content-upcoming');
+                const upcoming = allSessions.filter(s => s.status === 'scheduled');
+
+                if (upcoming.length === 0) {
+                    container.innerHTML = \`
                         <div class="bg-white rounded-2xl shadow-lg p-8 text-center border border-gray-100">
                             <i class="fas fa-calendar-check text-6xl text-gray-300 mb-4"></i>
-                            <p class="text-gray-600 text-lg">No scheduled lessons</p>
-                            <p class="text-gray-500 text-sm mt-2">New bookings will appear here</p>
+                            <p class="text-gray-600 text-lg">예약된 수업이 없습니다</p>
+                            <p class="text-gray-500 text-sm mt-2">새로운 예약이 들어오면 여기에 표시됩니다</p>
                         </div>
                     \`;
                     return;
                 }
 
-                // Separate upcoming and completed
-                const upcoming = sessions.filter(s => s.status === 'scheduled');
-                const completed = sessions.filter(s => s.status === 'completed');
-
-                list.innerHTML = \`
-                    \${upcoming.length > 0 ? \`
-                        <h3 class="text-lg font-bold text-gray-800 mb-3">
-                            <i class="fas fa-clock text-blue-600 mr-2"></i>Upcoming Lessons (\${upcoming.length})
-                        </h3>
-                        \${upcoming.map(session => renderSession(session)).join('')}
-                    \` : ''}
-                    
-                    \${completed.length > 0 ? \`
-                        <h3 class="text-lg font-bold text-gray-800 mb-3 mt-6">
-                            <i class="fas fa-check-circle text-emerald-600 mr-2"></i>Recently Completed
-                        </h3>
-                        \${completed.map(session => renderSession(session)).join('')}
-                    \` : ''}
-                \`;
+                container.innerHTML = upcoming
+                    .sort((a, b) => new Date(a.scheduled_at) - new Date(b.scheduled_at))
+                    .map(session => renderSession(session, true))
+                    .join('');
             }
 
-            function renderSession(session) {
+            function renderCompleted() {
+                const container = document.getElementById('content-completed');
+                const completed = allSessions.filter(s => s.status === 'completed');
+
+                if (completed.length === 0) {
+                    container.innerHTML = \`
+                        <div class="bg-white rounded-2xl shadow-lg p-8 text-center border border-gray-100">
+                            <i class="fas fa-check-circle text-6xl text-gray-300 mb-4"></i>
+                            <p class="text-gray-600 text-lg">완료된 수업이 없습니다</p>
+                        </div>
+                    \`;
+                    return;
+                }
+
+                container.innerHTML = completed
+                    .sort((a, b) => new Date(b.scheduled_at) - new Date(a.scheduled_at))
+                    .map(session => renderSession(session, false))
+                    .join('');
+            }
+
+            function renderCalendar() {
+                const year = currentMonth.getFullYear();
+                const month = currentMonth.getMonth();
+                
+                document.getElementById('calendarMonth').textContent = 
+                    \`\${year}년 \${month + 1}월\`;
+
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+                let html = ['일', '월', '화', '수', '목', '금', '토'].map(day => 
+                    \`<div class="text-center font-semibold text-gray-600 py-2">\${day}</div>\`
+                ).join('');
+
+                // Empty cells for days before month starts
+                for (let i = 0; i < firstDay; i++) {
+                    html += '<div class="text-center p-2"></div>';
+                }
+
+                // Days of month
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = new Date(year, month, day);
+                    const dateStr = date.toISOString().split('T')[0];
+                    
+                    const daySessions = allSessions.filter(s => {
+                        const sessionDate = new Date(s.scheduled_at);
+                        return sessionDate.toISOString().split('T')[0] === dateStr;
+                    });
+
+                    const isToday = new Date().toDateString() === date.toDateString();
+                    const hasSession = daySessions.length > 0;
+
+                    html += \`
+                        <div class="relative border rounded-lg p-2 min-h-[60px] \${isToday ? 'bg-blue-50 border-blue-300' : 'border-gray-200'} \${hasSession ? 'bg-emerald-50' : ''}">
+                            <div class="text-sm font-semibold text-gray-700 mb-1">\${day}</div>
+                            \${daySessions.map(s => {
+                                const time = new Date(s.scheduled_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+                                const statusColor = s.status === 'completed' ? 'bg-emerald-600' : 'bg-blue-600';
+                                return \`<div class="\${statusColor} text-white text-xs px-1 py-0.5 rounded mb-1" title="\${s.username} - \${time}">\${time}</div>\`;
+                            }).join('')}
+                        </div>
+                    \`;
+                }
+
+                document.getElementById('calendarGrid').innerHTML = html;
+            }
+
+            function changeMonth(delta) {
+                currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + delta, 1);
+                renderCalendar();
+            }
+
+            function renderSession(session, showCompleteButton = true) {
                 const date = new Date(session.scheduled_at);
                 const now = new Date();
                 const isPast = date < now;
                 const isCompleted = session.status === 'completed';
+                const studentPhone = session.student_phone || 'N/A';
+                
+                // Calculate revenue for this session
+                const sessionRevenue = session.duration === 25 ? 10500 : 21000;
                 
                 return \`
-                    <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 \${isCompleted ? 'opacity-75' : ''}">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 \${isCompleted ? 'opacity-90' : ''}">
                         <div class="flex items-start justify-between gap-4">
                             <div class="flex-1">
-                                <div class="flex items-center gap-2 mb-2">
+                                <div class="flex items-center gap-2 mb-3">
                                     <h3 class="text-lg font-bold text-gray-800">\${session.username || 'Student'}</h3>
                                     \${isCompleted ? \`
                                         <span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs font-semibold">
-                                            <i class="fas fa-check mr-1"></i>Completed
+                                            <i class="fas fa-check mr-1"></i>완료
                                         </span>
                                     \` : isPast ? \`
                                         <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-semibold">
-                                            <i class="fas fa-exclamation-circle mr-1"></i>Pending
+                                            <i class="fas fa-exclamation-circle mr-1"></i>대기중
                                         </span>
                                     \` : \`
                                         <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-semibold">
-                                            <i class="fas fa-calendar mr-1"></i>Scheduled
+                                            <i class="fas fa-calendar mr-1"></i>예약됨
                                         </span>
                                     \`}
                                 </div>
                                 
-                                <div class="space-y-1 text-sm text-gray-600">
-                                    <p><i class="fas fa-envelope text-gray-400 w-4"></i> \${session.email}</p>
-                                    <p><i class="fas fa-calendar-day text-blue-500 w-4"></i> \${date.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</p>
-                                    <p><i class="fas fa-clock text-purple-500 w-4"></i> \${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} (\${session.duration} min)</p>
+                                <div class="space-y-2 text-sm text-gray-600">
+                                    <p class="flex items-center gap-2">
+                                        <i class="fas fa-envelope text-gray-400 w-5"></i> 
+                                        <span>\${session.email}</span>
+                                    </p>
+                                    <p class="flex items-center gap-2">
+                                        <i class="fas fa-phone text-blue-500 w-5"></i> 
+                                        <span class="font-semibold text-blue-600">\${studentPhone}</span>
+                                    </p>
+                                    <p class="flex items-center gap-2">
+                                        <i class="fas fa-calendar-day text-purple-500 w-5"></i> 
+                                        <span>\${date.toLocaleDateString('ko-KR', { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                                    </p>
+                                    <p class="flex items-center gap-2">
+                                        <i class="fas fa-clock text-orange-500 w-5"></i> 
+                                        <span class="font-semibold">\${date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</span>
+                                        <span class="bg-gray-100 px-2 py-0.5 rounded text-xs font-semibold">\${session.duration}분</span>
+                                    </p>
+                                    \${isCompleted ? \`
+                                        <p class="flex items-center gap-2 mt-3 pt-3 border-t border-gray-200">
+                                            <i class="fas fa-won-sign text-emerald-500 w-5"></i> 
+                                            <span class="text-emerald-600 font-bold">\${sessionRevenue.toLocaleString()}원</span>
+                                        </p>
+                                    \` : ''}
                                 </div>
                             </div>
                             
-                            \${!isCompleted ? \`
+                            \${!isCompleted && showCompleteButton ? \`
                                 <button onclick="completeSession(\${session.id})" 
-                                    class="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-all whitespace-nowrap">
-                                    <i class="fas fa-check mr-1"></i>Mark Complete
+                                    class="px-5 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-semibold hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg whitespace-nowrap">
+                                    <i class="fas fa-check mr-2"></i>수업 완료
                                 </button>
-                            \` : \`
-                                <div class="text-emerald-600 text-2xl">
-                                    <i class="fas fa-check-circle"></i>
+                            \` : isCompleted ? \`
+                                <div class="flex flex-col items-center gap-2">
+                                    <div class="text-emerald-600 text-3xl">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <span class="text-xs text-emerald-600 font-semibold">완료됨</span>
                                 </div>
-                            \`}
+                            \` : ''}
                         </div>
                     </div>
                 \`;
             }
 
             async function completeSession(sessionId) {
-                const confirmed = confirm('Mark this lesson as completed?\\n\\nThis will deduct 1 credit from the student.');
+                const confirmed = confirm('이 수업을 완료 처리하시겠습니까?\\n\\n학생의 수업권 1개가 차감됩니다.');
                 if (!confirmed) return;
 
                 try {
@@ -3301,7 +3536,8 @@ app.get('/teacher/:teacherCode', (c) => {
                     });
 
                     if (response.data.success) {
-                        alert('✅ Lesson marked as completed!\\nStudent has ' + response.data.remaining_credits + ' credits remaining.');
+                        alert('✅ 수업이 완료 처리되었습니다!\\n학생의 남은 수업권: ' + response.data.remaining_credits + '개');
+                        
                         // Reload sessions
                         const sessionsResponse = await axios.post('/api/hiing/teacher/sessions', {
                             teacherCode: teacherCode,
@@ -3311,18 +3547,19 @@ app.get('/teacher/:teacherCode', (c) => {
                             loadSessions(sessionsResponse.data.sessions);
                         }
                     } else {
-                        alert('Failed to complete session: ' + response.data.error);
+                        alert('수업 완료 처리 실패: ' + response.data.error);
                     }
                 } catch (error) {
                     console.error('Complete session error:', error);
-                    alert('Error: ' + (error.response?.data?.error || error.message));
+                    alert('오류 발생: ' + (error.response?.data?.error || error.message));
                 }
             }
 
             function logout() {
-                if (confirm('Logout from teacher portal?')) {
+                if (confirm('로그아웃 하시겠습니까?')) {
                     teacherPin = null;
                     teacherData = null;
+                    allSessions = [];
                     document.getElementById('pinInput').value = '';
                     document.getElementById('loginForm').classList.remove('hidden');
                     document.getElementById('sessionsContainer').classList.add('hidden');
