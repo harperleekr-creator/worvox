@@ -1728,7 +1728,7 @@ class WorVox {
             
             console.log('⚡ Quick scores calculated, rendering results...');
             
-            // Render with quick scores (no feedback yet)
+            // Render with quick scores (loading detailed feedback)
             this.renderTimerResults({
               originalSentence,
               transcription,
@@ -1745,9 +1745,73 @@ class WorVox {
               isPremiumAnalysis: false,
               originalWords,
               spokenWords,
-              isLoading: false,
-              showDetailedButton: true // 🎯 Show button for detailed analysis
+              isLoading: true, // 🔄 Show loading for detailed feedback
+              showDetailedButton: false
             });
+            
+            // 🤖 Stage 2: Get detailed AI feedback automatically
+            try {
+              console.log('🤖 Stage 2: Getting detailed AI feedback...');
+              const detailedStartTime = Date.now();
+              
+              const detailedResponse = await axios.post('/api/pronunciation/analyze', {
+                referenceText: originalSentence,
+                userTranscription: transcription,
+                audioAnalysis: audioAnalysis
+              });
+              
+              console.log(`🤖 Detailed feedback received in ${Date.now() - detailedStartTime}ms`);
+              
+              if (detailedResponse.data.success) {
+                feedback = detailedResponse.data.pronunciationFeedback || '';
+                
+                // Final render with detailed feedback
+                this.renderTimerResults({
+                  originalSentence,
+                  transcription,
+                  timeLimit,
+                  accuracyScore,
+                  pronunciationScore,
+                  fluencyScore,
+                  averageScore: quickAverageScore,
+                  rating,
+                  ratingColor,
+                  ratingIcon,
+                  feedback: feedback,
+                  pronunciationIssues: detailedResponse.data.pronunciationIssues || [],
+                  isPremiumAnalysis: true,
+                  originalWords,
+                  spokenWords,
+                  isLoading: false,
+                  showDetailedButton: false
+                });
+                
+                console.log('✅ Detailed feedback displayed automatically');
+              }
+            } catch (detailedError) {
+              console.warn('⚠️ Failed to get detailed feedback:', detailedError);
+              
+              // Show results without detailed feedback
+              this.renderTimerResults({
+                originalSentence,
+                transcription,
+                timeLimit,
+                accuracyScore,
+                pronunciationScore,
+                fluencyScore,
+                averageScore: quickAverageScore,
+                rating,
+                ratingColor,
+                ratingIcon,
+                feedback: '',
+                pronunciationIssues: [],
+                isPremiumAnalysis: false,
+                originalWords,
+                spokenWords,
+                isLoading: false,
+                showDetailedButton: false
+              });
+            }
           } // ← End of if (quickResponse.data.success)
         } catch (error) {
           console.warn('⚠️ Failed to get AI analysis:', error);
@@ -2211,6 +2275,95 @@ class WorVox {
     }
   }
 
+  // Load detailed AI analysis for scenario sentence
+  async loadScenarioDetailedAnalysis() {
+    if (!this.pendingScenarioAnalysis) {
+      alert('분석 데이터를 찾을 수 없습니다.');
+      return;
+    }
+
+    const { originalSentence, transcription, audioAnalysis, scores } = this.pendingScenarioAnalysis;
+
+    // Show loading state by updating the feedback section
+    const feedbackSection = document.getElementById('premium-feedback-section');
+    if (feedbackSection) {
+      feedbackSection.innerHTML = `
+        <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <i class="fas fa-robot text-blue-600"></i>
+          💎 AI 발음 코치 피드백 (로딩 중...)
+        </h3>
+        <div class="bg-white rounded-xl p-6 text-center">
+          <div class="flex items-center justify-center mb-4">
+            <i class="fas fa-spinner fa-spin text-purple-600 text-3xl"></i>
+          </div>
+          <p class="text-gray-600">
+            상세한 발음 피드백을 생성하고 있습니다...
+          </p>
+        </div>
+      `;
+    } else {
+      // Show section if it doesn't exist
+      this.showInstantSentenceResult(scores, originalSentence, transcription, audioAnalysis, true);
+      setTimeout(() => this.loadScenarioDetailedAnalysis(), 100);
+      return;
+    }
+
+    try {
+      console.log('🎯 Loading detailed AI analysis for scenario...');
+      const startTime = Date.now();
+
+      const analysisResponse = await axios.post('/api/pronunciation/analyze', {
+        referenceText: originalSentence,
+        userTranscription: transcription,
+        audioAnalysis: audioAnalysis
+      });
+
+      console.log(`⏱️ Detailed analysis completed in ${Date.now() - startTime}ms`);
+
+      if (analysisResponse.data.success) {
+        const feedback = analysisResponse.data.pronunciationFeedback || '분석 결과를 생성하지 못했습니다.';
+
+        // Update feedback section
+        if (feedbackSection) {
+          feedbackSection.innerHTML = `
+            <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <i class="fas fa-robot text-blue-600"></i>
+              💎 AI 발음 코치 피드백
+            </h3>
+            <div class="bg-white rounded-xl p-5">
+              <div class="text-gray-700 leading-relaxed whitespace-pre-line">
+                ${feedback}
+              </div>
+            </div>
+          `;
+        }
+
+        console.log('✅ Scenario detailed feedback loaded');
+      }
+    } catch (error) {
+      console.error('❌ Failed to load detailed analysis:', error);
+      
+      if (feedbackSection) {
+        feedbackSection.innerHTML = `
+          <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <i class="fas fa-robot text-blue-600"></i>
+            💎 AI 발음 코치 피드백
+          </h3>
+          <div class="bg-white rounded-xl p-6 text-center">
+            <p class="text-red-600 mb-4">
+              <i class="fas fa-exclamation-circle mr-2"></i>
+              분석 생성에 실패했습니다.
+            </p>
+            <button onclick="worvox.loadScenarioDetailedAnalysis()" 
+              class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-all">
+              <i class="fas fa-redo mr-2"></i>다시 시도
+            </button>
+          </div>
+        `;
+      }
+    }
+  }
+
   // ========================================
   // Scenario Mode (Core/Premium Feature)
   // ========================================
@@ -2498,30 +2651,24 @@ class WorVox {
       }
     }
     
-    // Shuffle sentences for randomization (only if not AI-generated)
-    let shuffledSentences, shuffledTranslations;
+    // 🚀 Pick ONE random sentence instead of all 5
+    let selectedSentence, selectedTranslation;
     if (finalScenario.isAiGenerated) {
-      shuffledSentences = finalScenario.sentences;
-      shuffledTranslations = finalScenario.translations || [];
+      // For AI-generated, pick first sentence
+      selectedSentence = finalScenario.sentences[0];
+      selectedTranslation = finalScenario.translations?.[0] || '';
     } else {
-      shuffledSentences = [...finalScenario.sentences];
-      shuffledTranslations = [...(finalScenario.translations || [])];
-      
-      // Fisher-Yates shuffle algorithm
-      for (let i = shuffledSentences.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffledSentences[i], shuffledSentences[j]] = [shuffledSentences[j], shuffledSentences[i]];
-        if (shuffledTranslations.length > 0) {
-          [shuffledTranslations[i], shuffledTranslations[j]] = [shuffledTranslations[j], shuffledTranslations[i]];
-        }
-      }
+      // For default scenarios, pick random sentence
+      const randomIndex = Math.floor(Math.random() * finalScenario.sentences.length);
+      selectedSentence = finalScenario.sentences[randomIndex];
+      selectedTranslation = finalScenario.translations?.[randomIndex] || '';
     }
     
-    // Create shuffled scenario
-    const shuffledScenario = {
+    // Create single-sentence scenario
+    const singleSentenceScenario = {
       ...finalScenario,
-      sentences: shuffledSentences,
-      translations: shuffledTranslations
+      sentences: [selectedSentence],
+      translations: [selectedTranslation]
     };
     
     // Create session for scenario mode
@@ -2532,9 +2679,9 @@ class WorVox {
         level: this.currentUser.level || 'intermediate'
       });
       
-      // Initialize scenario practice state with shuffled scenario
+      // Initialize scenario practice state with single sentence
       this.currentScenarioPractice = {
-        scenario: shuffledScenario,
+        scenario: singleSentenceScenario,
         sessionId: sessionResponse.data.sessionId,
         currentSentenceIndex: 0,
         results: [],
@@ -2548,9 +2695,9 @@ class WorVox {
     } catch (error) {
       console.warn('⚠️ Failed to create scenario session:', error);
       
-      // Initialize without session with shuffled scenario
+      // Initialize without session with single sentence
       this.currentScenarioPractice = {
-        scenario: shuffledScenario,
+        scenario: singleSentenceScenario,
         currentSentenceIndex: 0,
         results: [],
         isPlaying: false,
@@ -2906,28 +3053,48 @@ class WorVox {
       const audioAnalysis = sttResponse.data.analysis || null;
       const originalSentence = this.currentScenarioPractice.scenario.sentences[this.currentScenarioPractice.currentSentenceIndex];
       
-      // Get detailed pronunciation analysis
+      // Get quick scores first
       let scores = this.calculateDetailedScores(originalSentence, transcription, audioBlob);
+      let feedback = '';
+      let isPremiumAnalysis = false;
       
-      // Try to get AI-based detailed analysis
-      if (transcription) {
+      // 🚀 Try to get quick AI scores AND detailed feedback (Premium users)
+      if (transcription && this.currentUser?.plan === 'premium') {
         try {
-          const analysisResponse = await axios.post('/api/pronunciation/analyze', {
+          const quickResponse = await axios.post('/api/pronunciation/analyze-quick', {
             referenceText: originalSentence,
             userTranscription: transcription,
             audioAnalysis: audioAnalysis
           });
           
-          if (analysisResponse.data.success) {
+          if (quickResponse.data.success) {
             scores = {
-              accuracy: analysisResponse.data.accuracy,
-              pronunciation: analysisResponse.data.pronunciation,
-              fluency: analysisResponse.data.fluency
+              accuracy: quickResponse.data.accuracy,
+              pronunciation: quickResponse.data.pronunciation,
+              fluency: quickResponse.data.fluency
             };
-            console.log('✅ Scenario detailed analysis:', scores);
+            console.log('✅ Scenario quick scores:', scores);
           }
         } catch (error) {
-          console.warn('⚠️ Failed to get detailed analysis, using basic scores:', error);
+          console.warn('⚠️ Failed to get quick analysis, using basic scores:', error);
+        }
+        
+        // 🤖 Get detailed AI feedback (Premium only)
+        try {
+          console.log('🤖 Requesting detailed AI feedback for scenario...');
+          const feedbackResponse = await axios.post('/api/pronunciation/analyze', {
+            referenceText: originalSentence,
+            userTranscription: transcription,
+            audioAnalysis: audioAnalysis
+          });
+          
+          if (feedbackResponse.data.success) {
+            feedback = feedbackResponse.data.pronunciationFeedback || '';
+            isPremiumAnalysis = true;
+            console.log('✅ Got detailed AI feedback:', feedback.substring(0, 100) + '...');
+          }
+        } catch (error) {
+          console.warn('⚠️ Failed to get detailed feedback:', error);
         }
       }
       
@@ -2946,11 +3113,12 @@ class WorVox {
         accuracy: scores.accuracy,
         pronunciation: scores.pronunciation,
         fluency: scores.fluency,
-        audioUrl: audioUrl
+        audioUrl: audioUrl,
+        audioAnalysis: audioAnalysis
       });
       
-      // Show instant result for this sentence
-      this.showInstantSentenceResult(scores, originalSentence, transcription);
+      // Show instant result for this sentence with feedback
+      this.showInstantSentenceResult(scores, originalSentence, transcription, audioAnalysis, isPremiumAnalysis, feedback);
       
     } catch (error) {
       console.error('Analysis error:', error);
@@ -3060,9 +3228,18 @@ class WorVox {
   }
   
   // Show instant result after each sentence
-  showInstantSentenceResult(scores, originalSentence, transcription) {
+  showInstantSentenceResult(scores, originalSentence, transcription, audioAnalysis = null, isPremiumAnalysis = false, feedback = '') {
     const { accuracy, pronunciation, fluency } = scores;
     const averageScore = Math.round((accuracy + pronunciation + fluency) / 3);
+    
+    // Store for detailed analysis
+    this.pendingScenarioAnalysis = {
+      originalSentence,
+      transcription,
+      audioAnalysis,
+      scores,
+      feedback
+    };
     
     let rating, ratingColor, ratingIcon;
     if (averageScore >= 80) {
@@ -3203,6 +3380,39 @@ class WorVox {
                 </div>
               </div>
               
+              <!-- AI Feedback Section (Premium) -->
+              ${this.currentUser?.plan === 'premium' && isPremiumAnalysis && feedback ? `
+              <div id="premium-feedback-section" class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 shadow-lg mb-6 border-2 border-blue-200">
+                <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <i class="fas fa-robot text-blue-600"></i>
+                  💎 AI 발음 코치 피드백
+                </h3>
+                <div class="bg-white rounded-xl p-5">
+                  <div class="text-gray-700 leading-relaxed whitespace-pre-line">
+                    ${feedback}
+                  </div>
+                </div>
+              </div>
+              ` : this.currentUser?.plan === 'premium' && !isPremiumAnalysis ? `
+              <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 shadow-lg mb-6 border-2 border-blue-200">
+                <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <i class="fas fa-robot text-blue-600"></i>
+                  💎 AI 발음 코치 피드백 (로딩 중...)
+                </h3>
+                <div class="bg-white rounded-xl p-6 text-center">
+                  <div class="flex items-center justify-center mb-4">
+                    <i class="fas fa-spinner fa-spin text-purple-600 text-3xl"></i>
+                  </div>
+                  <p class="text-gray-600">
+                    상세한 발음 피드백을 생성하고 있습니다...
+                  </p>
+                  <p class="text-xs text-gray-500 mt-3">
+                    ⏱️ 잠시만 기다려주세요
+                  </p>
+                </div>
+              </div>
+              ` : ''}
+              
               <!-- Action Buttons -->
               <div class="flex gap-4">
                 ${hasMore ? `
@@ -3211,9 +3421,9 @@ class WorVox {
                     <i class="fas fa-arrow-right mr-2"></i>다음 문장
                   </button>
                 ` : `
-                  <button onclick="worvox.showScenarioMode()" 
-                    class="flex-1 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-bold text-lg hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg">
-                    <i class="fas fa-check-circle mr-2"></i>완료
+                  <button onclick="worvox.startScenario(${this.currentScenarioPractice.scenario.id})" 
+                    class="flex-1 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl font-bold text-lg hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg">
+                    <i class="fas fa-redo mr-2"></i>다시 도전
                   </button>
                 `}
                 
