@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Page</title>
+</head>
+<body>
+    <div id="app">Loading...</div>
+    <script src="/static/app.min.js"></script>
+    <script>
+        console.log("Test page loaded");
+        console.log("worvox:", typeof worvox);
+        if (typeof worvox !== 'undefined' && worvox.showLoginPage) {
+            worvox.showLoginPage();
+        }
+    </script>
+</body>
+</html>

@@ -2791,6 +2791,44 @@ app.get('/api/health', (c) => {
   });
 });
 
+// TEST PAGE - Minimal test WITHOUT CDN
+app.get('/test', (c) => {
+  return c.html(`
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test WorVox - Minimal</title>
+</head>
+<body>
+    <h1>WorVox Test (No CDN)</h1>
+    <div id="app">Loading...</div>
+    <div id="debug"></div>
+    
+    <script>
+        console.log("=== Test Start ===");
+        console.log("Window loaded");
+    </script>
+    
+    <script src="/static/app.min.js"></script>
+    
+    <script>
+        console.log("=== After app.min.js ===");
+        const debug = document.getElementById('debug');
+        debug.innerHTML = '<p>WorVox class: ' + (typeof WorVox) + '</p>';
+        debug.innerHTML += '<p>worvox instance: ' + (typeof worvox) + '</p>';
+        
+        if (typeof worvox !== 'undefined' && worvox.showLoginPage) {
+            console.log("Calling showLoginPage");
+            worvox.showLoginPage();
+        } else {
+            console.error("WorVox not found!");
+        }
+    </script>
+</body>
+</html>
+  `);
+});
+
 // App page - Main application for logged users
 app.get('/app', (c) => {
   // Force COMPLETE cache busting - change this number to force refresh
