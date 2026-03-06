@@ -4585,19 +4585,23 @@ class WorVox {
             <div class="p-4 md:p-8">
               <div class="max-w-4xl mx-auto">
                 <!-- My Lesson Credits -->
-                <div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 md:p-8 text-white mb-6 md:mb-8">
+                <div id="liveSpeakingCredits" class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 md:p-8 text-white mb-6 md:mb-8">
                   <div class="flex items-center justify-between">
                     <div>
                       <h2 class="text-xl md:text-2xl font-bold mb-2">내 수업권</h2>
                       <p class="text-emerald-100 mb-4">1:1 프리미엄 전화영어</p>
                       <div class="flex items-center gap-4">
                         <div>
-                          <div class="text-3xl md:text-4xl font-bold">0</div>
+                          <div id="remainingLessons" class="text-3xl md:text-4xl font-bold">
+                            <i class="fas fa-spinner fa-spin"></i>
+                          </div>
                           <div class="text-emerald-100 text-sm">잔여 수업</div>
                         </div>
                         <div class="h-12 w-px bg-emerald-300"></div>
                         <div>
-                          <div class="text-3xl md:text-4xl font-bold">0</div>
+                          <div id="completedLessons" class="text-3xl md:text-4xl font-bold">
+                            <i class="fas fa-spinner fa-spin"></i>
+                          </div>
                           <div class="text-emerald-100 text-sm">완료한 수업</div>
                         </div>
                       </div>
@@ -4820,8 +4824,35 @@ class WorVox {
       </div>
     `;
     
+    // Load Live Speaking credits and sessions
+    this.loadLiveSpeakingCredits();
+    
     // Load gamification stats
     setTimeout(() => this.loadGamificationStats(), 100);
+  }
+
+  async loadLiveSpeakingCredits() {
+    if (!this.currentUser) return;
+
+    try {
+      // Load user's credits
+      const creditsResponse = await axios.get(`/api/hiing/credits/${this.currentUser.id}`);
+      if (creditsResponse.data.success) {
+        const remaining = creditsResponse.data.remaining_credits || 0;
+        document.getElementById('remainingLessons').textContent = remaining;
+      }
+
+      // Load user's completed sessions
+      const sessionsResponse = await axios.get(`/api/hiing/sessions/${this.currentUser.id}`);
+      if (sessionsResponse.data.success) {
+        const completed = sessionsResponse.data.sessions.filter(s => s.status === 'completed').length;
+        document.getElementById('completedLessons').textContent = completed;
+      }
+    } catch (error) {
+      console.error('Load Live Speaking credits error:', error);
+      document.getElementById('remainingLessons').textContent = '0';
+      document.getElementById('completedLessons').textContent = '0';
+    }
   }
 
   // Purchase lesson packages (일반결제)
@@ -4851,7 +4882,12 @@ class WorVox {
         }
       } catch (error) {
         console.error('Free trial error:', error);
-        alert('❌ Failed to register free trial. Please try again.');
+        // Check if it's a duplicate free trial error
+        if (error.response && error.response.status === 400) {
+          alert('❌ 무료 체험은 1회만 가능합니다.\n\n이미 무료 체험을 사용하셨습니다.\n수업권을 구매해주세요! 💰');
+        } else {
+          alert('❌ Failed to register free trial. Please try again.');
+        }
       }
       return;
     }

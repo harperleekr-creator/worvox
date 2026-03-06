@@ -274,6 +274,22 @@ app.post('/purchase', async (c: Context) => {
   const { DB } = c.env as Bindings
 
   try {
+    // For free trial, check if user already used it
+    if (packageType === 'free') {
+      const existingFreeTrial = await DB.prepare(`
+        SELECT id FROM hiing_credits
+        WHERE user_id = ? AND package_type = 'free'
+        LIMIT 1
+      `).bind(userId).first()
+
+      if (existingFreeTrial) {
+        return c.json({
+          success: false,
+          error: 'You have already used your free trial. Please purchase a lesson package.'
+        }, 400)
+      }
+    }
+
     // Calculate expiration date
     let expiresAt = null
     if (packageType === 'free') {
