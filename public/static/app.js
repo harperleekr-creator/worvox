@@ -3010,10 +3010,8 @@ class WorVox {
         }
       };
       
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(this.currentScenarioPractice.audioChunks, { type: mimeType });
-        await this.analyzeScenarioRecording(audioBlob);
-      };
+      // 🔧 NOTE: onstop handler removed - analysis is now triggered manually in stopScenarioRecording()
+      // This ensures reliable event handling similar to timer mode fix
       
       mediaRecorder.start();
       this.currentScenarioPractice.isRecording = true;
@@ -3031,10 +3029,32 @@ class WorVox {
   }
   
   // Stop recording
-  stopScenarioRecording() {
+  async stopScenarioRecording() {
+    console.log('Scenario Mode: Stopping recording');
+    
+    // 🔧 CRITICAL FIX: Manually trigger analysis instead of relying on onstop (same as timer mode)
+    let audioBlob = null;
+    
     if (this.currentScenarioPractice.mediaRecorder && this.currentScenarioPractice.mediaRecorder.state !== 'inactive') {
-      this.currentScenarioPractice.mediaRecorder.stop();
-      this.currentScenarioPractice.mediaRecorder.stream.getTracks().forEach(track => track.stop());
+      const mediaRecorder = this.currentScenarioPractice.mediaRecorder;
+      const mimeType = mediaRecorder.mimeType || 'audio/webm';
+      
+      // Create a promise to wait for the stop event
+      const stopPromise = new Promise((resolve) => {
+        mediaRecorder.addEventListener('stop', () => {
+          audioBlob = new Blob(this.currentScenarioPractice.audioChunks, { type: mimeType });
+          console.log('Scenario Mode: Recording stopped. Blob size:', audioBlob.size);
+          resolve(audioBlob);
+        }, { once: true });
+      });
+      
+      mediaRecorder.stop();
+      
+      // Wait for stop event and get audioBlob
+      audioBlob = await stopPromise;
+      
+      // Stop all tracks
+      mediaRecorder.stream.getTracks().forEach(track => track.stop());
     }
     
     this.currentScenarioPractice.isRecording = false;
@@ -3052,6 +3072,16 @@ class WorVox {
     
     if (recordStatus) {
       recordStatus.innerHTML = '<i class="fas fa-brain mr-1"></i>AI가 발음을 분석 중...';
+    }
+    
+    // 🚀 CRITICAL: Manually trigger analysis now that we have audioBlob
+    if (audioBlob && audioBlob.size > 0) {
+      console.log('Scenario Mode: Manually triggering analysis with blob size:', audioBlob.size);
+      await this.analyzeScenarioRecording(audioBlob);
+    } else {
+      console.error('Scenario Mode: No audio recorded or empty blob');
+      alert('녹음된 오디오가 없습니다. 다시 시도해주세요.');
+      this.showScenarioPractice();
     }
   }
   
