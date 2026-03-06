@@ -4888,16 +4888,26 @@ class WorVox {
         }
       } catch (error) {
         console.error('Free trial error:', error);
+        console.error('Error details:', {
+          hasResponse: !!error.response,
+          status: error.response?.status,
+          data: error.response?.data,
+          message: error.message
+        });
+        
         // Check if it's a duplicate free trial error (400 status)
         if (error.response && error.response.status === 400) {
-          const errorMsg = error.response.data.error || '';
+          const errorMsg = error.response.data?.error || '';
+          console.log('Error message from API:', errorMsg);
           if (errorMsg.includes('already used')) {
             alert('❌ 무료 체험은 1회만 가능합니다.\n\n이미 무료 체험을 사용하셨습니다.\n수업권을 구매해주세요! 💰');
           } else {
             alert('❌ ' + errorMsg);
           }
         } else {
-          alert('❌ Failed to register free trial. Please try again.');
+          // Show generic error with details in console
+          console.error('Non-400 error or missing response');
+          alert('❌ Failed to register free trial. Please try again.\n\nCheck browser console for details.');
         }
       }
       return;
