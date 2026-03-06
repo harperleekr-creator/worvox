@@ -1468,18 +1468,35 @@ class WorVox {
       this.mediaRecorder.stop();
     }
     
-    // Show completion message
+    // 🚀 Show enhanced completion message with progress
+    let progressValue = 0;
+    const progressInterval = setInterval(() => {
+      progressValue = Math.min(progressValue + Math.random() * 12, 95);
+      const progressBar = document.getElementById('analysis-progress-bar');
+      const progressText = document.getElementById('analysis-progress-text');
+      if (progressBar) progressBar.style.width = `${progressValue}%`;
+      if (progressText) progressText.textContent = `${Math.round(progressValue)}%`;
+    }, 150);
+    
+    this.analysisProgressInterval = progressInterval; // Store for cleanup
+
     const app = document.getElementById('app');
     app.innerHTML = `
       <div class="flex h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-pink-900 items-center justify-center p-4">
         <div class="bg-white rounded-2xl p-8 md:p-12 shadow-2xl max-w-2xl w-full text-center">
-          <div class="text-6xl mb-4">⏱️</div>
+          <div class="text-6xl mb-4 animate-bounce">⏱️</div>
           <h2 class="text-3xl font-bold text-gray-900 mb-3">시간 종료!</h2>
-          <p class="text-gray-600 text-lg mb-6">AI가 당신의 발음을 분석하고 있습니다...</p>
-          <div class="flex items-center justify-center gap-2 mb-8">
-            <div class="w-3 h-3 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
-            <div class="w-3 h-3 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
-            <div class="w-3 h-3 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+          <p class="text-gray-600 text-lg mb-6">발음을 분석하고 있습니다...</p>
+          
+          <!-- Progress Bar -->
+          <div class="w-full bg-gray-200 rounded-full h-3 mb-3 overflow-hidden">
+            <div id="analysis-progress-bar" class="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+          </div>
+          <p id="analysis-progress-text" class="text-sm text-gray-500 mb-6">0%</p>
+          
+          <div class="flex items-center justify-center gap-2">
+            <i class="fas fa-spinner fa-spin text-purple-500"></i>
+            <span id="analysis-status-text" class="text-gray-600">음성 인식 중...</span>
           </div>
         </div>
       </div>
@@ -1506,16 +1523,37 @@ class WorVox {
                      audioBlob.type.includes('mpeg') ? 'mp3' : 'webm';
       formData.append('audio', audioBlob, `timer-recording.${fileExt}`);
       
+      // Update status
+      const updateStatus = (text, progress) => {
+        const statusEl = document.getElementById('analysis-status-text');
+        const progressBar = document.getElementById('analysis-progress-bar');
+        const progressText = document.getElementById('analysis-progress-text');
+        if (statusEl) statusEl.textContent = text;
+        if (progressBar) progressBar.style.width = `${progress}%`;
+        if (progressText) progressText.textContent = `${progress}%`;
+      };
+
       console.log('Timer Mode: Sending audio to STT API...');
+      updateStatus('음성 인식 중...', 30);
+      
       const sttResponse = await axios.post('/api/stt/transcribe', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       
       console.log('Timer Mode: STT response:', sttResponse.data);
+      updateStatus('음성 인식 완료!', 60);
+      
       const transcription = sttResponse.data.transcription || sttResponse.data.text || '';
       const audioAnalysis = sttResponse.data.analysis || null;
       console.log('Timer Mode: Transcription:', transcription);
       console.log('Timer Mode: Audio analysis:', audioAnalysis);
+      
+      updateStatus('결과 준비 중...', 80);
+      
+      // Clear progress interval
+      if (this.analysisProgressInterval) {
+        clearInterval(this.analysisProgressInterval);
+      }
       
       // Create audio URL for playback
       const audioUrl = URL.createObjectURL(audioBlob);
@@ -1544,32 +1582,30 @@ class WorVox {
     const originalSentence = this.timerChallenge.sentence;
     const timeLimit = this.timerChallenge.seconds;
     
-    // End timer session if exists
-    if (this.timerChallenge.sessionId) {
-      try {
-        // Save result as messages
-        await axios.post('/api/messages/create', {
-          sessionId: this.timerChallenge.sessionId,
+    // Save session ID first
+    const sessionId = this.timerChallenge.sessionId;
+    
+    // 🚀 End timer session in background (non-blocking)
+    if (sessionId) {
+      // Don't await - run in background
+      Promise.all([
+        axios.post('/api/messages/create', {
+          sessionId: sessionId,
           role: 'system',
           content: `타이머 모드 ${timeLimit}초: ${originalSentence}`
-        });
-        
-        await axios.post('/api/messages/create', {
-          sessionId: this.timerChallenge.sessionId,
+        }),
+        axios.post('/api/messages/create', {
+          sessionId: sessionId,
           role: 'user',
           content: transcription || '(인식되지 않음)'
-        });
-        
-        // End session
-        await axios.post(`/api/sessions/end/${this.timerChallenge.sessionId}`);
-        console.log('✅ Timer session ended');
-      } catch (error) {
+        }),
+        axios.post(`/api/sessions/end/${sessionId}`)
+      ]).then(() => {
+        console.log('✅ Timer session saved in background');
+      }).catch((error) => {
         console.warn('⚠️ Failed to save timer session:', error);
-      }
+      });
     }
-    
-    // Save session ID for later report saving
-    const sessionId = this.timerChallenge.sessionId;
     
     // Simple similarity check (word count comparison)
     const originalWords = originalSentence.toLowerCase().split(' ').length;
@@ -1629,9 +1665,23 @@ class WorVox {
       isLoading: this.currentUser?.plan === 'premium' && transcription && transcription !== '(인식되지 않음)'
     });
     
-    // 🚀 STEP 2: Two-stage AI analysis (Premium only)
+    // Store data for on-demand detailed analysis
+    this.pendingDetailedAnalysis = {
+      sessionId,
+      originalSentence,
+      transcription,
+      timeLimit,
+      audioAnalysis,
+      originalWords,
+      spokenWords,
+      accuracyScore,
+      pronunciationScore,
+      fluencyScore
+    };
+    
+    // 🚀 STEP 2: Quick AI analysis only (Premium)
     if (transcription && transcription !== '(인식되지 않음)' && this.currentUser?.plan === 'premium') {
-      // Stage 1: Quick scores calculation (~500ms)
+      // Stage 1: Quick scores calculation (~500ms) - AUTO
       setTimeout(async () => {
         try {
           console.log('⚡ Stage 1: Getting quick scores...');
@@ -1690,120 +1740,14 @@ class WorVox {
               rating,
               ratingColor,
               ratingIcon,
-              feedback: '', // Loading feedback...
+              feedback: '', // No detailed feedback yet
               pronunciationIssues: [],
               isPremiumAnalysis: false,
               originalWords,
               spokenWords,
-              isLoading: true, // Show loading state for detailed feedback
-              loadingMessage: '🤖 발음 피드백 생성 중...'
+              isLoading: false,
+              showDetailedButton: true // 🎯 Show button for detailed analysis
             });
-            
-            // Stage 2: Detailed AI feedback in background (~5 seconds)
-            console.log('🎯 Stage 2: Loading detailed AI feedback...');
-            const detailedStartTime = Date.now();
-            
-            const analysisResponse = await axios.post('/api/pronunciation/analyze', {
-              referenceText: originalSentence,
-              userTranscription: transcription,
-              audioAnalysis: audioAnalysis
-            });
-            
-            console.log(`⏱️ Detailed analysis completed in ${Date.now() - detailedStartTime}ms`);
-            
-            if (analysisResponse.data.success) {
-              // Update with detailed pronunciation feedback
-              feedback = analysisResponse.data.pronunciationFeedback || '';
-              const pronunciationIssues = analysisResponse.data.pronunciationIssues || [];
-              isPremiumAnalysis = true;
-              
-              // Optionally refine scores with AI analysis
-              const aiAccuracy = analysisResponse.data.accuracy;
-              const aiPronunciation = analysisResponse.data.pronunciation;
-              const aiFluency = analysisResponse.data.fluency;
-              
-              // Blend quick scores with AI scores (70% quick, 30% AI for smooth transition)
-              accuracyScore = Math.round(accuracyScore * 0.7 + aiAccuracy * 0.3);
-              pronunciationScore = Math.round(pronunciationScore * 0.7 + aiPronunciation * 0.3);
-              fluencyScore = Math.round(fluencyScore * 0.7 + aiFluency * 0.3);
-              
-              const finalAverageScore = Math.round((accuracyScore + pronunciationScore + fluencyScore) / 3);
-              
-              // Update rating if needed
-              if (finalAverageScore >= 90) {
-                rating = '완벽해요!';
-                ratingColor = 'text-green-600';
-                ratingIcon = '🌟';
-              } else if (finalAverageScore >= 80) {
-                rating = '훌륭해요!';
-                ratingColor = 'text-blue-600';
-                ratingIcon = '🎉';
-              } else if (finalAverageScore >= 70) {
-                rating = '잘했어요!';
-                ratingColor = 'text-purple-600';
-                ratingIcon = '👍';
-              } else if (finalAverageScore >= 60) {
-                rating = '괜찮아요!';
-                ratingColor = 'text-yellow-600';
-                ratingIcon = '😊';
-              } else {
-                rating = '연습이 필요해요';
-                ratingColor = 'text-orange-600';
-                ratingIcon = '💪';
-              }
-              
-              console.log('✅ Detailed feedback loaded, updating results...');
-              
-              // Re-render with complete AI analysis
-              this.renderTimerResults({
-                originalSentence,
-                transcription,
-                timeLimit,
-                accuracyScore,
-                pronunciationScore,
-                fluencyScore,
-                averageScore: finalAverageScore,
-                rating,
-                ratingColor,
-                ratingIcon,
-                feedback,
-                pronunciationIssues,
-                isPremiumAnalysis,
-                originalWords,
-                spokenWords,
-                isLoading: false
-              });
-              
-              // Save report with AI analysis
-              if (sessionId && this.currentUser) {
-                try {
-                  const reportData = {
-                    originalSentence,
-                    transcription,
-                    timeLimit,
-                    accuracyScore,
-                    pronunciationScore,
-                    fluencyScore,
-                    averageScore: finalAverageScore,
-                    rating,
-                    feedback,
-                    pronunciationIssues,
-                    isPremiumAnalysis,
-                    completedAt: new Date().toISOString()
-                  };
-                  
-                  await axios.post('/api/mode-reports/save', {
-                    sessionId: sessionId,
-                    userId: this.currentUser.id,
-                    modeType: 'timer',
-                    reportData: reportData
-                  });
-                  console.log('✅ Timer report saved with AI analysis');
-                } catch (error) {
-                  console.warn('⚠️ Failed to save timer report:', error);
-                }
-              }
-            } // ← End of if (analysisResponse.data.success)
           } // ← End of if (quickResponse.data.success)
         } catch (error) {
           console.warn('⚠️ Failed to get AI analysis:', error);
@@ -1830,7 +1774,8 @@ class WorVox {
       isPremiumAnalysis,
       originalWords,
       spokenWords,
-      isLoading = false
+      isLoading = false,
+      showDetailedButton = false
     } = data;
     
     const app = document.getElementById('app');
@@ -2048,8 +1993,26 @@ class WorVox {
                     ` : ''}
                   </div>
                 </div>
-                ` : `
-                ${this.currentUser?.plan !== 'premium' ? `
+                ` : showDetailedButton ? `
+                <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 shadow-lg mb-6 border-2 border-blue-200">
+                  <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <i class="fas fa-robot text-blue-600"></i>
+                    💎 AI 코치 상세 분석 (Premium)
+                  </h3>
+                  <div class="bg-white rounded-xl p-6 text-center">
+                    <p class="text-gray-600 mb-4">
+                      발음 문제점, 개선 방법, 맞춤 조언을 받아보세요!
+                    </p>
+                    <button onclick="worvox.loadDetailedAnalysis()" 
+                      class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 px-6 rounded-xl transition-all transform hover:scale-105">
+                      <i class="fas fa-brain mr-2"></i>상세 분석 보기
+                    </button>
+                    <p class="text-xs text-gray-500 mt-3">
+                      ⏱️ 약 3-5초 소요됩니다
+                    </p>
+                  </div>
+                </div>
+                ` : this.currentUser?.plan !== 'premium' ? `
                 <div class="relative bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 shadow-lg mb-6 border-2 border-blue-200">
                   <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <i class="fas fa-robot text-blue-600"></i>
@@ -2098,6 +2061,154 @@ class WorVox {
         </div>
       </div>
     `;
+  }
+
+  // Load detailed AI analysis on demand
+  async loadDetailedAnalysis() {
+    if (!this.pendingDetailedAnalysis) {
+      alert('분석 데이터를 찾을 수 없습니다.');
+      return;
+    }
+
+    const {
+      sessionId,
+      originalSentence,
+      transcription,
+      timeLimit,
+      audioAnalysis,
+      originalWords,
+      spokenWords
+    } = this.pendingDetailedAnalysis;
+
+    // Show loading state
+    this.renderTimerResults({
+      originalSentence,
+      transcription,
+      timeLimit,
+      ...this.pendingDetailedAnalysis,
+      isLoading: true,
+      loadingMessage: '🤖 AI 상세 분석 생성 중...',
+      showDetailedButton: false
+    });
+
+    try {
+      console.log('🎯 Loading detailed AI analysis on demand...');
+      const startTime = Date.now();
+
+      const analysisResponse = await axios.post('/api/pronunciation/analyze', {
+        referenceText: originalSentence,
+        userTranscription: transcription,
+        audioAnalysis: audioAnalysis
+      });
+
+      console.log(`⏱️ Detailed analysis completed in ${Date.now() - startTime}ms`);
+
+      if (analysisResponse.data.success) {
+        const feedback = analysisResponse.data.pronunciationFeedback || '';
+        const pronunciationIssues = analysisResponse.data.pronunciationIssues || [];
+        
+        // Blend with AI scores
+        const aiAccuracy = analysisResponse.data.accuracy;
+        const aiPronunciation = analysisResponse.data.pronunciation;
+        const aiFluency = analysisResponse.data.fluency;
+        
+        const accuracyScore = Math.round(this.pendingDetailedAnalysis.accuracyScore * 0.7 + aiAccuracy * 0.3);
+        const pronunciationScore = Math.round(this.pendingDetailedAnalysis.pronunciationScore * 0.7 + aiPronunciation * 0.3);
+        const fluencyScore = Math.round(this.pendingDetailedAnalysis.fluencyScore * 0.7 + aiFluency * 0.3);
+        
+        const finalAverageScore = Math.round((accuracyScore + pronunciationScore + fluencyScore) / 3);
+        
+        // Update rating
+        let rating, ratingColor, ratingIcon;
+        if (finalAverageScore >= 90) {
+          rating = '완벽해요!';
+          ratingColor = 'text-green-600';
+          ratingIcon = '🌟';
+        } else if (finalAverageScore >= 80) {
+          rating = '훌륭해요!';
+          ratingColor = 'text-blue-600';
+          ratingIcon = '🎉';
+        } else if (finalAverageScore >= 70) {
+          rating = '잘했어요!';
+          ratingColor = 'text-purple-600';
+          ratingIcon = '👍';
+        } else if (finalAverageScore >= 60) {
+          rating = '괜찮아요!';
+          ratingColor = 'text-yellow-600';
+          ratingIcon = '😊';
+        } else {
+          rating = '연습이 필요해요';
+          ratingColor = 'text-orange-600';
+          ratingIcon = '💪';
+        }
+
+        console.log('✅ Detailed feedback loaded, updating results...');
+
+        // Render with complete AI analysis
+        this.renderTimerResults({
+          originalSentence,
+          transcription,
+          timeLimit,
+          accuracyScore,
+          pronunciationScore,
+          fluencyScore,
+          averageScore: finalAverageScore,
+          rating,
+          ratingColor,
+          ratingIcon,
+          feedback,
+          pronunciationIssues,
+          isPremiumAnalysis: true,
+          originalWords,
+          spokenWords,
+          isLoading: false,
+          showDetailedButton: false
+        });
+
+        // Save report with AI analysis
+        if (sessionId && this.currentUser) {
+          try {
+            const reportData = {
+              originalSentence,
+              transcription,
+              timeLimit,
+              accuracyScore,
+              pronunciationScore,
+              fluencyScore,
+              averageScore: finalAverageScore,
+              rating,
+              feedback,
+              pronunciationIssues,
+              isPremiumAnalysis: true,
+              completedAt: new Date().toISOString()
+            };
+
+            await axios.post('/api/mode-reports/save', {
+              sessionId: sessionId,
+              userId: this.currentUser.id,
+              modeType: 'timer',
+              reportData: reportData
+            });
+            console.log('✅ Timer report saved with AI analysis');
+          } catch (error) {
+            console.warn('⚠️ Failed to save timer report:', error);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('❌ Failed to load detailed analysis:', error);
+      alert('상세 분석 생성에 실패했습니다. 다시 시도해주세요.');
+      
+      // Show button again
+      this.renderTimerResults({
+        ...this.pendingDetailedAnalysis,
+        originalSentence: this.pendingDetailedAnalysis.originalSentence,
+        transcription: this.pendingDetailedAnalysis.transcription,
+        timeLimit: this.pendingDetailedAnalysis.timeLimit,
+        isLoading: false,
+        showDetailedButton: true
+      });
+    }
   }
 
   // ========================================
