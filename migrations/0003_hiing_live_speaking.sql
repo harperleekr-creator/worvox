@@ -59,9 +59,9 @@ CREATE INDEX IF NOT EXISTS idx_hiing_sessions_status ON hiing_sessions(status);
 
 -- 초기 강사 데이터 삽입 (Hiing.com 6명 강사)
 INSERT OR IGNORE INTO hiing_teachers (teacher_code, name, photo_url, specialty, experience, rating, phone_number, pin_code) VALUES
-('jennifer', 'Jennifer Kim', 'https://hiing.com/teachers/jennifer.jpg', 'Business English, IELTS', '10+ years teaching experience', 4.9, '+82-10-1234-5678', '1234'),
-('michael', 'Michael Johnson', 'https://hiing.com/teachers/michael.jpg', 'Conversational English, TOEFL', '8 years teaching experience', 4.8, '+82-10-2345-6789', '1234'),
-('sarah', 'Sarah Lee', 'https://hiing.com/teachers/sarah.jpg', 'Kids English, Phonics', '12 years teaching experience', 5.0, '+82-10-3456-7890', '1234'),
-('david', 'David Park', 'https://hiing.com/teachers/david.jpg', 'Business Presentations, Interview', '15 years teaching experience', 4.9, '+82-10-4567-8901', '1234'),
-('emma', 'Emma Wilson', 'https://hiing.com/teachers/emma.jpg', 'Grammar, Writing', '9 years teaching experience', 4.7, '+82-10-5678-9012', '1234'),
-('james', 'James Chen', 'https://hiing.com/teachers/james.jpg', 'OPIC, Accent Training', '11 years teaching experience', 4.8, '+82-10-6789-0123', '1234');
+('anna', 'Anna', 'https://hiing.com/teachers/anna.jpg', 'Business English, IELTS', '10+ years teaching experience', 4.9, '+82-10-1234-5678', '1234'),
+('matthew', 'Matthew', 'https://hiing.com/teachers/matthew.jpg', 'Conversational English, TOEFL', '8 years teaching experience', 4.8, '+82-10-2345-6789', '1234'),
+('youna', 'Youna', 'https://hiing.com/teachers/youna.jpg', 'Kids English, Phonics', '12 years teaching experience', 5.0, '+82-10-3456-7890', '1234'),
+('layla', 'Layla', 'https://hiing.com/teachers/layla.jpg', 'Business Presentations, Interview', '15 years teaching experience', 4.9, '+82-10-4567-8901', '1234'),
+('ella', 'Ella', 'https://hiing.com/teachers/ella.jpg', 'Grammar, Writing', '9 years teaching experience', 4.7, '+82-10-5678-9012', '1234'),
+('jeff', 'Jeff', 'https://hiing.com/teachers/jeff.jpg', 'OPIC, Accent Training', '11 years teaching experience', 4.8, '+82-10-6789-0123', '1234');

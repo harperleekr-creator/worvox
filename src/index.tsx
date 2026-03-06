@@ -213,17 +213,22 @@ app.get('/payment/success', (c) => {
               });
               
               if (response.data.success) {
+                // Check if this is a Live Speaking purchase
+                const isLiveSpeaking = orderId.includes('Live_Speaking') || orderId.includes('live_speaking');
+                const redirectUrl = isLiveSpeaking ? '/app?view=teacher-selection' : '/app';
+                
                 document.body.innerHTML = \`
                   <div class="min-h-screen flex items-center justify-center p-4 bg-gray-50">
                     <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
                       <div class="text-6xl mb-4">🎉</div>
                       <h1 class="text-2xl font-bold text-gray-900 mb-2">결제 완료!</h1>
                       <p class="text-gray-600 mb-6">결제가 성공적으로 완료되었습니다.</p>
+                      \${isLiveSpeaking ? '<p class="text-blue-600 font-semibold mb-4">이제 강사를 선택하세요!</p>' : ''}
                       <button 
-                        onclick="window.location.href='/'"
+                        onclick="window.location.href='${redirectUrl}'"
                         class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
                       >
-                        홈으로 돌아가기
+                        \${isLiveSpeaking ? '강사 선택하기' : '홈으로 돌아가기'}
                       </button>
                     </div>
                   </div>
@@ -3054,6 +3059,23 @@ app.get('/', (c) => {
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
         <script src="/static/gamification.js?v=${version}"></script>
         <script src="/static/app.min.js?v=${version}"></script>
+        
+        <!-- Auto-redirect to teacher selection if coming from payment -->
+        <script>
+          window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('view') === 'teacher-selection') {
+              // Wait for worvox object to be initialized
+              setTimeout(() => {
+                if (window.worvox && window.worvox.showTeacherSelection) {
+                  window.worvox.showTeacherSelection();
+                  // Clean up URL
+                  window.history.replaceState({}, '', '/app');
+                }
+              }, 500);
+            }
+          });
+        </script>
     </body>
     </html>
   `, 200, {
