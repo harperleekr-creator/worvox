@@ -4878,7 +4878,13 @@ class WorVox {
           // Show teacher selection page
           this.showTeacherSelection();
         } else {
-          throw new Error(response.data.error || 'Failed to register free trial');
+          // Handle error from response (duplicate free trial)
+          const errorMsg = response.data.error || 'Failed to register free trial';
+          if (errorMsg.includes('already used')) {
+            alert('❌ 무료 체험은 1회만 가능합니다.\n\n이미 무료 체험을 사용하셨습니다.\n수업권을 구매해주세요! 💰');
+          } else {
+            alert('❌ ' + errorMsg);
+          }
         }
       } catch (error) {
         console.error('Free trial error:', error);
