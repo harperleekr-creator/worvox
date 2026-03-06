@@ -4827,13 +4827,32 @@ class WorVox {
   // Purchase lesson packages (일반결제)
   async purchaseLessons(lessonCount, amount, packageType = 'one-time') {
     if (!this.currentUser) {
-      alert('로그인이 필요합니다.');
+      alert('Please login to purchase lesson credits.');
       return;
     }
 
-    // Free trial - no payment needed
+    // Free trial - no payment needed, go directly to teacher selection
     if (packageType === 'free') {
-      alert(`🎁 무료 체험 신청 완료!\n\n${lessonCount}회 수업권\n\n강사 배정 및 일정 조율을 위해\n곧 연락드리겠습니다! 🚀`);
+      try {
+        // Create free credit first
+        const response = await axios.post('/api/hiing/purchase', {
+          userId: this.currentUser.id,
+          lessonCount: 1,
+          amount: 0,
+          packageType: 'free'
+        });
+
+        if (response.data.success) {
+          alert(`🎁 Free trial registered!\n\nYou received ${lessonCount} lesson credit.\n\nPlease select a teacher and schedule your lesson! 🚀`);
+          // Show teacher selection page
+          this.showTeacherSelection();
+        } else {
+          throw new Error(response.data.error || 'Failed to register free trial');
+        }
+      } catch (error) {
+        console.error('Free trial error:', error);
+        alert('❌ Failed to register free trial. Please try again.');
+      }
       return;
     }
 
@@ -4913,8 +4932,368 @@ class WorVox {
       });
       
     } catch (error) {
-      console.error('Lesson purchase error:', error);
+      console.error('Lesson purchase error:', error)
       alert('❌ 결제 시작 중 오류가 발생했습니다.\n' + (error.message || ''));
+    }
+  }
+
+  // Teacher selection and booking
+  async showTeacherSelection() {
+    if (!this.currentUser) {
+      alert('Please login first.');
+      return;
+    }
+
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <!-- Mobile Header -->
+        <div class="md:hidden sticky top-0 z-50 bg-white border-b border-gray-200 px-4 py-3">
+          <div class="flex items-center justify-between">
+            <button onclick="worvox.showLiveSpeaking()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <i class="fas fa-arrow-left text-gray-700"></i>
+            </button>
+            <h1 class="text-lg font-bold text-gray-800">Select Teacher</h1>
+            <div class="w-10"></div>
+          </div>
+        </div>
+
+        <!-- Desktop Header -->
+        <div class="hidden md:flex items-center justify-between px-8 py-4 bg-white border-b border-gray-200">
+          <button onclick="worvox.showLiveSpeaking()" 
+            class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back to Live Speaking</span>
+          </button>
+          <h1 class="text-2xl font-bold text-gray-800">Select Your Teacher</h1>
+          <div class="w-32"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 py-8">
+          <!-- Credits Card -->
+          <div id="creditsCard" class="mb-8 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl shadow-xl p-6 text-white">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-emerald-100 text-sm mb-1">Available Lesson Credits</p>
+                <p class="text-4xl font-bold">Loading...</p>
+              </div>
+              <div class="text-6xl opacity-20">
+                <i class="fas fa-graduation-cap"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Teachers Grid -->
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">Choose Your Teacher</h2>
+          <div id="teachersGrid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="col-span-full text-center py-12">
+              <i class="fas fa-spinner fa-spin text-4xl text-gray-400 mb-4"></i>
+              <p class="text-gray-600">Loading teachers...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Load credits and teachers
+    this.loadUserCredits();
+    this.loadTeachers();
+  }
+
+  async loadUserCredits() {
+    try {
+      const response = await axios.get(`/api/hiing/credits/${this.currentUser.id}`);
+      if (response.data.success) {
+        const credits = response.data.remaining_credits;
+        document.getElementById('creditsCard').innerHTML = `
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-emerald-100 text-sm mb-1">Available Lesson Credits</p>
+              <p class="text-4xl font-bold">${credits} ${credits === 1 ? 'lesson' : 'lessons'}</p>
+              ${credits === 0 ? '<p class="text-emerald-100 text-sm mt-2">Please purchase credits to book a lesson</p>' : ''}
+            </div>
+            <div class="text-6xl opacity-20">
+              <i class="fas fa-graduation-cap"></i>
+            </div>
+          </div>
+        `;
+      }
+    } catch (error) {
+      console.error('Load credits error:', error);
+    }
+  }
+
+  async loadTeachers() {
+    try {
+      const response = await axios.get('/api/hiing/teachers');
+      if (response.data.success && response.data.teachers) {
+        const teachers = response.data.teachers;
+        const grid = document.getElementById('teachersGrid');
+        
+        if (teachers.length === 0) {
+          grid.innerHTML = `
+            <div class="col-span-full text-center py-12">
+              <i class="fas fa-user-slash text-4xl text-gray-400 mb-4"></i>
+              <p class="text-gray-600">No teachers available at the moment</p>
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = teachers.map(teacher => `
+          <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all overflow-hidden border border-gray-100">
+            <div class="aspect-square bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+              <img src="${teacher.photo_url}" alt="${teacher.name}" 
+                class="w-full h-full object-cover"
+                onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22><rect fill=%22%2393c5fd%22 width=%22200%22 height=%22200%22/><text x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-size=%2280%22 font-family=%22Arial%22>${teacher.name.charAt(0)}</text></svg>';">
+            </div>
+            <div class="p-6">
+              <div class="mb-4">
+                <h3 class="text-xl font-bold text-gray-800 mb-1">${teacher.name}</h3>
+                <div class="flex items-center gap-1 text-yellow-500 mb-2">
+                  ${Array(Math.floor(teacher.rating)).fill('<i class="fas fa-star"></i>').join('')}
+                  ${teacher.rating % 1 !== 0 ? '<i class="fas fa-star-half-alt"></i>' : ''}
+                  <span class="text-gray-600 text-sm ml-1">${teacher.rating}</span>
+                </div>
+                <p class="text-sm text-gray-600 mb-2"><i class="fas fa-book text-blue-500 mr-2"></i>${teacher.specialty}</p>
+                <p class="text-sm text-gray-600"><i class="fas fa-clock text-purple-500 mr-2"></i>${teacher.experience}</p>
+              </div>
+              
+              <button onclick="worvox.selectTeacher(${teacher.id}, '${teacher.name}')" 
+                class="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all shadow-md">
+                Select Teacher
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+    } catch (error) {
+      console.error('Load teachers error:', error);
+      document.getElementById('teachersGrid').innerHTML = `
+        <div class="col-span-full text-center py-12">
+          <i class="fas fa-exclamation-triangle text-4xl text-red-400 mb-4"></i>
+          <p class="text-gray-600">Failed to load teachers</p>
+        </div>
+      `;
+    }
+  }
+
+  async selectTeacher(teacherId, teacherName) {
+    if (!this.currentUser) {
+      alert('Please login first.');
+      return;
+    }
+
+    // Check if user has credits
+    const creditsResponse = await axios.get(`/api/hiing/credits/${this.currentUser.id}`);
+    if (!creditsResponse.data.success || creditsResponse.data.remaining_credits <= 0) {
+      alert('You need to purchase lesson credits first!');
+      this.showLiveSpeaking();
+      return;
+    }
+
+    // Show booking form
+    this.showBookingForm(teacherId, teacherName);
+  }
+
+  async showBookingForm(teacherId, teacherName) {
+    const app = document.getElementById('app');
+    
+    // Generate next 7 days for date selector
+    const dates = [];
+    for (let i = 1; i <= 7; i++) {
+      const date = new Date();
+      date.setDate(date.getDate() + i);
+      dates.push({
+        value: date.toISOString().split('T')[0],
+        label: date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+      });
+    }
+
+    // Generate time slots (09:00 - 21:00)
+    const times = [];
+    for (let hour = 9; hour <= 21; hour++) {
+      times.push(`${hour.toString().padStart(2, '0')}:00`);
+      if (hour < 21) {
+        times.push(`${hour.toString().padStart(2, '0')}:30`);
+      }
+    }
+
+    app.innerHTML = `
+      <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <!-- Mobile Header -->
+        <div class="md:hidden sticky top-0 z-50 bg-white border-b border-gray-200 px-4 py-3">
+          <div class="flex items-center justify-between">
+            <button onclick="worvox.showTeacherSelection()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <i class="fas fa-arrow-left text-gray-700"></i>
+            </button>
+            <h1 class="text-lg font-bold text-gray-800">Book Lesson</h1>
+            <div class="w-10"></div>
+          </div>
+        </div>
+
+        <!-- Desktop Header -->
+        <div class="hidden md:flex items-center justify-between px-8 py-4 bg-white border-b border-gray-200">
+          <button onclick="worvox.showTeacherSelection()" 
+            class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back to Teachers</span>
+          </button>
+          <h1 class="text-2xl font-bold text-gray-800">Book Your Lesson</h1>
+          <div class="w-32"></div>
+        </div>
+
+        <div class="max-w-3xl mx-auto px-4 py-8">
+          <!-- Teacher Info Card -->
+          <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-gray-100">
+            <div class="flex items-center gap-4">
+              <div class="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center">
+                <i class="fas fa-user text-2xl text-blue-600"></i>
+              </div>
+              <div>
+                <h2 class="text-2xl font-bold text-gray-800">${teacherName}</h2>
+                <p class="text-gray-600">Your selected teacher</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Booking Form -->
+          <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-gray-100">
+            <h3 class="text-xl font-bold text-gray-800 mb-6">Schedule Your Lesson</h3>
+            
+            <div class="space-y-6">
+              <!-- Date Selection -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  <i class="fas fa-calendar text-blue-600 mr-2"></i>Select Date
+                </label>
+                <select id="lessonDate" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <option value="">Choose a date...</option>
+                  ${dates.map(d => `<option value="${d.value}">${d.label}</option>`).join('')}
+                </select>
+              </div>
+
+              <!-- Time Selection -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  <i class="fas fa-clock text-purple-600 mr-2"></i>Select Time
+                </label>
+                <select id="lessonTime" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                  <option value="">Choose a time...</option>
+                  ${times.map(t => `<option value="${t}">${t}</option>`).join('')}
+                </select>
+              </div>
+
+              <!-- Duration Selection -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  <i class="fas fa-hourglass-half text-emerald-600 mr-2"></i>Lesson Duration
+                </label>
+                <div class="grid grid-cols-2 gap-4">
+                  <button onclick="worvox.selectDurationOption(25)" id="duration-25" 
+                    class="py-3 border-2 border-gray-300 rounded-lg hover:border-emerald-500 hover:bg-emerald-50 transition-all">
+                    <div class="font-semibold text-gray-800">25 Minutes</div>
+                    <div class="text-sm text-gray-600">Standard</div>
+                  </button>
+                  <button onclick="worvox.selectDurationOption(50)" id="duration-50" 
+                    class="py-3 border-2 border-gray-300 rounded-lg hover:border-emerald-500 hover:bg-emerald-50 transition-all">
+                    <div class="font-semibold text-gray-800">50 Minutes</div>
+                    <div class="text-sm text-gray-600">Extended</div>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Confirm Button -->
+              <button onclick="worvox.confirmSchedule(${teacherId}, '${teacherName}')" 
+                class="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-bold text-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg">
+                <i class="fas fa-check-circle mr-2"></i>Confirm Booking
+              </button>
+
+              <p class="text-sm text-gray-600 text-center">
+                <i class="fas fa-info-circle text-blue-500 mr-1"></i>
+                Your teacher will call you at the scheduled time
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Store selected teacher info
+    this.selectedTeacher = { id: teacherId, name: teacherName };
+    this.selectedDuration = 25; // default
+  }
+
+  selectDurationOption(minutes) {
+    // Remove previous selection
+    document.querySelectorAll('[id^="duration-"]').forEach(btn => {
+      btn.classList.remove('border-emerald-500', 'bg-emerald-50');
+      btn.classList.add('border-gray-300');
+    });
+    
+    // Add new selection
+    const btn = document.getElementById(`duration-${minutes}`);
+    btn.classList.remove('border-gray-300');
+    btn.classList.add('border-emerald-500', 'bg-emerald-50');
+    
+    this.selectedDuration = minutes;
+  }
+
+  async confirmSchedule(teacherId, teacherName) {
+    const date = document.getElementById('lessonDate').value;
+    const time = document.getElementById('lessonTime').value;
+    const duration = this.selectedDuration || 25;
+
+    if (!date || !time) {
+      alert('Please select both date and time');
+      return;
+    }
+
+    // Combine date and time into ISO string
+    const scheduledAt = new Date(`${date}T${time}:00`).toISOString();
+
+    const confirmed = confirm(`
+📚 Confirm Your Lesson Booking
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+Teacher: ${teacherName}
+Date: ${new Date(scheduledAt).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+Time: ${time}
+Duration: ${duration} minutes
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Your teacher will call you at the scheduled time.
+Proceed with booking?
+    `);
+
+    if (!confirmed) return;
+
+    try {
+      const response = await axios.post('/api/hiing/schedule', {
+        userId: this.currentUser.id,
+        teacherId: teacherId,
+        teacherName: teacherName,
+        scheduledAt: scheduledAt,
+        duration: duration
+      });
+
+      if (response.data.success) {
+        alert(`✅ Booking Confirmed!
+
+Teacher: ${teacherName}
+Date: ${new Date(scheduledAt).toLocaleDateString()}
+Time: ${time}
+Phone: ${response.data.teacher.phone}
+
+Your teacher will call you at the scheduled time. Please make sure your phone is available!`);
+        
+        // Go back to Live Speaking page
+        this.showLiveSpeaking();
+      } else {
+        throw new Error(response.data.error || 'Booking failed');
+      }
+    } catch (error) {
+      console.error('Schedule error:', error);
+      alert('❌ Failed to book lesson. Please try again.\n' + (error.response?.data?.error || error.message));
     }
   }
 

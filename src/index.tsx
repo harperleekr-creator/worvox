@@ -24,6 +24,7 @@ import modeReports from './routes/mode-reports';
 import aiPrompts from './routes/ai-prompts';
 import emailNotifications from './routes/email-notifications';
 import emails from './routes/emails';
+import hiing from './routes/hiing';
 import scheduled from './scheduled';
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -158,6 +159,7 @@ app.route('/api/mode-reports', modeReports);
 app.route('/api/ai-prompts', aiPrompts);
 app.route('/api/email-notifications', emailNotifications);
 app.route('/api/emails', emails);
+app.route('/api/hiing', hiing);
 
 // Preview routes
 app.route('/preview', preview);
@@ -3059,6 +3061,256 @@ app.get('/', (c) => {
     'Pragma': 'no-cache',
     'Expires': '0'
   });
+});
+
+// Teacher portal page
+app.get('/teacher/:teacherCode', (c) => {
+  const teacherCode = c.req.param('teacherCode');
+  
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Teacher Portal - WorVox Live Speaking</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    </head>
+    <body class="bg-gradient-to-br from-blue-50 via-white to-purple-50 min-h-screen">
+        <!-- Header -->
+        <div class="bg-white border-b border-gray-200 px-4 py-4 sticky top-0 z-50 shadow-sm">
+            <div class="max-w-4xl mx-auto flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-chalkboard-teacher text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold text-gray-800">Teacher Portal</h1>
+                        <p class="text-xs text-gray-600" id="teacherName">Loading...</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="text-sm text-gray-600 hover:text-gray-800">
+                    <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                </button>
+            </div>
+        </div>
+
+        <div class="max-w-4xl mx-auto px-4 py-6">
+            <!-- Login Form (shown initially) -->
+            <div id="loginForm" class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-gray-100">
+                <div class="text-center mb-6">
+                    <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-lock text-white text-3xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Teacher Login</h2>
+                    <p class="text-gray-600">Enter your PIN to access the portal</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">PIN Code</label>
+                        <input type="password" id="pinInput" 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-2xl tracking-widest"
+                            placeholder="••••" maxlength="4">
+                    </div>
+                    <button onclick="login()" 
+                        class="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Login
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sessions List (shown after login) -->
+            <div id="sessionsContainer" class="hidden">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Your Scheduled Lessons</h2>
+                    <p class="text-gray-600">Mark lessons as completed after the call</p>
+                </div>
+
+                <div id="sessionsList" class="space-y-4">
+                    <div class="text-center py-12">
+                        <i class="fas fa-spinner fa-spin text-4xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-600">Loading sessions...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+        <script>
+            const teacherCode = '${teacherCode}';
+            let teacherPin = null;
+            let teacherData = null;
+
+            // Auto-focus PIN input
+            document.getElementById('pinInput').focus();
+            
+            // Allow Enter key to submit
+            document.getElementById('pinInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') login();
+            });
+
+            async function login() {
+                const pin = document.getElementById('pinInput').value;
+                
+                if (!pin || pin.length !== 4) {
+                    alert('Please enter a 4-digit PIN');
+                    return;
+                }
+
+                try {
+                    const response = await axios.post('/api/hiing/teacher/sessions', {
+                        teacherCode: teacherCode,
+                        pinCode: pin
+                    });
+
+                    if (response.data.success) {
+                        teacherPin = pin;
+                        teacherData = response.data.teacher;
+                        document.getElementById('teacherName').textContent = teacherData.name;
+                        document.getElementById('loginForm').classList.add('hidden');
+                        document.getElementById('sessionsContainer').classList.remove('hidden');
+                        loadSessions(response.data.sessions);
+                    } else {
+                        alert('Invalid PIN. Please try again.');
+                        document.getElementById('pinInput').value = '';
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    alert('Login failed: ' + (error.response?.data?.error || 'Invalid PIN'));
+                    document.getElementById('pinInput').value = '';
+                }
+            }
+
+            function loadSessions(sessions) {
+                const list = document.getElementById('sessionsList');
+                
+                if (!sessions || sessions.length === 0) {
+                    list.innerHTML = \`
+                        <div class="bg-white rounded-2xl shadow-lg p-8 text-center border border-gray-100">
+                            <i class="fas fa-calendar-check text-6xl text-gray-300 mb-4"></i>
+                            <p class="text-gray-600 text-lg">No scheduled lessons</p>
+                            <p class="text-gray-500 text-sm mt-2">New bookings will appear here</p>
+                        </div>
+                    \`;
+                    return;
+                }
+
+                // Separate upcoming and completed
+                const upcoming = sessions.filter(s => s.status === 'scheduled');
+                const completed = sessions.filter(s => s.status === 'completed');
+
+                list.innerHTML = \`
+                    \${upcoming.length > 0 ? \`
+                        <h3 class="text-lg font-bold text-gray-800 mb-3">
+                            <i class="fas fa-clock text-blue-600 mr-2"></i>Upcoming Lessons (\${upcoming.length})
+                        </h3>
+                        \${upcoming.map(session => renderSession(session)).join('')}
+                    \` : ''}
+                    
+                    \${completed.length > 0 ? \`
+                        <h3 class="text-lg font-bold text-gray-800 mb-3 mt-6">
+                            <i class="fas fa-check-circle text-emerald-600 mr-2"></i>Recently Completed
+                        </h3>
+                        \${completed.map(session => renderSession(session)).join('')}
+                    \` : ''}
+                \`;
+            }
+
+            function renderSession(session) {
+                const date = new Date(session.scheduled_at);
+                const now = new Date();
+                const isPast = date < now;
+                const isCompleted = session.status === 'completed';
+                
+                return \`
+                    <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 \${isCompleted ? 'opacity-75' : ''}">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <h3 class="text-lg font-bold text-gray-800">\${session.username || 'Student'}</h3>
+                                    \${isCompleted ? \`
+                                        <span class="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full text-xs font-semibold">
+                                            <i class="fas fa-check mr-1"></i>Completed
+                                        </span>
+                                    \` : isPast ? \`
+                                        <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs font-semibold">
+                                            <i class="fas fa-exclamation-circle mr-1"></i>Pending
+                                        </span>
+                                    \` : \`
+                                        <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-semibold">
+                                            <i class="fas fa-calendar mr-1"></i>Scheduled
+                                        </span>
+                                    \`}
+                                </div>
+                                
+                                <div class="space-y-1 text-sm text-gray-600">
+                                    <p><i class="fas fa-envelope text-gray-400 w-4"></i> \${session.email}</p>
+                                    <p><i class="fas fa-calendar-day text-blue-500 w-4"></i> \${date.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</p>
+                                    <p><i class="fas fa-clock text-purple-500 w-4"></i> \${date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })} (\${session.duration} min)</p>
+                                </div>
+                            </div>
+                            
+                            \${!isCompleted ? \`
+                                <button onclick="completeSession(\${session.id})" 
+                                    class="px-4 py-2 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-all whitespace-nowrap">
+                                    <i class="fas fa-check mr-1"></i>Mark Complete
+                                </button>
+                            \` : \`
+                                <div class="text-emerald-600 text-2xl">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                            \`}
+                        </div>
+                    </div>
+                \`;
+            }
+
+            async function completeSession(sessionId) {
+                const confirmed = confirm('Mark this lesson as completed?\\n\\nThis will deduct 1 credit from the student.');
+                if (!confirmed) return;
+
+                try {
+                    const response = await axios.post('/api/hiing/teacher/complete', {
+                        teacherCode: teacherCode,
+                        pinCode: teacherPin,
+                        sessionId: sessionId
+                    });
+
+                    if (response.data.success) {
+                        alert('✅ Lesson marked as completed!\\nStudent has ' + response.data.remaining_credits + ' credits remaining.');
+                        // Reload sessions
+                        const sessionsResponse = await axios.post('/api/hiing/teacher/sessions', {
+                            teacherCode: teacherCode,
+                            pinCode: teacherPin
+                        });
+                        if (sessionsResponse.data.success) {
+                            loadSessions(sessionsResponse.data.sessions);
+                        }
+                    } else {
+                        alert('Failed to complete session: ' + response.data.error);
+                    }
+                } catch (error) {
+                    console.error('Complete session error:', error);
+                    alert('Error: ' + (error.response?.data?.error || error.message));
+                }
+            }
+
+            function logout() {
+                if (confirm('Logout from teacher portal?')) {
+                    teacherPin = null;
+                    teacherData = null;
+                    document.getElementById('pinInput').value = '';
+                    document.getElementById('loginForm').classList.remove('hidden');
+                    document.getElementById('sessionsContainer').classList.add('hidden');
+                    document.getElementById('pinInput').focus();
+                }
+            }
+        </script>
+    </body>
+    </html>
+  `);
 });
 
 // Export both app and scheduled job
