@@ -1,1 +1,1 @@
-{"version":1,"include":["/*"],"exclude":["/static/*","/favicon.ico","/favicon-*.png","/apple-touch-icon.png","/android-chrome-*.png"]}
+{"version":1,"include":["/*"],"exclude":["/static/*","/favicon.ico","/favicon-*.png","/apple-touch-icon.png","/android-chrome-*.png","/og-image.jpg","/logo.png","/*.webp"]}

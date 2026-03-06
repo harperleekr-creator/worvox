@@ -56,9 +56,6 @@ app.use('/favicon.ico', serveStatic({ root: './' }));
 app.use('/favicon-*', serveStatic({ root: './' }));
 app.use('/apple-touch-icon.png', serveStatic({ root: './' }));
 app.use('/android-chrome-*', serveStatic({ root: './' }));
-
-// Serve Open Graph image and logo
-app.use('/og-image.jpg', serveStatic({ root: './' }));
 app.use('/logo.png', serveStatic({ root: './' }));
 
 // Naver Webmaster verification file
