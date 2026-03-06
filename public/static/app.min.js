@@ -6381,6 +6381,88 @@ Proceed to payment?
                   <div id="searchResult" class="mt-4 md:mt-6 max-w-2xl mx-auto"></div>
                 </div>
                 
+                <!-- Feature Cards - 5 Learning Modes (MOVED HERE) -->
+                <div class="mb-6 md:mb-8">
+                  <h3 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4 md:mb-6 text-center">
+                    Choose Your Learning Mode
+                  </h3>
+                  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
+                    ${this.topics.filter(topic => 
+                      topic.name === 'Vocabulary' || topic.name === 'AI English Conversation'
+                    ).map(topic => {
+                      const isConversation = topic.name === 'AI English Conversation';
+                      const isVocabulary = topic.name === 'Vocabulary';
+                      const bgColor = isConversation 
+                        ? 'bg-gradient-to-br from-emerald-50 to-teal-50' 
+                        : isVocabulary 
+                          ? 'bg-gradient-to-br from-blue-50 to-indigo-50' 
+                          : 'bg-white';
+                      const borderColor = isConversation 
+                        ? 'border border-emerald-200 hover:border-emerald-400' 
+                        : isVocabulary 
+                          ? 'border border-blue-200 hover:border-blue-400' 
+                          : 'border border-gray-200 hover:border-emerald-400';
+                      const textColor = isConversation ? 'emerald' : 'blue';
+                      
+                      return `
+                      <div class="${bgColor} rounded-xl p-3 md:p-4 shadow-sm ${borderColor} hover:shadow-md transition-all cursor-pointer"
+                        data-topic-id="${topic.id}" 
+                        data-topic-name="${this.escapeHtml(topic.name)}" 
+                        data-topic-level="${topic.level}"
+                        onclick="worvox.startTopicById(${topic.id})">
+                        <div class="text-center">
+                          <div class="w-10 h-10 md:w-12 md:h-12 mx-auto mb-2 md:mb-3">
+                            <span class="text-3xl md:text-4xl">${topic.icon}</span>
+                          </div>
+                          <h3 class="text-sm md:text-base font-semibold text-gray-900 mb-1">${topic.name}</h3>
+                          <p class="text-xs text-gray-600 mb-2 line-clamp-2">${topic.description}</p>
+                          <span class="text-xs text-${textColor}-600 font-medium">Start →</span>
+                        </div>
+                      </div>
+                    `;
+                    }).join('')}
+                    
+                    <!-- Timer Mode Card -->
+                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-3 md:p-4 shadow-sm border border-purple-200 hover:border-purple-400 hover:shadow-md transition-all cursor-pointer"
+                      onclick="worvox.showTimerMode()">
+                      <div class="text-center">
+                        <div class="w-10 h-10 md:w-12 md:h-12 mx-auto mb-2 md:mb-3">
+                          <span class="text-3xl md:text-4xl">⏱️</span>
+                        </div>
+                        <h3 class="text-sm md:text-base font-semibold text-gray-900 mb-1">Timer Mode</h3>
+                        <p class="text-xs text-gray-600 mb-2 line-clamp-2">Complete sentences in 5-10 seconds</p>
+                        <span class="text-xs text-purple-600 font-medium">Start →</span>
+                      </div>
+                    </div>
+                    
+                    <!-- Scenario Mode Card -->
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-3 md:p-4 shadow-sm border border-blue-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer"
+                      onclick="worvox.showScenarioMode()">
+                      <div class="text-center">
+                        <div class="w-10 h-10 md:w-12 md:h-12 mx-auto mb-2 md:mb-3">
+                          <span class="text-3xl md:text-4xl">🎬</span>
+                        </div>
+                        <h3 class="text-sm md:text-base font-semibold text-gray-900 mb-1">Scenario Mode</h3>
+                        <p class="text-xs text-gray-600 mb-2 line-clamp-2">Practice 30 real-life conversations</p>
+                        <span class="text-xs text-blue-600 font-medium">Start →</span>
+                      </div>
+                    </div>
+                    
+                    <!-- Exam Mode Card -->
+                    <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 md:p-4 shadow-sm border border-orange-200 hover:border-orange-400 hover:shadow-md transition-all cursor-pointer"
+                      onclick="worvox.showExamMode()">
+                      <div class="text-center">
+                        <div class="w-10 h-10 md:w-12 md:h-12 mx-auto mb-2 md:mb-3">
+                          <span class="text-3xl md:text-4xl">📝</span>
+                        </div>
+                        <h3 class="text-sm md:text-base font-semibold text-gray-900 mb-1">Exam Mode</h3>
+                        <p class="text-xs text-gray-600 mb-2 line-clamp-2">OPIC-style 5-question speaking test</p>
+                        <span class="text-xs text-orange-600 font-medium">Start →</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
                 <!-- Daily Usage Tracker - Compact Grid -->
                 <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700 mb-6 md:mb-8">
                   <div class="flex items-center justify-between mb-3">
@@ -6536,83 +6618,6 @@ Proceed to payment?
                     <div class="text-center py-8 text-gray-400">
                       <i class="fas fa-spinner fa-spin text-4xl mb-3"></i>
                       <p class="text-sm">Loading report...</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <!-- Feature Cards - Compact Design -->
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 mb-6 md:mb-8">
-                  ${this.topics.filter(topic => 
-                    topic.name === 'Vocabulary' || topic.name === 'AI English Conversation'
-                  ).map(topic => {
-                    const isConversation = topic.name === 'AI English Conversation';
-                    const isVocabulary = topic.name === 'Vocabulary';
-                    const bgColor = isConversation 
-                      ? 'bg-gradient-to-br from-emerald-50 to-teal-50' 
-                      : isVocabulary 
-                        ? 'bg-gradient-to-br from-blue-50 to-indigo-50' 
-                        : 'bg-white';
-                    const borderColor = isConversation 
-                      ? 'border border-emerald-200 hover:border-emerald-400' 
-                      : isVocabulary 
-                        ? 'border border-blue-200 hover:border-blue-400' 
-                        : 'border border-gray-200 hover:border-emerald-400';
-                    const textColor = isConversation ? 'emerald' : 'blue';
-                    
-                    return `
-                    <div class="${bgColor} rounded-xl p-3 md:p-4 shadow-sm ${borderColor} hover:shadow-md transition-all cursor-pointer"
-                      data-topic-id="${topic.id}" 
-                      data-topic-name="${this.escapeHtml(topic.name)}" 
-                      data-topic-level="${topic.level}"
-                      onclick="worvox.startTopicById(${topic.id})">
-                      <div class="text-center">
-                        <div class="w-10 h-10 md:w-12 md:h-12 mx-auto mb-2 md:mb-3">
-                          <span class="text-3xl md:text-4xl">${topic.icon}</span>
-                        </div>
-                        <h3 class="text-sm md:text-base font-semibold text-gray-900 mb-1">${topic.name}</h3>
-                        <p class="text-xs text-gray-600 mb-2 line-clamp-2">${topic.description}</p>
-                        <span class="text-xs text-${textColor}-600 font-medium">Start →</span>
-                      </div>
-                    </div>
-                  `;
-                  }).join('')}
-                  
-                  <!-- Timer Mode Card -->
-                  <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-3 md:p-4 shadow-sm border border-purple-200 hover:border-purple-400 hover:shadow-md transition-all cursor-pointer"
-                    onclick="worvox.showTimerMode()">
-                    <div class="text-center">
-                      <div class="w-10 h-10 md:w-12 md:h-12 mx-auto mb-2 md:mb-3">
-                        <span class="text-3xl md:text-4xl">⏱️</span>
-                      </div>
-                      <h3 class="text-sm md:text-base font-semibold text-gray-900 mb-1">Timer Mode</h3>
-                      <p class="text-xs text-gray-600 mb-2 line-clamp-2">Complete sentences in 5-10 seconds</p>
-                      <span class="text-xs text-purple-600 font-medium">Start →</span>
-                    </div>
-                  </div>
-                  
-                  <!-- Scenario Mode Card -->
-                  <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-3 md:p-4 shadow-sm border border-blue-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer"
-                    onclick="worvox.showScenarioMode()">
-                    <div class="text-center">
-                      <div class="w-10 h-10 md:w-12 md:h-12 mx-auto mb-2 md:mb-3">
-                        <span class="text-3xl md:text-4xl">🎬</span>
-                      </div>
-                      <h3 class="text-sm md:text-base font-semibold text-gray-900 mb-1">Scenario Mode</h3>
-                      <p class="text-xs text-gray-600 mb-2 line-clamp-2">Practice 30 real-life conversations</p>
-                      <span class="text-xs text-blue-600 font-medium">Start →</span>
-                    </div>
-                  </div>
-                  
-                  <!-- Exam Mode Card -->
-                  <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 md:p-4 shadow-sm border border-orange-200 hover:border-orange-400 hover:shadow-md transition-all cursor-pointer"
-                    onclick="worvox.showExamMode()">
-                    <div class="text-center">
-                      <div class="w-10 h-10 md:w-12 md:h-12 mx-auto mb-2 md:mb-3">
-                        <span class="text-3xl md:text-4xl">📝</span>
-                      </div>
-                      <h3 class="text-sm md:text-base font-semibold text-gray-900 mb-1">Exam Mode</h3>
-                      <p class="text-xs text-gray-600 mb-2 line-clamp-2">OPIC-style 5-question speaking test</p>
-                      <span class="text-xs text-orange-600 font-medium">Start →</span>
                     </div>
                   </div>
                 </div>
