@@ -1434,16 +1434,8 @@ class WorVox {
         }
       };
       
-      this.mediaRecorder.onstop = async () => {
-        const mimeType = this.mediaRecorder.mimeType || 'audio/webm';
-        const audioBlob = new Blob(this.audioChunks, { type: mimeType });
-        console.log('Timer Mode: Recording stopped. Blob size:', audioBlob.size, 'type:', audioBlob.type);
-        
-        // Stop all tracks
-        stream.getTracks().forEach(track => track.stop());
-        
-        await this.analyzeTimerPerformance(audioBlob);
-      };
+      // 🔧 NOTE: onstop handler removed - analysis is now triggered manually in endTimerChallenge()
+      // This fixes the issue where onstop event wasn't firing reliably
       
       this.mediaRecorder.start();
       this.timerChallenge.recording = true;
@@ -1462,10 +1454,29 @@ class WorVox {
   async endTimerChallenge() {
     console.log('Timer Mode: Ending challenge');
     
-    // Stop recording
+    // 🔧 CRITICAL FIX: Manually trigger analysis instead of relying on onstop
+    let audioBlob = null;
+    
     if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
-      console.log('Timer Mode: Stopping recorder');
+      console.log('Timer Mode: Stopping recorder and preparing analysis');
+      
+      // Create a promise to wait for the stop event
+      const stopPromise = new Promise((resolve) => {
+        this.mediaRecorder.addEventListener('stop', () => {
+          const mimeType = this.mediaRecorder.mimeType || 'audio/webm';
+          audioBlob = new Blob(this.audioChunks, { type: mimeType });
+          console.log('Timer Mode: Recording stopped. Blob size:', audioBlob.size, 'type:', audioBlob.type);
+          resolve(audioBlob);
+        }, { once: true });
+      });
+      
       this.mediaRecorder.stop();
+      
+      // Wait for stop event and get audioBlob
+      audioBlob = await stopPromise;
+      
+      // Stop all tracks
+      this.mediaRecorder.stream.getTracks().forEach(track => track.stop());
     }
     
     // 🚀 Show enhanced completion message with progress
@@ -1501,6 +1512,15 @@ class WorVox {
         </div>
       </div>
     `;
+    
+    // 🚀 CRITICAL: Manually trigger analysis now that we have audioBlob
+    if (audioBlob && audioBlob.size > 0) {
+      console.log('Timer Mode: Manually triggering analysis with blob size:', audioBlob.size);
+      await this.analyzeTimerPerformance(audioBlob);
+    } else {
+      console.error('Timer Mode: No audio recorded or empty blob');
+      this.showTimerResults('(녹음된 오디오가 없습니다)');
+    }
   }
 
   // Analyze Timer Performance
