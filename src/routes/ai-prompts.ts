@@ -29,99 +29,21 @@ const getOpenAIClient = (env: any) => {
 // System prompts for each level
 const systemPrompts = {
   beginner: {
-    timer: `You are an English learning assistant. Generate ONE simple English sentence for beginner learners.
+    timer: `Generate ONE simple English sentence (5-10 words, basic vocabulary, present/past tense, topics: daily life/family/food). Return only the sentence.`,
 
-Requirements:
-- Use only basic vocabulary (1000 most common English words)
-- Keep sentence between 5-10 words
-- Use simple present tense or simple past tense
-- Use simple grammar (subject + verb + object)
-- Topics: daily life, family, food, weather, hobbies, pets, school
-- The sentence should be natural and commonly used in real life
+    scenario: `Generate 5 simple conversation sentences (3-8 words, basic vocabulary, situations: greeting/ordering/directions). Format: numbered 1-5, one per line.`,
 
-Return ONLY the sentence, no explanations or extra text.`,
-
-    scenario: `You are an English learning assistant. Generate a simple conversation scenario for beginner learners.
-
-Requirements:
-- Create 5 simple conversational sentences
-- Use basic vocabulary (1000 most common words)
-- Each sentence should be 3-8 words
-- Use simple grammar
-- Common situations: greeting, ordering food, asking directions, shopping, introducing
-- Format: Return ONLY 5 sentences, one per line, numbered 1-5
-
-Example format:
-1. Hello, how are you?
-2. I am fine, thank you.
-3. What is your name?
-4. My name is John.
-5. Nice to meet you.`,
-
-    exam: `You are an English learning assistant. Generate 5 OPIC-style speaking test questions with SPECIFIC difficulty distribution:
-
-CRITICAL Requirements:
-- Question 1-2: SIMPLE QUESTIONS (easy difficulty)
-  * Use basic vocabulary (1000 most common words)
-  * 4-10 words each
-  * Simple question forms (What is, Do you, Where do you, etc.)
-  * Topics: personal info, daily routine, family, hobbies, food
-  * Should require 10-20 second simple answers
-
-- Question 3-4: INTERMEDIATE QUESTIONS (medium difficulty)
-  * Use everyday vocabulary with some advanced words
-  * 8-15 words each
-  * Require explanation or opinion
-  * Topics: work, education, travel, experiences, preferences
-  * Should require 30-60 second detailed answers
-
-- Question 5: ROLE-PLAYING SCENARIO (hard difficulty)
-  * 15-30 words complex situation
-  * Real-life scenario requiring natural conversation
-  * Must start with "Imagine you are..." or "You are at..." or "I'm calling to..."
-  * Examples: restaurant reservation, hotel complaint, job interview, customer service issue
-  * Should require 60-90 second response with multiple sentences
-
-Format: Return ONLY 5 questions, one per line, numbered 1-5
-
-Example format:
-1. What is your favorite food?
-2. Do you have any brothers or sisters?
-3. Can you describe your typical day at work or school?
-4. What are your thoughts on learning English? Why is it important?
-5. Imagine you are at a restaurant and your order is wrong. The waiter brings you fish, but you ordered chicken. You're allergic to seafood. Explain the situation and ask for a solution politely.`
+    exam: `Generate 5 OPIC test questions:
+Q1-2: Simple (4-10 words, basic vocab, 10-20s answer)
+Q3-4: Intermediate (8-15 words, explanation needed, 30-60s)
+Q5: Role-play (15-30 words, start "Imagine you are...", 60-90s)
+Return numbered 1-5, one per line.`
   },
 
   intermediate: {
-    timer: `You are an English learning assistant. Generate ONE intermediate-level English sentence for learners.
+    timer: `Generate ONE intermediate sentence (12-20 words, compound/complex grammar, topics: work/education/travel). Return only the sentence.`,
 
-Requirements:
-- Use everyday vocabulary with some advanced words
-- Keep sentence between 12-20 words
-- Use compound sentences or complex grammar
-- Include past/present/future tenses, conditionals, or passive voice
-- Topics: work, education, travel, technology, health, relationships, opinions
-- The sentence should express a complete idea or opinion
-
-Return ONLY the sentence, no explanations or extra text.`,
-
-    scenario: `You are an English learning assistant. Generate a realistic conversation scenario for intermediate learners.
-
-Requirements:
-- Create 5 conversational sentences
-- Use everyday vocabulary with some advanced expressions
-- Each sentence should be 8-15 words
-- Include compound sentences, questions, and responses
-- Situations: workplace, doctor's office, interview, complaint, making plans
-- Use natural conversational English with common phrases
-- Format: Return ONLY 5 sentences, one per line, numbered 1-5
-
-Example format:
-1. I'd like to schedule a meeting for next Tuesday afternoon.
-2. Could you explain the project requirements in more detail?
-3. I'm afraid I have a conflict at that time.
-4. Let me check my calendar and get back to you.
-5. That would work perfectly for me, thank you.`,
+    scenario: `Generate 5 intermediate conversation sentences (8-15 words, situations: workplace/interview/complaint). Format: numbered 1-5, one per line.`,
 
     exam: `You are an English learning assistant. Generate 5 OPIC-style speaking test questions with SPECIFIC difficulty distribution:
 
@@ -158,69 +80,15 @@ Example format:
   },
 
   advanced: {
-    timer: `You are an English learning assistant. Generate ONE advanced-level English sentence for proficient learners.
+    timer: `Generate ONE advanced sentence (18-30 words, sophisticated vocab, complex grammar, topics: business/technology/global issues). Return only the sentence.`,
 
-Requirements:
-- Use sophisticated vocabulary and idiomatic expressions
-- Keep sentence between 18-30 words
-- Use complex grammar: conditionals, subjunctive, passive voice, relative clauses
-- Include phrasal verbs, idioms, or advanced expressions
-- Topics: business, technology, global issues, philosophy, culture, economics, politics
-- The sentence should express nuanced ideas or abstract concepts
+    scenario: `Generate 5 advanced conversation sentences (12-25 words, professional/academic tone, situations: negotiation/presentation). Format: numbered 1-5, one per line.`,
 
-Return ONLY the sentence, no explanations or extra text.`,
-
-    scenario: `You are an English learning assistant. Generate a sophisticated conversation scenario for advanced learners.
-
-Requirements:
-- Create 5 professional or academic conversational sentences
-- Use sophisticated vocabulary and complex expressions
-- Each sentence should be 12-25 words
-- Include complex grammar, idioms, and formal language
-- Situations: business negotiation, academic discussion, formal presentation, diplomatic conversation
-- Use advanced transitional phrases and professional tone
-- Format: Return ONLY 5 sentences, one per line, numbered 1-5
-
-Example format:
-1. I'd like to propose a strategic partnership that could benefit both organizations significantly.
-2. While I appreciate your perspective, we need to consider the long-term implications carefully.
-3. Could you elaborate on how this approach aligns with our core business objectives?
-4. I believe we should explore alternative solutions before making a final decision.
-5. Let's schedule a follow-up meeting to discuss the implementation timeline in greater detail.`,
-
-    exam: `You are an English learning assistant. Generate 5 OPIC-style speaking test questions with SPECIFIC difficulty distribution:
-
-CRITICAL Requirements:
-- Question 1-2: SIMPLE-TO-MODERATE QUESTIONS (easy difficulty)
-  * Use clear, straightforward vocabulary
-  * 6-12 words each
-  * Direct questions about experiences or preferences
-  * Topics: background, interests, daily life, career
-  * Should require 20-30 second answers
-
-- Question 3-4: ANALYTICAL QUESTIONS (medium difficulty)
-  * Use sophisticated vocabulary
-  * 12-20 words each
-  * Require critical thinking, comparison, or evaluation
-  * Topics: societal issues, technology impact, cultural differences, professional challenges
-  * Should require 60-90 second analytical responses
-
-- Question 5: COMPLEX ROLE-PLAYING SCENARIO (hard difficulty)
-  * 25-40 words multi-layered situation
-  * Professional, diplomatic, or complex social scenario
-  * Must start with "Imagine you are..." or "You're in a situation where..." or "You need to..."
-  * Include multiple constraints or conflicting requirements
-  * Examples: crisis management, diplomatic negotiation, ethical dilemma, strategic planning
-  * Should require 2-3 minute response with structured argumentation
-
-Format: Return ONLY 5 questions, one per line, numbered 1-5
-
-Example format:
-1. What field are you currently working in or studying?
-2. What are your long-term career aspirations?
-3. How has technology transformed workplace communication, and what are the implications for team dynamics?
-4. To what extent should companies prioritize employee well-being over productivity targets?
-5. Imagine you are the project manager of a critical product launch scheduled for next week. Your lead developer just informed you that a major bug was discovered that could compromise user data security. Your CEO is pressuring you to launch on time due to investor commitments, but your technical team recommends a two-week delay for proper fixes. Your company's reputation and customer trust are at stake. Explain how you would handle this situation, who you would consult, and what decision you would make. Justify your reasoning.`
+    exam: `Generate 5 OPIC advanced questions:
+Q1-2: Moderate (6-12 words, 20-30s answer)
+Q3-4: Analytical (12-20 words, critical thinking, 60-90s)
+Q5: Complex role-play (25-40 words, start "Imagine you are...", 2-3min response)
+Return numbered 1-5, one per line.`
   }
 };
 
@@ -293,7 +161,7 @@ aiPrompts.post('/generate', async (c) => {
     // Call OpenAI API for English content
     const client = getOpenAIClient(c.env);
     const completion = await client.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
@@ -306,7 +174,7 @@ aiPrompts.post('/generate', async (c) => {
 
     // Generate Korean translation
     const translationCompletion = await client.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4o-mini',
       messages: [
         { 
           role: 'system', 

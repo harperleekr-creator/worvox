@@ -62,62 +62,23 @@ analysis.post('/sessions/:sessionId/analyze', async (c) => {
       return c.json({ error: 'Not enough messages to analyze (minimum 3)' }, 400);
     }
     
-    // 5. LLM을 사용하여 분석 (GPT-3.5-turbo로 비용 절감)
-    const analysisPrompt = `You are an expert English language coach analyzing a student's conversation.
+    // 5. LLM을 사용하여 분석
+    const analysisPrompt = `English coach. Analyze conversation and return JSON only.
 
-Conversation:
 ${userMessages.map((m: any, i: number) => `${i + 1}. ${m.content}`).join('\n')}
 
-Analyze this conversation and provide:
-1. Overall Score (0-100): Rate the student's English proficiency
-2. Grammar Score (0-100)
-3. Vocabulary Score (0-100)
-4. Fluency Score (0-100)
-5. Top 3 Errors: Identify the most important mistakes with corrections
-6. Top 2 Better Expressions: Suggest more natural or advanced alternatives
-7. Grammar Feedback: Detailed analysis of grammar issues in Korean
-
-IMPORTANT: Keep scores between 50-95. Be encouraging but honest.
-
-Format your response as JSON:
+Required JSON format:
 {
-  "overall_score": <number>,
-  "grammar_score": <number>,
-  "vocabulary_score": <number>,
-  "fluency_score": <number>,
-  "errors": [
-    {
-      "original": "student's sentence",
-      "improved": "corrected sentence",
-      "explanation": "brief explanation in Korean",
-      "category": "grammar",
-      "priority": 3
-    }
-  ],
-  "suggestions": [
-    {
-      "original": "student's sentence",
-      "improved": "better expression",
-      "explanation": "why this is better in Korean",
-      "category": "vocabulary",
-      "priority": 2
-    }
-  ],
-  "grammar_feedback": "<detailed grammar analysis in Korean: 2-3 paragraphs explaining common patterns, what they did well, and what to improve>",
+  "overall_score": <50-95>,
+  "grammar_score": <50-95>,
+  "vocabulary_score": <50-95>,
+  "fluency_score": <50-95>,
+  "errors": [{"original":"","improved":"","explanation":"Korean","category":"grammar","priority":3}],
+  "suggestions": [{"original":"","improved":"","explanation":"Korean","category":"vocabulary","priority":2}],
+  "grammar_feedback": "Korean feedback (2-3 paragraphs: positives, patterns, tips)",
   "total_words": <number>,
   "avg_sentence_length": <number>
-}
-
-GRAMMAR FEEDBACK GUIDELINES:
-- Start with positive aspects of their grammar usage
-- Identify 2-3 recurring grammar patterns or errors
-- Explain why these grammar points are important
-- Provide practical tips for improvement
-- End with encouragement and next steps
-- Write in friendly, supportive Korean tone
-- Length: 2-3 paragraphs (5-8 sentences total)
-
-Return ONLY the JSON, no additional text.`;
+}`;
 
     const openaiApiKey = c.env.OPENAI_API_KEY;
     const openaiApiBase = c.env.OPENAI_API_BASE || 'https://api.openai.com/v1';
@@ -133,7 +94,7 @@ Return ONLY the JSON, no additional text.`;
         'Authorization': `Bearer ${openaiApiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: 'You are an English language analysis expert. Always respond with valid JSON only.' },
           { role: 'user', content: analysisPrompt }

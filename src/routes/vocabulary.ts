@@ -44,15 +44,15 @@ vocabulary.post('/admin/generate-meanings', async (c: Context<{ Bindings: Bindin
             'Authorization': `Bearer ${c.env.OPENAI_API_KEY}`
           },
           body: JSON.stringify({
-            model: 'gpt-3.5-turbo',
+            model: 'gpt-4o-mini',
             messages: [
               {
                 role: 'system',
-                content: 'You are an English dictionary. Provide concise, clear definitions in one sentence.'
+                content: 'English dictionary. Define in one sentence.'
               },
               {
                 role: 'user',
-                content: `Define "${word.word}" (${word.part_of_speech || 'word'}) in ONE clear sentence. Korean: ${word.meaning_ko}. Return ONLY the definition.`
+                content: `Define "${word.word}" (${word.part_of_speech}). KR: ${word.meaning_ko}`
               }
             ],
             temperature: 0.3,
@@ -141,35 +141,17 @@ vocabulary.get('/search', async (c: Context<{ Bindings: Bindings }>) => {
         'Authorization': `Bearer ${c.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4o-mini',
         messages: [
           {
             role: 'system',
-            content: 'You are an English vocabulary expert. Provide concise, accurate definitions for English words with Korean translations.'
+            content: 'Vocabulary expert. Return JSON only.'
           },
           {
             role: 'user',
-            content: `Provide information about the English word "${query}" in the following JSON format:
-{
-  "word": "${query}",
-  "meaning_ko": "Korean translation",
-  "meaning_en": "Simple English definition in one clear sentence",
-  "pronunciation": "IPA pronunciation",
-  "part_of_speech": "noun/verb/adjective/etc",
-  "example_sentence": "One simple example sentence",
-  "difficulty": "beginner/intermediate/advanced",
-  "toeic_related": true/false,
-  "toefl_related": true/false,
-  "summary": [
-    "Core meaning in 1-2 lines",
-    "TOEIC/TOEFL tip if applicable, or usage context",
-    "2-3 synonyms or related words",
-    "One common collocation or phrase",
-    "Pronunciation tip or common mistake to avoid"
-  ]
-}
-
-Return ONLY valid JSON, no other text. If the word doesn't exist or is invalid, return {"error": "Word not found"}.`
+            content: `Word "${query}" JSON:
+{"word":"${query}","meaning_ko":"KR","meaning_en":"EN def","pronunciation":"IPA","part_of_speech":"type","example_sentence":"ex","difficulty":"level","toeic_related":bool,"toefl_related":bool,"summary":["meaning","tip","synonyms","collocation","mistake"]}
+Invalid word: {"error":"Word not found"}`
           }
         ],
         temperature: 0.3
