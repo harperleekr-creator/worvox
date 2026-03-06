@@ -489,4 +489,254 @@ app.post('/teacher/change-pin', async (c: Context) => {
   }
 })
 
+// ========================================
+// 관리자 전용 API (Admin Dashboard)
+// ========================================
+
+// 9. Admin Dashboard - Get all teachers overview (모든 강사 통계 조회)
+app.post('/admin/dashboard', async (c: Context) => {
+  const { adminPin } = await c.req.json()
+  const { DB } = c.env as Bindings
+
+  try {
+    // Verify admin PIN (you can change this to a more secure method)
+    const ADMIN_PIN = '9999' // 관리자 PIN
+    
+    if (adminPin !== ADMIN_PIN) {
+      return c.json({ success: false, error: 'Invalid admin PIN' }, 401)
+    }
+
+    // Get all teachers
+    const teachers = await DB.prepare(`
+      SELECT * FROM hiing_teachers 
+      ORDER BY name ASC
+    `).all()
+
+    const now = new Date()
+    const currentMonth = now.getMonth()
+    const currentYear = now.getFullYear()
+
+    const RATE_25MIN = 10500
+    const RATE_50MIN = 21000
+
+    // Calculate stats for each teacher
+    const teacherStats = await Promise.all(
+      teachers.results.map(async (teacher: any) => {
+        // Get all sessions for this teacher
+        const sessions = await DB.prepare(`
+          SELECT 
+            s.*,
+            u.username as student_name,
+            u.email as student_email
+          FROM hiing_sessions s
+          LEFT JOIN users u ON s.user_id = u.id
+          WHERE s.teacher_id = ?
+          ORDER BY s.scheduled_at DESC
+        `).bind(teacher.id).all()
+
+        let totalSessions = 0
+        let completedSessions = 0
+        let sessions25min = 0
+        let sessions50min = 0
+        let monthlyRevenue = 0
+        let totalRevenue = 0
+
+        sessions.results.forEach((session: any) => {
+          const sessionDate = new Date(session.scheduled_at)
+          const isCurrentMonth = sessionDate.getMonth() === currentMonth && 
+                                sessionDate.getFullYear() === currentYear
+
+          if (session.status === 'completed') {
+            completedSessions++
+            
+            if (session.duration === 25) {
+              sessions25min++
+              totalRevenue += RATE_25MIN
+              if (isCurrentMonth) monthlyRevenue += RATE_25MIN
+            } else if (session.duration === 50) {
+              sessions50min++
+              totalRevenue += RATE_50MIN
+              if (isCurrentMonth) monthlyRevenue += RATE_50MIN
+            }
+          }
+
+          totalSessions++
+        })
+
+        // Get upcoming sessions
+        const upcomingSessions = sessions.results.filter((s: any) => 
+          ['scheduled', 'in_progress'].includes(s.status) &&
+          new Date(s.scheduled_at) > now
+        ).length
+
+        // Get today's sessions
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+        const todayEnd = new Date(todayStart)
+        todayEnd.setDate(todayEnd.getDate() + 1)
+
+        const todaySessions = sessions.results.filter((s: any) => {
+          const sessionDate = new Date(s.scheduled_at)
+          return sessionDate >= todayStart && sessionDate < todayEnd
+        }).length
+
+        return {
+          id: teacher.id,
+          teacherCode: teacher.teacher_code,
+          name: teacher.name,
+          specialty: teacher.specialty,
+          experience: teacher.experience,
+          rating: teacher.rating,
+          phoneNumber: teacher.phone_number,
+          isActive: teacher.is_active,
+          stats: {
+            totalSessions,
+            completedSessions,
+            sessions25min,
+            sessions50min,
+            monthlyRevenue,
+            totalRevenue,
+            upcomingSessions,
+            todaySessions
+          }
+        }
+      })
+    )
+
+    // Calculate overall platform stats
+    const overallStats = teacherStats.reduce((acc, teacher) => ({
+      totalTeachers: acc.totalTeachers + 1,
+      activeTeachers: acc.activeTeachers + (teacher.isActive ? 1 : 0),
+      totalSessions: acc.totalSessions + teacher.stats.totalSessions,
+      completedSessions: acc.completedSessions + teacher.stats.completedSessions,
+      monthlyRevenue: acc.monthlyRevenue + teacher.stats.monthlyRevenue,
+      totalRevenue: acc.totalRevenue + teacher.stats.totalRevenue,
+      upcomingSessions: acc.upcomingSessions + teacher.stats.upcomingSessions,
+      todaySessions: acc.todaySessions + teacher.stats.todaySessions
+    }), {
+      totalTeachers: 0,
+      activeTeachers: 0,
+      totalSessions: 0,
+      completedSessions: 0,
+      monthlyRevenue: 0,
+      totalRevenue: 0,
+      upcomingSessions: 0,
+      todaySessions: 0
+    })
+
+    return c.json({
+      success: true,
+      overallStats,
+      teachers: teacherStats,
+      currentMonth: now.toLocaleString('ko-KR', { month: 'long' }),
+      currentYear
+    })
+  } catch (error: any) {
+    console.error('Admin dashboard error:', error)
+    return c.json({ success: false, error: error.message }, 500)
+  }
+})
+
+// 10. Admin Dashboard - Get specific teacher detail (특정 강사 상세 조회)
+app.post('/admin/teacher-detail', async (c: Context) => {
+  const { adminPin, teacherId } = await c.req.json()
+  const { DB } = c.env as Bindings
+
+  try {
+    // Verify admin PIN
+    const ADMIN_PIN = '9999'
+    
+    if (adminPin !== ADMIN_PIN) {
+      return c.json({ success: false, error: 'Invalid admin PIN' }, 401)
+    }
+
+    // Get teacher info
+    const teacher = await DB.prepare(`
+      SELECT * FROM hiing_teachers WHERE id = ?
+    `).bind(teacherId).first() as any
+
+    if (!teacher) {
+      return c.json({ success: false, error: 'Teacher not found' }, 404)
+    }
+
+    // Get all sessions with student info
+    const sessions = await DB.prepare(`
+      SELECT 
+        s.*,
+        u.username as student_name,
+        u.email as student_email,
+        u.phone_number as student_phone
+      FROM hiing_sessions s
+      LEFT JOIN users u ON s.user_id = u.id
+      WHERE s.teacher_id = ?
+      ORDER BY s.scheduled_at DESC
+    `).bind(teacherId).all()
+
+    // Calculate statistics
+    const now = new Date()
+    const currentMonth = now.getMonth()
+    const currentYear = now.getFullYear()
+
+    let totalSessions = 0
+    let completedSessions = 0
+    let sessions25min = 0
+    let sessions50min = 0
+    let monthlyRevenue = 0
+    let totalRevenue = 0
+
+    const RATE_25MIN = 10500
+    const RATE_50MIN = 21000
+
+    sessions.results.forEach((session: any) => {
+      const sessionDate = new Date(session.scheduled_at)
+      const isCurrentMonth = sessionDate.getMonth() === currentMonth && 
+                            sessionDate.getFullYear() === currentYear
+
+      if (session.status === 'completed') {
+        completedSessions++
+        
+        if (session.duration === 25) {
+          sessions25min++
+          totalRevenue += RATE_25MIN
+          if (isCurrentMonth) monthlyRevenue += RATE_25MIN
+        } else if (session.duration === 50) {
+          sessions50min++
+          totalRevenue += RATE_50MIN
+          if (isCurrentMonth) monthlyRevenue += RATE_50MIN
+        }
+      }
+
+      totalSessions++
+    })
+
+    return c.json({
+      success: true,
+      teacher: {
+        id: teacher.id,
+        name: teacher.name,
+        code: teacher.teacher_code,
+        specialty: teacher.specialty,
+        experience: teacher.experience,
+        rating: teacher.rating,
+        phoneNumber: teacher.phone_number,
+        pinCode: teacher.pin_code,
+        isActive: teacher.is_active
+      },
+      stats: {
+        totalSessions,
+        completedSessions,
+        sessions25min,
+        sessions50min,
+        monthlyRevenue,
+        totalRevenue,
+        currentMonth: now.toLocaleString('ko-KR', { month: 'long' }),
+        currentYear
+      },
+      sessions: sessions.results
+    })
+  } catch (error: any) {
+    console.error('Admin teacher detail error:', error)
+    return c.json({ success: false, error: error.message }, 500)
+  }
+})
+
 export default app

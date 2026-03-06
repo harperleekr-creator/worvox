@@ -3125,6 +3125,711 @@ app.get('/', (c) => {
 });
 
 // Teacher portal page
+app.get('/admin/hiing-dashboard', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Admin Dashboard - WorVox Live Speaking</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    </head>
+    <body class="bg-gradient-to-br from-purple-50 via-white to-blue-50 min-h-screen">
+        <!-- PIN 입력 모달 -->
+        <div id="pinModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+                <div class="text-center mb-6">
+                    <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shield-alt text-white text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">관리자 인증</h2>
+                    <p class="text-gray-600">관리자 PIN을 입력하세요</p>
+                </div>
+                
+                <div class="mb-6">
+                    <input 
+                        type="password" 
+                        id="adminPinInput" 
+                        maxlength="4"
+                        placeholder="4자리 PIN"
+                        class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-center text-2xl font-bold tracking-widest focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none transition-all"
+                        onkeypress="if(event.key==='Enter') verifyAdminPin()"
+                    />
+                </div>
+                
+                <button 
+                    onclick="verifyAdminPin()" 
+                    class="w-full bg-gradient-to-r from-purple-500 to-pink-600 text-white py-3 rounded-xl font-bold hover:from-purple-600 hover:to-pink-700 transition-all transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-unlock mr-2"></i>인증하기
+                </button>
+                
+                <p class="text-xs text-gray-500 text-center mt-4">
+                    <i class="fas fa-info-circle mr-1"></i>관리자 PIN은 9999입니다
+                </p>
+            </div>
+        </div>
+
+        <!-- 메인 대시보드 (PIN 인증 후 표시) -->
+        <div id="mainDashboard" class="hidden">
+            <!-- Header -->
+            <div class="bg-white border-b border-gray-200 px-4 py-4 sticky top-0 z-40 shadow-sm">
+                <div class="max-w-7xl mx-auto flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center">
+                            <i class="fas fa-crown text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-gray-800">관리자 대시보드</h1>
+                            <p class="text-sm text-gray-600">WorVox Live Speaking 통합 관리</p>
+                        </div>
+                    </div>
+                    <button onclick="logout()" class="text-sm text-gray-600 hover:text-red-600 px-4 py-2 rounded-lg hover:bg-red-50 transition-colors">
+                        <i class="fas fa-sign-out-alt mr-1"></i>로그아웃
+                    </button>
+                </div>
+            </div>
+
+            <!-- 전체 통계 -->
+            <div class="max-w-7xl mx-auto px-4 py-6">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">전체 플랫폼 통계</h2>
+                    <p class="text-gray-600" id="currentPeriod">Loading...</p>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-6 shadow-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <i class="fas fa-users text-3xl opacity-80"></i>
+                            <span class="text-xs bg-white bg-opacity-20 px-2 py-1 rounded-full">Total</span>
+                        </div>
+                        <div class="text-3xl font-bold mb-1" id="totalTeachers">-</div>
+                        <div class="text-sm opacity-90">총 강사 수</div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl p-6 shadow-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <i class="fas fa-check-circle text-3xl opacity-80"></i>
+                            <span class="text-xs bg-white bg-opacity-20 px-2 py-1 rounded-full">Active</span>
+                        </div>
+                        <div class="text-3xl font-bold mb-1" id="activeTeachers">-</div>
+                        <div class="text-sm opacity-90">활성 강사</div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-2xl p-6 shadow-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <i class="fas fa-calendar-check text-3xl opacity-80"></i>
+                            <span class="text-xs bg-white bg-opacity-20 px-2 py-1 rounded-full">Sessions</span>
+                        </div>
+                        <div class="text-3xl font-bold mb-1" id="totalSessions">-</div>
+                        <div class="text-sm opacity-90">전체 수업</div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-pink-500 to-pink-600 text-white rounded-2xl p-6 shadow-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <i class="fas fa-won-sign text-3xl opacity-80"></i>
+                            <span class="text-xs bg-white bg-opacity-20 px-2 py-1 rounded-full">Revenue</span>
+                        </div>
+                        <div class="text-2xl font-bold mb-1" id="totalRevenue">-</div>
+                        <div class="text-sm opacity-90">총 매출</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <div class="bg-white rounded-2xl p-6 shadow-lg border-2 border-orange-200">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-calendar-day text-2xl text-orange-600"></i>
+                            <h3 class="text-lg font-bold text-gray-800">오늘 수업</h3>
+                        </div>
+                        <div class="text-4xl font-bold text-orange-600" id="todaySessions">-</div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-6 shadow-lg border-2 border-blue-200">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-clock text-2xl text-blue-600"></i>
+                            <h3 class="text-lg font-bold text-gray-800">예정 수업</h3>
+                        </div>
+                        <div class="text-4xl font-bold text-blue-600" id="upcomingSessions">-</div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-6 shadow-lg border-2 border-green-200">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-calendar-alt text-2xl text-green-600"></i>
+                            <h3 class="text-lg font-bold text-gray-800">이번 달 매출</h3>
+                        </div>
+                        <div class="text-3xl font-bold text-green-600" id="monthlyRevenue">-</div>
+                    </div>
+                </div>
+
+                <!-- 강사 목록 -->
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-bold text-gray-800">강사별 상세 통계</h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">강사</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">전문 분야</th>
+                                    <th class="px-6 py-3 text-center text-xs font-bold text-gray-700 uppercase">평점</th>
+                                    <th class="px-6 py-3 text-center text-xs font-bold text-gray-700 uppercase">총 수업</th>
+                                    <th class="px-6 py-3 text-center text-xs font-bold text-gray-700 uppercase">완료</th>
+                                    <th class="px-6 py-3 text-right text-xs font-bold text-gray-700 uppercase">이번 달 매출</th>
+                                    <th class="px-6 py-3 text-right text-xs font-bold text-gray-700 uppercase">총 매출</th>
+                                    <th class="px-6 py-3 text-center text-xs font-bold text-gray-700 uppercase">상태</th>
+                                    <th class="px-6 py-3 text-center text-xs font-bold text-gray-700 uppercase">액션</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teacherTableBody" class="divide-y divide-gray-200">
+                                <!-- 동적으로 채워짐 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            let adminPin = null;
+            let dashboardData = null;
+
+            // PIN 인증
+            async function verifyAdminPin() {
+                const pin = document.getElementById('adminPinInput').value;
+                
+                if (!pin || pin.length !== 4) {
+                    alert('4자리 PIN을 입력해주세요');
+                    return;
+                }
+
+                try {
+                    const response = await axios.post('/api/hiing/admin/dashboard', {
+                        adminPin: pin
+                    });
+
+                    if (response.data.success) {
+                        adminPin = pin;
+                        dashboardData = response.data;
+                        document.getElementById('pinModal').classList.add('hidden');
+                        document.getElementById('mainDashboard').classList.remove('hidden');
+                        renderDashboard();
+                    }
+                } catch (error) {
+                    console.error('PIN verification error:', error);
+                    if (error.response?.status === 401) {
+                        alert('잘못된 관리자 PIN입니다');
+                    } else {
+                        alert('인증 중 오류가 발생했습니다');
+                    }
+                    document.getElementById('adminPinInput').value = '';
+                }
+            }
+
+            // 대시보드 렌더링
+            function renderDashboard() {
+                const { overallStats, teachers, currentMonth, currentYear } = dashboardData;
+
+                // 기간 표시
+                document.getElementById('currentPeriod').textContent = \`\${currentMonth} \${currentYear}\`;
+
+                // 전체 통계
+                document.getElementById('totalTeachers').textContent = overallStats.totalTeachers;
+                document.getElementById('activeTeachers').textContent = overallStats.activeTeachers;
+                document.getElementById('totalSessions').textContent = overallStats.totalSessions;
+                document.getElementById('totalRevenue').textContent = overallStats.totalRevenue.toLocaleString() + '원';
+                document.getElementById('todaySessions').textContent = overallStats.todaySessions;
+                document.getElementById('upcomingSessions').textContent = overallStats.upcomingSessions;
+                document.getElementById('monthlyRevenue').textContent = overallStats.monthlyRevenue.toLocaleString() + '원';
+
+                // 강사 목록
+                const tbody = document.getElementById('teacherTableBody');
+                tbody.innerHTML = teachers.map(teacher => \`
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+                                    \${teacher.name.charAt(0)}
+                                </div>
+                                <div>
+                                    <div class="font-medium text-gray-900">\${teacher.name}</div>
+                                    <div class="text-xs text-gray-500">\${teacher.teacherCode}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-700 max-w-xs">
+                                \${teacher.specialty}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="flex items-center justify-center gap-1">
+                                <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                <span class="font-medium text-gray-900">\${teacher.rating.toFixed(1)}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="font-medium text-gray-900">\${teacher.stats.totalSessions}</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                                \${teacher.stats.completedSessions}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-medium text-green-600">
+                                \${teacher.stats.monthlyRevenue.toLocaleString()}원
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="font-bold text-gray-900">
+                                \${teacher.stats.totalRevenue.toLocaleString()}원
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            \${teacher.isActive 
+                                ? '<span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">활성</span>'
+                                : '<span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">비활성</span>'
+                            }
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <button onclick="viewTeacherDetail(\${teacher.id}, '\${teacher.name}')" 
+                                class="text-blue-600 hover:text-blue-800 font-medium text-sm hover:bg-blue-50 px-3 py-1 rounded-lg transition-colors">
+                                <i class="fas fa-chart-line mr-1"></i>상세보기
+                            </button>
+                        </td>
+                    </tr>
+                \`).join('');
+            }
+
+            // 강사 상세 보기
+            async function viewTeacherDetail(teacherId, teacherName) {
+                if (!confirm(\`\${teacherName} 강사의 상세 대시보드를 보시겠습니까?\`)) {
+                    return;
+                }
+
+                try {
+                    const response = await axios.post('/api/hiing/admin/teacher-detail', {
+                        adminPin: adminPin,
+                        teacherId: teacherId
+                    });
+
+                    if (response.data.success) {
+                        const { teacher, stats, sessions } = response.data;
+                        showTeacherDetailModal(teacher, stats, sessions);
+                    }
+                } catch (error) {
+                    console.error('Teacher detail error:', error);
+                    alert('강사 정보를 불러오는데 실패했습니다');
+                }
+            }
+
+            // 강사 상세 모달
+            function showTeacherDetailModal(teacher, stats, sessions) {
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+                modal.onclick = (e) => {
+                    if (e.target === modal) modal.remove();
+                };
+
+                modal.innerHTML = \`
+                    <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                        <div class="sticky top-0 bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-t-2xl">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h2 class="text-2xl font-bold">\${teacher.name} 강사</h2>
+                                    <p class="text-sm opacity-90">\${teacher.code} | \${teacher.specialty}</p>
+                                </div>
+                                <button onclick="this.closest('.fixed').remove()" 
+                                    class="text-white hover:bg-white hover:bg-opacity-20 w-10 h-10 rounded-full transition-colors">
+                                    <i class="fas fa-times text-xl"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="p-6">
+                            <!-- 통계 -->
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                <div class="bg-blue-50 rounded-xl p-4 text-center">
+                                    <div class="text-2xl font-bold text-blue-600">\${stats.totalSessions}</div>
+                                    <div class="text-sm text-gray-600">총 수업</div>
+                                </div>
+                                <div class="bg-green-50 rounded-xl p-4 text-center">
+                                    <div class="text-2xl font-bold text-green-600">\${stats.completedSessions}</div>
+                                    <div class="text-sm text-gray-600">완료 수업</div>
+                                </div>
+                                <div class="bg-purple-50 rounded-xl p-4 text-center">
+                                    <div class="text-xl font-bold text-purple-600">\${stats.monthlyRevenue.toLocaleString()}원</div>
+                                    <div class="text-sm text-gray-600">이번 달</div>
+                                </div>
+                                <div class="bg-pink-50 rounded-xl p-4 text-center">
+                                    <div class="text-xl font-bold text-pink-600">\${stats.totalRevenue.toLocaleString()}원</div>
+                                    <div class="text-sm text-gray-600">총 매출</div>
+                                </div>
+                            </div>
+
+                            <!-- 강사 정보 -->
+                            <div class="bg-gray-50 rounded-xl p-4 mb-6">
+                                <h3 class="font-bold text-gray-800 mb-3">강사 정보</h3>
+                                <div class="grid grid-cols-2 gap-3 text-sm">
+                                    <div>
+                                        <span class="text-gray-600">전화번호:</span>
+                                        <span class="font-medium ml-2">\${teacher.phoneNumber}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-600">PIN 코드:</span>
+                                        <span class="font-medium ml-2">\${teacher.pinCode}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-600">평점:</span>
+                                        <span class="font-medium ml-2">\${teacher.rating.toFixed(1)} ⭐</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-600">상태:</span>
+                                        <span class="font-medium ml-2">\${teacher.isActive ? '활성' : '비활성'}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 최근 수업 목록 -->
+                            <div>
+                                <h3 class="font-bold text-gray-800 mb-3">최근 수업 내역 (최대 20개)</h3>
+                                <div class="max-h-96 overflow-y-auto border border-gray-200 rounded-xl">
+                                    <table class="w-full text-sm">
+                                        <thead class="bg-gray-50 sticky top-0">
+                                            <tr>
+                                                <th class="px-4 py-2 text-left">학생</th>
+                                                <th class="px-4 py-2 text-left">예약 시간</th>
+                                                <th class="px-4 py-2 text-center">시간</th>
+                                                <th class="px-4 py-2 text-center">상태</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-200">
+                                            \${sessions.slice(0, 20).map(session => {
+                                                const date = new Date(session.scheduled_at);
+                                                const statusColors = {
+                                                    'scheduled': 'bg-blue-100 text-blue-800',
+                                                    'completed': 'bg-green-100 text-green-800',
+                                                    'cancelled': 'bg-red-100 text-red-800',
+                                                    'no_show': 'bg-gray-100 text-gray-800'
+                                                };
+                                                const statusTexts = {
+                                                    'scheduled': '예정',
+                                                    'completed': '완료',
+                                                    'cancelled': '취소',
+                                                    'no_show': '노쇼'
+                                                };
+                                                return \`
+                                                    <tr class="hover:bg-gray-50">
+                                                        <td class="px-4 py-3">
+                                                            <div class="font-medium">\${session.student_name || 'Unknown'}</div>
+                                                            <div class="text-xs text-gray-500">\${session.student_email || ''}</div>
+                                                        </td>
+                                                        <td class="px-4 py-3">
+                                                            \${date.toLocaleString('ko-KR', {
+                                                                month: 'short',
+                                                                day: 'numeric',
+                                                                hour: '2-digit',
+                                                                minute: '2-digit'
+                                                            })}
+                                                        </td>
+                                                        <td class="px-4 py-3 text-center">\${session.duration}분</td>
+                                                        <td class="px-4 py-3 text-center">
+                                                            <span class="px-2 py-1 rounded-full text-xs font-medium \${statusColors[session.status]}">
+                                                                \${statusTexts[session.status]}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                \`;
+                                            }).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                \`;
+
+                document.body.appendChild(modal);
+            }
+
+            // 로그아웃
+            function logout() {
+                if (confirm('로그아웃하시겠습니까?')) {
+                    location.reload();
+                }
+            }
+
+            // 초기화
+            document.getElementById('adminPinInput').focus();
+        </script>
+    </body>
+    </html>
+  `);
+});
+
+// Admin Dashboard Route
+app.get('/admin/dashboard', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Admin Dashboard - WorVox Live Speaking</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+        <style>
+            .stat-card { transition: all 0.3s ease; }
+            .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.1); }
+            .teacher-row { transition: all 0.2s ease; }
+            .teacher-row:hover { background-color: #f0f9ff; }
+        </style>
+    </head>
+    <body class="bg-gradient-to-br from-indigo-50 via-white to-pink-50 min-h-screen">
+        <!-- Header -->
+        <div class="bg-white border-b border-gray-200 px-4 py-4 sticky top-0 z-50 shadow-sm">
+            <div class="max-w-7xl mx-auto flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-pink-600 rounded-full flex items-center justify-center">
+                        <i class="fas fa-shield-alt text-white text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold text-gray-800">Admin Dashboard</h1>
+                        <p class="text-xs text-gray-600">WorVox Live Speaking 관리</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="text-sm text-gray-600 hover:text-red-600 px-4 py-2 rounded-lg hover:bg-red-50 transition-colors">
+                    <i class="fas fa-sign-out-alt mr-1"></i>로그아웃
+                </button>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 py-6">
+            <!-- Login Form (shown initially) -->
+            <div id="loginForm" class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-gray-100 max-w-md mx-auto mt-20">
+                <div class="text-center mb-6">
+                    <div class="w-20 h-20 bg-gradient-to-br from-indigo-600 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-lock text-white text-3xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Admin Login</h2>
+                    <p class="text-gray-600">관리자 PIN을 입력하세요</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Admin PIN</label>
+                        <input type="password" id="adminPinInput" 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-center text-2xl tracking-widest"
+                            placeholder="••••" maxlength="4">
+                    </div>
+                    <button onclick="login()" 
+                        class="w-full py-3 bg-gradient-to-r from-indigo-600 to-pink-600 text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-pink-700 transition-all shadow-lg">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Login
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Content (hidden initially) -->
+            <div id="dashboardContent" class="hidden space-y-6">
+                <!-- Overall Statistics -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="stat-card bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-chalkboard-teacher text-blue-600 text-xl"></i>
+                            </div>
+                            <span class="text-sm text-gray-500">강사</span>
+                        </div>
+                        <div class="text-3xl font-bold text-gray-800" id="totalTeachers">-</div>
+                        <div class="text-sm text-gray-500 mt-1">활성: <span id="activeTeachers">-</span></div>
+                    </div>
+
+                    <div class="stat-card bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-calendar-check text-green-600 text-xl"></i>
+                            </div>
+                            <span class="text-sm text-gray-500">수업</span>
+                        </div>
+                        <div class="text-3xl font-bold text-gray-800" id="totalSessions">-</div>
+                        <div class="text-sm text-gray-500 mt-1">완료: <span id="completedSessions">-</span></div>
+                    </div>
+
+                    <div class="stat-card bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-won-sign text-purple-600 text-xl"></i>
+                            </div>
+                            <span class="text-sm text-gray-500" id="currentMonthLabel">이번 달</span>
+                        </div>
+                        <div class="text-3xl font-bold text-gray-800" id="monthlyRevenue">-</div>
+                        <div class="text-sm text-gray-500 mt-1">총 매출: <span id="totalRevenue">-</span></div>
+                    </div>
+
+                    <div class="stat-card bg-white rounded-xl p-6 border border-gray-100 shadow-sm">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-clock text-orange-600 text-xl"></i>
+                            </div>
+                            <span class="text-sm text-gray-500">예정</span>
+                        </div>
+                        <div class="text-3xl font-bold text-gray-800" id="upcomingSessions">-</div>
+                        <div class="text-sm text-gray-500 mt-1">오늘: <span id="todaySessions">-</span></div>
+                    </div>
+                </div>
+
+                <!-- Teachers Table -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-6 border-b border-gray-200">
+                        <h2 class="text-xl font-bold text-gray-800">강사 목록 및 통계</h2>
+                        <p class="text-sm text-gray-600 mt-1">각 강사의 활동 현황과 매출을 확인하세요</p>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">강사</th>
+                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">전문분야</th>
+                                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">전체 수업</th>
+                                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">완료</th>
+                                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">이번 달 매출</th>
+                                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">총 매출</th>
+                                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">예정</th>
+                                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">상태</th>
+                                </tr>
+                            </thead>
+                            <tbody id="teachersTableBody" class="divide-y divide-gray-200">
+                                <tr>
+                                    <td colspan="8" class="px-6 py-12 text-center text-gray-500">
+                                        <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                                        <div>데이터를 불러오는 중...</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+        <script>
+            let adminPin = '';
+
+            async function login() {
+                const pin = document.getElementById('adminPinInput').value;
+                
+                if (pin.length !== 4) {
+                    alert('4자리 PIN을 입력하세요');
+                    return;
+                }
+
+                try {
+                    const response = await axios.post('/api/hiing/admin/dashboard', { adminPin: pin });
+                    
+                    if (response.data.success) {
+                        adminPin = pin;
+                        document.getElementById('loginForm').classList.add('hidden');
+                        document.getElementById('dashboardContent').classList.remove('hidden');
+                        displayDashboardData(response.data);
+                    } else {
+                        alert('잘못된 관리자 PIN입니다');
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    alert('로그인 실패: ' + (error.response?.data?.error || error.message));
+                }
+            }
+
+            function displayDashboardData(data) {
+                const { overallStats, teachers, currentMonth, currentYear } = data;
+                
+                // Overall stats
+                document.getElementById('totalTeachers').textContent = overallStats.totalTeachers;
+                document.getElementById('activeTeachers').textContent = overallStats.activeTeachers;
+                document.getElementById('totalSessions').textContent = overallStats.totalSessions.toLocaleString();
+                document.getElementById('completedSessions').textContent = overallStats.completedSessions.toLocaleString();
+                document.getElementById('monthlyRevenue').textContent = '₩' + overallStats.monthlyRevenue.toLocaleString();
+                document.getElementById('totalRevenue').textContent = '₩' + overallStats.totalRevenue.toLocaleString();
+                document.getElementById('upcomingSessions').textContent = overallStats.upcomingSessions.toLocaleString();
+                document.getElementById('todaySessions').textContent = overallStats.todaySessions.toLocaleString();
+                document.getElementById('currentMonthLabel').textContent = currentMonth;
+
+                // Teachers table
+                const tbody = document.getElementById('teachersTableBody');
+                tbody.innerHTML = '';
+
+                teachers.forEach(teacher => {
+                    const row = document.createElement('tr');
+                    row.className = 'teacher-row';
+                    row.innerHTML = \`
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
+                                    \${teacher.name.charAt(0)}
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-800">\${teacher.name}</div>
+                                    <div class="text-xs text-gray-500">@\${teacher.teacherCode}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-700">\${teacher.specialty}</div>
+                            <div class="text-xs text-gray-500">\${teacher.experience}</div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="text-sm font-semibold text-gray-800">\${teacher.stats.totalSessions}</div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="text-sm font-semibold text-green-600">\${teacher.stats.completedSessions}</div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="text-sm font-semibold text-purple-600">₩\${teacher.stats.monthlyRevenue.toLocaleString()}</div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="text-sm font-semibold text-gray-800">₩\${teacher.stats.totalRevenue.toLocaleString()}</div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="text-sm font-semibold text-orange-600">\${teacher.stats.upcomingSessions}</div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            \${teacher.isActive 
+                                ? '<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">활성</span>' 
+                                : '<span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">비활성</span>'
+                            }
+                        </td>
+                    \`;
+                    tbody.appendChild(row);
+                });
+            }
+
+            function logout() {
+                if (confirm('로그아웃 하시겠습니까?')) {
+                    adminPin = '';
+                    document.getElementById('loginForm').classList.remove('hidden');
+                    document.getElementById('dashboardContent').classList.add('hidden');
+                    document.getElementById('adminPinInput').value = '';
+                }
+            }
+
+            // Enter key support
+            document.getElementById('adminPinInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    login();
+                }
+            });
+        </script>
+    </body>
+    </html>
+  `);
+});
+
 app.get('/teacher/:teacherCode', (c) => {
   const teacherCode = c.req.param('teacherCode');
   
