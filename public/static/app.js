@@ -5042,9 +5042,9 @@ class WorVox {
 
         grid.innerHTML = teachers.map(teacher => `
           <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all overflow-hidden border border-gray-100">
-            <!-- Smaller circular photo -->
+            <!-- Smaller circular photo (96px) -->
             <div class="flex justify-center pt-6 pb-2">
-              <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-100 shadow-lg">
+              <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-gray-100 shadow-lg">
                 <img src="${teacher.photo_url}" alt="${teacher.name}" 
                   class="w-full h-full object-cover"
                   onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22><circle fill=%22%2393c5fd%22 cx=%22100%22 cy=%22100%22 r=%22100%22/><text x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-size=%2280%22 font-family=%22Arial%22>${teacher.name.charAt(0)}</text></svg>';">
