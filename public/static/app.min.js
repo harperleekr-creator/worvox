@@ -5021,7 +5021,7 @@ class WorVox {
         <!-- Mobile Header -->
         <div class="md:hidden sticky top-0 z-50 bg-white border-b border-gray-200 px-4 py-3">
           <div class="flex items-center justify-between">
-            <button onclick="worvox.showLiveSpeaking()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+            <button onclick="worvox.showRealConversation()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
               <i class="fas fa-arrow-left text-gray-700"></i>
             </button>
             <h1 class="text-lg font-bold text-gray-800">Select Teacher</h1>
@@ -5031,7 +5031,7 @@ class WorVox {
 
         <!-- Desktop Header -->
         <div class="hidden md:flex items-center justify-between px-8 py-4 bg-white border-b border-gray-200">
-          <button onclick="worvox.showLiveSpeaking()" 
+          <button onclick="worvox.showRealConversation()" 
             class="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
             <i class="fas fa-arrow-left"></i>
             <span>Back to Live Speaking</span>

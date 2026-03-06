@@ -3112,9 +3112,14 @@ app.get('/teacher/:teacherCode', (c) => {
                         <p class="text-xs text-gray-600" id="teacherName">Loading...</p>
                     </div>
                 </div>
-                <button onclick="logout()" class="text-sm text-gray-600 hover:text-gray-800">
-                    <i class="fas fa-sign-out-alt mr-1"></i>Logout
-                </button>
+                <div class="flex items-center gap-2">
+                    <button onclick="showChangePinModal()" class="text-sm text-gray-600 hover:text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors">
+                        <i class="fas fa-key mr-1"></i>PIN 변경
+                    </button>
+                    <button onclick="logout()" class="text-sm text-gray-600 hover:text-red-600 px-3 py-2 rounded-lg hover:bg-red-50 transition-colors">
+                        <i class="fas fa-sign-out-alt mr-1"></i>로그아웃
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -3140,6 +3145,51 @@ app.get('/teacher/:teacherCode', (c) => {
                         class="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg">
                         <i class="fas fa-sign-in-alt mr-2"></i>Login
                     </button>
+                </div>
+            </div>
+
+            <!-- PIN Change Modal (hidden by default) -->
+            <div id="changePinModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-8 max-w-md w-full border border-gray-100">
+                    <div class="text-center mb-6">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-key text-white text-2xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2">PIN 번호 변경</h2>
+                        <p class="text-gray-600 text-sm">새로운 4자리 PIN을 설정하세요</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">현재 PIN</label>
+                            <input type="password" id="currentPinInput" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-xl tracking-widest"
+                                placeholder="••••" maxlength="4">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">새 PIN</label>
+                            <input type="password" id="newPinInput" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-xl tracking-widest"
+                                placeholder="••••" maxlength="4">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">새 PIN 확인</label>
+                            <input type="password" id="confirmPinInput" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-xl tracking-widest"
+                                placeholder="••••" maxlength="4">
+                        </div>
+                        
+                        <div class="flex gap-3 pt-2">
+                            <button onclick="hideChangePinModal()" 
+                                class="flex-1 py-3 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition-all">
+                                <i class="fas fa-times mr-2"></i>취소
+                            </button>
+                            <button onclick="changePin()" 
+                                class="flex-1 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all shadow-lg">
+                                <i class="fas fa-check mr-2"></i>변경
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -3552,6 +3602,68 @@ app.get('/teacher/:teacherCode', (c) => {
                 } catch (error) {
                     console.error('Complete session error:', error);
                     alert('오류 발생: ' + (error.response?.data?.error || error.message));
+                }
+            }
+
+            function showChangePinModal() {
+                document.getElementById('changePinModal').classList.remove('hidden');
+                document.getElementById('currentPinInput').value = '';
+                document.getElementById('newPinInput').value = '';
+                document.getElementById('confirmPinInput').value = '';
+                document.getElementById('currentPinInput').focus();
+            }
+
+            function hideChangePinModal() {
+                document.getElementById('changePinModal').classList.add('hidden');
+            }
+
+            async function changePin() {
+                const currentPin = document.getElementById('currentPinInput').value;
+                const newPin = document.getElementById('newPinInput').value;
+                const confirmPin = document.getElementById('confirmPinInput').value;
+
+                // Validation
+                if (!currentPin || currentPin.length !== 4) {
+                    alert('현재 PIN을 4자리로 입력해주세요');
+                    return;
+                }
+
+                if (!newPin || newPin.length !== 4 || !/^\d{4}$/.test(newPin)) {
+                    alert('새 PIN은 4자리 숫자여야 합니다');
+                    return;
+                }
+
+                if (newPin !== confirmPin) {
+                    alert('새 PIN이 일치하지 않습니다');
+                    return;
+                }
+
+                if (currentPin === newPin) {
+                    alert('새 PIN이 현재 PIN과 동일합니다. 다른 PIN을 입력해주세요');
+                    return;
+                }
+
+                try {
+                    const response = await axios.post('/api/hiing/teacher/change-pin', {
+                        teacherCode: teacherCode,
+                        currentPin: currentPin,
+                        newPin: newPin
+                    });
+
+                    if (response.data.success) {
+                        alert('✅ PIN이 성공적으로 변경되었습니다!\\n다음 로그인부터 새 PIN을 사용하세요.');
+                        teacherPin = newPin; // Update current session PIN
+                        hideChangePinModal();
+                    } else {
+                        alert('PIN 변경 실패: ' + response.data.error);
+                    }
+                } catch (error) {
+                    console.error('Change PIN error:', error);
+                    if (error.response?.status === 401) {
+                        alert('❌ 현재 PIN이 올바르지 않습니다');
+                    } else {
+                        alert('오류 발생: ' + (error.response?.data?.error || error.message));
+                    }
                 }
             }
 

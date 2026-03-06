@@ -447,4 +447,46 @@ app.post('/teacher/dashboard', async (c: Context) => {
   }
 })
 
+// 8. Change teacher PIN (강사 PIN 번호 변경)
+app.post('/teacher/change-pin', async (c: Context) => {
+  const { teacherCode, currentPin, newPin } = await c.req.json()
+  const { DB } = c.env as Bindings
+
+  try {
+    // Validate inputs
+    if (!teacherCode || !currentPin || !newPin) {
+      return c.json({ success: false, error: 'Missing required fields' }, 400)
+    }
+
+    if (newPin.length !== 4 || !/^\d{4}$/.test(newPin)) {
+      return c.json({ success: false, error: 'PIN must be exactly 4 digits' }, 400)
+    }
+
+    // Verify teacher with current PIN
+    const teacher: any = await DB.prepare(`
+      SELECT * FROM hiing_teachers 
+      WHERE teacher_code = ? AND pin_code = ? AND is_active = 1
+    `).bind(teacherCode, currentPin).first()
+
+    if (!teacher) {
+      return c.json({ success: false, error: 'Invalid teacher code or current PIN' }, 401)
+    }
+
+    // Update PIN
+    await DB.prepare(`
+      UPDATE hiing_teachers 
+      SET pin_code = ? 
+      WHERE id = ?
+    `).bind(newPin, teacher.id).run()
+
+    return c.json({
+      success: true,
+      message: 'PIN changed successfully'
+    })
+  } catch (error: any) {
+    console.error('Change PIN error:', error)
+    return c.json({ success: false, error: error.message }, 500)
+  }
+})
+
 export default app
