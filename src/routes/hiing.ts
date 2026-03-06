@@ -64,7 +64,7 @@ app.get('/teachers', async (c: Context) => {
 
 // 3. Create booking/schedule (예약 생성)
 app.post('/schedule', async (c: Context) => {
-  const { userId, teacherId, teacherName, scheduledAt, duration } = await c.req.json()
+  const { userId, teacherId, teacherName, scheduledAt, duration, studentPhone } = await c.req.json()
   const { DB } = c.env as Bindings
 
   try {
@@ -92,15 +92,16 @@ app.post('/schedule', async (c: Context) => {
     // Create session (NOT deducted yet!)
     const insertResult = await DB.prepare(`
       INSERT INTO hiing_sessions 
-      (user_id, teacher_id, teacher_name, scheduled_at, duration, teacher_phone, status)
-      VALUES (?, ?, ?, ?, ?, ?, 'scheduled')
+      (user_id, teacher_id, teacher_name, scheduled_at, duration, teacher_phone, student_phone, status)
+      VALUES (?, ?, ?, ?, ?, ?, ?, 'scheduled')
     `).bind(
       userId,
       teacherId,
       teacherName,
       scheduledAt,
       duration,
-      teacher.phone_number
+      teacher.phone_number,
+      studentPhone || null
     ).run()
 
     // Get the created session

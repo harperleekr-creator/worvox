@@ -5284,6 +5284,17 @@ class WorVox {
                 </select>
               </div>
 
+              <!-- Phone Number Input -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  <i class="fas fa-phone text-green-600 mr-2"></i>전화번호 (강사가 연락할 번호)
+                </label>
+                <input type="tel" id="studentPhone" placeholder="010-1234-5678" 
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  value="${this.currentUser?.phone || ''}">
+                <p class="text-xs text-gray-500 mt-1">강사님이 수업 시간에 이 번호로 전화드립니다</p>
+              </div>
+
               <!-- Duration Selection -->
               <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
@@ -5342,10 +5353,16 @@ class WorVox {
   async confirmSchedule(teacherId, teacherName) {
     const date = document.getElementById('lessonDate').value;
     const time = document.getElementById('lessonTime').value;
+    const studentPhone = document.getElementById('studentPhone').value;
     const duration = this.selectedDuration || 25;
 
     if (!date || !time) {
-      alert('Please select both date and time');
+      alert('날짜와 시간을 선택해주세요');
+      return;
+    }
+
+    if (!studentPhone || studentPhone.trim() === '') {
+      alert('전화번호를 입력해주세요');
       return;
     }
 
@@ -5373,21 +5390,24 @@ Proceed with booking?
         teacherId: teacherId,
         teacherName: teacherName,
         scheduledAt: scheduledAt,
-        duration: duration
+        duration: duration,
+        studentPhone: studentPhone
       });
 
       if (response.data.success) {
-        alert(`✅ Booking Confirmed!
+        alert(`✅ 예약 완료!
 
-Teacher: ${teacherName}
-Date: ${new Date(scheduledAt).toLocaleDateString()}
-Time: ${time}
-Phone: ${response.data.teacher.phone}
+강사: ${teacherName}
+날짜: ${new Date(scheduledAt).toLocaleDateString('ko-KR')}
+시간: ${time}
+학생 전화번호: ${studentPhone}
+수업 시간: ${duration}분
 
-Your teacher will call you at the scheduled time. Please make sure your phone is available!`);
+강사님이 예약 시간에 ${studentPhone}로 전화드립니다.
+전화를 받을 수 있도록 준비해주세요!`);
         
         // Go back to Live Speaking page
-        this.showLiveSpeaking();
+        this.showRealConversation();
       } else {
         throw new Error(response.data.error || 'Booking failed');
       }
