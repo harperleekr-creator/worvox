@@ -5042,21 +5042,50 @@ class WorVox {
 
         grid.innerHTML = teachers.map(teacher => `
           <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all overflow-hidden border border-gray-100">
-            <div class="aspect-square bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
-              <img src="${teacher.photo_url}" alt="${teacher.name}" 
-                class="w-full h-full object-cover"
-                onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22><rect fill=%22%2393c5fd%22 width=%22200%22 height=%22200%22/><text x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-size=%2280%22 font-family=%22Arial%22>${teacher.name.charAt(0)}</text></svg>';">
+            <!-- Smaller circular photo -->
+            <div class="flex justify-center pt-6 pb-2">
+              <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-100 shadow-lg">
+                <img src="${teacher.photo_url}" alt="${teacher.name}" 
+                  class="w-full h-full object-cover"
+                  onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22><circle fill=%22%2393c5fd%22 cx=%22100%22 cy=%22100%22 r=%22100%22/><text x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-size=%2280%22 font-family=%22Arial%22>${teacher.name.charAt(0)}</text></svg>';">
+              </div>
             </div>
-            <div class="p-6">
-              <div class="mb-4">
-                <h3 class="text-xl font-bold text-gray-800 mb-1">${teacher.name}</h3>
-                <div class="flex items-center gap-1 text-yellow-500 mb-2">
-                  ${Array(Math.floor(teacher.rating)).fill('<i class="fas fa-star"></i>').join('')}
-                  ${teacher.rating % 1 !== 0 ? '<i class="fas fa-star-half-alt"></i>' : ''}
-                  <span class="text-gray-600 text-sm ml-1">${teacher.rating}</span>
+            
+            <!-- Nationality flags -->
+            <div class="flex justify-center gap-2 mb-2">
+              <span class="text-2xl">${teacher.nationality || '🇰🇷🇺🇸'}</span>
+            </div>
+            
+            <!-- Name badge (yellow background like screenshot) -->
+            <div class="mx-4 mb-3">
+              <div class="bg-yellow-300 rounded-full py-2 px-4 text-center">
+                <h3 class="text-lg font-bold text-gray-900">${teacher.name}</h3>
+              </div>
+            </div>
+            
+            <div class="px-6 pb-6">
+              <!-- Title/Subtitle -->
+              <div class="text-center mb-3">
+                <p class="text-sm text-gray-700 font-semibold whitespace-pre-line">${teacher.title || teacher.specialty.substring(0, 50)}</p>
+              </div>
+              
+              <!-- Main specialty/experience (scrollable if long) -->
+              <div class="mb-4 max-h-24 overflow-y-auto">
+                <p class="text-xs text-gray-600 whitespace-pre-line leading-relaxed">${teacher.specialty}</p>
+              </div>
+              
+              <!-- Bio/Message box (black background like screenshot) -->
+              ${teacher.bio ? `
+                <div class="bg-black rounded-lg p-3 mb-4">
+                  <p class="text-xs text-yellow-300 whitespace-pre-line leading-relaxed">${teacher.bio}</p>
                 </div>
-                <p class="text-sm text-gray-600 mb-2"><i class="fas fa-book text-blue-500 mr-2"></i>${teacher.specialty}</p>
-                <p class="text-sm text-gray-600"><i class="fas fa-clock text-purple-500 mr-2"></i>${teacher.experience}</p>
+              ` : ''}
+              
+              <!-- Rating -->
+              <div class="flex items-center justify-center gap-1 text-yellow-500 mb-4">
+                ${Array(Math.floor(teacher.rating)).fill('<i class="fas fa-star"></i>').join('')}
+                ${teacher.rating % 1 !== 0 ? '<i class="fas fa-star-half-alt"></i>' : ''}
+                <span class="text-gray-600 text-sm ml-1">${teacher.rating}</span>
               </div>
               
               <button onclick="worvox.selectTeacher(${teacher.id}, '${teacher.name}')" 

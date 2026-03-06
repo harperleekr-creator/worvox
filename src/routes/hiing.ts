@@ -46,7 +46,7 @@ app.get('/teachers', async (c: Context) => {
 
   try {
     const result = await DB.prepare(`
-      SELECT id, teacher_code, name, photo_url, specialty, experience, rating, phone_number
+      SELECT id, teacher_code, name, photo_url, specialty, experience, rating, phone_number, bio, nationality, title
       FROM hiing_teachers
       WHERE is_active = 1
       ORDER BY rating DESC
