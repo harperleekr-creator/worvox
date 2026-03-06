@@ -1,6 +1,49 @@
 # WorVox - AI English Learning Platform
 
-## 🔔 최신 업데이트 (2026-03-05 09:30 UTC) - ✅ Production 배포 완료
+## 🔔 최신 업데이트 (2026-03-06 14:30 UTC) - ✅ Production 배포 완료
+
+### 🎯 관리자 대시보드 추가 - Commit `97c0fab` ✅
+
+**배포 정보**
+- **Production**: https://worvox.com ✅ 
+- **Admin Dashboard**: https://worvox.com/admin/dashboard ✅
+- **Preview**: https://db79a314.worvox.pages.dev ✅
+- **GitHub Commit**: https://github.com/harperleekr-creator/worvox/commit/97c0fab
+
+#### 1. ✅ 관리자 대시보드 구현
+- **추가된 기능**:
+  - ✅ **전체 통계 카드**:
+    - 총 강사 수 / 활성 강사 수
+    - 총 수업 수 / 완료된 수업 수
+    - 이번 달 매출 / 총 매출
+    - 예정된 수업 / 오늘 수업
+  - ✅ **강사별 상세 통계 테이블**:
+    - 강사 정보 (이름, 코드, 전문분야, 경력)
+    - 수업 통계 (전체, 완료, 예정)
+    - 매출 통계 (이번 달, 총 매출)
+    - 활성 상태 표시
+  - ✅ **보안**:
+    - 관리자 PIN (9999) 인증 필수
+    - 로그아웃 기능
+  - ✅ **디자인**:
+    - Indigo-Pink 그라데이션 테마
+    - 반응형 레이아웃 (모바일/데스크톱)
+    - Hover 효과 및 애니메이션
+    
+- **백엔드 API** (`/api/hiing/admin/dashboard`):
+  - ✅ 모든 강사의 통계 조회
+  - ✅ 전체 플랫폼 통계 집계
+  - ✅ 월별/총 매출 계산
+  - ✅ 예정 수업 및 오늘 수업 집계
+  
+**접속 방법**:
+1. https://worvox.com/admin/dashboard 접속
+2. Admin PIN 입력: `9999`
+3. 전체 강사 통계 및 관리 화면 확인
+
+---
+
+## 🔔 이전 업데이트 (2026-03-05 09:30 UTC) - ✅ Production 배포 완료
 
 ### 🎯 문법 피드백 추가 - Commit `9e87b91` ✅
 
