@@ -4888,9 +4888,14 @@ class WorVox {
         }
       } catch (error) {
         console.error('Free trial error:', error);
-        // Check if it's a duplicate free trial error
+        // Check if it's a duplicate free trial error (400 status)
         if (error.response && error.response.status === 400) {
-          alert('❌ 무료 체험은 1회만 가능합니다.\n\n이미 무료 체험을 사용하셨습니다.\n수업권을 구매해주세요! 💰');
+          const errorMsg = error.response.data.error || '';
+          if (errorMsg.includes('already used')) {
+            alert('❌ 무료 체험은 1회만 가능합니다.\n\n이미 무료 체험을 사용하셨습니다.\n수업권을 구매해주세요! 💰');
+          } else {
+            alert('❌ ' + errorMsg);
+          }
         } else {
           alert('❌ Failed to register free trial. Please try again.');
         }
