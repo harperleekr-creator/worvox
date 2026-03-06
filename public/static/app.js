@@ -12,6 +12,10 @@ class WorVox {
     this.isRecording = false;
     this.currentAudio = null;
     
+    // 🚀 Option C: Preloaded prompts cache
+    this.preloadedPrompts = {};
+    this.isPreloading = false;
+    
     // User plan and usage tracking
     this.userPlan = 'free'; // 'free', 'premium', 'business'
     this.currentBillingPeriod = 'monthly'; // 'monthly' or 'yearly'
@@ -992,50 +996,112 @@ class WorVox {
 
     // Check if AI prompts are enabled
     if (this.currentUser.use_ai_prompts && this.isPremiumUser()) {
-      // Show loading indicator
+      // 🚀 Option A: Enhanced loading with progress bar
+      let progressValue = 0;
+      const progressInterval = setInterval(() => {
+        progressValue = Math.min(progressValue + Math.random() * 15, 95);
+        const progressBar = document.getElementById('ai-progress-bar');
+        const progressText = document.getElementById('ai-progress-text');
+        if (progressBar) progressBar.style.width = `${progressValue}%`;
+        if (progressText) progressText.textContent = `${Math.round(progressValue)}%`;
+      }, 150);
+
       const app = document.getElementById('app');
       app.innerHTML = `
         <div class="flex h-screen items-center justify-center bg-gradient-to-br from-purple-900 via-purple-800 to-pink-900">
-          <div class="text-center text-white">
-            <div class="text-6xl mb-4">🤖</div>
+          <div class="text-center text-white px-4 max-w-md w-full">
+            <div class="text-6xl mb-4 animate-bounce">🤖</div>
             <h2 class="text-2xl font-bold mb-2">AI 프롬프트 생성 중...</h2>
-            <p class="text-purple-200">
+            <p class="text-purple-200 mb-6">
               ${
                 this.currentUser.level === 'beginner' ? '초급 레벨에 맞는 간단한 문장을 준비하고 있습니다' :
                 this.currentUser.level === 'intermediate' ? '중급 레벨에 맞는 실용적인 문장을 준비하고 있습니다' :
                 '고급 레벨에 맞는 심화 문장을 준비하고 있습니다'
               }
             </p>
-            <div class="mt-6">
-              <i class="fas fa-spinner fa-spin text-4xl"></i>
+            
+            <div class="w-full bg-purple-800/30 rounded-full h-3 mb-3 overflow-hidden">
+              <div id="ai-progress-bar" class="bg-gradient-to-r from-yellow-400 to-pink-400 h-3 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+            </div>
+            <p id="ai-progress-text" class="text-sm text-purple-200 mb-4">0%</p>
+            
+            <div class="flex items-center justify-center space-x-2 text-sm text-purple-200">
+              <i class="fas fa-spinner fa-spin"></i>
+              <span id="ai-status-text">캐시 확인 중...</span>
             </div>
           </div>
         </div>
       `;
 
       try {
+        const updateStatus = (text) => {
+          const statusEl = document.getElementById('ai-status-text');
+          if (statusEl) statusEl.textContent = text;
+        };
+
         console.log('🤖 Generating AI prompt for level:', this.currentUser.level);
-        const response = await axios.post('/api/ai-prompts/generate', {
-          mode: 'timer',
-          level: this.currentUser.level,
-          userId: this.currentUser.id
-        });
-
-        console.log('🤖 AI Response:', response.data);
-
-        if (response.data.success && response.data.data.sentence) {
-          randomSentence = response.data.data.sentence;
-          translation = response.data.data.translation || '✨ AI가 생성한 맞춤형 문장'; // Use AI translation
-          console.log('✅ Using AI-generated prompt:', randomSentence);
-          console.log('✅ Korean translation:', translation);
+        
+        // 🚀 Option C: Check preloaded cache first
+        const cacheKey = `ai_prompt_${this.currentUser.level}_timer`;
+        if (this.preloadedPrompts && this.preloadedPrompts[cacheKey]) {
+          console.log('⚡ Using preloaded prompt!');
+          clearInterval(progressInterval);
+          const progressBar = document.getElementById('ai-progress-bar');
+          const progressText = document.getElementById('ai-progress-text');
+          if (progressBar) progressBar.style.width = '100%';
+          if (progressText) progressText.textContent = '100%';
+          updateStatus('캐시에서 로드 완료! ⚡');
+          
+          const cached = this.preloadedPrompts[cacheKey];
+          randomSentence = cached.sentence;
+          translation = cached.translation;
+          delete this.preloadedPrompts[cacheKey];
+          await new Promise(resolve => setTimeout(resolve, 300));
         } else {
-          throw new Error('AI generation failed: ' + JSON.stringify(response.data));
+          updateStatus('AI 프롬프트 생성 중...');
+          
+          const response = await axios.post('/api/ai-prompts/generate', {
+            mode: 'timer',
+            level: this.currentUser.level,
+            userId: this.currentUser.id,
+            useCache: true
+          });
+
+          console.log('🤖 AI Response:', response.data);
+          
+          clearInterval(progressInterval);
+          const progressBar = document.getElementById('ai-progress-bar');
+          const progressText = document.getElementById('ai-progress-text');
+          if (progressBar) progressBar.style.width = '100%';
+          if (progressText) progressText.textContent = '100%';
+          
+          if (response.data.cached) {
+            updateStatus('캐시에서 로드 완료! ⚡');
+            console.log('✅ Using cached prompt');
+          } else {
+            updateStatus('새 프롬프트 생성 완료! ✨');
+            console.log('✅ Generated new prompt');
+          }
+
+          if (response.data.success && response.data.data.sentence) {
+            randomSentence = response.data.data.sentence;
+            translation = response.data.data.translation || '✨ AI가 생성한 맞춤형 문장';
+            console.log('✅ Using AI-generated prompt:', randomSentence);
+            console.log('✅ Korean translation:', translation);
+          } else {
+            throw new Error('AI generation failed: ' + JSON.stringify(response.data));
+          }
+          
+          await new Promise(resolve => setTimeout(resolve, 300));
         }
+        
+        // 🚀 Option C: Preload next prompt in background
+        this.preloadNextPrompt();
       } catch (error) {
+        clearInterval(progressInterval);
         console.error('❌ AI prompt generation failed:', error);
         console.error('Error details:', error.response?.data);
         
-        // Show error and fall back to default
         alert('AI 프롬프트 생성에 실패했습니다.\n기본 문장 풀을 사용합니다.');
         ({ randomSentence, translation } = this.getDefaultTimerSentence());
       }
@@ -1046,6 +1112,44 @@ class WorVox {
     }
     
     this.renderTimerChallenge(seconds, randomSentence, translation);
+  }
+
+  // 🚀 Option C: Preload next prompt in background
+  async preloadNextPrompt() {
+    if (this.isPreloading || !this.currentUser) return;
+    
+    try {
+      this.isPreloading = true;
+      const cacheKey = `ai_prompt_${this.currentUser.level}_timer`;
+      
+      // Skip if already cached
+      if (this.preloadedPrompts[cacheKey]) {
+        console.log('⏩ Prompt already preloaded');
+        this.isPreloading = false;
+        return;
+      }
+      
+      console.log('🔄 Preloading next prompt in background...');
+      
+      const response = await axios.post('/api/ai-prompts/generate', {
+        mode: 'timer',
+        level: this.currentUser.level,
+        userId: this.currentUser.id,
+        useCache: true
+      });
+      
+      if (response.data.success && response.data.data.sentence) {
+        this.preloadedPrompts[cacheKey] = {
+          sentence: response.data.data.sentence,
+          translation: response.data.data.translation
+        };
+        console.log('✅ Next prompt preloaded successfully!');
+      }
+    } catch (error) {
+      console.error('⚠️ Preload failed (non-critical):', error);
+    } finally {
+      this.isPreloading = false;
+    }
   }
 
   getDefaultTimerSentence() {

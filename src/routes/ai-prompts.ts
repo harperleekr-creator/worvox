@@ -103,7 +103,7 @@ aiPrompts.post('/generate', async (c) => {
       baseUrl: c.env.OPENAI_API_BASE
     });
 
-    const { mode, level, userId, topic, description } = await c.req.json();
+    const { mode, level, userId, topic, description, useCache = true } = await c.req.json();
 
     // Validate input
     if (!mode || !level) {
@@ -116,6 +116,35 @@ aiPrompts.post('/generate', async (c) => {
 
     if (!['beginner', 'intermediate', 'advanced'].includes(level)) {
       return c.json({ success: false, error: 'Invalid level' }, 400);
+    }
+
+    // 🚀 Option B: Try cache first (for timer mode without custom topic)
+    if (useCache && mode === 'timer' && !topic) {
+      try {
+        const cached = await c.env.DB.prepare(`
+          SELECT content, created_at
+          FROM ai_generated_prompts
+          WHERE mode = ? AND level = ? AND user_id IS NULL
+          ORDER BY RANDOM()
+          LIMIT 1
+        `).bind(mode, level).first();
+
+        if (cached) {
+          const cachedContent = JSON.parse(cached.content as string);
+          console.log('✅ Using cached prompt:', cachedContent);
+          return c.json({
+            success: true,
+            data: cachedContent,
+            level,
+            mode,
+            cached: true,
+            cachedAt: cached.created_at
+          });
+        }
+      } catch (cacheError) {
+        console.log('⚠️ Cache lookup failed, generating new:', cacheError);
+        // Continue to generate new prompt
+      }
     }
 
     // Check if user is Premium or Core (if userId provided)
@@ -239,7 +268,15 @@ aiPrompts.post('/generate', async (c) => {
     }
 
     // Cache the generated prompt in database
-    if (userId) {
+    // 🚀 Option B: Cache for all users (global cache for common prompts)
+    if (mode === 'timer' && !topic) {
+      // Cache globally for timer mode (no user-specific)
+      await c.env.DB.prepare(`
+        INSERT INTO ai_generated_prompts (user_id, mode, level, content, created_at)
+        VALUES (?, ?, ?, ?, datetime('now'))
+      `).bind(null, mode, level, JSON.stringify(result)).run();
+    } else if (userId) {
+      // Cache user-specific prompts
       await c.env.DB.prepare(`
         INSERT INTO ai_generated_prompts (user_id, mode, level, content, created_at)
         VALUES (?, ?, ?, ?, datetime('now'))
@@ -250,7 +287,8 @@ aiPrompts.post('/generate', async (c) => {
       success: true, 
       data: result,
       level,
-      mode
+      mode,
+      cached: false
     });
 
   } catch (error) {
