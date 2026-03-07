@@ -193,4 +193,87 @@ gamification.get('/leaderboard', async (c: Context<{ Bindings: Bindings }>) => {
   }
 })
 
+// Get user's spin count
+gamification.get('/spin-count/:userId', async (c: Context<{ Bindings: Bindings }>) => {
+  try {
+    const userId = c.req.param('userId')
+    
+    const user = await c.env.DB.prepare(`
+      SELECT spin_count FROM users WHERE id = ?
+    `).bind(userId).first() as any
+
+    if (!user) {
+      return c.json({ success: false, error: 'User not found' }, 404)
+    }
+
+    return c.json({
+      success: true,
+      spin_count: user.spin_count || 0
+    })
+  } catch (error) {
+    console.error('Error getting spin count:', error)
+    return c.json({ success: false, error: 'Failed to get spin count' }, 500)
+  }
+})
+
+// Update user's spin count
+gamification.post('/spin-count/update', async (c: Context<{ Bindings: Bindings }>) => {
+  try {
+    const { userId, spin_count } = await c.req.json()
+    
+    if (!userId || spin_count === undefined) {
+      return c.json({ success: false, error: 'Missing userId or spin_count' }, 400)
+    }
+
+    await c.env.DB.prepare(`
+      UPDATE users SET spin_count = ? WHERE id = ?
+    `).bind(spin_count, userId).run()
+
+    return c.json({
+      success: true,
+      spin_count
+    })
+  } catch (error) {
+    console.error('Error updating spin count:', error)
+    return c.json({ success: false, error: 'Failed to update spin count' }, 500)
+  }
+})
+
+// Use spin (decrement by 1)
+gamification.post('/spin/use', async (c: Context<{ Bindings: Bindings }>) => {
+  try {
+    const { userId } = await c.req.json()
+    
+    if (!userId) {
+      return c.json({ success: false, error: 'Missing userId' }, 400)
+    }
+
+    const user = await c.env.DB.prepare(`
+      SELECT spin_count FROM users WHERE id = ?
+    `).bind(userId).first() as any
+
+    if (!user) {
+      return c.json({ success: false, error: 'User not found' }, 404)
+    }
+
+    if ((user.spin_count || 0) <= 0) {
+      return c.json({ success: false, error: 'No spins available' }, 400)
+    }
+
+    const newSpinCount = (user.spin_count || 0) - 1
+
+    await c.env.DB.prepare(`
+      UPDATE users SET spin_count = ? WHERE id = ?
+    `).bind(newSpinCount, userId).run()
+
+    return c.json({
+      success: true,
+      spin_count: newSpinCount
+    })
+  } catch (error) {
+    console.error('Error using spin:', error)
+    return c.json({ success: false, error: 'Failed to use spin' }, 500)
+  }
+})
+
 export default gamification

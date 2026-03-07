@@ -10401,8 +10401,8 @@ Proceed to payment?
       // Load gamification stats after rendering
       await this.loadGamificationStats();
       
-      // Initialize spin count (from localStorage or default)
-      this.availableSpins = parseInt(localStorage.getItem('worvox_spin_count') || '0');
+      // Load spin count from database
+      await this.loadSpinCount();
       this.updateSpinCount();
     } catch (error) {
       console.error('Error loading rewards:', error);
@@ -10437,6 +10437,29 @@ Proceed to payment?
         </div>
       `;
     }).join('');
+  }
+  
+  async loadSpinCount() {
+    try {
+      const response = await axios.get(`/api/gamification/spin-count/${this.currentUser.id}`);
+      if (response.data.success) {
+        this.availableSpins = response.data.spin_count || 0;
+      }
+    } catch (error) {
+      console.error('Error loading spin count:', error);
+      this.availableSpins = 0;
+    }
+  }
+  
+  async saveSpinCount() {
+    try {
+      await axios.post('/api/gamification/spin-count/update', {
+        userId: this.currentUser.id,
+        spin_count: this.availableSpins
+      });
+    } catch (error) {
+      console.error('Error saving spin count:', error);
+    }
   }
   
   updateSpinCount() {
@@ -10488,14 +10511,14 @@ Proceed to payment?
       if (reward.type === 'spin') {
         // Add spins to available count
         this.availableSpins = (this.availableSpins || 0) + reward.spins;
-        localStorage.setItem('worvox_spin_count', this.availableSpins.toString());
+        await this.saveSpinCount();
         this.updateSpinCount();
         alert(`🎉 축하합니다!\n\n돌림판 ${reward.spins}회가 지급되었습니다!\n\n상단의 "돌림판 돌리기" 버튼을 눌러 행운을 시험해보세요!`);
       } else if (reward.type === 'premium') {
         alert(`🎉 축하합니다!\n\n프리미엄 ${reward.days}일 무료 체험권이 지급되었습니다!`);
       } else if (reward.type === 'xp+spin') {
         this.availableSpins = (this.availableSpins || 0) + reward.spins;
-        localStorage.setItem('worvox_spin_count', this.availableSpins.toString());
+        await this.saveSpinCount();
         this.updateSpinCount();
         alert(`🎉 축하합니다!\n\nLevel 83으로 즉시 상승 + 돌림판 ${reward.spins}회 기회가 지급되었습니다!`);
       } else if (reward.type === 'coupon') {
@@ -10627,10 +10650,10 @@ Proceed to payment?
     wheel.style.transform = `rotate(${targetDegree}deg)`;
     
     // Show result after animation
-    setTimeout(() => {
+    setTimeout(async () => {
       // Decrease available spins
       this.availableSpins--;
-      localStorage.setItem('worvox_spin_count', this.availableSpins.toString());
+      await this.saveSpinCount();
       this.updateSpinCount();
       
       document.getElementById('spinResult').innerHTML = `
