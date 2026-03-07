@@ -10288,7 +10288,7 @@ Proceed to payment?
                       </div>
                       
                       <!-- Wheel -->
-                      <div id="spinWheel" class="absolute inset-0 rounded-full border-8 border-gray-800 shadow-2xl overflow-hidden" style="transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);">
+                      <div id="spinWheel" class="absolute inset-0 rounded-full border-8 border-gray-800 shadow-2xl" style="transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99); overflow: hidden;">
                         ${this.generateSpinWheelHTML()}
                       </div>
                       
@@ -10397,14 +10397,27 @@ Proceed to payment?
       { name: '아이패드', icon: '📱', color: '#6366F1' }
     ];
     
+    const sectorAngle = 360 / prizes.length; // 45 degrees for 8 sections
     return prizes.map((prize, index) => {
-      const angle = (360 / prizes.length) * index;
+      const rotation = sectorAngle * index;
+      const halfAngle = sectorAngle / 2;
+      
+      // Calculate clip-path for perfect pie slice
+      const x1 = 50;
+      const y1 = 50;
+      const x2 = 50 + 50 * Math.sin(0);
+      const y2 = 50 - 50 * Math.cos(0);
+      const x3 = 50 + 50 * Math.sin((sectorAngle * Math.PI) / 180);
+      const y3 = 50 - 50 * Math.cos((sectorAngle * Math.PI) / 180);
+      
       return `
-        <div class="absolute w-full h-full" style="transform: rotate(${angle}deg); transform-origin: center;">
-          <div class="absolute w-1/2 h-full right-1/2 origin-right flex items-center justify-end pr-3" style="background: ${prize.color}; clip-path: polygon(100% 0, 100% 100%, 0 50%);">
-            <div class="transform rotate-90 text-center">
-              <div class="text-3xl mb-1">${prize.icon}</div>
-              <div class="text-[11px] font-bold text-white whitespace-nowrap leading-tight">${prize.name}</div>
+        <div class="absolute w-full h-full" style="transform: rotate(${rotation}deg); transform-origin: center center;">
+          <div style="position: absolute; width: 100%; height: 100%; clip-path: polygon(50% 50%, 50% 0%, ${x3}% ${y3}%); background: ${prize.color};">
+            <div class="absolute" style="top: 25%; left: 50%; transform: translate(-50%, 0) rotate(${halfAngle}deg);">
+              <div class="text-center">
+                <div class="text-2xl mb-0.5">${prize.icon}</div>
+                <div class="text-[10px] font-bold text-white whitespace-nowrap leading-tight">${prize.name}</div>
+              </div>
             </div>
           </div>
         </div>
