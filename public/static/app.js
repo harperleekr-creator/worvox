@@ -10277,55 +10277,30 @@ Proceed to payment?
                 
                 <!-- Spin Wheel Section -->
                 <div id="spinWheelSection" class="bg-white rounded-2xl shadow-xl p-6 mb-8">
-                  <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">🎰 행운의 돌림판</h3>
+                  <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">🎰 행운의 돌림판</h3>
                   
-                  <!-- Wheel Container -->
-                  <div class="relative mb-6">
-                    <!-- Wheel -->
-                    <div id="spinWheel" class="relative w-80 h-80 mx-auto rounded-full border-8 border-gray-800 shadow-2xl overflow-hidden" style="transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);">
-                      ${this.generateSpinWheelHTML()}
+                  <!-- Wheel Container (centered with flex) -->
+                  <div class="flex justify-center items-center mb-6">
+                    <div class="relative" style="width: 320px; height: 320px;">
+                      <!-- Pointer -->
+                      <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2 z-30">
+                        <div class="w-0 h-0 border-l-[12px] border-r-[12px] border-t-[24px] border-l-transparent border-r-transparent border-t-red-600 drop-shadow-lg"></div>
+                      </div>
+                      
+                      <!-- Wheel -->
+                      <div id="spinWheel" class="absolute inset-0 rounded-full border-8 border-gray-800 shadow-2xl overflow-hidden" style="transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);">
+                        ${this.generateSpinWheelHTML()}
+                      </div>
+                      
+                      <!-- Center Button -->
+                      <button id="spinButton" onclick="worvox.spinTheWheel()" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full shadow-2xl flex items-center justify-center text-white font-bold text-lg hover:scale-110 transition-all z-20 border-4 border-white">
+                        SPIN
+                      </button>
                     </div>
-                    
-                    <!-- Pointer -->
-                    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2 z-10">
-                      <div class="w-0 h-0 border-l-8 border-r-8 border-t-16 border-l-transparent border-r-transparent border-t-red-500"></div>
-                    </div>
-                    
-                    <!-- Center Button -->
-                    <button id="spinButton" onclick="worvox.spinTheWheel()" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full shadow-2xl flex items-center justify-center text-white font-bold text-xl hover:scale-110 transition-all z-20 border-4 border-white">
-                      SPIN
-                    </button>
                   </div>
                   
                   <!-- Result Display -->
-                  <div id="spinResult" class="text-center mb-4 min-h-16"></div>
-                  
-                  <!-- Prize List (without probabilities) -->
-                  <div class="mt-6">
-                    <h4 class="text-lg font-bold text-gray-800 mb-3 text-center">🎁 경품 목록</h4>
-                    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
-                      <div class="text-center p-3 bg-blue-50 rounded-lg">
-                        <div class="text-3xl mb-1">⚡</div>
-                        <div class="text-sm font-semibold">XP 50</div>
-                      </div>
-                      <div class="text-center p-3 bg-purple-50 rounded-lg">
-                        <div class="text-3xl mb-1">💫</div>
-                        <div class="text-sm font-semibold">XP 300</div>
-                      </div>
-                      <div class="text-center p-3 bg-green-50 rounded-lg">
-                        <div class="text-3xl mb-1">☕</div>
-                        <div class="text-sm font-semibold">아메리카노</div>
-                      </div>
-                      <div class="text-center p-3 bg-yellow-50 rounded-lg">
-                        <div class="text-3xl mb-1">🎫</div>
-                        <div class="text-sm font-semibold">1만원권</div>
-                      </div>
-                      <div class="text-center p-3 bg-red-50 rounded-lg">
-                        <div class="text-3xl mb-1">📱</div>
-                        <div class="text-sm font-semibold">고급 경품</div>
-                      </div>
-                    </div>
-                  </div>
+                  <div id="spinResult" class="text-center"></div>
                 </div>
 
                 <!-- Rewards Grid -->
@@ -10428,10 +10403,10 @@ Proceed to payment?
       const angle = (360 / prizes.length) * index;
       return `
         <div class="absolute w-full h-full" style="transform: rotate(${angle}deg); transform-origin: center;">
-          <div class="absolute w-1/2 h-full right-1/2 origin-right flex items-center justify-end pr-4" style="background: ${prize.color}; clip-path: polygon(100% 0, 100% 100%, 0 50%);">
+          <div class="absolute w-1/2 h-full right-1/2 origin-right flex items-center justify-end pr-2" style="background: ${prize.color}; clip-path: polygon(100% 0, 100% 100%, 0 50%);">
             <div class="transform rotate-90 text-center">
-              <div class="text-2xl mb-1">${prize.icon}</div>
-              <div class="text-[10px] font-bold text-white whitespace-nowrap">${prize.name}</div>
+              <div class="text-2xl mb-0.5">${prize.icon}</div>
+              <div class="text-[9px] font-bold text-white whitespace-nowrap leading-tight">${prize.name}</div>
             </div>
           </div>
         </div>
@@ -10656,33 +10631,71 @@ Proceed to payment?
       await this.saveSpinCount();
       this.updateSpinCount();
       
+      // Award XP if XP prize
+      let xpAwarded = 0;
+      if (selectedPrize.name === 'XP 50') {
+        xpAwarded = 50;
+        await this.awardXP(50, 'spin_wheel', 'Spin Wheel - XP 50');
+      } else if (selectedPrize.name === 'XP 300') {
+        xpAwarded = 300;
+        await this.awardXP(300, 'spin_wheel', 'Spin Wheel - XP 300');
+      }
+      
       document.getElementById('spinResult').innerHTML = `
-        <div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white py-4 px-6 rounded-xl shadow-lg animate-bounce">
-          <div class="text-5xl mb-2">${selectedPrize.icon}</div>
-          <div class="text-2xl font-bold mb-1">축하합니다!</div>
-          <div class="text-xl">${selectedPrize.name} 당첨!</div>
-          <div class="text-sm mt-2 text-yellow-100">남은 횟수: ${this.availableSpins}회</div>
+        <div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white py-6 px-8 rounded-2xl shadow-2xl">
+          <div class="text-6xl mb-3">${selectedPrize.icon}</div>
+          <div class="text-3xl font-bold mb-2">축하합니다!</div>
+          <div class="text-2xl mb-1">${selectedPrize.name} 당첨!</div>
+          ${xpAwarded > 0 ? `<div class="text-lg mt-2 text-yellow-100">✨ +${xpAwarded} XP 획득!</div>` : ''}
+          <div class="text-sm mt-3 text-yellow-100">남은 횟수: ${this.availableSpins}회</div>
+          <button onclick="worvox.closeSpinResult()" class="mt-4 bg-white text-orange-600 px-6 py-2 rounded-lg font-bold hover:bg-orange-50 transition-all">
+            확인
+          </button>
         </div>
       `;
-      
-      // Re-enable button if spins remain
-      if (this.availableSpins > 0) {
-        spinButton.disabled = false;
-        spinButton.classList.remove('opacity-50', 'cursor-not-allowed');
-        // Reset wheel rotation for next spin
-        setTimeout(() => {
-          wheel.style.transition = 'none';
-          wheel.style.transform = 'rotate(0deg)';
-          setTimeout(() => {
-            wheel.style.transition = 'transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
-          }, 50);
-        }, 2000);
-      } else {
-        document.getElementById('spinResult').innerHTML += `
-          <p class="text-gray-600 mt-4">모든 기회를 사용했습니다!</p>
-        `;
-      }
     }, 3000);
+  }
+  
+  async awardXP(xp, activityType, details) {
+    try {
+      await axios.post('/api/gamification/xp/add', {
+        userId: this.currentUser.id,
+        xp: xp,
+        activityType: activityType,
+        details: details
+      });
+      // Reload stats to show updated XP
+      await this.loadGamificationStats();
+    } catch (error) {
+      console.error('Error awarding XP:', error);
+    }
+  }
+  
+  closeSpinResult() {
+    const spinButton = document.getElementById('spinButton');
+    const wheel = document.getElementById('spinWheel');
+    
+    // Clear result
+    document.getElementById('spinResult').innerHTML = '';
+    
+    // Re-enable button if spins remain
+    if (this.availableSpins > 0) {
+      spinButton.disabled = false;
+      spinButton.classList.remove('opacity-50', 'cursor-not-allowed');
+      
+      // Reset wheel rotation for next spin
+      wheel.style.transition = 'none';
+      wheel.style.transform = 'rotate(0deg)';
+      setTimeout(() => {
+        wheel.style.transition = 'transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
+      }, 50);
+    } else {
+      document.getElementById('spinResult').innerHTML = `
+        <p class="text-gray-600 text-lg">모든 기회를 사용했습니다!</p>
+        <p class="text-gray-500 text-sm mt-2">레벨업 보상으로 돌림판을 다시 받으세요!</p>
+      `;
+    }
+  }
   }
 
   showUpgrade() {
