@@ -10244,59 +10244,55 @@ Proceed to payment?
             <div class="flex-1 overflow-y-auto p-4 md:p-8">
               <div class="max-w-6xl mx-auto">
                 <!-- Current Level & Spin Count Card -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
                   <!-- Level Card -->
-                  <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-6 text-white shadow-2xl">
-                    <div class="flex items-center justify-between mb-4">
+                  <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-4 text-white shadow-lg">
+                    <div class="flex items-center justify-between mb-2">
                       <div>
-                        <h2 class="text-3xl font-bold mb-2">Level ${userLevel}</h2>
-                        <p class="text-indigo-100">Keep learning to unlock more rewards!</p>
+                        <h2 class="text-xl font-bold mb-1">Level ${userLevel}</h2>
+                        <p class="text-xs text-indigo-100">Keep learning to unlock rewards!</p>
                       </div>
-                      <div class="text-6xl">🎯</div>
+                      <div class="text-3xl">🎯</div>
                     </div>
-                    <div class="bg-white bg-opacity-20 rounded-full h-4">
-                      <div class="bg-yellow-400 h-4 rounded-full transition-all" style="width: ${stats ? stats.stats.progress : 0}%"></div>
+                    <div class="bg-white bg-opacity-20 rounded-full h-2">
+                      <div class="bg-yellow-400 h-2 rounded-full transition-all" style="width: ${stats ? stats.stats.progress : 0}%"></div>
                     </div>
-                    <div class="mt-2 text-sm text-indigo-100">
-                      ${stats ? `${stats.stats.xp} / ${stats.stats.xpForNextLevel} XP to next level` : ''}
+                    <div class="mt-1 text-xs text-indigo-100">
+                      ${stats ? `${stats.stats.xp} / ${stats.stats.xpForNextLevel} XP` : ''}
                     </div>
                   </div>
                   
                   <!-- Spin Wheel Count Card -->
-                  <div class="bg-gradient-to-r from-orange-500 to-pink-500 rounded-2xl p-6 text-white shadow-2xl">
-                    <div class="flex items-center justify-between mb-4">
-                      <div>
-                        <h2 class="text-3xl font-bold mb-2">보유 랜덤박스</h2>
-                        <p class="text-orange-100">행운의 랜덤박스를 열어보세요!</p>
-                      </div>
-                      <div class="text-6xl">🎰</div>
-                    </div>
+                  <div class="bg-gradient-to-r from-orange-500 to-pink-500 rounded-xl p-4 text-white shadow-lg">
                     <div class="flex items-center justify-between">
                       <div>
-                        <div class="text-5xl font-bold" id="availableSpins">0</div>
-                        <p class="text-sm text-orange-100 mt-1">사용 가능 횟수</p>
+                        <h2 class="text-xl font-bold mb-1">보유 랜덤박스</h2>
+                        <div class="flex items-baseline gap-2">
+                          <div class="text-3xl font-bold" id="availableSpins">0</div>
+                          <p class="text-xs text-orange-100">개</p>
+                        </div>
                       </div>
-                      <button onclick="worvox.openRandomBox()" class="bg-white text-orange-600 px-6 py-3 rounded-lg font-bold hover:bg-orange-50 transition-all shadow-lg">
-                        랜덤박스 열기
+                      <button onclick="worvox.openRandomBox()" class="bg-white text-orange-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-orange-50 transition-all shadow-lg">
+                        열기
                       </button>
                     </div>
                   </div>
                 </div>
                 
                 <!-- Random Box Section -->
-                <div id="randomBoxSection" class="bg-white rounded-2xl shadow-xl p-6 mb-8">
-                  <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">🎁 행운의 랜덤박스</h3>
+                <div id="randomBoxSection" class="bg-white rounded-xl shadow-lg p-4 mb-4">
+                  <h3 class="text-lg font-bold text-gray-800 mb-3 text-center">🎁 행운의 랜덤박스</h3>
                   
                   <!-- Box Container -->
-                  <div class="flex justify-center items-center mb-6">
-                    <div class="relative" style="width: 300px; height: 300px;">
+                  <div class="flex justify-center items-center mb-3">
+                    <div class="relative" style="width: 200px; height: 200px;">
                       <!-- Mystery Box (closed) -->
                       <div id="mysteryBox" class="absolute inset-0 cursor-pointer transition-all duration-500" onclick="worvox.openBox()">
-                        <div class="w-full h-full bg-gradient-to-br from-purple-600 via-pink-500 to-orange-500 rounded-2xl shadow-2xl flex items-center justify-center transform hover:scale-105 transition-all">
+                        <div class="w-full h-full bg-gradient-to-br from-purple-600 via-pink-500 to-orange-500 rounded-xl shadow-xl flex items-center justify-center transform hover:scale-105 transition-all">
                           <div class="text-center text-white">
-                            <div class="text-8xl mb-4">🎁</div>
-                            <div class="text-2xl font-bold mb-2">클릭하세요!</div>
-                            <div class="text-lg opacity-80">무엇이 나올까요?</div>
+                            <div class="text-5xl mb-2">🎁</div>
+                            <div class="text-lg font-bold mb-1">클릭하세요!</div>
+                            <div class="text-xs opacity-80">무엇이 나올까요?</div>
                           </div>
                         </div>
                       </div>
@@ -10305,8 +10301,8 @@ Proceed to payment?
                       <div id="boxOpening" class="absolute inset-0 hidden">
                         <div class="w-full h-full flex items-center justify-center">
                           <div class="text-center">
-                            <div class="text-6xl animate-bounce">✨</div>
-                            <div class="text-xl font-bold text-gray-800 mt-4">열는 중...</div>
+                            <div class="text-4xl animate-bounce">✨</div>
+                            <div class="text-base font-bold text-gray-800 mt-2">열는 중...</div>
                           </div>
                         </div>
                       </div>
@@ -10554,13 +10550,13 @@ Proceed to payment?
       
       // Show result
       boxResult.innerHTML = `
-        <div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white py-8 px-10 rounded-2xl shadow-2xl">
-          <div class="text-8xl mb-4">${selectedPrize.icon}</div>
-          <div class="text-4xl font-bold mb-3">축하합니다!</div>
-          <div class="text-2xl mb-2">${selectedPrize.name} 당첨!</div>
-          ${xpAwarded > 0 ? `<div class="text-xl mt-3 text-yellow-100">✨ +${xpAwarded} XP 획득!</div>` : ''}
-          <div class="text-lg mt-4 text-yellow-100">남은 횟수: ${this.availableSpins}회</div>
-          <button onclick="worvox.closeBoxResult()" class="mt-6 bg-white text-orange-600 px-8 py-3 rounded-lg font-bold hover:bg-orange-50 transition-all text-xl">
+        <div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white py-4 px-6 rounded-xl shadow-lg">
+          <div class="text-4xl mb-2">${selectedPrize.icon}</div>
+          <div class="text-xl font-bold mb-2">축하합니다!</div>
+          <div class="text-base mb-1">${selectedPrize.name} 당첨!</div>
+          ${xpAwarded > 0 ? `<div class="text-sm mt-2 text-yellow-100">✨ +${xpAwarded} XP 획득!</div>` : ''}
+          <div class="text-sm mt-2 text-yellow-100">남은 횟수: ${this.availableSpins}회</div>
+          <button onclick="worvox.closeBoxResult()" class="mt-3 bg-white text-orange-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-orange-50 transition-all">
             확인
           </button>
         </div>
