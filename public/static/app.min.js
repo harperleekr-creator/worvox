@@ -10300,34 +10300,29 @@ Proceed to payment?
                   <!-- Result Display -->
                   <div id="spinResult" class="text-center mb-4 min-h-16"></div>
                   
-                  <!-- Prize List -->
+                  <!-- Prize List (without probabilities) -->
                   <div class="mt-6">
                     <h4 class="text-lg font-bold text-gray-800 mb-3 text-center">🎁 경품 목록</h4>
                     <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
                       <div class="text-center p-3 bg-blue-50 rounded-lg">
                         <div class="text-3xl mb-1">⚡</div>
                         <div class="text-sm font-semibold">XP 50</div>
-                        <div class="text-xs text-gray-500">55%</div>
                       </div>
                       <div class="text-center p-3 bg-purple-50 rounded-lg">
                         <div class="text-3xl mb-1">💫</div>
                         <div class="text-sm font-semibold">XP 300</div>
-                        <div class="text-xs text-gray-500">40%</div>
                       </div>
                       <div class="text-center p-3 bg-green-50 rounded-lg">
                         <div class="text-3xl mb-1">☕</div>
                         <div class="text-sm font-semibold">아메리카노</div>
-                        <div class="text-xs text-gray-500">4.9%</div>
                       </div>
                       <div class="text-center p-3 bg-yellow-50 rounded-lg">
                         <div class="text-3xl mb-1">🎫</div>
                         <div class="text-sm font-semibold">1만원권</div>
-                        <div class="text-xs text-gray-500">0.025%</div>
                       </div>
                       <div class="text-center p-3 bg-red-50 rounded-lg">
                         <div class="text-3xl mb-1">📱</div>
                         <div class="text-sm font-semibold">고급 경품</div>
-                        <div class="text-xs text-gray-500">0.1%</div>
                       </div>
                     </div>
                   </div>
@@ -10543,15 +10538,15 @@ Proceed to payment?
           <!-- Spin Wheel Container -->
           <div class="relative mb-6">
             <!-- Wheel -->
-            <div id="spinWheel" class="relative w-80 h-80 mx-auto rounded-full border-8 border-gray-800 shadow-2xl overflow-hidden" style="transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);">
+            <div id="spinWheel" class="relative w-60 h-60 mx-auto rounded-full border-8 border-gray-800 shadow-2xl overflow-hidden" style="transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);">
               ${prizes.map((prize, index) => {
                 const angle = (360 / prizes.length) * index;
                 return `
                   <div class="absolute w-full h-full" style="transform: rotate(${angle}deg); transform-origin: center;">
-                    <div class="absolute w-1/2 h-full right-1/2 origin-right flex items-center justify-end pr-4" style="background: ${prize.color}; clip-path: polygon(100% 0, 100% 100%, 0 50%);">
+                    <div class="absolute w-1/2 h-full right-1/2 origin-right flex items-center justify-end pr-2" style="background: ${prize.color}; clip-path: polygon(100% 0, 100% 100%, 0 50%);">
                       <div class="transform rotate-90 text-center">
-                        <div class="text-3xl mb-1">${prize.icon}</div>
-                        <div class="text-xs font-bold text-white whitespace-nowrap">${prize.name}</div>
+                        <div class="text-2xl mb-0.5">${prize.icon}</div>
+                        <div class="text-[9px] font-bold text-white whitespace-nowrap leading-tight">${prize.name}</div>
                       </div>
                     </div>
                   </div>
@@ -10565,7 +10560,7 @@ Proceed to payment?
             </div>
             
             <!-- Center Button -->
-            <button id="spinButton" onclick="worvox.spinTheWheel()" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full shadow-2xl flex items-center justify-center text-white font-bold text-xl hover:scale-110 transition-all z-20 border-4 border-white">
+            <button id="spinButton" onclick="worvox.spinTheWheel()" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full shadow-2xl flex items-center justify-center text-white font-bold text-lg hover:scale-110 transition-all z-20 border-4 border-white">
               SPIN
             </button>
           </div>
