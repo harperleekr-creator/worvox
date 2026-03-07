@@ -10254,12 +10254,33 @@ Proceed to payment?
   // Rewards System
   async showRewards() {
     try {
+      // Load user from localStorage if not in memory
+      if (!this.currentUser) {
+        const storedUser = localStorage.getItem('worvox_user');
+        if (storedUser) {
+          this.currentUser = JSON.parse(storedUser);
+          console.log('Loaded user from localStorage:', this.currentUser);
+        }
+      }
+      
       // Ensure user is logged in
       if (!this.currentUser || !this.currentUser.id) {
         console.error('User not logged in');
         alert('로그인이 필요합니다.');
         this.showLogin();
         return;
+      }
+      
+      // Force reload current user from database to ensure fresh data
+      try {
+        const userResponse = await axios.get(`/api/users/${this.currentUser.id}`);
+        if (userResponse.data.success) {
+          this.currentUser = userResponse.data.data;
+          localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
+          console.log('Refreshed current user:', this.currentUser);
+        }
+      } catch (error) {
+        console.warn('Could not refresh user data:', error);
       }
       
       // Get user gamification stats
@@ -10549,6 +10570,18 @@ Proceed to payment?
   }
   
   async openBox() {
+    // Ensure user is loaded
+    if (!this.currentUser) {
+      const storedUser = localStorage.getItem('worvox_user');
+      if (storedUser) {
+        this.currentUser = JSON.parse(storedUser);
+      } else {
+        alert('로그인이 필요합니다.');
+        this.showLogin();
+        return;
+      }
+    }
+    
     // Check available count
     if (!this.availableSpins || this.availableSpins <= 0) {
       alert('보유한 랜덤박스 횟수가 없습니다!');
