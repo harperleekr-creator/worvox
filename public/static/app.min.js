@@ -6576,7 +6576,7 @@ Proceed to payment?
                   <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-3">
                     🎁 First lesson free
                   </p>
-                  <button onclick="window.location.href='/teachers'" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-medium py-3 px-4 rounded-xl transition-all text-left text-sm md:text-base border border-gray-200 dark:border-gray-700">
+                  <button onclick="worvox.showRealConversation()" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-medium py-3 px-4 rounded-xl transition-all text-left text-sm md:text-base border border-gray-200 dark:border-gray-700">
                     [ Book Live Lesson ]
                   </button>
                 </div>
