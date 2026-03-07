@@ -6460,178 +6460,125 @@ Proceed to payment?
             <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
               <div class="p-4 md:p-8">
                 <div class="max-w-4xl mx-auto">
-                <!-- Welcome Message -->
-                <div class="text-center mb-8 md:mb-12">
-                  <h1 class="text-2xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 md:mb-3">Welcome back, ${this.currentUser.username}!</h1>
-                  <p class="text-gray-600 dark:text-gray-300 text-base md:text-lg">What would you like to learn today?</p>
+                <!-- Welcome Message - ChatGPT Style -->
+                <div class="mb-6">
+                  <h1 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                    Welcome back <span class="text-amber-500">👋</span>
+                  </h1>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">Harper</p>
                 </div>
                 
-                <!-- Quick Start Guide Banner -->
-                <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-6 md:p-8 mb-6 md:mb-8 shadow-lg text-white">
-                  <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                    <div class="flex-1 text-center md:text-left">
-                      <h2 class="text-xl md:text-2xl font-bold mb-2">
-                        <i class="fas fa-rocket mr-2"></i>Start Your English Journey!
-                      </h2>
-                      <p class="text-emerald-100 text-sm md:text-base">
-                        Choose a mode below to practice speaking, build vocabulary, or chat with AI
-                      </p>
+                <!-- Today's Goal Card -->
+                <div class="bg-gradient-to-br from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-5 md:p-6 mb-5 text-white shadow-lg">
+                  <div class="flex items-center gap-3 mb-3">
+                    <div class="text-2xl">🔥</div>
+                    <div>
+                      <h3 class="font-bold text-base md:text-lg">Today's Goal</h3>
+                      <p class="text-xs md:text-sm text-gray-300">Speak English for 5 minutes</p>
                     </div>
-                    <div class="flex flex-wrap gap-2 justify-center">
-                      <button onclick="worvox.showAIConversation()" class="bg-white text-emerald-600 hover:bg-emerald-50 px-4 py-2 rounded-lg font-semibold transition-all shadow-md">
-                        <i class="fas fa-comments mr-2"></i>AI Chat
-                      </button>
-                      <button onclick="worvox.showTimerMode()" class="bg-white text-emerald-600 hover:bg-emerald-50 px-4 py-2 rounded-lg font-semibold transition-all shadow-md">
-                        <i class="fas fa-stopwatch mr-2"></i>Timer
-                      </button>
-                      <button onclick="worvox.startVocabulary()" class="bg-white text-emerald-600 hover:bg-emerald-50 px-4 py-2 rounded-lg font-semibold transition-all shadow-md">
-                        <i class="fas fa-book mr-2"></i>Words
-                      </button>
+                  </div>
+                  <button onclick="worvox.showAIConversation()" class="w-full bg-white text-gray-900 font-semibold py-2.5 rounded-lg hover:bg-gray-100 transition-all text-sm md:text-base">
+                    [ Start Speaking ]
+                  </button>
+                </div>
+                
+                <!-- Divider -->
+                <div class="border-t border-gray-200 dark:border-gray-700 my-5"></div>
+                
+                <!-- Start Speaking with AI Section -->
+                <div class="mb-5">
+                  <h2 class="text-base md:text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                    🎤 Start Speaking with AI
+                  </h2>
+                  <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-3">
+                    Practice real conversation
+                  </p>
+                  <button onclick="worvox.showAIConversation()" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-medium py-3 px-4 rounded-xl transition-all text-left text-sm md:text-base border border-gray-200 dark:border-gray-700">
+                    [ Start AI Conversation ]
+                  </button>
+                </div>
+                
+                <!-- Divider -->
+                <div class="border-t border-gray-200 dark:border-gray-700 my-5"></div>
+                
+                <!-- Continue Learning Section -->
+                <div class="mb-5">
+                  <h2 class="text-base md:text-lg font-bold text-gray-900 dark:text-white mb-3">
+                    Continue Learning
+                  </h2>
+                  <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-3">
+                    Scenario: Restaurant conversation
+                  </p>
+                  <button onclick="worvox.showScenarioMode()" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-medium py-3 px-4 rounded-xl transition-all text-left text-sm md:text-base border border-gray-200 dark:border-gray-700">
+                    [ Continue ]
+                  </button>
+                </div>
+                
+                <!-- Divider -->
+                <div class="border-t border-gray-200 dark:border-gray-700 my-5"></div>
+                
+                <!-- Stats Section -->
+                <div class="mb-5">
+                  <h2 class="text-base md:text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                    🔥 Streak | XP | Words
+                  </h2>
+                  <div class="grid grid-cols-3 gap-3">
+                    <div class="text-center">
+                      <div class="text-xl md:text-2xl font-bold text-orange-500">${stats.todayMessages || 0}</div>
+                      <div class="text-xs text-gray-500">Streak</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-xl md:text-2xl font-bold text-purple-500">${stats.totalXp || 0}</div>
+                      <div class="text-xs text-gray-500">XP</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-xl md:text-2xl font-bold text-blue-500">${stats.wordsLearned || 0}</div>
+                      <div class="text-xs text-gray-500">Words</div>
                     </div>
                   </div>
                 </div>
                 
-                <!-- Daily Goals & Stats -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 md:mb-8">
-                  <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 shadow-md text-white">
-                    <div class="flex items-center gap-3 mb-2">
-                      <div class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-fire text-2xl"></i>
-                      </div>
-                      <div>
-                        <div class="text-xs opacity-80">Today's Streak</div>
-                        <div class="text-2xl font-bold">${stats.todayMessages || 0}</div>
-                      </div>
-                    </div>
-                    <div class="text-xs opacity-80">Keep going! 🎯</div>
-                  </div>
-                  
-                  <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-4 shadow-md text-white">
-                    <div class="flex items-center gap-3 mb-2">
-                      <div class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-trophy text-2xl"></i>
-                      </div>
-                      <div>
-                        <div class="text-xs opacity-80">Total XP</div>
-                        <div class="text-2xl font-bold">${stats.totalXp || 0}</div>
-                      </div>
-                    </div>
-                    <div class="text-xs opacity-80">Level ${stats.level || 1} • ${stats.nextLevelXp || 100} to next</div>
-                  </div>
-                  
-                  <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-4 shadow-md text-white">
-                    <div class="flex items-center gap-3 mb-2">
-                      <div class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
-                        <i class="fas fa-book-open text-2xl"></i>
-                      </div>
-                      <div>
-                        <div class="text-xs opacity-80">Words Learned</div>
-                        <div class="text-2xl font-bold">${stats.wordsLearned || 0}</div>
-                      </div>
-                    </div>
-                    <div class="text-xs opacity-80">Great progress! 📚</div>
-                  </div>
-                </div>
+                <!-- Divider -->
+                <div class="border-t border-gray-200 dark:border-gray-700 my-5"></div>
                 
-                <!-- Word Search Section -->
-                <div class="mb-6 md:mb-8">
-                  <div class="relative max-w-2xl mx-auto">
-                    <input 
-                      type="text" 
-                      id="wordSearch" 
-                      placeholder="Search for any English word..." 
-                      class="w-full px-4 md:px-6 py-3 md:py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-emerald-500 text-gray-700 placeholder-gray-400 text-base md:text-lg pr-24"
-                      onkeypress="if(event.key==='Enter') worvox.searchWord()"
-                    />
-                    <button 
-                      onclick="worvox.searchWord()"
-                      class="absolute right-2 md:right-4 top-1/2 transform -translate-y-1/2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 md:px-6 py-2 rounded-lg transition-all text-sm md:text-base">
-                      <i class="fas fa-search mr-1 md:mr-2"></i><span class="hidden sm:inline">Search</span>
+                <!-- Practice Modes Section -->
+                <div class="mb-5">
+                  <h2 class="text-base md:text-lg font-bold text-gray-900 dark:text-white mb-3">
+                    Practice Modes
+                  </h2>
+                  <div class="space-y-2">
+                    <button onclick="worvox.showAIConversation()" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-medium py-3 px-4 rounded-xl transition-all text-left text-sm md:text-base border border-gray-200 dark:border-gray-700">
+                      AI Conversation
+                    </button>
+                    <button onclick="worvox.showScenarioMode()" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-medium py-3 px-4 rounded-xl transition-all text-left text-sm md:text-base border border-gray-200 dark:border-gray-700">
+                      Scenario
+                    </button>
+                    <button onclick="worvox.showTimerMode()" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-medium py-3 px-4 rounded-xl transition-all text-left text-sm md:text-base border border-gray-200 dark:border-gray-700">
+                      Timer
+                    </button>
+                    <button onclick="worvox.startVocabulary()" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-medium py-3 px-4 rounded-xl transition-all text-left text-sm md:text-base border border-gray-200 dark:border-gray-700">
+                      Vocabulary
+                    </button>
+                    <button onclick="worvox.showExamMode()" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-medium py-3 px-4 rounded-xl transition-all text-left text-sm md:text-base border border-gray-200 dark:border-gray-700">
+                      Exam
                     </button>
                   </div>
-                  <div id="searchResult" class="mt-4 md:mt-6 max-w-2xl mx-auto"></div>
                 </div>
                 
-                <!-- Feature Cards - 5 Learning Modes (MOVED HERE) -->
-                <div class="mb-6 md:mb-8">
-                  <h3 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-4 md:mb-6 text-center">
-                    Choose Your Learning Mode
-                  </h3>
-                  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
-                    ${this.topics.filter(topic => 
-                      topic.name === 'Vocabulary' || topic.name === 'AI English Conversation'
-                    ).map(topic => {
-                      const isConversation = topic.name === 'AI English Conversation';
-                      const isVocabulary = topic.name === 'Vocabulary';
-                      const bgColor = isConversation 
-                        ? 'bg-gradient-to-br from-emerald-50 to-teal-50' 
-                        : isVocabulary 
-                          ? 'bg-gradient-to-br from-blue-50 to-indigo-50' 
-                          : 'bg-white';
-                      const borderColor = isConversation 
-                        ? 'border border-emerald-200 hover:border-emerald-400' 
-                        : isVocabulary 
-                          ? 'border border-blue-200 hover:border-blue-400' 
-                          : 'border border-gray-200 hover:border-emerald-400';
-                      const textColor = isConversation ? 'emerald' : 'blue';
-                      
-                      return `
-                      <div class="${bgColor} rounded-xl p-3 md:p-4 shadow-sm ${borderColor} hover:shadow-md transition-all cursor-pointer"
-                        data-topic-id="${topic.id}" 
-                        data-topic-name="${this.escapeHtml(topic.name)}" 
-                        data-topic-level="${topic.level}"
-                        onclick="worvox.startTopicById(${topic.id})">
-                        <div class="text-center">
-                          <div class="w-10 h-10 md:w-12 md:h-12 mx-auto mb-2 md:mb-3">
-                            <span class="text-3xl md:text-4xl">${topic.icon}</span>
-                          </div>
-                          <h3 class="text-sm md:text-base font-semibold text-gray-900 mb-1">${topic.name}</h3>
-                          <p class="text-xs text-gray-600 mb-2 line-clamp-2">${topic.description}</p>
-                          <span class="text-xs text-${textColor}-600 font-medium">Start →</span>
-                        </div>
-                      </div>
-                    `;
-                    }).join('')}
-                    
-                    <!-- Timer Mode Card -->
-                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-3 md:p-4 shadow-sm border border-purple-200 hover:border-purple-400 hover:shadow-md transition-all cursor-pointer"
-                      onclick="worvox.showTimerMode()">
-                      <div class="text-center">
-                        <div class="w-10 h-10 md:w-12 md:h-12 mx-auto mb-2 md:mb-3">
-                          <span class="text-3xl md:text-4xl">⏱️</span>
-                        </div>
-                        <h3 class="text-sm md:text-base font-semibold text-gray-900 mb-1">Timer Mode</h3>
-                        <p class="text-xs text-gray-600 mb-2 line-clamp-2">Complete sentences in 5-10 seconds</p>
-                        <span class="text-xs text-purple-600 font-medium">Start →</span>
-                      </div>
-                    </div>
-                    
-                    <!-- Scenario Mode Card -->
-                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-3 md:p-4 shadow-sm border border-blue-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer"
-                      onclick="worvox.showScenarioMode()">
-                      <div class="text-center">
-                        <div class="w-10 h-10 md:w-12 md:h-12 mx-auto mb-2 md:mb-3">
-                          <span class="text-3xl md:text-4xl">🎬</span>
-                        </div>
-                        <h3 class="text-sm md:text-base font-semibold text-gray-900 mb-1">Scenario Mode</h3>
-                        <p class="text-xs text-gray-600 mb-2 line-clamp-2">Practice 30 real-life conversations</p>
-                        <span class="text-xs text-blue-600 font-medium">Start →</span>
-                      </div>
-                    </div>
-                    
-                    <!-- Exam Mode Card -->
-                    <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-3 md:p-4 shadow-sm border border-orange-200 hover:border-orange-400 hover:shadow-md transition-all cursor-pointer"
-                      onclick="worvox.showExamMode()">
-                      <div class="text-center">
-                        <div class="w-10 h-10 md:w-12 md:h-12 mx-auto mb-2 md:mb-3">
-                          <span class="text-3xl md:text-4xl">📝</span>
-                        </div>
-                        <h3 class="text-sm md:text-base font-semibold text-gray-900 mb-1">Exam Mode</h3>
-                        <p class="text-xs text-gray-600 mb-2 line-clamp-2">OPIC-style 5-question speaking test</p>
-                        <span class="text-xs text-orange-600 font-medium">Start →</span>
-                      </div>
-                    </div>
-                  </div>
+                <!-- Divider -->
+                <div class="border-t border-gray-200 dark:border-gray-700 my-5"></div>
+                
+                <!-- Speak with a Tutor Section -->
+                <div class="mb-5">
+                  <h2 class="text-base md:text-lg font-bold text-gray-900 dark:text-white mb-3">
+                    Speak with a Tutor
+                  </h2>
+                  <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-3">
+                    🎁 First lesson free
+                  </p>
+                  <button onclick="window.location.href='/teachers'" class="w-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white font-medium py-3 px-4 rounded-xl transition-all text-left text-sm md:text-base border border-gray-200 dark:border-gray-700">
+                    [ Book Live Lesson ]
+                  </button>
                 </div>
                 
                 <!-- Daily Usage Tracker - Compact Grid -->
