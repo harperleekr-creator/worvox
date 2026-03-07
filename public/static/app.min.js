@@ -10654,22 +10654,38 @@ Proceed to payment?
   
   async awardXP(xp, activityType, details) {
     try {
+      if (!this.currentUser || !this.currentUser.id) {
+        console.error('Current user not found');
+        alert('XP 지급 중 오류가 발생했습니다. (User not found)');
+        return;
+      }
+      
+      console.log('Awarding XP:', xp, 'to user:', this.currentUser.id);
+      
       const response = await axios.post('/api/gamification/xp/add', {
         userId: this.currentUser.id,
         xp: xp,
         activityType: activityType,
         details: details
       });
-      console.log('XP awarded:', response.data);
-      // Reload stats to show updated XP and level
-      await this.loadGamificationStats();
-      // Force reload current user data
-      const userResponse = await axios.get(`/api/users/${this.currentUser.id}`);
-      if (userResponse.data.success) {
-        this.currentUser = userResponse.data.data;
+      
+      console.log('XP award response:', response.data);
+      
+      if (response.data.success) {
+        // Reload stats to show updated XP and level
+        await this.loadGamificationStats();
+        // Force reload current user data
+        const userResponse = await axios.get(`/api/users/${this.currentUser.id}`);
+        if (userResponse.data.success) {
+          this.currentUser = userResponse.data.data;
+          console.log('User data reloaded, new XP:', this.currentUser.total_xp);
+        }
+      } else {
+        throw new Error(response.data.error || 'XP award failed');
       }
     } catch (error) {
       console.error('Error awarding XP:', error);
+      console.error('Error details:', error.response?.data);
       alert('XP 지급 중 오류가 발생했습니다.');
     }
   }
