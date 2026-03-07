@@ -10429,9 +10429,18 @@ Proceed to payment?
   
   async loadSpinCount() {
     try {
+      if (!this.currentUser || !this.currentUser.id) {
+        console.warn('Cannot load spin count: user not logged in');
+        this.availableSpins = 0;
+        return;
+      }
+      console.log('Loading spin count for user:', this.currentUser.id);
       const response = await axios.get(`/api/gamification/spin-count/${this.currentUser.id}`);
       if (response.data.success) {
         this.availableSpins = response.data.spin_count || 0;
+        console.log('Loaded spin count:', this.availableSpins);
+      } else {
+        this.availableSpins = 0;
       }
     } catch (error) {
       console.error('Error loading spin count:', error);
@@ -10441,6 +10450,11 @@ Proceed to payment?
   
   async saveSpinCount() {
     try {
+      if (!this.currentUser || !this.currentUser.id) {
+        console.warn('Cannot save spin count: user not logged in');
+        return;
+      }
+      console.log('Saving spin count:', this.availableSpins, 'for user:', this.currentUser.id);
       await axios.post('/api/gamification/spin-count/update', {
         userId: this.currentUser.id,
         spin_count: this.availableSpins
@@ -10453,7 +10467,9 @@ Proceed to payment?
   updateSpinCount() {
     const spinCountElement = document.getElementById('availableSpins');
     if (spinCountElement) {
-      spinCountElement.textContent = this.availableSpins || 0;
+      const count = this.availableSpins || 0;
+      spinCountElement.textContent = count;
+      console.log('Updated UI spin count:', count);
     }
   }
   
@@ -10538,7 +10554,7 @@ Proceed to payment?
       
       // Show result
       boxResult.innerHTML = `
-        <div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white py-8 px-10 rounded-2xl shadow-2xl animate-bounce">
+        <div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white py-8 px-10 rounded-2xl shadow-2xl">
           <div class="text-8xl mb-4">${selectedPrize.icon}</div>
           <div class="text-4xl font-bold mb-3">축하합니다!</div>
           <div class="text-2xl mb-2">${selectedPrize.name} 당첨!</div>
