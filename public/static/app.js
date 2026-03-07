@@ -10696,7 +10696,6 @@ Proceed to payment?
       `;
     }
   }
-  }
 
   showUpgrade() {
     // Redirect to Plan page
