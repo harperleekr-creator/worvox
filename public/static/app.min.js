@@ -7040,12 +7040,65 @@ Proceed to payment?
 
           <!-- Chat Container -->
           <div class="flex-1 overflow-hidden flex flex-col">
-            <div id="chatMessages" class="flex-1 overflow-y-auto p-6 chat-container">
+            <div id="chatMessages" class="flex-1 overflow-y-auto p-4 md:p-6 chat-container">
               <div class="max-w-3xl mx-auto">
-                <div class="text-center text-gray-500 py-12">
-                  <i class="fas fa-comments text-5xl mb-4"></i>
-                  <p class="text-lg">Start speaking to practice English!</p>
-                  <p class="text-sm text-gray-400 mt-2">Tap the microphone button below</p>
+                <div class="text-center text-gray-500 py-8 md:py-12">
+                  <i class="fas fa-comments text-4xl md:text-5xl mb-4"></i>
+                  <p class="text-base md:text-lg font-semibold mb-2">Choose a conversation topic!</p>
+                  <p class="text-sm text-gray-400 mb-6">Select a scenario below or start speaking freely</p>
+                  
+                  <!-- Conversation Scenario Buttons -->
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-2xl mx-auto mb-6">
+                    <button onclick="worvox.startAIScenario('roleplay')" 
+                      class="bg-gradient-to-br from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+                      <div class="text-3xl mb-2">🎭</div>
+                      <div class="text-sm font-semibold">AI Roleplay</div>
+                    </button>
+                    
+                    <button onclick="worvox.startAIScenario('interview')" 
+                      class="bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+                      <div class="text-3xl mb-2">💼</div>
+                      <div class="text-sm font-semibold">Job Interview</div>
+                    </button>
+                    
+                    <button onclick="worvox.startAIScenario('meeting')" 
+                      class="bg-gradient-to-br from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+                      <div class="text-3xl mb-2">📊</div>
+                      <div class="text-sm font-semibold">Business Meeting</div>
+                    </button>
+                    
+                    <button onclick="worvox.startAIScenario('restaurant')" 
+                      class="bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+                      <div class="text-3xl mb-2">🍽️</div>
+                      <div class="text-sm font-semibold">Restaurant</div>
+                    </button>
+                    
+                    <button onclick="worvox.startAIScenario('travel')" 
+                      class="bg-gradient-to-br from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+                      <div class="text-3xl mb-2">✈️</div>
+                      <div class="text-sm font-semibold">Travel</div>
+                    </button>
+                    
+                    <button onclick="worvox.startAIScenario('shopping')" 
+                      class="bg-gradient-to-br from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+                      <div class="text-3xl mb-2">🛍️</div>
+                      <div class="text-sm font-semibold">Shopping</div>
+                    </button>
+                    
+                    <button onclick="worvox.startAIScenario('doctor')" 
+                      class="bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+                      <div class="text-3xl mb-2">🏥</div>
+                      <div class="text-sm font-semibold">Doctor Visit</div>
+                    </button>
+                    
+                    <button onclick="worvox.startAIScenario('casual')" 
+                      class="bg-gradient-to-br from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+                      <div class="text-3xl mb-2">💬</div>
+                      <div class="text-sm font-semibold">Casual Chat</div>
+                    </button>
+                  </div>
+                  
+                  <p class="text-xs text-gray-400">Or tap the microphone below to start a free conversation</p>
                 </div>
               </div>
             </div>
@@ -7072,6 +7125,95 @@ Proceed to payment?
     
     // Load gamification stats after rendering
     setTimeout(() => this.loadGamificationStats(), 100);
+  }
+
+  async startAIScenario(scenarioType) {
+    // Define scenario prompts
+    const scenarios = {
+      roleplay: {
+        emoji: '🎭',
+        title: 'AI Roleplay',
+        prompt: "Hello! I'm excited to do some roleplay with you today. What kind of character or situation would you like to explore? I can be anyone - a friend, a colleague, a historical figure, or even a fictional character!",
+        systemContext: "You are a versatile AI roleplay partner. Adapt to any character or situation the user requests and stay in character throughout the conversation."
+      },
+      interview: {
+        emoji: '💼',
+        title: 'Job Interview',
+        prompt: "Good morning! Thank you for coming in today. I'm the hiring manager, and I'm excited to learn more about you. Let's start with this: Can you tell me about yourself and why you're interested in this position?",
+        systemContext: "You are a professional job interviewer. Ask relevant questions about the candidate's experience, skills, and career goals. Provide constructive feedback."
+      },
+      meeting: {
+        emoji: '📊',
+        title: 'Business Meeting',
+        prompt: "Good morning everyone! Thank you for joining today's meeting. We have several important items on our agenda. Let's start by discussing our quarterly goals and progress. What updates do you have from your department?",
+        systemContext: "You are a professional business meeting facilitator. Guide discussions, ask relevant questions, and help make decisions."
+      },
+      restaurant: {
+        emoji: '🍽️',
+        title: 'Restaurant',
+        prompt: "Good evening! Welcome to our restaurant. I'm your server today. Have you dined with us before? Let me tell you about our specials for tonight!",
+        systemContext: "You are a friendly restaurant server. Help customers order food, make recommendations, and answer questions about the menu."
+      },
+      travel: {
+        emoji: '✈️',
+        title: 'Travel',
+        prompt: "Hello! Welcome to our travel information desk. Are you visiting our city for the first time? I'd be happy to help you with directions, recommendations, or any questions about local attractions!",
+        systemContext: "You are a helpful travel guide. Provide information about tourist attractions, local customs, transportation, and helpful tips."
+      },
+      shopping: {
+        emoji: '🛍️',
+        title: 'Shopping',
+        prompt: "Hi there! Welcome to our store! I'm here to help you find exactly what you're looking for today. What kind of items are you interested in?",
+        systemContext: "You are a helpful retail sales associate. Assist customers in finding products, answer questions, and provide recommendations."
+      },
+      doctor: {
+        emoji: '🏥',
+        title: 'Doctor Visit',
+        prompt: "Hello! Please come in and have a seat. I'm Dr. Smith. What brings you to the clinic today? Tell me about any symptoms you've been experiencing.",
+        systemContext: "You are a kind and professional doctor. Ask about symptoms, provide general health advice (always remind that this is practice and not real medical advice)."
+      },
+      casual: {
+        emoji: '💬',
+        title: 'Casual Chat',
+        prompt: "Hey! How's it going? I'm always up for a good conversation. What's on your mind today? We can talk about anything - hobbies, current events, life experiences, or just chat about our day!",
+        systemContext: "You are a friendly conversation partner. Chat naturally about everyday topics, ask follow-up questions, and keep the conversation engaging."
+      }
+    };
+
+    const scenario = scenarios[scenarioType];
+    if (!scenario) return;
+
+    // Clear chat messages
+    const chatMessages = document.getElementById('chatMessages');
+    chatMessages.innerHTML = `
+      <div class="max-w-3xl mx-auto">
+        <div class="mb-4 p-3 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl text-white text-center">
+          <div class="text-3xl mb-2">${scenario.emoji}</div>
+          <div class="font-semibold">${scenario.title} Mode</div>
+        </div>
+      </div>
+    `;
+
+    // Store scenario context for AI
+    this.currentScenarioContext = scenario.systemContext;
+
+    // Add AI greeting message
+    this.addMessage(scenario.prompt, 'bot');
+
+    // Auto-play AI greeting
+    try {
+      const response = await axios.post('/api/tts/synthesize', {
+        text: scenario.prompt,
+        userId: this.currentUser.id
+      });
+
+      if (response.data.audioUrl) {
+        const audio = new Audio(response.data.audioUrl);
+        audio.play();
+      }
+    } catch (error) {
+      console.error('TTS error:', error);
+    }
   }
 
   async toggleRecording() {
@@ -7178,10 +7320,14 @@ Proceed to payment?
 
       // Step 2: Get AI response
       console.log('Sending to Chat API...');
+      
+      // Use scenario context if available, otherwise use topic system prompt
+      const systemPrompt = this.currentScenarioContext || this.currentTopic.systemPrompt;
+      
       const chatResponse = await axios.post('/api/chat/message', {
         sessionId: this.currentSession,
         userMessage: transcription,
-        systemPrompt: this.currentTopic.systemPrompt
+        systemPrompt: systemPrompt
       });
 
       console.log('Chat Response:', chatResponse.data);
@@ -7243,7 +7389,7 @@ Proceed to payment?
     }
   }
 
-  addMessage(role, content) {
+  addMessage(content, role) {
     const messageIndex = this.messages.length;
     this.messages.push({ role, content, audioUrl: null });
     
