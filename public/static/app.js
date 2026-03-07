@@ -10194,6 +10194,14 @@ Proceed to payment?
   // Rewards System
   async showRewards() {
     try {
+      // Ensure user is logged in
+      if (!this.currentUser || !this.currentUser.id) {
+        console.error('User not logged in');
+        alert('로그인이 필요합니다.');
+        this.showLogin();
+        return;
+      }
+      
       // Get user gamification stats
       const stats = await gamificationManager.getStats(this.currentUser.id);
       const userLevel = stats ? stats.stats.level : 1;
@@ -10387,38 +10395,26 @@ Proceed to payment?
   
   generateSpinWheelHTML() {
     const prizes = [
-      { name: 'XP 50', icon: '⚡', color: '#EF4444' },
-      { name: 'XP 300', icon: '💫', color: '#F97316' },
-      { name: '스타벅스', icon: '☕', color: '#F59E0B' },
-      { name: '1만원권', icon: '🎫', color: '#EAB308' },
-      { name: '키보드', icon: '⌨️', color: '#10B981' },
-      { name: '삼성버즈', icon: '🎧', color: '#14B8A6' },
-      { name: '에어팟', icon: '🎵', color: '#3B82F6' },
-      { name: '아이패드', icon: '📱', color: '#6366F1' }
+      { name: 'XP 50', icon: '⚡', color: '#EF4444' },      // Red
+      { name: 'XP 300', icon: '💫', color: '#6366F1' },    // Blue  
+      { name: '스타벅스', icon: '☕', color: '#F59E0B' },   // Yellow
+      { name: '1만원권', icon: '🎫', color: '#14B8A6' },   // Teal
+      { name: '키보드', icon: '⌨️', color: '#10B981' },    // Green
+      { name: '삼성버즈', icon: '🎧', color: '#3B82F6' },  // Light Blue
+      { name: '에어팟', icon: '🎵', color: '#F97316' },    // Orange
+      { name: '아이패드', icon: '📱', color: '#EAB308' }   // Gold
     ];
     
-    const sectorAngle = 360 / prizes.length; // 45 degrees for 8 sections
+    const sectorAngle = 360 / 8; // 45 degrees
+    
     return prizes.map((prize, index) => {
       const rotation = sectorAngle * index;
-      const halfAngle = sectorAngle / 2;
-      
-      // Calculate clip-path for perfect pie slice
-      const x1 = 50;
-      const y1 = 50;
-      const x2 = 50 + 50 * Math.sin(0);
-      const y2 = 50 - 50 * Math.cos(0);
-      const x3 = 50 + 50 * Math.sin((sectorAngle * Math.PI) / 180);
-      const y3 = 50 - 50 * Math.cos((sectorAngle * Math.PI) / 180);
       
       return `
-        <div class="absolute w-full h-full" style="transform: rotate(${rotation}deg); transform-origin: center center;">
-          <div style="position: absolute; width: 100%; height: 100%; clip-path: polygon(50% 50%, 50% 0%, ${x3}% ${y3}%); background: ${prize.color};">
-            <div class="absolute" style="top: 25%; left: 50%; transform: translate(-50%, 0) rotate(${halfAngle}deg);">
-              <div class="text-center">
-                <div class="text-2xl mb-0.5">${prize.icon}</div>
-                <div class="text-[10px] font-bold text-white whitespace-nowrap leading-tight">${prize.name}</div>
-              </div>
-            </div>
+        <div style="position: absolute; width: 100%; height: 100%; transform: rotate(${rotation}deg); clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 50%); background: ${prize.color};">
+          <div style="position: absolute; top: 30%; left: 70%; transform: translate(-50%, -50%) rotate(22.5deg); text-align: center;">
+            <div style="font-size: 24px; margin-bottom: 2px;">${prize.icon}</div>
+            <div style="font-size: 10px; font-weight: bold; color: white; white-space: nowrap;">${prize.name}</div>
           </div>
         </div>
       `;
