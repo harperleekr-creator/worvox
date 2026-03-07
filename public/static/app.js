@@ -10283,12 +10283,12 @@ Proceed to payment?
                 <div id="randomBoxSection" class="bg-white rounded-xl shadow-lg p-4 mb-4">
                   <h3 class="text-lg font-bold text-gray-800 mb-3 text-center">🎁 행운의 랜덤박스</h3>
                   
-                  <!-- Box Container -->
-                  <div class="flex justify-center items-center mb-3">
-                    <div class="relative" style="width: 200px; height: 200px;">
+                  <!-- Fixed Size Container -->
+                  <div class="flex justify-center items-center" style="min-height: 240px;">
+                    <div class="relative" style="width: 200px;">
                       <!-- Mystery Box (closed) -->
-                      <div id="mysteryBox" class="absolute inset-0 cursor-pointer transition-all duration-500" onclick="worvox.openBox()">
-                        <div class="w-full h-full bg-gradient-to-br from-purple-600 via-pink-500 to-orange-500 rounded-xl shadow-xl flex items-center justify-center transform hover:scale-105 transition-all">
+                      <div id="mysteryBox" class="cursor-pointer transition-all duration-500" onclick="worvox.openBox()">
+                        <div class="bg-gradient-to-br from-purple-600 via-pink-500 to-orange-500 rounded-xl shadow-xl flex items-center justify-center transform hover:scale-105 transition-all" style="width: 200px; height: 200px;">
                           <div class="text-center text-white">
                             <div class="text-5xl mb-2">🎁</div>
                             <div class="text-lg font-bold mb-1">클릭하세요!</div>
@@ -10298,7 +10298,7 @@ Proceed to payment?
                       </div>
                       
                       <!-- Opening Animation Container -->
-                      <div id="boxOpening" class="absolute inset-0 hidden">
+                      <div id="boxOpening" class="hidden absolute top-0 left-0" style="width: 200px; height: 200px;">
                         <div class="w-full h-full flex items-center justify-center">
                           <div class="text-center">
                             <div class="text-4xl animate-bounce">✨</div>
@@ -10306,11 +10306,11 @@ Proceed to payment?
                           </div>
                         </div>
                       </div>
+                      
+                      <!-- Result Display (Inside same container) -->
+                      <div id="boxResult" class="hidden absolute top-0 left-0" style="width: 200px;"></div>
                     </div>
                   </div>
-                  
-                  <!-- Result Display -->
-                  <div id="boxResult" class="text-center"></div>
                 </div>
 
                 <!-- Rewards Grid -->
@@ -10548,19 +10548,20 @@ Proceed to payment?
       // Hide opening animation
       boxOpening.classList.add('hidden');
       
-      // Show result
+      // Show result (same size as box)
       boxResult.innerHTML = `
-        <div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white py-4 px-6 rounded-xl shadow-lg">
+        <div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl shadow-lg flex flex-col items-center justify-center" style="width: 200px; height: 200px;">
           <div class="text-4xl mb-2">${selectedPrize.icon}</div>
-          <div class="text-xl font-bold mb-2">축하합니다!</div>
-          <div class="text-base mb-1">${selectedPrize.name} 당첨!</div>
-          ${xpAwarded > 0 ? `<div class="text-sm mt-2 text-yellow-100">✨ +${xpAwarded} XP 획득!</div>` : ''}
-          <div class="text-sm mt-2 text-yellow-100">남은 횟수: ${this.availableSpins}회</div>
-          <button onclick="worvox.closeBoxResult()" class="mt-3 bg-white text-orange-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-orange-50 transition-all">
+          <div class="text-lg font-bold mb-1">축하합니다!</div>
+          <div class="text-sm mb-1">${selectedPrize.name}</div>
+          ${xpAwarded > 0 ? `<div class="text-xs mt-1 text-yellow-100">✨ +${xpAwarded} XP</div>` : ''}
+          <div class="text-xs mt-1 text-yellow-100">남은: ${this.availableSpins}회</div>
+          <button onclick="worvox.closeBoxResult()" class="mt-2 bg-white text-orange-600 px-3 py-1 rounded text-xs font-bold hover:bg-orange-50 transition-all">
             확인
           </button>
         </div>
       `;
+      boxResult.classList.remove('hidden');
     }, 2000);
   }
   
@@ -10568,17 +10569,23 @@ Proceed to payment?
     const mysteryBox = document.getElementById('mysteryBox');
     const boxResult = document.getElementById('boxResult');
     
-    // Clear result
+    // Hide result
+    boxResult.classList.add('hidden');
     boxResult.innerHTML = '';
     
     // Show box again if spins remain
     if (this.availableSpins > 0) {
       mysteryBox.classList.remove('hidden');
     } else {
+      mysteryBox.classList.add('hidden');
       boxResult.innerHTML = `
-        <p class="text-gray-600 text-lg">모든 기회를 사용했습니다!</p>
-        <p class="text-gray-500 text-sm mt-2">레벨업 보상으로 랜덤박스를 다시 받으세요!</p>
+        <div class="bg-gray-100 rounded-xl flex flex-col items-center justify-center text-center" style="width: 200px; height: 200px;">
+          <div class="text-3xl mb-2">🎁</div>
+          <p class="text-gray-600 text-sm px-4">모든 기회를<br>사용했습니다!</p>
+          <p class="text-gray-500 text-xs mt-2 px-4">레벨업 보상으로<br>다시 받으세요!</p>
+        </div>
       `;
+      boxResult.classList.remove('hidden');
     }
   }
 
