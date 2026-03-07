@@ -10208,13 +10208,13 @@ Proceed to payment?
 
       // Define rewards (unlocked at level 30, 40, 50, etc.)
       const rewards = [
-        { level: 30, title: '돌림판 1회', description: '행운의 돌림판을 돌려보세요!', icon: '🎰', type: 'spin', spins: 1, unlocked: userLevel >= 30 },
+        { level: 30, title: '랜덤박스 1회', description: '행운의 랜덤박스를 열어보세요!', icon: '🎁', type: 'spin', spins: 1, unlocked: userLevel >= 30 },
         { level: 40, title: '프리미엄 5일 무료', description: '프리미엄 기능을 5일간 체험하세요', icon: '👑', type: 'premium', days: 5, unlocked: userLevel >= 40 },
-        { level: 50, title: '돌림판 2회', description: '행운의 돌림판을 2번 돌려보세요!', icon: '🎰', type: 'spin', spins: 2, unlocked: userLevel >= 50 },
-        { level: 60, title: '돌림판 3회', description: '행운의 돌림판을 3번 돌려보세요!', icon: '🎰', type: 'spin', spins: 3, unlocked: userLevel >= 60 },
-        { level: 70, title: '돌림판 4회', description: '행운의 돌림판을 4번 돌려보세요!', icon: '🎰', type: 'spin', spins: 4, unlocked: userLevel >= 70 },
-        { level: 80, title: 'XP 보상 + 돌림판 3회', description: 'Level 83까지 즉시 상승 + 돌림판 3회', icon: '⚡', type: 'xp+spin', xpBonus: 'level83', spins: 3, unlocked: userLevel >= 80 },
-        { level: 90, title: '돌림판 5회', description: '행운의 돌림판을 5번 돌려보세요!', icon: '🎰', type: 'spin', spins: 5, unlocked: userLevel >= 90 },
+        { level: 50, title: '랜덤박스 2회', description: '행운의 랜덤박스를 2번 열어보세요!', icon: '🎁', type: 'spin', spins: 2, unlocked: userLevel >= 50 },
+        { level: 60, title: '랜덤박스 3회', description: '행운의 랜덤박스를 3번 열어보세요!', icon: '🎁', type: 'spin', spins: 3, unlocked: userLevel >= 60 },
+        { level: 70, title: '랜덤박스 4회', description: '행운의 랜덤박스를 4번 열어보세요!', icon: '🎁', type: 'spin', spins: 4, unlocked: userLevel >= 70 },
+        { level: 80, title: 'XP 보상 + 랜덤박스 3회', description: 'Level 83까지 즉시 상승 + 랜덤박스 3회', icon: '⚡', type: 'xp+spin', xpBonus: 'level83', spins: 3, unlocked: userLevel >= 80 },
+        { level: 90, title: '랜덤박스 5회', description: '행운의 랜덤박스를 5번 열어보세요!', icon: '🎁', type: 'spin', spins: 5, unlocked: userLevel >= 90 },
         { level: 100, title: '대한항공 10만원 쿠폰', description: '대한항공 항공권 구매에 사용 가능', icon: '✈️', type: 'coupon', value: '100,000원', unlocked: userLevel >= 100 },
       ];
 
@@ -10266,8 +10266,8 @@ Proceed to payment?
                   <div class="bg-gradient-to-r from-orange-500 to-pink-500 rounded-2xl p-6 text-white shadow-2xl">
                     <div class="flex items-center justify-between mb-4">
                       <div>
-                        <h2 class="text-3xl font-bold mb-2">보유 돌림판</h2>
-                        <p class="text-orange-100">행운의 돌림판을 돌려보세요!</p>
+                        <h2 class="text-3xl font-bold mb-2">보유 랜덤박스</h2>
+                        <p class="text-orange-100">행운의 랜덤박스를 열어보세요!</p>
                       </div>
                       <div class="text-6xl">🎰</div>
                     </div>
@@ -10276,39 +10276,45 @@ Proceed to payment?
                         <div class="text-5xl font-bold" id="availableSpins">0</div>
                         <p class="text-sm text-orange-100 mt-1">사용 가능 횟수</p>
                       </div>
-                      <button onclick="worvox.openSpinWheel()" class="bg-white text-orange-600 px-6 py-3 rounded-lg font-bold hover:bg-orange-50 transition-all shadow-lg">
-                        돌림판 돌리기
+                      <button onclick="worvox.openRandomBox()" class="bg-white text-orange-600 px-6 py-3 rounded-lg font-bold hover:bg-orange-50 transition-all shadow-lg">
+                        랜덤박스 열기
                       </button>
                     </div>
                   </div>
                 </div>
                 
-                <!-- Spin Wheel Section -->
-                <div id="spinWheelSection" class="bg-white rounded-2xl shadow-xl p-6 mb-8">
-                  <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">🎰 행운의 돌림판</h3>
+                <!-- Random Box Section -->
+                <div id="randomBoxSection" class="bg-white rounded-2xl shadow-xl p-6 mb-8">
+                  <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">🎁 행운의 랜덤박스</h3>
                   
-                  <!-- Wheel Container (centered with flex) -->
+                  <!-- Box Container -->
                   <div class="flex justify-center items-center mb-6">
-                    <div class="relative" style="width: 320px; height: 320px;">
-                      <!-- Pointer -->
-                      <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2 z-30">
-                        <div class="w-0 h-0 border-l-[12px] border-r-[12px] border-t-[24px] border-l-transparent border-r-transparent border-t-red-600 drop-shadow-lg"></div>
+                    <div class="relative" style="width: 300px; height: 300px;">
+                      <!-- Mystery Box (closed) -->
+                      <div id="mysteryBox" class="absolute inset-0 cursor-pointer transition-all duration-500" onclick="worvox.openBox()">
+                        <div class="w-full h-full bg-gradient-to-br from-purple-600 via-pink-500 to-orange-500 rounded-2xl shadow-2xl flex items-center justify-center transform hover:scale-105 transition-all">
+                          <div class="text-center text-white">
+                            <div class="text-8xl mb-4">🎁</div>
+                            <div class="text-2xl font-bold mb-2">클릭하세요!</div>
+                            <div class="text-lg opacity-80">무엇이 나올까요?</div>
+                          </div>
+                        </div>
                       </div>
                       
-                      <!-- Wheel -->
-                      <div id="spinWheel" class="absolute inset-0 rounded-full border-8 border-gray-800 shadow-2xl" style="transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99); overflow: hidden;">
-                        ${this.generateSpinWheelHTML()}
+                      <!-- Opening Animation Container -->
+                      <div id="boxOpening" class="absolute inset-0 hidden">
+                        <div class="w-full h-full flex items-center justify-center">
+                          <div class="text-center">
+                            <div class="text-6xl animate-bounce">✨</div>
+                            <div class="text-xl font-bold text-gray-800 mt-4">열는 중...</div>
+                          </div>
+                        </div>
                       </div>
-                      
-                      <!-- Center Button -->
-                      <button id="spinButton" onclick="worvox.spinTheWheel()" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full shadow-2xl flex items-center justify-center text-white font-bold text-lg hover:scale-110 transition-all z-20 border-4 border-white">
-                        SPIN
-                      </button>
                     </div>
                   </div>
                   
                   <!-- Result Display -->
-                  <div id="spinResult" class="text-center"></div>
+                  <div id="boxResult" class="text-center"></div>
                 </div>
 
                 <!-- Rewards Grid -->
@@ -10451,22 +10457,116 @@ Proceed to payment?
     }
   }
   
-  openSpinWheel() {
+  openRandomBox() {
     if (!this.availableSpins || this.availableSpins <= 0) {
-      alert('보유한 돌림판 횟수가 없습니다!\n\n레벨업 보상을 통해 돌림판을 획득하세요.');
+      alert('보유한 랜덤박스 횟수가 없습니다!\n\n레벨업 보상을 통해 랜덤박스를 획득하세요.');
       return;
     }
     
-    // Scroll to spin wheel section
-    const spinSection = document.getElementById('spinWheelSection');
-    if (spinSection) {
-      spinSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Scroll to random box section
+    const boxSection = document.getElementById('randomBoxSection');
+    if (boxSection) {
+      boxSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
       
       // Highlight the section briefly
-      spinSection.classList.add('ring-4', 'ring-orange-500');
+      boxSection.classList.add('ring-4', 'ring-orange-500');
       setTimeout(() => {
-        spinSection.classList.remove('ring-4', 'ring-orange-500');
+        boxSection.classList.remove('ring-4', 'ring-orange-500');
       }, 2000);
+    }
+  }
+  
+  async openBox() {
+    // Check available count
+    if (!this.availableSpins || this.availableSpins <= 0) {
+      alert('보유한 랜덤박스 횟수가 없습니다!');
+      return;
+    }
+    
+    // Hide box, show opening animation
+    const mysteryBox = document.getElementById('mysteryBox');
+    const boxOpening = document.getElementById('boxOpening');
+    const boxResult = document.getElementById('boxResult');
+    
+    mysteryBox.classList.add('hidden');
+    boxOpening.classList.remove('hidden');
+    
+    // Prizes with probabilities
+    const prizes = [
+      { name: 'XP 50', probability: 55, icon: '⚡' },
+      { name: 'XP 300', probability: 40, icon: '💫' },
+      { name: '스타벅스 아메리카노', probability: 4.9, icon: '☕' },
+      { name: '스타벅스 1만원권', probability: 0.025, icon: '🎫' },
+      { name: '로지텍 무선 키보드', probability: 0.025, icon: '⌨️' },
+      { name: '삼성 버즈', probability: 0.025, icon: '🎧' },
+      { name: '에어팟 프로', probability: 0.013, icon: '🎵' },
+      { name: '아이패드 프로', probability: 0.012, icon: '📱' }
+    ];
+    
+    // Select prize based on probability
+    const random = Math.random() * 100;
+    let cumulative = 0;
+    let selectedPrize = prizes[0];
+    
+    for (let i = 0; i < prizes.length; i++) {
+      cumulative += prizes[i].probability;
+      if (random <= cumulative) {
+        selectedPrize = prizes[i];
+        break;
+      }
+    }
+    
+    // Wait for animation (2 seconds)
+    setTimeout(async () => {
+      // Decrease available count
+      this.availableSpins--;
+      await this.saveSpinCount();
+      this.updateSpinCount();
+      
+      // Award XP if XP prize
+      let xpAwarded = 0;
+      if (selectedPrize.name === 'XP 50') {
+        xpAwarded = 50;
+        await this.awardXP(50, 'random_box', 'Random Box - XP 50');
+      } else if (selectedPrize.name === 'XP 300') {
+        xpAwarded = 300;
+        await this.awardXP(300, 'random_box', 'Random Box - XP 300');
+      }
+      
+      // Hide opening animation
+      boxOpening.classList.add('hidden');
+      
+      // Show result
+      boxResult.innerHTML = `
+        <div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white py-8 px-10 rounded-2xl shadow-2xl animate-bounce">
+          <div class="text-8xl mb-4">${selectedPrize.icon}</div>
+          <div class="text-4xl font-bold mb-3">축하합니다!</div>
+          <div class="text-2xl mb-2">${selectedPrize.name} 당첨!</div>
+          ${xpAwarded > 0 ? `<div class="text-xl mt-3 text-yellow-100">✨ +${xpAwarded} XP 획득!</div>` : ''}
+          <div class="text-lg mt-4 text-yellow-100">남은 횟수: ${this.availableSpins}회</div>
+          <button onclick="worvox.closeBoxResult()" class="mt-6 bg-white text-orange-600 px-8 py-3 rounded-lg font-bold hover:bg-orange-50 transition-all text-xl">
+            확인
+          </button>
+        </div>
+      `;
+    }, 2000);
+  }
+  
+  closeBoxResult() {
+    const mysteryBox = document.getElementById('mysteryBox');
+    const boxResult = document.getElementById('boxResult');
+    
+    // Clear result
+    boxResult.innerHTML = '';
+    
+    // Show box again if spins remain
+    if (this.availableSpins > 0) {
+      mysteryBox.classList.remove('hidden');
+    } else {
+      boxResult.innerHTML = `
+        <p class="text-gray-600 text-lg">모든 기회를 사용했습니다!</p>
+        <p class="text-gray-500 text-sm mt-2">레벨업 보상으로 랜덤박스를 다시 받으세요!</p>
+      `;
     }
   }
 
@@ -10495,14 +10595,14 @@ Proceed to payment?
         this.availableSpins = (this.availableSpins || 0) + reward.spins;
         await this.saveSpinCount();
         this.updateSpinCount();
-        alert(`🎉 축하합니다!\n\n돌림판 ${reward.spins}회가 지급되었습니다!\n\n상단의 "돌림판 돌리기" 버튼을 눌러 행운을 시험해보세요!`);
+        alert(`🎉 축하합니다!\n\n랜덤박스 ${reward.spins}회가 지급되었습니다!\n\n상단의 "랜덤박스 열기" 버튼을 눌러 행운을 시험해보세요!`);
       } else if (reward.type === 'premium') {
         alert(`🎉 축하합니다!\n\n프리미엄 ${reward.days}일 무료 체험권이 지급되었습니다!`);
       } else if (reward.type === 'xp+spin') {
         this.availableSpins = (this.availableSpins || 0) + reward.spins;
         await this.saveSpinCount();
         this.updateSpinCount();
-        alert(`🎉 축하합니다!\n\nLevel 83으로 즉시 상승 + 돌림판 ${reward.spins}회 기회가 지급되었습니다!`);
+        alert(`🎉 축하합니다!\n\nLevel 83으로 즉시 상승 + 랜덤박스 ${reward.spins}회 기회가 지급되었습니다!`);
       } else if (reward.type === 'coupon') {
         alert(`✈️ 축하합니다!\n\n대한항공 ${reward.value} 쿠폰이 지급되었습니다!\n쿠폰은 이메일로 전송됩니다.`);
       }
