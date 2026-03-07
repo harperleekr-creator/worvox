@@ -30,6 +30,8 @@ gamification.post('/xp/add', async (c: Context<{ Bindings: Bindings }>) => {
   try {
     const { userId, xp, activityType, details } = await c.req.json()
     
+    console.log('XP add request:', { userId, xp, activityType, details })
+    
     if (!userId || !xp) {
       return c.json({ success: false, error: 'Missing userId or xp' }, 400)
     }
@@ -41,8 +43,15 @@ gamification.post('/xp/add', async (c: Context<{ Bindings: Bindings }>) => {
       WHERE id = ?
     `).bind(userId).first() as any
 
+    console.log('User found:', user ? 'yes' : 'no', 'userId:', userId)
+
     if (!user) {
-      return c.json({ success: false, error: 'User not found' }, 404)
+      return c.json({ 
+        success: false, 
+        error: 'User not found', 
+        userId: userId,
+        message: `User with id ${userId} not found in database` 
+      }, 404)
     }
 
     const newTotalXP = (user.total_xp || 0) + xp

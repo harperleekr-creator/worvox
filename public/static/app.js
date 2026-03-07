@@ -10779,13 +10779,24 @@ Proceed to payment?
   
   async awardXP(xp, activityType, details) {
     try {
-      if (!this.currentUser || !this.currentUser.id) {
-        console.error('Current user not found');
-        alert('XP 지급 중 오류가 발생했습니다. (User not found)');
+      if (!this.currentUser) {
+        console.error('Current user is null or undefined');
+        console.error('localStorage user:', localStorage.getItem('worvox_user'));
+        alert('XP 지급 중 오류가 발생했습니다. (User not loaded)');
         return;
       }
       
-      console.log('Awarding XP:', xp, 'to user:', this.currentUser.id);
+      if (!this.currentUser.id) {
+        console.error('Current user has no id:', this.currentUser);
+        alert('XP 지급 중 오류가 발생했습니다. (User ID missing)');
+        return;
+      }
+      
+      console.log('=== XP Award Debug ===');
+      console.log('Current user:', this.currentUser);
+      console.log('User ID:', this.currentUser.id);
+      console.log('XP to award:', xp);
+      console.log('Activity:', activityType);
       
       const response = await axios.post('/api/gamification/xp/add', {
         userId: this.currentUser.id,
@@ -10804,14 +10815,24 @@ Proceed to payment?
         if (userResponse.data.success) {
           this.currentUser = userResponse.data.data;
           console.log('User data reloaded, new XP:', this.currentUser.total_xp);
+          // Also update localStorage
+          localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
         }
       } else {
         throw new Error(response.data.error || 'XP award failed');
       }
     } catch (error) {
-      console.error('Error awarding XP:', error);
-      console.error('Error details:', error.response?.data);
-      alert('XP 지급 중 오류가 발생했습니다.');
+      console.error('=== XP Award Error ===');
+      console.error('Error:', error);
+      console.error('Error message:', error.message);
+      console.error('Response data:', error.response?.data);
+      console.error('Response status:', error.response?.status);
+      
+      let errorMsg = 'XP 지급 중 오류가 발생했습니다.';
+      if (error.response?.data?.message) {
+        errorMsg += '\n' + error.response.data.message;
+      }
+      alert(errorMsg);
     }
   }
   
