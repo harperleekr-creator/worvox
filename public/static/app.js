@@ -10200,14 +10200,14 @@ Proceed to payment?
 
       // Define rewards (unlocked at level 30, 40, 50, etc.)
       const rewards = [
-        { level: 30, title: 'Bronze Champion', description: 'AI 튜터와 무제한 대화', icon: '🥉', type: 'feature', unlocked: userLevel >= 30 },
-        { level: 40, title: 'Silver Master', description: '프리미엄 단어장 액세스', icon: '🥈', type: 'feature', unlocked: userLevel >= 40 },
-        { level: 50, title: 'Gold Expert', description: '맞춤형 학습 플랜', icon: '🥇', type: 'feature', unlocked: userLevel >= 50 },
-        { level: 60, title: 'Platinum Pro', description: '발음 교정 AI 튜터', icon: '💎', type: 'feature', unlocked: userLevel >= 60 },
-        { level: 70, title: 'Diamond Elite', description: '실시간 번역 기능', icon: '💠', type: 'feature', unlocked: userLevel >= 70 },
-        { level: 80, title: 'Master Scholar', description: '비즈니스 영어 코스', icon: '👑', type: 'course', unlocked: userLevel >= 80 },
-        { level: 90, title: 'Legendary Linguist', description: 'TOEIC/TOEFL 모의고사', icon: '🏆', type: 'course', unlocked: userLevel >= 90 },
-        { level: 100, title: 'Ultimate Master', description: '평생 프리미엄 멤버십', icon: '⭐', type: 'premium', unlocked: userLevel >= 100 },
+        { level: 30, title: '돌림판 1회', description: '행운의 돌림판을 돌려보세요!', icon: '🎰', type: 'spin', spins: 1, unlocked: userLevel >= 30 },
+        { level: 40, title: '프리미엄 5일 무료', description: '프리미엄 기능을 5일간 체험하세요', icon: '👑', type: 'premium', days: 5, unlocked: userLevel >= 40 },
+        { level: 50, title: '돌림판 2회', description: '행운의 돌림판을 2번 돌려보세요!', icon: '🎰', type: 'spin', spins: 2, unlocked: userLevel >= 50 },
+        { level: 60, title: '돌림판 3회', description: '행운의 돌림판을 3번 돌려보세요!', icon: '🎰', type: 'spin', spins: 3, unlocked: userLevel >= 60 },
+        { level: 70, title: '돌림판 4회', description: '행운의 돌림판을 4번 돌려보세요!', icon: '🎰', type: 'spin', spins: 4, unlocked: userLevel >= 70 },
+        { level: 80, title: 'XP 보상 + 돌림판 3회', description: 'Level 83까지 즉시 상승 + 돌림판 3회', icon: '⚡', type: 'xp+spin', xpBonus: 'level83', spins: 3, unlocked: userLevel >= 80 },
+        { level: 90, title: '돌림판 5회', description: '행운의 돌림판을 5번 돌려보세요!', icon: '🎰', type: 'spin', spins: 5, unlocked: userLevel >= 90 },
+        { level: 100, title: '대한항공 10만원 쿠폰', description: '대한항공 항공권 구매에 사용 가능', icon: '✈️', type: 'coupon', value: '100,000원', unlocked: userLevel >= 100 },
       ];
 
       const app = document.getElementById('app');
@@ -10291,7 +10291,7 @@ Proceed to payment?
                         <!-- Type Badge -->
                         <div class="text-center">
                           <span class="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">
-                            ${reward.type === 'feature' ? '🎯 Feature' : reward.type === 'course' ? '📚 Course' : '👑 Premium'}
+                            ${reward.type === 'spin' ? '🎰 돌림판' : reward.type === 'premium' ? '👑 프리미엄' : reward.type === 'xp+spin' ? '⚡ XP+돌림판' : reward.type === 'coupon' ? '✈️ 쿠폰' : '🎁 보상'}
                           </span>
                         </div>
                         
@@ -10299,7 +10299,7 @@ Proceed to payment?
                         ${reward.unlocked ? `
                           <button onclick="worvox.claimReward(${reward.level})" 
                             class="mt-4 w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all">
-                            <i class="fas fa-gift mr-2"></i>Claim Reward
+                            <i class="fas fa-gift mr-2"></i>보상 받기
                           </button>
                         ` : ''}
                       </div>
@@ -10330,9 +10330,191 @@ Proceed to payment?
     }
   }
 
-  claimReward(level) {
-    // Placeholder for claim reward functionality
-    alert(`🎉 Congratulations! You've claimed the Level ${level} reward!\n\nThis feature will be available soon.`);
+  async claimReward(level) {
+    try {
+      // Get reward info
+      const stats = await gamificationManager.getStats(this.currentUser.id);
+      const userLevel = stats ? stats.stats.level : 1;
+      
+      const rewards = [
+        { level: 30, type: 'spin', spins: 1 },
+        { level: 40, type: 'premium', days: 5 },
+        { level: 50, type: 'spin', spins: 2 },
+        { level: 60, type: 'spin', spins: 3 },
+        { level: 70, type: 'spin', spins: 4 },
+        { level: 80, type: 'xp+spin', xpBonus: 'level83', spins: 3 },
+        { level: 90, type: 'spin', spins: 5 },
+        { level: 100, type: 'coupon', value: '100,000원' },
+      ];
+      
+      const reward = rewards.find(r => r.level === level);
+      if (!reward) return;
+      
+      if (reward.type === 'spin') {
+        this.showSpinWheel(reward.spins);
+      } else if (reward.type === 'premium') {
+        alert(`🎉 축하합니다!\n\n프리미엄 ${reward.days}일 무료 체험권이 지급되었습니다!`);
+      } else if (reward.type === 'xp+spin') {
+        alert(`🎉 축하합니다!\n\nLevel 83으로 즉시 상승 + 돌림판 ${reward.spins}회 기회가 지급되었습니다!`);
+        this.showSpinWheel(reward.spins);
+      } else if (reward.type === 'coupon') {
+        alert(`✈️ 축하합니다!\n\n대한항공 ${reward.value} 쿠폰이 지급되었습니다!\n쿠폰은 이메일로 전송됩니다.`);
+      }
+    } catch (error) {
+      console.error('Claim reward error:', error);
+      alert('보상 수령 중 오류가 발생했습니다.');
+    }
+  }
+  
+  showSpinWheel(totalSpins) {
+    // Store total spins
+    this.remainingSpins = totalSpins;
+    
+    // Spin wheel prizes with probabilities
+    const prizes = [
+      { name: 'XP 50', probability: 55, icon: '⚡', color: '#3B82F6' },
+      { name: 'XP 300', probability: 40, icon: '💫', color: '#8B5CF6' },
+      { name: '스타벅스 아메리카노', probability: 4.9, icon: '☕', color: '#10B981' },
+      { name: '스타벅스 1만원권', probability: 0.025, icon: '🎫', color: '#F59E0B' },
+      { name: '로지텍 무선 키보드', probability: 0.025, icon: '⌨️', color: '#EF4444' },
+      { name: '삼성 버즈', probability: 0.012, icon: '🎧', color: '#EC4899' },
+      { name: '에어팟 프로', probability: 0.012, icon: '🎵', color: '#14B8A6' },
+      { name: '삼성 워치', probability: 0.013, icon: '⌚', color: '#F97316' },
+      { name: '애플 워치', probability: 0.013, icon: '⌚', color: '#6366F1' },
+      { name: '아이패드 프로', probability: 0.01, icon: '📱', color: '#A855F7' }
+    ];
+    
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 md:p-8 shadow-2xl">
+          <!-- Header -->
+          <div class="text-center mb-6">
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">🎰 행운의 돌림판</h2>
+            <p class="text-gray-600">남은 기회: <span id="remainingSpins" class="text-2xl font-bold text-indigo-600">${totalSpins}</span>회</p>
+          </div>
+          
+          <!-- Spin Wheel Container -->
+          <div class="relative mb-6">
+            <!-- Wheel -->
+            <div id="spinWheel" class="relative w-80 h-80 mx-auto rounded-full border-8 border-gray-800 shadow-2xl overflow-hidden" style="transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);">
+              ${prizes.map((prize, index) => {
+                const angle = (360 / prizes.length) * index;
+                return `
+                  <div class="absolute w-full h-full" style="transform: rotate(${angle}deg); transform-origin: center;">
+                    <div class="absolute w-1/2 h-full right-1/2 origin-right flex items-center justify-end pr-4" style="background: ${prize.color}; clip-path: polygon(100% 0, 100% 100%, 0 50%);">
+                      <div class="transform rotate-90 text-center">
+                        <div class="text-3xl mb-1">${prize.icon}</div>
+                        <div class="text-xs font-bold text-white whitespace-nowrap">${prize.name}</div>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+            
+            <!-- Pointer -->
+            <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2 z-10">
+              <div class="w-0 h-0 border-l-8 border-r-8 border-t-16 border-l-transparent border-r-transparent border-t-red-500"></div>
+            </div>
+            
+            <!-- Center Button -->
+            <button id="spinButton" onclick="worvox.spinTheWheel()" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full shadow-2xl flex items-center justify-center text-white font-bold text-xl hover:scale-110 transition-all z-20 border-4 border-white">
+              SPIN
+            </button>
+          </div>
+          
+          <!-- Result Display -->
+          <div id="spinResult" class="text-center mb-4 min-h-16"></div>
+          
+          <!-- Close Button -->
+          <button onclick="worvox.showRewards()" class="w-full py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold transition-all">
+            닫기
+          </button>
+        </div>
+      </div>
+    `;
+  }
+  
+  spinTheWheel() {
+    if (this.remainingSpins <= 0) {
+      alert('남은 기회가 없습니다!');
+      return;
+    }
+    
+    // Disable button
+    const spinButton = document.getElementById('spinButton');
+    spinButton.disabled = true;
+    spinButton.classList.add('opacity-50', 'cursor-not-allowed');
+    
+    // Prizes with cumulative probabilities
+    const prizes = [
+      { name: 'XP 50', probability: 55, icon: '⚡' },
+      { name: 'XP 300', probability: 40, icon: '💫' },
+      { name: '스타벅스 아메리카노', probability: 4.9, icon: '☕' },
+      { name: '스타벅스 1만원권', probability: 0.025, icon: '🎫' },
+      { name: '로지텍 무선 키보드', probability: 0.025, icon: '⌨️' },
+      { name: '삼성 버즈', probability: 0.012, icon: '🎧' },
+      { name: '에어팟 프로', probability: 0.012, icon: '🎵' },
+      { name: '삼성 워치', probability: 0.013, icon: '⌚' },
+      { name: '애플 워치', probability: 0.013, icon: '⌚' },
+      { name: '아이패드 프로', probability: 0.01, icon: '📱' }
+    ];
+    
+    // Select prize based on probability
+    const random = Math.random() * 100;
+    let cumulative = 0;
+    let selectedPrize = prizes[0];
+    let selectedIndex = 0;
+    
+    for (let i = 0; i < prizes.length; i++) {
+      cumulative += prizes[i].probability;
+      if (random <= cumulative) {
+        selectedPrize = prizes[i];
+        selectedIndex = i;
+        break;
+      }
+    }
+    
+    // Calculate rotation
+    const degreesPerPrize = 360 / prizes.length;
+    const targetDegree = 360 * 5 + (degreesPerPrize * selectedIndex) + (degreesPerPrize / 2);
+    
+    // Rotate wheel
+    const wheel = document.getElementById('spinWheel');
+    wheel.style.transform = `rotate(${targetDegree}deg)`;
+    
+    // Show result after animation
+    setTimeout(() => {
+      this.remainingSpins--;
+      document.getElementById('remainingSpins').textContent = this.remainingSpins;
+      
+      document.getElementById('spinResult').innerHTML = `
+        <div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white py-4 px-6 rounded-xl shadow-lg animate-bounce">
+          <div class="text-5xl mb-2">${selectedPrize.icon}</div>
+          <div class="text-2xl font-bold mb-1">축하합니다!</div>
+          <div class="text-xl">${selectedPrize.name} 당첨!</div>
+        </div>
+      `;
+      
+      // Re-enable button if spins remain
+      if (this.remainingSpins > 0) {
+        spinButton.disabled = false;
+        spinButton.classList.remove('opacity-50', 'cursor-not-allowed');
+        // Reset wheel rotation for next spin
+        setTimeout(() => {
+          wheel.style.transition = 'none';
+          wheel.style.transform = 'rotate(0deg)';
+          setTimeout(() => {
+            wheel.style.transition = 'transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
+          }, 50);
+        }, 2000);
+      } else {
+        document.getElementById('spinResult').innerHTML += `
+          <p class="text-gray-600 mt-4">모든 기회를 사용했습니다!</p>
+        `;
+      }
+    }, 3000);
   }
 
   showUpgrade() {
