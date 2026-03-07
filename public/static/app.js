@@ -10387,26 +10387,24 @@ Proceed to payment?
   
   generateSpinWheelHTML() {
     const prizes = [
-      { name: 'XP 50', icon: '⚡', color: '#3B82F6' },
-      { name: 'XP 300', icon: '💫', color: '#8B5CF6' },
-      { name: '스타벅스', icon: '☕', color: '#10B981' },
-      { name: '1만원권', icon: '🎫', color: '#F59E0B' },
-      { name: '키보드', icon: '⌨️', color: '#EF4444' },
-      { name: '삼성버즈', icon: '🎧', color: '#EC4899' },
-      { name: '에어팟', icon: '🎵', color: '#14B8A6' },
-      { name: '삼성워치', icon: '⌚', color: '#F97316' },
-      { name: '애플워치', icon: '⌚', color: '#6366F1' },
-      { name: '아이패드', icon: '📱', color: '#A855F7' }
+      { name: 'XP 50', icon: '⚡', color: '#EF4444' },
+      { name: 'XP 300', icon: '💫', color: '#F97316' },
+      { name: '스타벅스', icon: '☕', color: '#F59E0B' },
+      { name: '1만원권', icon: '🎫', color: '#EAB308' },
+      { name: '키보드', icon: '⌨️', color: '#10B981' },
+      { name: '삼성버즈', icon: '🎧', color: '#14B8A6' },
+      { name: '에어팟', icon: '🎵', color: '#3B82F6' },
+      { name: '아이패드', icon: '📱', color: '#6366F1' }
     ];
     
     return prizes.map((prize, index) => {
       const angle = (360 / prizes.length) * index;
       return `
         <div class="absolute w-full h-full" style="transform: rotate(${angle}deg); transform-origin: center;">
-          <div class="absolute w-1/2 h-full right-1/2 origin-right flex items-center justify-end pr-2" style="background: ${prize.color}; clip-path: polygon(100% 0, 100% 100%, 0 50%);">
+          <div class="absolute w-1/2 h-full right-1/2 origin-right flex items-center justify-end pr-3" style="background: ${prize.color}; clip-path: polygon(100% 0, 100% 100%, 0 50%);">
             <div class="transform rotate-90 text-center">
-              <div class="text-2xl mb-0.5">${prize.icon}</div>
-              <div class="text-[9px] font-bold text-white whitespace-nowrap leading-tight">${prize.name}</div>
+              <div class="text-3xl mb-1">${prize.icon}</div>
+              <div class="text-[11px] font-bold text-white whitespace-nowrap leading-tight">${prize.name}</div>
             </div>
           </div>
         </div>
@@ -10587,18 +10585,16 @@ Proceed to payment?
     spinButton.disabled = true;
     spinButton.classList.add('opacity-50', 'cursor-not-allowed');
     
-    // Prizes with cumulative probabilities
+    // Prizes with cumulative probabilities (8 prizes)
     const prizes = [
       { name: 'XP 50', probability: 55, icon: '⚡' },
       { name: 'XP 300', probability: 40, icon: '💫' },
       { name: '스타벅스 아메리카노', probability: 4.9, icon: '☕' },
       { name: '스타벅스 1만원권', probability: 0.025, icon: '🎫' },
       { name: '로지텍 무선 키보드', probability: 0.025, icon: '⌨️' },
-      { name: '삼성 버즈', probability: 0.012, icon: '🎧' },
-      { name: '에어팟 프로', probability: 0.012, icon: '🎵' },
-      { name: '삼성 워치', probability: 0.013, icon: '⌚' },
-      { name: '애플 워치', probability: 0.013, icon: '⌚' },
-      { name: '아이패드 프로', probability: 0.01, icon: '📱' }
+      { name: '삼성 버즈', probability: 0.025, icon: '🎧' },
+      { name: '에어팟 프로', probability: 0.013, icon: '🎵' },
+      { name: '아이패드 프로', probability: 0.012, icon: '📱' }
     ];
     
     // Select prize based on probability
@@ -10658,16 +10654,23 @@ Proceed to payment?
   
   async awardXP(xp, activityType, details) {
     try {
-      await axios.post('/api/gamification/xp/add', {
+      const response = await axios.post('/api/gamification/xp/add', {
         userId: this.currentUser.id,
         xp: xp,
         activityType: activityType,
         details: details
       });
-      // Reload stats to show updated XP
+      console.log('XP awarded:', response.data);
+      // Reload stats to show updated XP and level
       await this.loadGamificationStats();
+      // Force reload current user data
+      const userResponse = await axios.get(`/api/users/${this.currentUser.id}`);
+      if (userResponse.data.success) {
+        this.currentUser = userResponse.data.data;
+      }
     } catch (error) {
       console.error('Error awarding XP:', error);
+      alert('XP 지급 중 오류가 발생했습니다.');
     }
   }
   
