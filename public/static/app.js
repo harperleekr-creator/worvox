@@ -6466,6 +6466,73 @@ Proceed to payment?
                   <p class="text-gray-600 dark:text-gray-300 text-base md:text-lg">What would you like to learn today?</p>
                 </div>
                 
+                <!-- Quick Start Guide Banner -->
+                <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-6 md:p-8 mb-6 md:mb-8 shadow-lg text-white">
+                  <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="flex-1 text-center md:text-left">
+                      <h2 class="text-xl md:text-2xl font-bold mb-2">
+                        <i class="fas fa-rocket mr-2"></i>Start Your English Journey!
+                      </h2>
+                      <p class="text-emerald-100 text-sm md:text-base">
+                        Choose a mode below to practice speaking, build vocabulary, or chat with AI
+                      </p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 justify-center">
+                      <button onclick="worvox.showAIConversation()" class="bg-white text-emerald-600 hover:bg-emerald-50 px-4 py-2 rounded-lg font-semibold transition-all shadow-md">
+                        <i class="fas fa-comments mr-2"></i>AI Chat
+                      </button>
+                      <button onclick="worvox.showTimerMode()" class="bg-white text-emerald-600 hover:bg-emerald-50 px-4 py-2 rounded-lg font-semibold transition-all shadow-md">
+                        <i class="fas fa-stopwatch mr-2"></i>Timer
+                      </button>
+                      <button onclick="worvox.startVocabulary()" class="bg-white text-emerald-600 hover:bg-emerald-50 px-4 py-2 rounded-lg font-semibold transition-all shadow-md">
+                        <i class="fas fa-book mr-2"></i>Words
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Daily Goals & Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 md:mb-8">
+                  <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 shadow-md text-white">
+                    <div class="flex items-center gap-3 mb-2">
+                      <div class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-fire text-2xl"></i>
+                      </div>
+                      <div>
+                        <div class="text-xs opacity-80">Today's Streak</div>
+                        <div class="text-2xl font-bold">${stats.todayMessages || 0}</div>
+                      </div>
+                    </div>
+                    <div class="text-xs opacity-80">Keep going! 🎯</div>
+                  </div>
+                  
+                  <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-4 shadow-md text-white">
+                    <div class="flex items-center gap-3 mb-2">
+                      <div class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-trophy text-2xl"></i>
+                      </div>
+                      <div>
+                        <div class="text-xs opacity-80">Total XP</div>
+                        <div class="text-2xl font-bold">${stats.totalXp || 0}</div>
+                      </div>
+                    </div>
+                    <div class="text-xs opacity-80">Level ${stats.level || 1} • ${stats.nextLevelXp || 100} to next</div>
+                  </div>
+                  
+                  <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-4 shadow-md text-white">
+                    <div class="flex items-center gap-3 mb-2">
+                      <div class="w-10 h-10 bg-white bg-opacity-20 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-book-open text-2xl"></i>
+                      </div>
+                      <div>
+                        <div class="text-xs opacity-80">Words Learned</div>
+                        <div class="text-2xl font-bold">${stats.wordsLearned || 0}</div>
+                      </div>
+                    </div>
+                    <div class="text-xs opacity-80">Great progress! 📚</div>
+                  </div>
+                </div>
+                
                 <!-- Word Search Section -->
                 <div class="mb-6 md:mb-8">
                   <div class="relative max-w-2xl mx-auto">
