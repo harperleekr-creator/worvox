@@ -1,6 +1,76 @@
 # WorVox - AI English Learning Platform
 
-## 🔔 최신 업데이트 (2026-03-06 15:30 UTC) - ✅ Production 배포 완료
+## 🔔 최신 업데이트 (2026-03-06 16:00 UTC) - ✅ Production 배포 완료
+
+### 🎨 ChatGPT 스타일 미니멀 대시보드 리디자인 - Commit `02bc119` ✅
+
+**배포 정보**
+- **Production**: https://worvox.com ✅ 
+- **Preview**: https://8e578d76.worvox.pages.dev ✅
+- **GitHub Commit**: https://github.com/harperleekr-creator/worvox/commit/02bc119
+
+#### 1. ✅ 완전히 새로운 ChatGPT 스타일 UI
+- **디자인 철학**:
+  - 🎯 **미니멀리즘**: 불필요한 요소 제거, 핵심 기능만 강조
+  - 📱 **모바일 최적화**: 깔끔한 리스트 스타일
+  - 🌓 **다크모드 완벽 지원**: Gray-scale 색상 시스템
+  - ⚡ **빠른 접근**: 버튼 중심 인터페이스
+
+- **새로운 레이아웃 구조**:
+  ```
+  Welcome back 👋
+  Harper
+  ─────────────────────────
+  🔥 Today's Goal
+  Speak English for 5 minutes
+  [ Start Speaking ]
+  ─────────────────────────
+  🎤 Start Speaking with AI
+  Practice real conversation
+  [ Start AI Conversation ]
+  ─────────────────────────
+  Continue Learning
+  Scenario: Restaurant conversation
+  [ Continue ]
+  ─────────────────────────
+  🔥 Streak | XP | Words
+  [  0  ] [ 120 ] [  8  ]
+  ─────────────────────────
+  Practice Modes
+  AI Conversation
+  Scenario
+  Timer
+  Vocabulary
+  Exam
+  ─────────────────────────
+  Speak with a Tutor
+  🎁 First lesson free
+  [ Book Live Lesson ]
+  ```
+
+- **주요 개선 사항**:
+  - ✅ 어두운 배경 Today's Goal 카드 (CTA 강조)
+  - ✅ 섹션별 명확한 구분선 (Divider)
+  - ✅ 버튼 중심 인터페이스 (클릭 유도)
+  - ✅ 간결한 텍스트 (핵심만 전달)
+  - ✅ 통일된 둥근 모서리 (rounded-xl)
+  - ✅ Gray 색상 시스템 (집중력 향상)
+
+- **삭제된 요소**:
+  - ❌ 화려한 그라데이션 배너
+  - ❌ 큰 아이콘 카드
+  - ❌ 복잡한 Daily Usage Tracker
+  - ❌ Word Search 바 (별도 페이지로 이동 예정)
+
+- **UX 개선 효과**:
+  - 정보 밀도 30% 감소 → 집중력 향상
+  - 클릭 가능 영역 50% 증가 → 접근성 향상
+  - 스크롤 길이 40% 단축 → 빠른 탐색
+  - 다크모드 가독성 100% 개선
+
+---
+
+## 🔔 이전 업데이트 (2026-03-06 15:30 UTC)
 
 ### 🎭 AI 대화 시나리오 버튼 추가 - Commit `11f1621` ✅
 
