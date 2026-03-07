@@ -1,6 +1,42 @@
 # WorVox - AI English Learning Platform
 
-## 🔔 최신 업데이트 (2026-03-06 15:00 UTC) - ✅ Production 배포 완료
+## 🔔 최신 업데이트 (2026-03-06 15:30 UTC) - ✅ Production 배포 완료
+
+### 🎭 AI 대화 시나리오 버튼 추가 - Commit `11f1621` ✅
+
+**배포 정보**
+- **Production**: https://worvox.com ✅ 
+- **Preview**: https://d090a8e1.worvox.pages.dev ✅
+- **GitHub Commit**: https://github.com/harperleekr-creator/worvox/commit/11f1621
+
+#### 1. ✅ AI 대화 시나리오 선택 기능
+- **추가된 8개 시나리오 버튼**:
+  - 🎭 **AI Roleplay**: 다양한 캐릭터와 상황 연기
+  - 💼 **Job Interview**: 취업 면접 연습
+  - 📊 **Business Meeting**: 비즈니스 회의 시뮬레이션
+  - 🍽️ **Restaurant**: 레스토랑 주문 연습
+  - ✈️ **Travel**: 여행 상황 대화
+  - 🛍️ **Shopping**: 쇼핑 대화 연습
+  - 🏥 **Doctor Visit**: 병원 방문 대화
+  - 💬 **Casual Chat**: 자유로운 일상 대화
+
+- **작동 방식**:
+  1. AI 대화 모드 진입 시 8개 시나리오 버튼 표시
+  2. 버튼 클릭 → AI가 먼저 인사 메시지 전송
+  3. TTS로 AI 음성 자동 재생
+  4. 시나리오 컨텍스트가 대화 전체에 적용
+  5. 자유 대화도 여전히 가능 (마이크 버튼)
+
+- **UX 개선**:
+  - 각 버튼마다 고유한 그라데이션 색상
+  - 아이콘 + 텍스트로 직관적 표현
+  - Hover 효과 (확대 + 그림자)
+  - 반응형 그리드 (모바일 2열, 데스크톱 4열)
+  - 시나리오 모드 배지 표시
+
+---
+
+## 🔔 이전 업데이트 (2026-03-06 15:00 UTC)
 
 ### 🎨 사용자 대시보드 UX 개선 - Commit `59e5cb5` ✅
 
