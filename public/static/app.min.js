@@ -7350,7 +7350,7 @@ Proceed to payment?
       }
       
       // Add user message to UI
-      this.addMessage('user', transcription);
+      this.addMessage(transcription, 'user');
 
       // Step 2: Get AI response
       console.log('Sending to Chat API...');
@@ -7368,7 +7368,7 @@ Proceed to payment?
       const aiMessage = chatResponse.data.message;
       
       // Add AI message to UI (without audio yet)
-      this.addMessage('assistant', aiMessage);
+      this.addMessage(aiMessage, 'assistant');
 
       // Step 3: Generate speech for AI response
       console.log('Sending to TTS API...');
