@@ -63,22 +63,49 @@ analysis.post('/sessions/:sessionId/analyze', async (c) => {
     }
     
     // 5. LLM을 사용하여 분석
-    const analysisPrompt = `English coach. Analyze conversation and return JSON only.
+    const analysisPrompt = `You are an expert English teacher analyzing a student's conversation. Provide detailed feedback in JSON format.
 
+**Student's messages:**
 ${userMessages.map((m: any, i: number) => `${i + 1}. ${m.content}`).join('\n')}
 
-Required JSON format:
+**Analysis Requirements:**
+1. Find 2-3 grammar errors or mistakes (if any exist)
+2. Suggest 1-2 better expressions or vocabulary improvements
+3. Provide encouraging feedback in Korean
+
+**Return JSON in this exact format:**
 {
   "overall_score": <50-95>,
   "grammar_score": <50-95>,
   "vocabulary_score": <50-95>,
   "fluency_score": <50-95>,
-  "errors": [{"original":"","improved":"","explanation":"Korean","category":"grammar","priority":3}],
-  "suggestions": [{"original":"","improved":"","explanation":"Korean","category":"vocabulary","priority":2}],
-  "grammar_feedback": "Korean feedback (2-3 paragraphs: positives, patterns, tips)",
-  "total_words": <number>,
-  "avg_sentence_length": <number>
-}`;
+  "errors": [
+    {
+      "original": "actual student sentence with error",
+      "improved": "corrected version",
+      "explanation": "한국어로 왜 틀렸는지 자세히 설명",
+      "category": "grammar",
+      "priority": 3
+    }
+  ],
+  "suggestions": [
+    {
+      "original": "student's expression",
+      "improved": "more natural/advanced expression",
+      "explanation": "한국어로 왜 더 나은지 설명",
+      "category": "vocabulary",
+      "priority": 2
+    }
+  ],
+  "grammar_feedback": "한국어로 잘한 점, 패턴, 개선 팁 (2-3문단)",
+  "total_words": <estimated word count>,
+  "avg_sentence_length": <average words per sentence>
+}
+
+**Important:** 
+- Always include at least 1-2 errors and 1 suggestion
+- Use actual sentences from the student's messages
+- Explanations must be in Korean and detailed`;
 
     const openaiApiKey = c.env.OPENAI_API_KEY;
     const openaiApiBase = c.env.OPENAI_API_BASE || 'https://api.openai.com/v1';
