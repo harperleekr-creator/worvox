@@ -814,13 +814,156 @@ class WorVox {
       return; // Show upgrade banner
     }
     
+    // Show topic selection screen
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="flex h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:bg-gray-900">
+        ${this.getSidebar('ai-conversation')}
+        
+        <div class="flex-1 flex flex-col overflow-hidden">
+          <!-- Header -->
+          <div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 md:px-6 py-3 md:py-4">
+            <div class="flex items-center gap-2 max-w-6xl mx-auto">
+              <button onclick="worvox.showTopicSelection()" 
+                class="text-gray-600 dark:text-gray-300 hover:text-gray-800 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
+                <i class="fas fa-arrow-left text-xl"></i>
+              </button>
+              <div>
+                <h1 class="text-lg md:text-2xl font-bold text-gray-800 dark:text-white mb-1">🎤 AI English Conversation</h1>
+                <p class="hidden md:block text-gray-600 dark:text-gray-400 text-sm">Choose a conversation topic</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Content -->
+          <div class="flex-1 overflow-y-auto p-4 md:p-8">
+            <div class="max-w-4xl mx-auto">
+              <!-- Guide Card -->
+              <div class="bg-white dark:bg-gray-800 rounded-xl p-4 mb-5 border-2 border-blue-200 dark:border-blue-800">
+                <div class="flex items-start gap-3">
+                  <div class="text-2xl">💬</div>
+                  <div>
+                    <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-1">대화 주제를 선택하세요</h3>
+                    <p class="text-xs text-gray-600 dark:text-gray-400">관심있는 주제나 실생활 상황을 선택해 AI와 자유롭게 대화하세요</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Topics Grid -->
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-5">
+                <!-- AI Roleplay -->
+                <button onclick="worvox.selectConversationTopic('ai-roleplay', '🎭 AI Roleplay', 'You are a friendly AI assistant helping users practice English through various role-play scenarios.')" 
+                  class="bg-gradient-to-br from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl p-4 transition-all transform hover:scale-105 text-left">
+                  <div class="text-3xl mb-2">🎭</div>
+                  <div class="text-sm font-bold">AI Roleplay</div>
+                  <div class="text-xs opacity-80 mt-1">초급~고급</div>
+                </button>
+                
+                <!-- Job Interview -->
+                <button onclick="worvox.selectConversationTopic('job-interview', '💼 Job Interview', 'You are an experienced HR interviewer conducting a professional job interview in English.')" 
+                  class="bg-gradient-to-br from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-xl p-4 transition-all transform hover:scale-105 text-left">
+                  <div class="text-3xl mb-2">💼</div>
+                  <div class="text-sm font-bold">Job Interview</div>
+                  <div class="text-xs opacity-80 mt-1">중급~고급</div>
+                </button>
+                
+                <!-- Business Meeting -->
+                <button onclick="worvox.selectConversationTopic('business-meeting', '📊 Business Meeting', 'You are a business professional leading a meeting to discuss company strategies and goals.')" 
+                  class="bg-gradient-to-br from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-xl p-4 transition-all transform hover:scale-105 text-left">
+                  <div class="text-3xl mb-2">📊</div>
+                  <div class="text-sm font-bold">Business Meeting</div>
+                  <div class="text-xs opacity-80 mt-1">중급~고급</div>
+                </button>
+                
+                <!-- Restaurant -->
+                <button onclick="worvox.selectConversationTopic('restaurant', '🍽️ Restaurant', 'You are a friendly waiter/waitress at a restaurant helping customers order food.')" 
+                  class="bg-gradient-to-br from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-xl p-4 transition-all transform hover:scale-105 text-left">
+                  <div class="text-3xl mb-2">🍽️</div>
+                  <div class="text-sm font-bold">Restaurant</div>
+                  <div class="text-xs opacity-80 mt-1">초급~중급</div>
+                </button>
+                
+                <!-- Travel -->
+                <button onclick="worvox.selectConversationTopic('travel', '✈️ Travel', 'You are a helpful travel guide assisting tourists with travel plans and recommendations.')" 
+                  class="bg-gradient-to-br from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 text-white rounded-xl p-4 transition-all transform hover:scale-105 text-left">
+                  <div class="text-3xl mb-2">✈️</div>
+                  <div class="text-sm font-bold">Travel</div>
+                  <div class="text-xs opacity-80 mt-1">초급~중급</div>
+                </button>
+                
+                <!-- Shopping -->
+                <button onclick="worvox.selectConversationTopic('shopping', '🛍️ Shopping', 'You are a sales assistant in a store helping customers find what they need.')" 
+                  class="bg-gradient-to-br from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white rounded-xl p-4 transition-all transform hover:scale-105 text-left">
+                  <div class="text-3xl mb-2">🛍️</div>
+                  <div class="text-sm font-bold">Shopping</div>
+                  <div class="text-xs opacity-80 mt-1">초급~중급</div>
+                </button>
+                
+                <!-- Doctor Visit -->
+                <button onclick="worvox.selectConversationTopic('doctor-visit', '🏥 Doctor Visit', 'You are a doctor helping patients describe their symptoms and providing medical advice.')" 
+                  class="bg-gradient-to-br from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-xl p-4 transition-all transform hover:scale-105 text-left">
+                  <div class="text-3xl mb-2">🏥</div>
+                  <div class="text-sm font-bold">Doctor Visit</div>
+                  <div class="text-xs opacity-80 mt-1">중급</div>
+                </button>
+                
+                <!-- Military English -->
+                <button onclick="worvox.selectConversationTopic('military-english', '🪖 Military English', 'You are a military officer conducting briefings and tactical discussions in professional military English.')" 
+                  class="bg-gradient-to-br from-gray-700 to-gray-900 hover:from-gray-800 hover:to-black text-white rounded-xl p-4 transition-all transform hover:scale-105 text-left">
+                  <div class="text-3xl mb-2">🪖</div>
+                  <div class="text-sm font-bold">Military English</div>
+                  <div class="text-xs opacity-80 mt-1">중급~고급</div>
+                </button>
+                
+                <!-- Casual Chat -->
+                <button onclick="worvox.selectConversationTopic('casual-chat', '💬 Casual Chat', 'You are a friendly conversation partner ready to chat about everyday topics.')" 
+                  class="bg-gradient-to-br from-slate-500 to-gray-600 hover:from-slate-600 hover:to-gray-700 text-white rounded-xl p-4 transition-all transform hover:scale-105 text-left">
+                  <div class="text-3xl mb-2">💬</div>
+                  <div class="text-sm font-bold">Casual Chat</div>
+                  <div class="text-xs opacity-80 mt-1">모든 레벨</div>
+                </button>
+              </div>
+              
+              <!-- Free Conversation -->
+              <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl p-5 text-white">
+                <div class="flex items-start gap-3 mb-3">
+                  <div class="text-3xl">🎯</div>
+                  <div>
+                    <h3 class="text-base font-bold mb-1">자유 주제 대화</h3>
+                    <p class="text-sm opacity-90">특정 주제 없이 자유롭게 대화하고 싶으신가요?</p>
+                  </div>
+                </div>
+                <button onclick="worvox.selectConversationTopic('free-talk', '💬 Free Talk', 'You are a friendly AI assistant. Have a natural, free-flowing conversation on any topic the user wants to discuss.')" 
+                  class="w-full bg-white text-emerald-700 font-bold py-2 px-4 rounded-lg hover:bg-emerald-50 transition-all">
+                  자유 대화 시작하기
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  async selectConversationTopic(topicId, topicName, systemPrompt) {
+    // Increment usage when starting conversation
+    this.incrementUsage('aiConversations');
+    
+    // Get or create topic in database
     const topics = await axios.get('/api/topics');
-    const conversationTopic = topics.data.topics.find(t => t.name === 'AI English Conversation');
-    if (conversationTopic) {
-      // Increment usage when starting conversation
-      this.incrementUsage('aiConversations');
-      this.startSession(conversationTopic.id, conversationTopic.name, conversationTopic.system_prompt, conversationTopic.level);
+    let conversationTopic = topics.data.topics.find(t => t.name === topicName);
+    
+    if (!conversationTopic) {
+      // Create new topic if it doesn't exist
+      conversationTopic = {
+        id: Date.now(), // temporary ID
+        name: topicName,
+        system_prompt: systemPrompt,
+        level: 'intermediate'
+      };
     }
+    
+    this.startSession(conversationTopic.id, topicName, systemPrompt, conversationTopic.level || 'intermediate');
   }
 
   async startVocabulary() {
