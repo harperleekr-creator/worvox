@@ -817,7 +817,7 @@ class WorVox {
     // Increment usage when starting conversation
     this.incrementUsage('aiConversations');
     
-    // Create session directly
+    // Create session directly and start with Casual Chat scenario
     try {
       const response = await axios.post('/api/sessions/create', {
         userId: this.currentUser.id,
@@ -828,11 +828,16 @@ class WorVox {
       if (response.data.success) {
         this.currentSession = response.data.sessionId;
         this.currentTopic = {
-          name: 'AI English Conversation',
-          systemPrompt: 'You are a friendly AI assistant helping users practice English conversation.'
+          name: 'Casual Chat',
+          systemPrompt: 'You are a friendly conversation partner. Chat naturally about everyday topics, ask follow-up questions, and keep the conversation engaging.'
         };
         this.messages = [];
         this.showChatInterface();
+        
+        // Auto-start with casual chat greeting
+        setTimeout(() => {
+          this.startAIScenario('casual');
+        }, 100);
       }
     } catch (error) {
       console.error('Error starting conversation:', error);
