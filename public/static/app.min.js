@@ -946,24 +946,37 @@ class WorVox {
   }
   
   async selectConversationTopic(topicId, topicName, systemPrompt) {
-    // Increment usage when starting conversation
-    this.incrementUsage('aiConversations');
-    
-    // Get or create topic in database
-    const topics = await axios.get('/api/topics');
-    let conversationTopic = topics.data.topics.find(t => t.name === topicName);
-    
-    if (!conversationTopic) {
-      // Create new topic if it doesn't exist
-      conversationTopic = {
-        id: Date.now(), // temporary ID
-        name: topicName,
-        system_prompt: systemPrompt,
+    try {
+      console.log('Selecting conversation topic:', topicName);
+      
+      // Increment usage when starting conversation
+      this.incrementUsage('aiConversations');
+      
+      // For custom topics, use a simple approach - just start session directly
+      // No need to find in database, just create session with the provided info
+      const response = await axios.post('/api/sessions/create', {
+        userId: this.currentUser.id,
+        topicId: 1, // Use default topic ID for AI conversations
         level: 'intermediate'
-      };
+      });
+
+      if (response.data.success) {
+        this.currentSession = response.data.sessionId;
+        this.currentTopic = {
+          name: topicName,
+          systemPrompt: systemPrompt
+        };
+        this.messages = [];
+        console.log('Session started successfully:', this.currentSession);
+        this.showChatInterface();
+      } else {
+        throw new Error('Failed to create session');
+      }
+    } catch (error) {
+      console.error('Error selecting conversation topic:', error);
+      console.error('Error details:', error.response?.data);
+      alert('세션 시작 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
-    
-    this.startSession(conversationTopic.id, topicName, systemPrompt, conversationTopic.level || 'intermediate');
   }
 
   async startVocabulary() {
