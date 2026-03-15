@@ -2931,6 +2931,20 @@ app.get('/app', (c) => {
               
               // Force hard reload
               console.log('WorVox version updated to ${FORCE_VERSION} - Forcing reload');
+              
+              // Show loading message for mobile users
+              if (document.body) {
+                document.body.innerHTML = \`
+                  <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#f3f4f6;font-family:sans-serif;">
+                    <div style="text-align:center;padding:20px;">
+                      <div style="font-size:48px;margin-bottom:16px;">🔄</div>
+                      <div style="font-size:18px;font-weight:600;color:#1f2937;margin-bottom:8px;">업데이트 적용 중...</div>
+                      <div style="font-size:14px;color:#6b7280;">잠시만 기다려주세요</div>
+                    </div>
+                  </div>
+                \`;
+              }
+              
               setTimeout(() => {
                 window.location.reload(true);
               }, 100);
