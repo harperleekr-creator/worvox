@@ -41,12 +41,21 @@ app.use('*', async (c, next) => {
 // Enable CORS for API routes
 app.use('/api/*', cors());
 
-// Serve static files with no-cache headers for JS files
+// Serve static files with no-cache headers for JS and CSS files
 app.use('/static/*.js', async (c, next) => {
   await next();
-  c.header('Cache-Control', 'no-cache, no-store, must-revalidate');
+  c.header('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
   c.header('Pragma', 'no-cache');
   c.header('Expires', '0');
+  c.header('Vary', '*');
+});
+
+app.use('/static/*.css', async (c, next) => {
+  await next();
+  c.header('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+  c.header('Pragma', 'no-cache');
+  c.header('Expires', '0');
+  c.header('Vary', '*');
 });
 
 app.use('/static/*', serveStatic({ root: './public' }));
@@ -2899,13 +2908,36 @@ app.get('/app', (c) => {
         <div id="app"></div>
         
         <script>
-          // Force cache clear
-          if ('caches' in window) {
-            caches.keys().then(names => {
-              names.forEach(name => caches.delete(name));
-            });
-          }
-          console.log('WorVox v${FORCE_VERSION} - Cache cleared');
+          // Force cache clear - aggressive approach
+          (function() {
+            // Clear Service Worker caches
+            if ('caches' in window) {
+              caches.keys().then(names => {
+                names.forEach(name => caches.delete(name));
+              });
+            }
+            
+            // Clear localStorage version check
+            const currentVersion = '${FORCE_VERSION}';
+            const storedVersion = localStorage.getItem('worvox_version');
+            if (storedVersion !== currentVersion) {
+              // Clear all localStorage except user data
+              const userData = localStorage.getItem('worvox_user');
+              const premiumData = localStorage.getItem('worvox_premium');
+              localStorage.clear();
+              if (userData) localStorage.setItem('worvox_user', userData);
+              if (premiumData) localStorage.setItem('worvox_premium', premiumData);
+              localStorage.setItem('worvox_version', currentVersion);
+              
+              // Force hard reload
+              console.log('WorVox version updated to ${FORCE_VERSION} - Forcing reload');
+              setTimeout(() => {
+                window.location.reload(true);
+              }, 100);
+            }
+            
+            console.log('WorVox v${FORCE_VERSION} - Cache cleared');
+          })();
         </script>
         
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
@@ -3118,9 +3150,11 @@ app.get('/', (c) => {
     </body>
     </html>
   `, 200, {
-    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0',
     'Pragma': 'no-cache',
-    'Expires': '0'
+    'Expires': '0',
+    'X-Content-Type-Options': 'nosniff',
+    'Vary': '*'
   });
 });
 
