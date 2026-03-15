@@ -28,8 +28,8 @@ import hiing from './routes/hiing';
 import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
-const APP_VERSION = '20260307-spin-wheel-8';
-const CACHE_BUST = Date.now().toString(36); // Unique per deployment
+const APP_VERSION = '20260315-cache-fix';
+const BUILD_TIME = '1773580172597'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -2848,7 +2848,7 @@ app.get('/test', (c) => {
 // App page - Main application for logged users
 app.get('/app', (c) => {
   // Force COMPLETE cache busting - change this number to force refresh
-  const version = CACHE_BUST;
+  const version = BUILD_TIME;
   
   return c.html(`
     <!DOCTYPE html>
@@ -2924,7 +2924,7 @@ app.get('/app', (c) => {
             }
             
             // Just log the version - files auto-update via ?v= param
-            console.log('WorVox v${APP_VERSION} (build ${CACHE_BUST})');
+            console.log('WorVox v${APP_VERSION} (build ${BUILD_TIME})');
           })();
         </script>
         
@@ -2939,7 +2939,7 @@ app.get('/app', (c) => {
 
 // Main page
 app.get('/', (c) => {
-  const version = CACHE_BUST;
+  const version = BUILD_TIME;
   
   return c.html(`
     <!DOCTYPE html>
