@@ -27,6 +27,10 @@ import emails from './routes/emails';
 import hiing from './routes/hiing';
 import scheduled from './scheduled';
 
+// Cache busting version - update this when deploying new code
+const APP_VERSION = '20260307-spin-wheel-8';
+const CACHE_BUST = Date.now().toString(36); // Unique per deployment
+
 const app = new Hono<{ Bindings: Bindings }>();
 
 // Redirect www to non-www
@@ -41,21 +45,24 @@ app.use('*', async (c, next) => {
 // Enable CORS for API routes
 app.use('/api/*', cors());
 
-// Serve static files with no-cache headers for JS and CSS files
-app.use('/static/*.js', async (c, next) => {
+// Serve static files with proper cache headers
+// For versioned files (with ?v= or .v123.), use long cache
+// For non-versioned files, use no-cache
+app.use('/static/*', async (c, next) => {
+  const url = new URL(c.req.url);
+  const hasVersion = url.searchParams.has('v') || /\.[a-f0-9]{8,}\.(js|css)/.test(url.pathname);
+  
   await next();
-  c.header('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
-  c.header('Pragma', 'no-cache');
-  c.header('Expires', '0');
-  c.header('Vary', '*');
-});
-
-app.use('/static/*.css', async (c, next) => {
-  await next();
-  c.header('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
-  c.header('Pragma', 'no-cache');
-  c.header('Expires', '0');
-  c.header('Vary', '*');
+  
+  if (hasVersion) {
+    // Versioned files - cache for 1 year (immutable)
+    c.header('Cache-Control', 'public, max-age=31536000, immutable');
+  } else {
+    // Non-versioned files - no cache
+    c.header('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+    c.header('Pragma', 'no-cache');
+    c.header('Expires', '0');
+  }
 });
 
 app.use('/static/*', serveStatic({ root: './public' }));
@@ -2841,8 +2848,7 @@ app.get('/test', (c) => {
 // App page - Main application for logged users
 app.get('/app', (c) => {
   // Force COMPLETE cache busting - change this number to force refresh
-  const FORCE_VERSION = '20260307-spin-wheel-8';
-  const version = `${FORCE_VERSION}-${Date.now()}`;
+  const version = CACHE_BUST;
   
   return c.html(`
     <!DOCTYPE html>
@@ -2908,49 +2914,17 @@ app.get('/app', (c) => {
         <div id="app"></div>
         
         <script>
-          // Force cache clear - aggressive approach
+          // Simple cache management - no forced reload needed
           (function() {
-            // Clear Service Worker caches
+            // Clear Service Worker caches only
             if ('caches' in window) {
               caches.keys().then(names => {
                 names.forEach(name => caches.delete(name));
               });
             }
             
-            // Clear localStorage version check
-            const currentVersion = '${FORCE_VERSION}';
-            const storedVersion = localStorage.getItem('worvox_version');
-            if (storedVersion !== currentVersion) {
-              // Clear all localStorage except user data
-              const userData = localStorage.getItem('worvox_user');
-              const premiumData = localStorage.getItem('worvox_premium');
-              localStorage.clear();
-              if (userData) localStorage.setItem('worvox_user', userData);
-              if (premiumData) localStorage.setItem('worvox_premium', premiumData);
-              localStorage.setItem('worvox_version', currentVersion);
-              
-              // Force hard reload
-              console.log('WorVox version updated to ${FORCE_VERSION} - Forcing reload');
-              
-              // Show loading message for mobile users
-              if (document.body) {
-                document.body.innerHTML = \`
-                  <div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#f3f4f6;font-family:sans-serif;">
-                    <div style="text-align:center;padding:20px;">
-                      <div style="font-size:48px;margin-bottom:16px;">🔄</div>
-                      <div style="font-size:18px;font-weight:600;color:#1f2937;margin-bottom:8px;">업데이트 적용 중...</div>
-                      <div style="font-size:14px;color:#6b7280;">잠시만 기다려주세요</div>
-                    </div>
-                  </div>
-                \`;
-              }
-              
-              setTimeout(() => {
-                window.location.reload(true);
-              }, 100);
-            }
-            
-            console.log('WorVox v${FORCE_VERSION} - Cache cleared');
+            // Just log the version - files auto-update via ?v= param
+            console.log('WorVox v${APP_VERSION} (build ${CACHE_BUST})');
           })();
         </script>
         
@@ -2965,9 +2939,7 @@ app.get('/app', (c) => {
 
 // Main page
 app.get('/', (c) => {
-  // Force COMPLETE cache busting - change this number to force refresh
-  const FORCE_VERSION = '20260226-billing-toggle-v1';
-  const version = `${FORCE_VERSION}-${Date.now()}`;
+  const version = CACHE_BUST;
   
   return c.html(`
     <!DOCTYPE html>
