@@ -1648,8 +1648,8 @@ class WorVox {
     
     // 🚀 STEP 2: Two-stage AI analysis (Premium only)
     if (transcription && transcription !== '(인식되지 않음)' && this.currentUser?.plan === 'premium') {
-      // Stage 1: Quick scores calculation (~500ms)
-      setTimeout(async () => {
+      // Stage 1: Quick scores calculation (immediate, no delay)
+      (async () => {
         try {
           console.log('⚡ Stage 1: Getting quick scores...');
           const quickStartTime = Date.now();
@@ -2591,32 +2591,61 @@ class WorVox {
   
   // Play scenario audio using TTS
   async playScenarioAudio(text) {
+    console.log('🔊 playScenarioAudio called with text:', text);
+    
     const playBtn = document.getElementById('playAudioBtn');
-    if (this.currentScenarioPractice.isPlaying) return;
+    if (!playBtn) {
+      console.error('❌ playAudioBtn element not found');
+      return;
+    }
+    
+    if (!this.currentScenarioPractice) {
+      console.error('❌ currentScenarioPractice not initialized');
+      return;
+    }
+    
+    if (this.currentScenarioPractice.isPlaying) {
+      console.log('⚠️ Already playing, ignoring');
+      return;
+    }
     
     try {
       this.currentScenarioPractice.isPlaying = true;
       playBtn.disabled = true;
       playBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>재생 중...';
       
-      console.log('TTS: Requesting audio for:', text);
+      console.log('📡 TTS: Requesting audio for:', text);
+      console.log('📡 TTS: API endpoint: /api/tts/speak');
       
       // Call TTS API with correct endpoint
       const response = await axios.post('/api/tts/speak', { text }, { 
         responseType: 'arraybuffer',
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        timeout: 30000 // 30 second timeout
       });
       
-      console.log('TTS: Received audio response, size:', response.data.byteLength);
+      console.log('✅ TTS: Received audio response, size:', response.data.byteLength);
+      console.log('✅ TTS: Response headers:', response.headers);
+      
+      if (response.data.byteLength === 0) {
+        throw new Error('Received empty audio data');
+      }
       
       // Create audio element and play (simpler approach)
       const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
       const audioUrl = URL.createObjectURL(audioBlob);
       const audio = new Audio(audioUrl);
       
+      console.log('🎵 Audio element created, URL:', audioUrl);
+      
+      audio.onloadeddata = () => {
+        console.log('✅ Audio data loaded successfully');
+      };
+      
       audio.onended = () => {
+        console.log('✅ Audio playback ended');
         this.currentScenarioPractice.isPlaying = false;
         playBtn.disabled = false;
         playBtn.innerHTML = '<i class="fas fa-volume-up mr-2"></i>듣기';
@@ -2624,20 +2653,24 @@ class WorVox {
       };
       
       audio.onerror = (e) => {
-        console.error('Audio playback error:', e);
+        console.error('❌ Audio playback error:', e);
+        console.error('❌ Audio error details:', audio.error);
         this.currentScenarioPractice.isPlaying = false;
         playBtn.disabled = false;
         playBtn.innerHTML = '<i class="fas fa-volume-up mr-2"></i>듣기';
         URL.revokeObjectURL(audioUrl);
-        alert('오디오 재생 중 오류가 발생했습니다.');
+        alert('오디오 재생 중 오류가 발생했습니다.\n\n에러: ' + (audio.error ? audio.error.message : 'Unknown'));
       };
       
+      console.log('▶️ Starting audio playback...');
       await audio.play();
-      console.log('TTS: Audio playback started');
+      console.log('✅ TTS: Audio playback started successfully');
       
     } catch (error) {
-      console.error('TTS error:', error);
-      console.error('TTS error response:', error.response?.data);
+      console.error('❌ TTS error:', error);
+      console.error('❌ TTS error message:', error.message);
+      console.error('❌ TTS error response:', error.response?.data);
+      console.error('❌ TTS error status:', error.response?.status);
       this.currentScenarioPractice.isPlaying = false;
       playBtn.disabled = false;
       playBtn.innerHTML = '<i class="fas fa-volume-up mr-2"></i>듣기';
@@ -2828,7 +2861,9 @@ class WorVox {
             scores = {
               accuracy: analysisResponse.data.accuracy,
               pronunciation: analysisResponse.data.pronunciation,
-              fluency: analysisResponse.data.fluency
+              fluency: analysisResponse.data.fluency,
+              pronunciationFeedback: analysisResponse.data.pronunciationFeedback || '',
+              pronunciationIssues: analysisResponse.data.pronunciationIssues || []
             };
             console.log('✅ Scenario detailed analysis:', scores);
           }
@@ -2852,11 +2887,13 @@ class WorVox {
         accuracy: scores.accuracy,
         pronunciation: scores.pronunciation,
         fluency: scores.fluency,
-        audioUrl: audioUrl
+        audioUrl: audioUrl,
+        pronunciationFeedback: scores.pronunciationFeedback || '',
+        pronunciationIssues: scores.pronunciationIssues || []
       });
       
       // Show instant result for this sentence
-      this.showInstantSentenceResult(scores, originalSentence, transcription);
+      this.showInstantSentenceResult(scores, originalSentence, transcription, audioUrl);
       
     } catch (error) {
       console.error('Analysis error:', error);
@@ -2966,8 +3003,8 @@ class WorVox {
   }
   
   // Show instant result after each sentence
-  showInstantSentenceResult(scores, originalSentence, transcription) {
-    const { accuracy, pronunciation, fluency } = scores;
+  showInstantSentenceResult(scores, originalSentence, transcription, audioUrl = null) {
+    const { accuracy, pronunciation, fluency, pronunciationFeedback = '', pronunciationIssues = [] } = scores;
     const averageScore = Math.round((accuracy + pronunciation + fluency) / 3);
     
     let rating, ratingColor, ratingIcon;
@@ -3107,6 +3144,36 @@ class WorVox {
                     </div>
                   </div>
                 </div>
+                
+                <!-- Pronunciation Feedback (if available) -->
+                ${pronunciationFeedback ? `
+                  <div class="border-t pt-6 mt-6">
+                    <div class="flex items-center mb-3">
+                      <i class="fas fa-comments text-purple-600 mr-2"></i>
+                      <h4 class="text-lg font-bold text-gray-900">발음 교정 피드백</h4>
+                    </div>
+                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                      <p class="text-gray-800 leading-relaxed">${pronunciationFeedback}</p>
+                    </div>
+                    
+                    ${pronunciationIssues && pronunciationIssues.length > 0 ? `
+                      <div class="mt-4">
+                        <h5 class="text-sm font-semibold text-gray-700 mb-2">주의할 발음:</h5>
+                        <div class="space-y-2">
+                          ${pronunciationIssues.map(issue => `
+                            <div class="flex items-start gap-2 text-sm">
+                              <i class="fas fa-exclamation-circle text-orange-500 mt-0.5"></i>
+                              <div>
+                                <span class="font-semibold text-gray-800">${issue.word}</span>
+                                <span class="text-gray-600"> - ${issue.feedback}</span>
+                              </div>
+                            </div>
+                          `).join('')}
+                        </div>
+                      </div>
+                    ` : ''}
+                  </div>
+                ` : ''}
               </div>
               
               <!-- Action Buttons -->
