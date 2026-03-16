@@ -4679,17 +4679,22 @@ class WorVox {
       if (storedUser) {
         try {
           this.currentUser = JSON.parse(storedUser);
+          this.userPlan = this.currentUser.plan || 'free';
+          console.log('🔍 Loaded user from localStorage:', this.currentUser);
         } catch (e) {
           console.error('Failed to parse stored user:', e);
         }
       }
     }
     
-    // Ensure user is logged in
-    if (!this.currentUser || !this.currentUser.id || !this.currentUser.name) {
+    // Ensure user is logged in (only check essential fields)
+    if (!this.currentUser || !this.currentUser.id) {
+      console.error('❌ User not logged in for Live Speaking');
       this.showLogin();
       return;
     }
+    
+    console.log('✅ User logged in for Live Speaking:', this.currentUser.email || this.currentUser.id);
     
     const app = document.getElementById('app');
     app.innerHTML = `
@@ -10368,8 +10373,10 @@ Proceed to payment?
       // Force reload current user from database to ensure fresh data
       try {
         const userResponse = await axios.get(`/api/users/${this.currentUser.id}`);
-        if (userResponse.data.success) {
-          this.currentUser = userResponse.data.data;
+        console.log('🔍 User API response:', userResponse.data);
+        if (userResponse.data.success && userResponse.data.user) {
+          this.currentUser = userResponse.data.user;
+          this.userPlan = this.currentUser.plan || 'free';
           localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
           console.log('✅ Refreshed current user:', this.currentUser);
         } else {
