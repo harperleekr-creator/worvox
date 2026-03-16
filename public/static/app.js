@@ -1592,11 +1592,11 @@ class WorVox {
       isPremiumAnalysis: false,
       originalWords,
       spokenWords,
-      isLoading: this.currentUser?.plan === 'premium' && transcription && transcription !== '(인식되지 않음)'
+      isLoading: this.isPremiumUser() && transcription && transcription !== '(인식되지 않음)'
     });
     
     // 🚀 STEP 2: Streaming AI analysis (Premium only) - GPT-4o + Real-time
-    if (transcription && transcription !== '(인식되지 않음)' && this.currentUser?.plan === 'premium') {
+    if (transcription && transcription !== '(인식되지 않음)' && this.isPremiumUser()) {
       (async () => {
         try {
           console.log('⚡ Starting streaming AI analysis (GPT-4o)...');
