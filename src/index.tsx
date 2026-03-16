@@ -29,7 +29,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1773627785942'; // Update manually or via build script
+const BUILD_TIME = '1773627881644'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -2946,10 +2946,10 @@ app.get('/app', (c) => {
                   window.worvox.showDashboard();
                 } catch (e) {
                   console.error('Failed to parse stored user:', e);
-                  window.worvox.showLoginPage();
+                  window.worvox.showLogin();
                 }
               } else {
-                window.worvox.showLoginPage();
+                window.worvox.showLogin();
               }
             } else {
               console.error('WorVox app failed to initialize');
