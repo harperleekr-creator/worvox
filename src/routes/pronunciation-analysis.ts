@@ -157,82 +157,35 @@ pronunciationAnalysis.post('/analyze', async (c) => {
       console.warn('⚠️ Cache lookup failed, proceeding with API call:', error);
     }
 
-    // Use GPT-4o-mini for detailed pronunciation analysis
-    const prompt = `You are an expert English pronunciation and grammar coach. Analyze the following:
+    // Optimized prompt for faster response
+    const prompt = `Compare pronunciation quality:
 
-REFERENCE TEXT (what user should say):
-"${referenceText}"
+Reference: "${referenceText}"
+User said: "${userTranscription}"
+${audioAnalysis ? `Speech: ${(audioAnalysis.wordCount / audioAnalysis.duration).toFixed(1)} words/sec` : ''}
 
-USER'S ACTUAL SPEECH (transcribed):
-"${userTranscription}"
+Score 0-100 for:
+- Accuracy: content match
+- Pronunciation: clarity (STT shows quality)
+- Fluency: natural flow
 
-${audioAnalysis ? `
-AUDIO ANALYSIS:
-- Duration: ${audioAnalysis.duration}s
-- Word count: ${audioAnalysis.wordCount}
-- Speech rate: ${(audioAnalysis.wordCount / audioAnalysis.duration).toFixed(2)} words/sec
-- Initial Fluency Score: ${audioAnalysis.fluencyScore}
-- Initial Pronunciation Score: ${audioAnalysis.pronunciationScore}
-` : ''}
-
-Provide a detailed analysis with these scores (0-100):
-
-1. **Accuracy Score**: How closely the content matches the reference text
-   - 95-100: Perfect match with maybe 1 minor word difference
-   - 85-94: Very close, 1-2 words different or minor grammar mistakes
-   - 70-84: Good understanding, several words different but meaning preserved
-   - 50-69: Partial understanding, missing key words or wrong structure
-   - Below 50: Significant differences, wrong meaning or very incomplete
-
-2. **Pronunciation Score**: Quality of pronunciation (considering transcription accuracy)
-   - 95-100: Near-native, all words correctly recognized
-   - 85-94: Very clear, might have 1-2 difficult words misrecognized
-   - 70-84: Clear but noticeable accent, several words misrecognized
-   - 50-69: Understandable but many pronunciation issues
-   - Below 50: Difficult to understand, many words misrecognized
-
-3. **Fluency Score**: Natural flow and rhythm${audioAnalysis ? ' (use provided audio analysis)' : ''}
-   - 95-100: Natural rhythm, appropriate pauses, smooth delivery
-   - 85-94: Good flow with minor hesitations
-   - 70-84: Noticeable pauses but maintains communication
-   - 50-69: Frequent pauses, choppy delivery
-   - Below 50: Very slow, many long pauses, broken speech
-
-IMPORTANT: 
-- Be strict but fair - native-like performance should score 90+
-- Clear non-native accent with good comprehensibility should score 70-85
-- Significant pronunciation issues that affect understanding should score below 70
-- Consider that STT might misrecognize words due to pronunciation issues
-- Focus ONLY on pronunciation quality, NOT grammar
-
-Respond ONLY with valid JSON:
+Respond ONLY valid JSON:
 {
   "accuracy": <number>,
   "pronunciation": <number>,
   "fluency": <number>,
-  "pronunciationFeedback": "<detailed pronunciation feedback in Korean: 2-3 paragraphs focusing on specific sounds, stress patterns, intonation>",
-  "strengths": ["<specific pronunciation strength 1>", "<specific pronunciation strength 2>"],
-  "improvements": ["<specific pronunciation area to improve 1>", "<specific pronunciation area to improve 2>"],
-  "pronunciationIssues": [
-    {
-      "word": "<problematic word>",
-      "issue": "<what's wrong>",
-      "tip": "<how to improve in Korean>"
-    }
-  ],
-  "nextSteps": "<practical pronunciation practice advice in Korean>"
+  "pronunciationFeedback": "<Korean: 2-3문장, 잘한점→개선점→조언>",
+  "strengths": ["strength1", "strength2"],
+  "improvements": ["improve1", "improve2"],
+  "pronunciationIssues": [{"word": "word", "issue": "problem", "tip": "Korean tip"}],
+  "nextSteps": "<Korean: 1문장 실천조언>"
 }
 
-PRONUNCIATION FEEDBACK GUIDELINES:
-- Start with what they pronounced well (positive reinforcement)
-- Identify 2-3 specific problematic sounds with examples (e.g., /th/ sound, /r/ vs /l/, vowel length)
-- Explain WHY these pronunciation issues matter (comprehension, clarity, natural flow)
-- Give concrete pronunciation tips (tongue position, lip shape, stress patterns, intonation)
-- Provide practical exercises (minimal pairs, word stress drills, shadowing practice)
-- End with encouraging next steps
-- Write in friendly, supportive Korean tone
-- Length: 2-3 paragraphs (5-8 sentences total)
-- NO GRAMMAR ANALYSIS - pronunciation focus only`;
+Guidelines:
+- Native-like: 90+, Good accent: 70-85, Issues: <70
+- Focus pronunciation ONLY
+- Be encouraging but honest
+- Keep Korean feedback concise`;
 
     const response = await fetch(`${openaiApiBase}/chat/completions`, {
       method: 'POST',
@@ -253,7 +206,7 @@ PRONUNCIATION FEEDBACK GUIDELINES:
           }
         ],
         temperature: 0.3, // Lower temperature for more consistent scoring
-        max_tokens: 500,
+        max_tokens: 300, // Reduced for faster response (detailed analysis)
       }),
     });
 
