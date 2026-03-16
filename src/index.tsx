@@ -29,7 +29,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1773647909202'; // Update manually or via build script
+const BUILD_TIME = '1773652461433'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -46,26 +46,27 @@ app.use('*', async (c, next) => {
 app.use('/api/*', cors());
 
 // Serve static files with proper cache headers
-// For versioned files (with ?v= or .v123.), use long cache
-// For non-versioned files, use no-cache
+app.use('/static/*', serveStatic({ root: './public' }));
+
+// Override cache headers after serveStatic
 app.use('/static/*', async (c, next) => {
+  await next();
+  
   const url = new URL(c.req.url);
   const hasVersion = url.searchParams.has('v') || /\.[a-f0-9]{8,}\.(js|css)/.test(url.pathname);
-  
-  await next();
   
   if (hasVersion) {
     // Versioned files - cache for 1 year (immutable)
     c.header('Cache-Control', 'public, max-age=31536000, immutable');
+    c.header('Surrogate-Control', 'max-age=31536000'); // For Cloudflare
   } else {
     // Non-versioned files - no cache
-    c.header('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+    c.header('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0');
+    c.header('Surrogate-Control', 'no-store'); // For Cloudflare
     c.header('Pragma', 'no-cache');
     c.header('Expires', '0');
   }
 });
-
-app.use('/static/*', serveStatic({ root: './public' }));
 
 // Serve favicon files directly (no path prefix)
 app.use('/favicon.ico', serveStatic({ root: './' }));
