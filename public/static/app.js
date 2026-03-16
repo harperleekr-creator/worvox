@@ -10855,7 +10855,6 @@ Proceed to payment?
           </div>
         </div>
       `;
-      `;
       boxResult.classList.remove('hidden');
     }
   }
