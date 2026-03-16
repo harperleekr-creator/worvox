@@ -29,7 +29,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1773671611120'; // Update manually or via build script
+const BUILD_TIME = '1773672041352'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -506,17 +506,17 @@ app.get('/landing', (c) => {
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <title>WorVox | AI 영어 학습 플랫폼 - 실시간 발음 교정 & 맞춤형 회화 연습</title>
+        <title>WorVox | AI 영어 스피킹 플랫폼 - 실시간 발음 교정 & 맞춤형 회화 연습</title>
         
         <!-- SEO Meta Tags -->
-        <meta name="description" content="WorVox AI 영어 학습 플랫폼 - GPT-4 기반 실시간 발음 교정, ElevenLabs TTS 음성 합성, 30가지 실전 시나리오로 영어 회화 실력 3배 향상. 월 1.9만원으로 24시간 무제한 학습. 2주 무료 체험 시작!">
+        <meta name="description" content="WorVox AI 영어 스피킹 플랫폼 - GPT-4 기반 실시간 발음 교정, ElevenLabs TTS 음성 합성, 30가지 실전 시나리오로 영어 회화 실력 3배 향상. 월 1.9만원으로 24시간 무제한 학습. 2주 무료 체험 시작!">
         <meta name="keywords" content="AI 영어 학습, 영어 발음 교정, 영어 회화 연습, OPIC 준비, 영어 말하기, GPT-4 영어, ElevenLabs, 실시간 피드백, 영어 학원 대체, 온라인 영어 과외, AI 영어 코치, 영어 공부 앱, 영어 스피킹, 발음 분석, 맞춤형 영어 학습">
         <meta name="robots" content="index, follow">
         
         <!-- Open Graph -->
         <meta property="og:type" content="website">
         <meta property="og:url" content="https://worvox.com">
-        <meta property="og:title" content="WorVox - AI 영어 학습 플랫폼 | 실시간 발음 교정 & 회화 연습">
+        <meta property="og:title" content="WorVox - AI 영어 스피킹 플랫폼 | 실시간 발음 교정 & 회화 연습">
         <meta property="og:description" content="GPT-4 기반 AI로 영어 회화 실력 3배 향상! 실시간 발음 교정, 30가지 실전 시나리오, OPIC 준비. 월 1.9만원, 2주 무료 체험!">
         <meta property="og:image" content="https://worvox.com/logo.png">
         
@@ -562,7 +562,7 @@ app.get('/landing', (c) => {
                 
                 <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
                     <span class="bg-gradient-to-r from-purple-600 to-blue-600 text-transparent bg-clip-text">
-                        AI 영어 학습 플랫폼
+                        AI 영어 스피킹 플랫폼
                     </span>
                     <br/>
                     <span class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl">실시간 발음 교정 & 맞춤형 회화 연습</span>
@@ -1970,7 +1970,7 @@ app.get('/about', (c) => {
           "@context": "https://schema.org",
           "@type": "AboutPage",
           "name": "WorVox 소개",
-          "description": "AI 영어 학습 플랫폼 WorVox의 회사 소개 및 비전",
+          "description": "AI 영어 스피킹 플랫폼 WorVox의 회사 소개 및 비전",
           "url": "https://worvox.com/about",
           "mainEntity": {
             "@type": "EducationalOrganization",
@@ -2872,7 +2872,7 @@ app.get('/app', (c) => {
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <title>WorVox - AI 영어 학습 플랫폼</title>
+        <title>WorVox - AI 영어 스피킹 플랫폼</title>
         
         <meta name="robots" content="noindex, nofollow">
         
@@ -3079,7 +3079,7 @@ app.get('/', (c) => {
             "bestRating": "5",
             "worstRating": "1"
           },
-          "description": "AI 영어 학습 플랫폼 - 실시간 발음 교정, 맞춤형 대화 연습, OPIC 스타일 시험",
+          "description": "AI 영어 스피킹 플랫폼 - 실시간 발음 교정, 맞춤형 대화 연습, OPIC 스타일 시험",
           "screenshot": "https://worvox.com/static/logo.webp",
           "creator": {
             "@type": "Organization",
