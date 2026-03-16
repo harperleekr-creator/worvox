@@ -4673,6 +4673,25 @@ class WorVox {
 
 
   showRealConversation() {
+    // Load user from localStorage if not in memory
+    if (!this.currentUser) {
+      const storedUser = localStorage.getItem('worvox_user');
+      if (storedUser) {
+        try {
+          this.currentUser = JSON.parse(storedUser);
+        } catch (e) {
+          console.error('Failed to parse stored user:', e);
+        }
+      }
+    }
+    
+    // Ensure user is logged in
+    if (!this.currentUser || !this.currentUser.id || !this.currentUser.name) {
+      alert('로그인이 필요합니다.');
+      this.showLogin();
+      return;
+    }
+    
     const app = document.getElementById('app');
     app.innerHTML = `
       <div class="flex h-screen bg-gray-50 dark:bg-gray-900">
@@ -10338,6 +10357,14 @@ Proceed to payment?
         }
       } catch (error) {
         console.warn('Could not refresh user data:', error);
+      }
+      
+      // Double-check user is still valid after refresh
+      if (!this.currentUser || !this.currentUser.id) {
+        console.error('User data invalid after refresh');
+        alert('사용자 정보를 불러올 수 없습니다. 다시 로그인해주세요.');
+        this.showLogin();
+        return;
       }
       
       // Get user gamification stats
