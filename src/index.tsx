@@ -29,7 +29,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1773580172597'; // Update manually or via build script
+const BUILD_TIME = '1773624231916'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -3099,7 +3099,7 @@ app.get('/', (c) => {
               names.forEach(name => caches.delete(name));
             });
           }
-          console.log('WorVox v${FORCE_VERSION} - Cache cleared');
+          console.log('WorVox v${APP_VERSION} (build ${BUILD_TIME}) - Cache cleared');
           
           // Conditional routing: Show landing page for non-logged users
           (function() {
