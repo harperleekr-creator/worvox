@@ -157,35 +157,20 @@ pronunciationAnalysis.post('/analyze', async (c) => {
       console.warn('⚠️ Cache lookup failed, proceeding with API call:', error);
     }
 
-    // Optimized prompt for faster response
-    const prompt = `Compare pronunciation quality:
+    // Ultra-optimized prompt for streaming + GPT-4o
+    const prompt = `Reference: "${referenceText}"
+User: "${userTranscription}"
 
-Reference: "${referenceText}"
-User said: "${userTranscription}"
-${audioAnalysis ? `Speech: ${(audioAnalysis.wordCount / audioAnalysis.duration).toFixed(1)} words/sec` : ''}
-
-Score 0-100 for:
-- Accuracy: content match
-- Pronunciation: clarity (STT shows quality)
-- Fluency: natural flow
-
-Respond ONLY valid JSON:
+Score (0-100) & feedback in JSON:
 {
-  "accuracy": <number>,
-  "pronunciation": <number>,
-  "fluency": <number>,
-  "pronunciationFeedback": "<Korean: 2-3문장, 잘한점→개선점→조언>",
-  "strengths": ["strength1", "strength2"],
-  "improvements": ["improve1", "improve2"],
-  "pronunciationIssues": [{"word": "word", "issue": "problem", "tip": "Korean tip"}],
-  "nextSteps": "<Korean: 1문장 실천조언>"
+  "accuracy": <num>,
+  "pronunciation": <num>,
+  "fluency": <num>,
+  "pronunciationFeedback": "<Korean 2문장: 잘한점+개선점>",
+  "pronunciationIssues": [{"word":"x","issue":"y","tip":"Korean"}]
 }
 
-Guidelines:
-- Native-like: 90+, Good accent: 70-85, Issues: <70
-- Focus pronunciation ONLY
-- Be encouraging but honest
-- Keep Korean feedback concise`;
+Be realistic, strict, encouraging. Native-like: 90+, Good: 70-85, Needs work: <70`;
 
     const response = await fetch(`${openaiApiBase}/chat/completions`, {
       method: 'POST',
@@ -194,19 +179,20 @@ Guidelines:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o', // Upgraded to GPT-4o for best quality + speed
         messages: [
           {
             role: 'system',
-            content: 'You are an expert English pronunciation and fluency analyzer. Provide accurate, strict scores based on real pronunciation quality.'
+            content: 'Expert pronunciation analyzer. Strict, realistic scores.'
           },
           {
             role: 'user',
             content: prompt
           }
         ],
-        temperature: 0.3, // Lower temperature for more consistent scoring
-        max_tokens: 300, // Reduced for faster response (detailed analysis)
+        temperature: 0.3,
+        max_tokens: 150, // Optimized: 300 → 150 (50% reduction)
+        stream: false, // Will implement streaming in analyze-stream endpoint
       }),
     });
 
@@ -579,6 +565,195 @@ pronunciationAnalysis.post('/analyze-quick', async (c) => {
     console.error('Quick analysis error:', error);
     return c.json({ 
       error: 'Failed to calculate quick scores',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
+// 🚀 NEW: Streaming pronunciation analysis (GPT-4o + real-time feedback)
+pronunciationAnalysis.post('/analyze-stream', async (c) => {
+  try {
+    const { 
+      referenceText, 
+      userTranscription, 
+      audioAnalysis 
+    } = await c.req.json();
+
+    if (!referenceText || !userTranscription) {
+      return c.json({ error: 'Reference text and user transcription are required' }, 400);
+    }
+
+    const openaiApiKey = c.env.OPENAI_API_KEY;
+    const openaiApiBase = c.env.OPENAI_API_BASE || 'https://api.openai.com/v1';
+
+    if (!openaiApiKey) {
+      return c.json({ error: 'OpenAI API key not configured' }, 500);
+    }
+
+    // Check cache first (streaming bypasses cache for real-time UX)
+    const cacheKey = generateCacheKey('pronunciation', referenceText, userTranscription);
+    
+    try {
+      const cached = await c.env.DB.prepare(
+        'SELECT analysis_data FROM ai_analysis_cache WHERE cache_key = ?'
+      ).bind(cacheKey).first();
+
+      if (cached) {
+        console.log('✅ Cache HIT - returning cached result for streaming');
+        const cachedData = JSON.parse(cached.analysis_data as string);
+        return c.json({
+          success: true,
+          ...cachedData,
+          cached: true
+        });
+      }
+    } catch (error) {
+      console.warn('⚠️ Cache lookup failed:', error);
+    }
+
+    // Ultra-optimized streaming prompt for GPT-4o
+    const prompt = `Reference: "${referenceText}"
+User: "${userTranscription}"
+
+JSON response:
+{
+  "accuracy": <0-100>,
+  "pronunciation": <0-100>,
+  "fluency": <0-100>,
+  "pronunciationFeedback": "<Korean 2문장>",
+  "pronunciationIssues": [{"word":"","issue":"","tip":""}]
+}
+
+Realistic scoring. Native: 90+, Good: 70-85, Needs work: <70`;
+
+    const response = await fetch(`${openaiApiBase}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openaiApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o', // GPT-4o for best quality + speed
+        messages: [
+          {
+            role: 'system',
+            content: 'Expert pronunciation analyzer. Strict, realistic scores.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.3,
+        max_tokens: 150, // Optimized token limit
+        stream: true, // 🚀 Enable streaming for real-time feedback
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('GPT streaming error:', error);
+      return c.json({ error: 'Failed to analyze pronunciation' }, 500);
+    }
+
+    // Stream the response back to client
+    const stream = new ReadableStream({
+      async start(controller) {
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        if (!reader) {
+          controller.close();
+          return;
+        }
+
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            
+            if (done) {
+              // Parse final accumulated buffer
+              try {
+                const jsonMatch = buffer.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                  const scores = JSON.parse(jsonMatch[0]);
+                  const resultData = {
+                    accuracy: Math.round(scores.accuracy),
+                    pronunciation: Math.round(scores.pronunciation),
+                    fluency: Math.round(scores.fluency),
+                    pronunciationFeedback: scores.pronunciationFeedback || '',
+                    pronunciationIssues: scores.pronunciationIssues || [],
+                  };
+
+                  // Cache the result
+                  try {
+                    await c.env.DB.prepare(`
+                      INSERT INTO ai_analysis_cache (cache_key, analysis_type, input_hash, analysis_data)
+                      VALUES (?, ?, ?, ?)
+                      ON CONFLICT(cache_key) DO UPDATE SET
+                        analysis_data = excluded.analysis_data,
+                        last_used_at = CURRENT_TIMESTAMP
+                    `).bind(
+                      cacheKey,
+                      'pronunciation',
+                      cacheKey,
+                      JSON.stringify(resultData)
+                    ).run();
+                  } catch (cacheError) {
+                    console.warn('⚠️ Failed to cache streaming result:', cacheError);
+                  }
+                }
+              } catch (parseError) {
+                console.warn('⚠️ Failed to parse streaming result for cache:', parseError);
+              }
+
+              controller.close();
+              break;
+            }
+
+            const chunk = decoder.decode(value, { stream: true });
+            buffer += chunk;
+            
+            // Parse SSE format: "data: {...}"
+            const lines = chunk.split('\n');
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const data = line.slice(6).trim();
+                if (data === '[DONE]') continue;
+                
+                try {
+                  const parsed = JSON.parse(data);
+                  const content = parsed.choices?.[0]?.delta?.content;
+                  if (content) {
+                    // Send chunk to client
+                    controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ content })}\n\n`));
+                  }
+                } catch (e) {
+                  // Ignore parse errors for incomplete chunks
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Streaming error:', error);
+          controller.error(error);
+        }
+      }
+    });
+
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+    });
+
+  } catch (error) {
+    console.error('Streaming analysis error:', error);
+    return c.json({ 
+      error: 'Internal server error during streaming analysis',
       details: error instanceof Error ? error.message : 'Unknown error'
     }, 500);
   }

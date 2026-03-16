@@ -1595,83 +1595,103 @@ class WorVox {
       isLoading: this.currentUser?.plan === 'premium' && transcription && transcription !== '(인식되지 않음)'
     });
     
-    // 🚀 STEP 2: Direct AI analysis (Premium only) - Same as Scenario Mode
+    // 🚀 STEP 2: Streaming AI analysis (Premium only) - GPT-4o + Real-time
     if (transcription && transcription !== '(인식되지 않음)' && this.currentUser?.plan === 'premium') {
       (async () => {
         try {
-          console.log('⚡ Getting AI pronunciation analysis (same as scenario mode)...');
+          console.log('⚡ Starting streaming AI analysis (GPT-4o)...');
           const analysisStartTime = Date.now();
           
-          const analysisResponse = await axios.post('/api/pronunciation/analyze', {
-            referenceText: originalSentence,
-            userTranscription: transcription,
-            audioAnalysis: audioAnalysis
-          });
+          // Try streaming first (real-time feedback)
+          let streamingSupported = true;
+          let streamBuffer = '';
           
-          console.log(`⚡ AI analysis received in ${Date.now() - analysisStartTime}ms`);
-          
-          if (analysisResponse.data.success) {
-            // Update with AI scores immediately
-            accuracyScore = analysisResponse.data.accuracy;
-            pronunciationScore = analysisResponse.data.pronunciation;
-            fluencyScore = analysisResponse.data.fluency;
-            
-            // Get feedback and issues
-            feedback = analysisResponse.data.pronunciationFeedback || '';
-            const pronunciationIssues = analysisResponse.data.pronunciationIssues || [];
-            isPremiumAnalysis = true;
-            
-            const finalAverageScore = Math.round((accuracyScore + pronunciationScore + fluencyScore) / 3);
-            
-            // Update rating
-            if (finalAverageScore >= 90) {
-              rating = '완벽해요!';
-              ratingColor = 'text-green-600';
-              ratingIcon = '🌟';
-            } else if (finalAverageScore >= 80) {
-              rating = '훌륭해요!';
-              ratingColor = 'text-blue-600';
-              ratingIcon = '🎉';
-            } else if (finalAverageScore >= 70) {
-              rating = '잘했어요!';
-              ratingColor = 'text-purple-600';
-              ratingIcon = '👍';
-            } else if (finalAverageScore >= 60) {
-              rating = '괜찮아요!';
-              ratingColor = 'text-yellow-600';
-              ratingIcon = '😊';
-            } else {
-              rating = '연습이 필요해요';
-              ratingColor = 'text-orange-600';
-              ratingIcon = '💪';
-            }
-            
-            console.log('✅ AI analysis loaded, rendering complete results...');
-            
-            // Render with complete AI analysis (same as scenario mode)
-            this.renderTimerResults({
-              originalSentence,
-              transcription,
-              timeLimit,
-              accuracyScore,
-              pronunciationScore,
-              fluencyScore,
-              averageScore: finalAverageScore,
-              rating,
-              ratingColor,
-              ratingIcon,
-              feedback,
-              pronunciationIssues,
-              isPremiumAnalysis,
-              originalWords,
-              spokenWords,
-              isLoading: false
+          try {
+            const response = await fetch('/api/pronunciation/analyze-stream', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                referenceText: originalSentence,
+                userTranscription: transcription,
+                audioAnalysis: audioAnalysis
+              })
             });
             
-            // Save report with AI analysis
-            if (sessionId && this.currentUser) {
-              try {
-                const reportData = {
+            // Check if response is streaming or regular JSON
+            const contentType = response.headers.get('content-type');
+            
+            if (contentType?.includes('text/event-stream')) {
+              console.log('🌊 Streaming response detected');
+              const reader = response.body.getReader();
+              const decoder = new TextDecoder();
+              
+              while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                
+                const chunk = decoder.decode(value);
+                streamBuffer += chunk;
+                
+                // Parse SSE chunks
+                const lines = chunk.split('\n');
+                for (const line of lines) {
+                  if (line.startsWith('data: ')) {
+                    try {
+                      const data = JSON.parse(line.slice(6));
+                      if (data.content) {
+                        // Show streaming content in real-time (optional UI update)
+                        console.log('📝 Streaming:', data.content);
+                      }
+                    } catch (e) {
+                      // Ignore parse errors
+                    }
+                  }
+                }
+              }
+              
+              console.log(`🌊 Streaming completed in ${Date.now() - analysisStartTime}ms`);
+              
+              // Parse final result from buffer
+              const jsonMatch = streamBuffer.match(/\{[\s\S]*\}/);
+              if (jsonMatch) {
+                const scores = JSON.parse(jsonMatch[0]);
+                accuracyScore = scores.accuracy;
+                pronunciationScore = scores.pronunciation;
+                fluencyScore = scores.fluency;
+                feedback = scores.pronunciationFeedback || '';
+                const pronunciationIssues = scores.pronunciationIssues || [];
+            
+                isPremiumAnalysis = true;
+                
+                const finalAverageScore = Math.round((accuracyScore + pronunciationScore + fluencyScore) / 3);
+                
+                // Update rating
+                if (finalAverageScore >= 90) {
+                  rating = '완벽해요!';
+                  ratingColor = 'text-green-600';
+                  ratingIcon = '🌟';
+                } else if (finalAverageScore >= 80) {
+                  rating = '훌륭해요!';
+                  ratingColor = 'text-blue-600';
+                  ratingIcon = '🎉';
+                } else if (finalAverageScore >= 70) {
+                  rating = '잘했어요!';
+                  ratingColor = 'text-purple-600';
+                  ratingIcon = '👍';
+                } else if (finalAverageScore >= 60) {
+                  rating = '괜찮아요!';
+                  ratingColor = 'text-yellow-600';
+                  ratingIcon = '😊';
+                } else {
+                  rating = '연습이 필요해요';
+                  ratingColor = 'text-orange-600';
+                  ratingIcon = '💪';
+                }
+                
+                console.log('✅ Streaming analysis complete, rendering results...');
+                
+                // Render with streaming results
+                this.renderTimerResults({
                   originalSentence,
                   transcription,
                   timeLimit,
@@ -1680,26 +1700,232 @@ class WorVox {
                   fluencyScore,
                   averageScore: finalAverageScore,
                   rating,
+                  ratingColor,
+                  ratingIcon,
                   feedback,
                   pronunciationIssues,
                   isPremiumAnalysis,
-                  completedAt: new Date().toISOString()
-                };
-                
-                await axios.post('/api/mode-reports/save', {
-                  sessionId: sessionId,
-                  userId: this.currentUser.id,
-                  modeType: 'timer',
-                  reportData: reportData
+                  originalWords,
+                  spokenWords,
+                  isLoading: false
                 });
-                console.log('✅ Timer report saved with AI analysis');
-              } catch (error) {
-                console.warn('⚠️ Failed to save timer report:', error);
+                
+                // Save report
+                if (sessionId && this.currentUser) {
+                  try {
+                    await axios.post('/api/mode-reports/save', {
+                      sessionId: sessionId,
+                      userId: this.currentUser.id,
+                      modeType: 'timer',
+                      reportData: {
+                        originalSentence,
+                        transcription,
+                        timeLimit,
+                        accuracyScore,
+                        pronunciationScore,
+                        fluencyScore,
+                        averageScore: finalAverageScore,
+                        rating,
+                        feedback,
+                        pronunciationIssues,
+                        isPremiumAnalysis,
+                        completedAt: new Date().toISOString()
+                      }
+                    });
+                    console.log('✅ Timer report saved');
+                  } catch (error) {
+                    console.warn('⚠️ Failed to save timer report:', error);
+                  }
+                }
+              } else {
+                throw new Error('Failed to parse streaming result');
+              }
+            } else {
+              // Fallback to regular JSON response
+              console.log('📦 Regular JSON response, not streaming');
+              streamingSupported = false;
+              const data = await response.json();
+              
+              if (data.success) {
+                accuracyScore = data.accuracy;
+                pronunciationScore = data.pronunciation;
+                fluencyScore = data.fluency;
+                feedback = data.pronunciationFeedback || '';
+                const pronunciationIssues = data.pronunciationIssues || [];
+                isPremiumAnalysis = true;
+                
+                const finalAverageScore = Math.round((accuracyScore + pronunciationScore + fluencyScore) / 3);
+                
+                // Update rating
+                if (finalAverageScore >= 90) {
+                  rating = '완벽해요!';
+                  ratingColor = 'text-green-600';
+                  ratingIcon = '🌟';
+                } else if (finalAverageScore >= 80) {
+                  rating = '훌륭해요!';
+                  ratingColor = 'text-blue-600';
+                  ratingIcon = '🎉';
+                } else if (finalAverageScore >= 70) {
+                  rating = '잘했어요!';
+                  ratingColor = 'text-purple-600';
+                  ratingIcon = '👍';
+                } else if (finalAverageScore >= 60) {
+                  rating = '괜찮아요!';
+                  ratingColor = 'text-yellow-600';
+                  ratingIcon = '😊';
+                } else {
+                  rating = '연습이 필요해요';
+                  ratingColor = 'text-orange-600';
+                  ratingIcon = '💪';
+                }
+                
+                console.log(`✅ Regular analysis complete in ${Date.now() - analysisStartTime}ms`);
+                
+                // Render results
+                this.renderTimerResults({
+                  originalSentence,
+                  transcription,
+                  timeLimit,
+                  accuracyScore,
+                  pronunciationScore,
+                  fluencyScore,
+                  averageScore: finalAverageScore,
+                  rating,
+                  ratingColor,
+                  ratingIcon,
+                  feedback,
+                  pronunciationIssues,
+                  isPremiumAnalysis,
+                  originalWords,
+                  spokenWords,
+                  isLoading: false
+                });
+                
+                // Save report
+                if (sessionId && this.currentUser) {
+                  try {
+                    await axios.post('/api/mode-reports/save', {
+                      sessionId: sessionId,
+                      userId: this.currentUser.id,
+                      modeType: 'timer',
+                      reportData: {
+                        originalSentence,
+                        transcription,
+                        timeLimit,
+                        accuracyScore,
+                        pronunciationScore,
+                        fluencyScore,
+                        averageScore: finalAverageScore,
+                        rating,
+                        feedback,
+                        pronunciationIssues,
+                        isPremiumAnalysis,
+                        completedAt: new Date().toISOString()
+                      }
+                    });
+                    console.log('✅ Timer report saved');
+                  } catch (error) {
+                    console.warn('⚠️ Failed to save timer report:', error);
+                  }
+                }
+              }
+            }
+          } catch (streamError) {
+            console.warn('⚠️ Streaming failed, using fallback:', streamError);
+            
+            // Fallback to regular non-streaming API
+            const analysisResponse = await axios.post('/api/pronunciation/analyze', {
+              referenceText: originalSentence,
+              userTranscription: transcription,
+              audioAnalysis: audioAnalysis
+            });
+            
+            console.log(`📦 Fallback analysis in ${Date.now() - analysisStartTime}ms`);
+            
+            if (analysisResponse.data.success) {
+              accuracyScore = analysisResponse.data.accuracy;
+              pronunciationScore = analysisResponse.data.pronunciation;
+              fluencyScore = analysisResponse.data.fluency;
+              feedback = analysisResponse.data.pronunciationFeedback || '';
+              const pronunciationIssues = analysisResponse.data.pronunciationIssues || [];
+              isPremiumAnalysis = true;
+              
+              const finalAverageScore = Math.round((accuracyScore + pronunciationScore + fluencyScore) / 3);
+              
+              // Update rating
+              if (finalAverageScore >= 90) {
+                rating = '완벽해요!';
+                ratingColor = 'text-green-600';
+                ratingIcon = '🌟';
+              } else if (finalAverageScore >= 80) {
+                rating = '훌륭해요!';
+                ratingColor = 'text-blue-600';
+                ratingIcon = '🎉';
+              } else if (finalAverageScore >= 70) {
+                rating = '잘했어요!';
+                ratingColor = 'text-purple-600';
+                ratingIcon = '👍';
+              } else if (finalAverageScore >= 60) {
+                rating = '괜찮아요!';
+                ratingColor = 'text-yellow-600';
+                ratingIcon = '😊';
+              } else {
+                rating = '연습이 필요해요';
+                ratingColor = 'text-orange-600';
+                ratingIcon = '💪';
+              }
+              
+              // Render results
+              this.renderTimerResults({
+                originalSentence,
+                transcription,
+                timeLimit,
+                accuracyScore,
+                pronunciationScore,
+                fluencyScore,
+                averageScore: finalAverageScore,
+                rating,
+                ratingColor,
+                ratingIcon,
+                feedback,
+                pronunciationIssues,
+                isPremiumAnalysis,
+                originalWords,
+                spokenWords,
+                isLoading: false
+              });
+              
+              // Save report
+              if (sessionId && this.currentUser) {
+                try {
+                  await axios.post('/api/mode-reports/save', {
+                    sessionId: sessionId,
+                    userId: this.currentUser.id,
+                    modeType: 'timer',
+                    reportData: {
+                      originalSentence,
+                      transcription,
+                      timeLimit,
+                      accuracyScore,
+                      pronunciationScore,
+                      fluencyScore,
+                      averageScore: finalAverageScore,
+                      rating,
+                      feedback,
+                      pronunciationIssues,
+                      isPremiumAnalysis,
+                      completedAt: new Date().toISOString()
+                    }
+                  });
+                  console.log('✅ Timer report saved (fallback)');
+                } catch (error) {
+                  console.warn('⚠️ Failed to save timer report:', error);
+                }
               }
             }
           }
         } catch (error) {
-          console.warn('⚠️ Failed to get AI analysis:', error);
+          console.warn('⚠️ All analysis attempts failed:', error);
           // Keep showing STT-based results
         }
       })();
@@ -2724,27 +2950,62 @@ class WorVox {
       // Get detailed pronunciation analysis
       let scores = this.calculateDetailedScores(originalSentence, transcription, audioBlob);
       
-      // Try to get AI-based detailed analysis
+      // Try streaming AI analysis (GPT-4o + faster)
       if (transcription) {
         try {
-          const analysisResponse = await axios.post('/api/pronunciation/analyze', {
-            referenceText: originalSentence,
-            userTranscription: transcription,
-            audioAnalysis: audioAnalysis
+          console.log('⚡ Starting scenario streaming analysis...');
+          const response = await fetch('/api/pronunciation/analyze-stream', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              referenceText: originalSentence,
+              userTranscription: transcription,
+              audioAnalysis: audioAnalysis
+            })
           });
           
-          if (analysisResponse.data.success) {
-            scores = {
-              accuracy: analysisResponse.data.accuracy,
-              pronunciation: analysisResponse.data.pronunciation,
-              fluency: analysisResponse.data.fluency,
-              pronunciationFeedback: analysisResponse.data.pronunciationFeedback || '',
-              pronunciationIssues: analysisResponse.data.pronunciationIssues || []
-            };
-            console.log('✅ Scenario detailed analysis:', scores);
+          const contentType = response.headers.get('content-type');
+          
+          if (contentType?.includes('text/event-stream')) {
+            // Streaming response
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let streamBuffer = '';
+            
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              streamBuffer += decoder.decode(value);
+            }
+            
+            const jsonMatch = streamBuffer.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+              const result = JSON.parse(jsonMatch[0]);
+              scores = {
+                accuracy: result.accuracy,
+                pronunciation: result.pronunciation,
+                fluency: result.fluency,
+                pronunciationFeedback: result.pronunciationFeedback || '',
+                pronunciationIssues: result.pronunciationIssues || []
+              };
+              console.log('✅ Scenario streaming analysis:', scores);
+            }
+          } else {
+            // Regular JSON response
+            const data = await response.json();
+            if (data.success) {
+              scores = {
+                accuracy: data.accuracy,
+                pronunciation: data.pronunciation,
+                fluency: data.fluency,
+                pronunciationFeedback: data.pronunciationFeedback || '',
+                pronunciationIssues: data.pronunciationIssues || []
+              };
+              console.log('✅ Scenario analysis:', scores);
+            }
           }
         } catch (error) {
-          console.warn('⚠️ Failed to get detailed analysis, using basic scores:', error);
+          console.warn('⚠️ Failed to get AI analysis, using basic scores:', error);
         }
       }
       
