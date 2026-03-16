@@ -8334,6 +8334,21 @@ Proceed to payment?
   // History feature
   async showHistory() {
     try {
+      // Load user from localStorage if not in memory
+      if (!this.currentUser) {
+        const storedUser = localStorage.getItem('worvox_user');
+        if (storedUser) {
+          this.currentUser = JSON.parse(storedUser);
+        }
+      }
+      
+      // Ensure user is logged in
+      if (!this.currentUser || !this.currentUser.id) {
+        alert('로그인이 필요합니다.');
+        this.showLogin();
+        return;
+      }
+      
       const response = await axios.get(`/api/history/sessions/${this.currentUser.id}`);
       const sessions = response.data.sessions;
       
@@ -8844,6 +8859,21 @@ Proceed to payment?
 
   // Show Plan/Pricing Page
   showPlan() {
+    // Load user from localStorage if not in memory
+    if (!this.currentUser) {
+      const storedUser = localStorage.getItem('worvox_user');
+      if (storedUser) {
+        this.currentUser = JSON.parse(storedUser);
+      }
+    }
+    
+    // Ensure user is logged in
+    if (!this.currentUser || !this.currentUser.id) {
+      alert('로그인이 필요합니다.');
+      this.showLogin();
+      return;
+    }
+    
     const app = document.getElementById('app');
     app.innerHTML = `
       <div class="flex h-screen bg-gray-50 dark:bg-gray-900">
