@@ -4687,7 +4687,6 @@ class WorVox {
     
     // Ensure user is logged in
     if (!this.currentUser || !this.currentUser.id || !this.currentUser.name) {
-      alert('로그인이 필요합니다.');
       this.showLogin();
       return;
     }
@@ -6435,6 +6434,25 @@ Proceed to payment?
 
   async showTopicSelection() {
     try {
+      // Ensure user is logged in (load from localStorage if needed)
+      if (!this.currentUser) {
+        const storedUser = localStorage.getItem('worvox_user');
+        if (storedUser) {
+          try {
+            this.currentUser = JSON.parse(storedUser);
+            this.userPlan = this.currentUser.plan || 'free';
+          } catch (e) {
+            console.error('Failed to parse stored user:', e);
+            this.showLogin();
+            return;
+          }
+        } else {
+          // No user found, redirect to login
+          this.showLogin();
+          return;
+        }
+      }
+      
       // Fetch topics
       const topicsResponse = await axios.get('/api/topics');
       this.topics = topicsResponse.data.topics; // Store for later use
@@ -8363,7 +8381,7 @@ Proceed to payment?
       
       // Ensure user is logged in
       if (!this.currentUser || !this.currentUser.id) {
-        alert('로그인이 필요합니다.');
+        
         this.showLogin();
         return;
       }
@@ -8888,7 +8906,7 @@ Proceed to payment?
     
     // Ensure user is logged in
     if (!this.currentUser || !this.currentUser.id) {
-      alert('로그인이 필요합니다.');
+      
       this.showLogin();
       return;
     }
@@ -10342,7 +10360,7 @@ Proceed to payment?
       // Ensure user is logged in
       if (!this.currentUser || !this.currentUser.id) {
         console.error('User not logged in');
-        alert('로그인이 필요합니다.');
+        
         this.showLogin();
         return;
       }
@@ -10660,7 +10678,7 @@ Proceed to payment?
       if (storedUser) {
         this.currentUser = JSON.parse(storedUser);
       } else {
-        alert('로그인이 필요합니다.');
+        
         this.showLogin();
         return;
       }
@@ -14412,7 +14430,7 @@ Proceed to payment?
   // Start 2-week free trial with billing key
   async startFreeTrial(plan) {
     if (!this.currentUser) {
-      alert('로그인이 필요합니다.');
+      
       this.showLogin();
       return;
     }
@@ -14623,7 +14641,7 @@ Proceed to payment?
 
   async selectPlan(planName) {
     if (!this.currentUser) {
-      alert('로그인이 필요합니다.');
+      
       return;
     }
 
