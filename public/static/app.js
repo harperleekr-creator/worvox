@@ -1946,6 +1946,7 @@ class WorVox {
       ratingColor,
       ratingIcon,
       feedback,
+      pronunciationIssues = [],
       isPremiumAnalysis,
       originalWords,
       spokenWords,
@@ -2141,7 +2142,7 @@ class WorVox {
                       </div>
                     </div>
                     
-                    ${data.pronunciationIssues && data.pronunciationIssues.length > 0 ? `
+                    ${pronunciationIssues && pronunciationIssues.length > 0 ? `
                     <!-- Pronunciation Issues -->
                     <div class="bg-white rounded-xl p-5 border-2 border-green-200">
                       <h4 class="font-bold text-gray-800 mb-2 flex items-center gap-2">
@@ -2149,7 +2150,7 @@ class WorVox {
                         발음 개선 포인트
                       </h4>
                       <div class="space-y-3">
-                        ${data.pronunciationIssues.map(issue => `
+                        ${pronunciationIssues.map(issue => `
                           <div class="bg-green-50 rounded-lg p-3">
                             <div class="font-semibold text-gray-800 mb-1">
                               <i class="fas fa-volume-up text-green-600 mr-2"></i>"${issue.word}" 발음
@@ -3297,14 +3298,20 @@ class WorVox {
                     
                     ${pronunciationIssues && pronunciationIssues.length > 0 ? `
                       <div class="mt-4">
-                        <h5 class="text-sm font-semibold text-gray-700 mb-2">주의할 발음:</h5>
-                        <div class="space-y-2">
+                        <h5 class="text-sm font-semibold text-gray-700 mb-3">
+                          <i class="fas fa-lightbulb text-yellow-500 mr-1"></i>발음 개선 포인트:
+                        </h5>
+                        <div class="space-y-3">
                           ${pronunciationIssues.map(issue => `
-                            <div class="flex items-start gap-2 text-sm">
-                              <i class="fas fa-exclamation-circle text-orange-500 mt-0.5"></i>
-                              <div>
-                                <span class="font-semibold text-gray-800">${issue.word}</span>
-                                <span class="text-gray-600"> - ${issue.feedback}</span>
+                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                              <div class="font-semibold text-gray-800 mb-1">
+                                <i class="fas fa-volume-up text-yellow-600 mr-2"></i>"${issue.word}" 발음
+                              </div>
+                              <div class="text-sm text-gray-700 mb-2">
+                                <span class="text-red-600">문제:</span> ${issue.issue}
+                              </div>
+                              <div class="text-sm text-green-700">
+                                <i class="fas fa-check-circle mr-1"></i>${issue.tip}
                               </div>
                             </div>
                           `).join('')}
