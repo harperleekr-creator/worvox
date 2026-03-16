@@ -15523,3 +15523,7 @@ window.addEventListener('load', () => {
     console.warn('Google Sign-In library not loaded');
   }
 });
+
+// Initialize WorVox app
+window.worvox = new WorVox();
+console.log('WorVox app initialized');
