@@ -29,7 +29,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1773652630388'; // Update manually or via build script
+const BUILD_TIME = '1773652902880'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -2936,7 +2936,7 @@ app.get('/app', (c) => {
         
         <script>
           // Auto-start the app after all scripts are loaded
-          window.addEventListener('load', function() {
+          window.addEventListener('load', async function() {
             if (window.worvox) {
               // Check if user is logged in
               const storedUser = localStorage.getItem('worvox_user');
@@ -2944,7 +2944,18 @@ app.get('/app', (c) => {
                 try {
                   const user = JSON.parse(storedUser);
                   window.worvox.currentUser = user;
-                  window.worvox.showDashboard();
+                  window.worvox.userPlan = user.plan || 'free';
+                  
+                  // Load user data
+                  try {
+                    await window.worvox.loadUsageFromServer();
+                    await window.worvox.loadGamificationStats();
+                  } catch (e) {
+                    console.warn('Failed to load user data:', e);
+                  }
+                  
+                  // Show topic selection (main dashboard)
+                  window.worvox.showTopicSelection();
                 } catch (e) {
                   console.error('Failed to parse stored user:', e);
                   window.worvox.showLogin();
