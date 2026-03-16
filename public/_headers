@@ -1,15 +1,9 @@
-# Cache versioned static files for 1 year
-/static/*.js?v=*
+# Cache versioned static files for 1 year (immutable)
+# These files have ?v=timestamp in URL, so they change when content changes
+/static/app.min.js
   Cache-Control: public, max-age=31536000, immutable
-  Surrogate-Control: max-age=31536000
-
-/static/*.css?v=*
+/static/gamification.js
   Cache-Control: public, max-age=31536000, immutable
-  Surrogate-Control: max-age=31536000
+/static/style.css
+  Cache-Control: public, max-age=31536000, immutable
 
-# No cache for non-versioned files
-/static/*
-  Cache-Control: no-cache, no-store, must-revalidate, max-age=0
-  Surrogate-Control: no-store
-  Pragma: no-cache
-  Expires: 0
