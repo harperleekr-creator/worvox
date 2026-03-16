@@ -1013,70 +1013,34 @@ class WorVox {
 
     // Check if AI prompts are enabled
     if (this.currentUser.use_ai_prompts && this.isPremiumUser()) {
-      // 🚀 Option A: Enhanced loading with progress bar
-      let progressValue = 0;
-      const progressInterval = setInterval(() => {
-        progressValue = Math.min(progressValue + Math.random() * 15, 95);
-        const progressBar = document.getElementById('ai-progress-bar');
-        const progressText = document.getElementById('ai-progress-text');
-        if (progressBar) progressBar.style.width = `${progressValue}%`;
-        if (progressText) progressText.textContent = `${Math.round(progressValue)}%`;
-      }, 150);
-
+      // Simple loading screen (same as scenario mode mystery box)
       const app = document.getElementById('app');
       app.innerHTML = `
-        <div class="flex h-screen items-center justify-center bg-gradient-to-br from-purple-900 via-purple-800 to-pink-900">
-          <div class="text-center text-white px-4 max-w-md w-full">
-            <div class="text-6xl mb-4 animate-bounce">🤖</div>
-            <h2 class="text-2xl font-bold mb-2">AI 프롬프트 생성 중...</h2>
-            <p class="text-purple-200 mb-6">
-              ${
-                this.currentUser.level === 'beginner' ? '초급 레벨에 맞는 간단한 문장을 준비하고 있습니다' :
-                this.currentUser.level === 'intermediate' ? '중급 레벨에 맞는 실용적인 문장을 준비하고 있습니다' :
-                '고급 레벨에 맞는 심화 문장을 준비하고 있습니다'
-              }
-            </p>
-            
-            <div class="w-full bg-purple-800/30 rounded-full h-3 mb-3 overflow-hidden">
-              <div id="ai-progress-bar" class="bg-gradient-to-r from-yellow-400 to-pink-400 h-3 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
-            </div>
-            <p id="ai-progress-text" class="text-sm text-purple-200 mb-4">0%</p>
-            
-            <div class="flex items-center justify-center space-x-2 text-sm text-purple-200">
+        <div class="flex h-screen items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-purple-100">
+          <div class="text-center px-4">
+            <div class="text-8xl mb-6 animate-bounce">🎁</div>
+            <div class="text-lg font-bold text-purple-900 mb-2">Opening...</div>
+            <div class="flex items-center justify-center space-x-2 text-purple-600">
               <i class="fas fa-spinner fa-spin"></i>
-              <span id="ai-status-text">캐시 확인 중...</span>
+              <span>AI 프롬프트 생성 중...</span>
             </div>
           </div>
         </div>
       `;
 
       try {
-        const updateStatus = (text) => {
-          const statusEl = document.getElementById('ai-status-text');
-          if (statusEl) statusEl.textContent = text;
-        };
-
         console.log('🤖 Generating AI prompt for level:', this.currentUser.level);
         
-        // 🚀 Option C: Check preloaded cache first
+        // Check preloaded cache first
         const cacheKey = `ai_prompt_${this.currentUser.level}_timer`;
         if (this.preloadedPrompts && this.preloadedPrompts[cacheKey]) {
           console.log('⚡ Using preloaded prompt!');
-          clearInterval(progressInterval);
-          const progressBar = document.getElementById('ai-progress-bar');
-          const progressText = document.getElementById('ai-progress-text');
-          if (progressBar) progressBar.style.width = '100%';
-          if (progressText) progressText.textContent = '100%';
-          updateStatus('캐시에서 로드 완료! ⚡');
-          
           const cached = this.preloadedPrompts[cacheKey];
           randomSentence = cached.sentence;
           translation = cached.translation;
           delete this.preloadedPrompts[cacheKey];
-          await new Promise(resolve => setTimeout(resolve, 300));
+          await new Promise(resolve => setTimeout(resolve, 500));
         } else {
-          updateStatus('AI 프롬프트 생성 중...');
-          
           const response = await axios.post('/api/ai-prompts/generate', {
             mode: 'timer',
             level: this.currentUser.level,
@@ -1085,20 +1049,6 @@ class WorVox {
           });
 
           console.log('🤖 AI Response:', response.data);
-          
-          clearInterval(progressInterval);
-          const progressBar = document.getElementById('ai-progress-bar');
-          const progressText = document.getElementById('ai-progress-text');
-          if (progressBar) progressBar.style.width = '100%';
-          if (progressText) progressText.textContent = '100%';
-          
-          if (response.data.cached) {
-            updateStatus('캐시에서 로드 완료! ⚡');
-            console.log('✅ Using cached prompt');
-          } else {
-            updateStatus('새 프롬프트 생성 완료! ✨');
-            console.log('✅ Generated new prompt');
-          }
 
           if (response.data.success && response.data.data.sentence) {
             randomSentence = response.data.data.sentence;
@@ -1109,13 +1059,12 @@ class WorVox {
             throw new Error('AI generation failed: ' + JSON.stringify(response.data));
           }
           
-          await new Promise(resolve => setTimeout(resolve, 300));
+          await new Promise(resolve => setTimeout(resolve, 500));
         }
         
-        // 🚀 Option C: Preload next prompt in background
+        // Preload next prompt in background
         this.preloadNextPrompt();
       } catch (error) {
-        clearInterval(progressInterval);
         console.error('❌ AI prompt generation failed:', error);
         console.error('Error details:', error.response?.data);
         
@@ -1646,44 +1595,48 @@ class WorVox {
       isLoading: this.currentUser?.plan === 'premium' && transcription && transcription !== '(인식되지 않음)'
     });
     
-    // 🚀 STEP 2: Two-stage AI analysis (Premium only)
+    // 🚀 STEP 2: Direct AI analysis (Premium only) - Same as Scenario Mode
     if (transcription && transcription !== '(인식되지 않음)' && this.currentUser?.plan === 'premium') {
-      // Stage 1: Quick scores calculation (immediate, no delay)
       (async () => {
         try {
-          console.log('⚡ Stage 1: Getting quick scores...');
-          const quickStartTime = Date.now();
+          console.log('⚡ Getting AI pronunciation analysis (same as scenario mode)...');
+          const analysisStartTime = Date.now();
           
-          const quickResponse = await axios.post('/api/pronunciation/analyze-quick', {
+          const analysisResponse = await axios.post('/api/pronunciation/analyze', {
             referenceText: originalSentence,
             userTranscription: transcription,
             audioAnalysis: audioAnalysis
           });
           
-          console.log(`⚡ Quick scores received in ${Date.now() - quickStartTime}ms`);
+          console.log(`⚡ AI analysis received in ${Date.now() - analysisStartTime}ms`);
           
-          if (quickResponse.data.success) {
-            // Update with quick scores immediately
-            accuracyScore = quickResponse.data.accuracy;
-            pronunciationScore = quickResponse.data.pronunciation;
-            fluencyScore = quickResponse.data.fluency;
+          if (analysisResponse.data.success) {
+            // Update with AI scores immediately
+            accuracyScore = analysisResponse.data.accuracy;
+            pronunciationScore = analysisResponse.data.pronunciation;
+            fluencyScore = analysisResponse.data.fluency;
             
-            const quickAverageScore = Math.round((accuracyScore + pronunciationScore + fluencyScore) / 3);
+            // Get feedback and issues
+            feedback = analysisResponse.data.pronunciationFeedback || '';
+            const pronunciationIssues = analysisResponse.data.pronunciationIssues || [];
+            isPremiumAnalysis = true;
             
-            // Update rating based on quick scores
-            if (quickAverageScore >= 90) {
+            const finalAverageScore = Math.round((accuracyScore + pronunciationScore + fluencyScore) / 3);
+            
+            // Update rating
+            if (finalAverageScore >= 90) {
               rating = '완벽해요!';
               ratingColor = 'text-green-600';
               ratingIcon = '🌟';
-            } else if (quickAverageScore >= 80) {
+            } else if (finalAverageScore >= 80) {
               rating = '훌륭해요!';
               ratingColor = 'text-blue-600';
               ratingIcon = '🎉';
-            } else if (quickAverageScore >= 70) {
+            } else if (finalAverageScore >= 70) {
               rating = '잘했어요!';
               ratingColor = 'text-purple-600';
               ratingIcon = '👍';
-            } else if (quickAverageScore >= 60) {
+            } else if (finalAverageScore >= 60) {
               rating = '괜찮아요!';
               ratingColor = 'text-yellow-600';
               ratingIcon = '😊';
@@ -1693,9 +1646,9 @@ class WorVox {
               ratingIcon = '💪';
             }
             
-            console.log('⚡ Quick scores calculated, rendering results...');
+            console.log('✅ AI analysis loaded, rendering complete results...');
             
-            // Render with quick scores (no feedback yet)
+            // Render with complete AI analysis (same as scenario mode)
             this.renderTimerResults({
               originalSentence,
               transcription,
@@ -1703,130 +1656,53 @@ class WorVox {
               accuracyScore,
               pronunciationScore,
               fluencyScore,
-              averageScore: quickAverageScore,
+              averageScore: finalAverageScore,
               rating,
               ratingColor,
               ratingIcon,
-              feedback: '', // Loading feedback...
-              pronunciationIssues: [],
-              isPremiumAnalysis: false,
+              feedback,
+              pronunciationIssues,
+              isPremiumAnalysis,
               originalWords,
               spokenWords,
-              isLoading: true, // Show loading state for detailed feedback
-              loadingMessage: '🤖 발음 피드백 생성 중...'
+              isLoading: false
             });
             
-            // Stage 2: Detailed AI feedback in background (~5 seconds)
-            console.log('🎯 Stage 2: Loading detailed AI feedback...');
-            const detailedStartTime = Date.now();
-            
-            const analysisResponse = await axios.post('/api/pronunciation/analyze', {
-              referenceText: originalSentence,
-              userTranscription: transcription,
-              audioAnalysis: audioAnalysis
-            });
-            
-            console.log(`⏱️ Detailed analysis completed in ${Date.now() - detailedStartTime}ms`);
-            
-            if (analysisResponse.data.success) {
-              // Update with detailed pronunciation feedback
-              feedback = analysisResponse.data.pronunciationFeedback || '';
-              const pronunciationIssues = analysisResponse.data.pronunciationIssues || [];
-              isPremiumAnalysis = true;
-              
-              // Optionally refine scores with AI analysis
-              const aiAccuracy = analysisResponse.data.accuracy;
-              const aiPronunciation = analysisResponse.data.pronunciation;
-              const aiFluency = analysisResponse.data.fluency;
-              
-              // Blend quick scores with AI scores (70% quick, 30% AI for smooth transition)
-              accuracyScore = Math.round(accuracyScore * 0.7 + aiAccuracy * 0.3);
-              pronunciationScore = Math.round(pronunciationScore * 0.7 + aiPronunciation * 0.3);
-              fluencyScore = Math.round(fluencyScore * 0.7 + aiFluency * 0.3);
-              
-              const finalAverageScore = Math.round((accuracyScore + pronunciationScore + fluencyScore) / 3);
-              
-              // Update rating if needed
-              if (finalAverageScore >= 90) {
-                rating = '완벽해요!';
-                ratingColor = 'text-green-600';
-                ratingIcon = '🌟';
-              } else if (finalAverageScore >= 80) {
-                rating = '훌륭해요!';
-                ratingColor = 'text-blue-600';
-                ratingIcon = '🎉';
-              } else if (finalAverageScore >= 70) {
-                rating = '잘했어요!';
-                ratingColor = 'text-purple-600';
-                ratingIcon = '👍';
-              } else if (finalAverageScore >= 60) {
-                rating = '괜찮아요!';
-                ratingColor = 'text-yellow-600';
-                ratingIcon = '😊';
-              } else {
-                rating = '연습이 필요해요';
-                ratingColor = 'text-orange-600';
-                ratingIcon = '💪';
+            // Save report with AI analysis
+            if (sessionId && this.currentUser) {
+              try {
+                const reportData = {
+                  originalSentence,
+                  transcription,
+                  timeLimit,
+                  accuracyScore,
+                  pronunciationScore,
+                  fluencyScore,
+                  averageScore: finalAverageScore,
+                  rating,
+                  feedback,
+                  pronunciationIssues,
+                  isPremiumAnalysis,
+                  completedAt: new Date().toISOString()
+                };
+                
+                await axios.post('/api/mode-reports/save', {
+                  sessionId: sessionId,
+                  userId: this.currentUser.id,
+                  modeType: 'timer',
+                  reportData: reportData
+                });
+                console.log('✅ Timer report saved with AI analysis');
+              } catch (error) {
+                console.warn('⚠️ Failed to save timer report:', error);
               }
-              
-              console.log('✅ Detailed feedback loaded, updating results...');
-              
-              // Re-render with complete AI analysis
-              this.renderTimerResults({
-                originalSentence,
-                transcription,
-                timeLimit,
-                accuracyScore,
-                pronunciationScore,
-                fluencyScore,
-                averageScore: finalAverageScore,
-                rating,
-                ratingColor,
-                ratingIcon,
-                feedback,
-                pronunciationIssues,
-                isPremiumAnalysis,
-                originalWords,
-                spokenWords,
-                isLoading: false
-              });
-              
-              // Save report with AI analysis
-              if (sessionId && this.currentUser) {
-                try {
-                  const reportData = {
-                    originalSentence,
-                    transcription,
-                    timeLimit,
-                    accuracyScore,
-                    pronunciationScore,
-                    fluencyScore,
-                    averageScore: finalAverageScore,
-                    rating,
-                    feedback,
-                    pronunciationIssues,
-                    isPremiumAnalysis,
-                    completedAt: new Date().toISOString()
-                  };
-                  
-                  await axios.post('/api/mode-reports/save', {
-                    sessionId: sessionId,
-                    userId: this.currentUser.id,
-                    modeType: 'timer',
-                    reportData: reportData
-                  });
-                  console.log('✅ Timer report saved with AI analysis');
-                } catch (error) {
-                  console.warn('⚠️ Failed to save timer report:', error);
-                }
-              }
-            } // ← End of if (analysisResponse.data.success)
-          } // ← End of if (quickResponse.data.success)
+            }
+          }
         } catch (error) {
           console.warn('⚠️ Failed to get AI analysis:', error);
           // Keep showing STT-based results
         }
-      }, 100); // Start after 100ms
+      })();
     }
   }
   
