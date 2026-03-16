@@ -10777,12 +10777,14 @@ Proceed to payment?
       
       // Award XP if XP prize
       let xpAwarded = 0;
+      let xpAwardSuccess = false;
       try {
         if (selectedPrize.name === 'XP 50') {
           xpAwarded = 50;
           const result = await this.awardXP(50, 'random_box', 'Random Box - XP 50');
           if (result && result.success) {
             console.log('✅ XP awarded successfully:', xpAwarded);
+            xpAwardSuccess = true;
             // Refresh user stats to update UI
             await this.loadUsageFromServer();
             await this.loadGamificationStats();
@@ -10792,6 +10794,7 @@ Proceed to payment?
           const result = await this.awardXP(300, 'random_box', 'Random Box - XP 300');
           if (result && result.success) {
             console.log('✅ XP awarded successfully:', xpAwarded);
+            xpAwardSuccess = true;
             // Refresh user stats to update UI
             await this.loadUsageFromServer();
             await this.loadGamificationStats();
@@ -10800,6 +10803,39 @@ Proceed to payment?
       } catch (error) {
         console.error('❌ Error awarding XP:', error);
         // Still show the prize but with an error message
+      }
+      
+      // Update Rewards page Level Card in real-time if XP was awarded
+      if (xpAwardSuccess && xpAwarded > 0) {
+        try {
+          const stats = await gamificationManager.getStats(this.currentUser.id);
+          if (stats) {
+            // Update Level display
+            const levelCards = document.querySelectorAll('.bg-gradient-to-r.from-indigo-600 h2');
+            if (levelCards.length > 0) {
+              levelCards[0].textContent = `Level ${stats.stats.level}`;
+            }
+            
+            // Update XP progress bar
+            const progressBar = document.querySelector('.bg-yellow-400');
+            if (progressBar) {
+              progressBar.style.width = `${stats.stats.progress}%`;
+            }
+            
+            // Update XP text
+            const xpTexts = document.querySelectorAll('.text-xs.text-indigo-100');
+            for (let elem of xpTexts) {
+              if (elem.textContent.includes('XP')) {
+                elem.textContent = `${stats.stats.xp} / ${stats.stats.xpForNextLevel} XP`;
+                break;
+              }
+            }
+            
+            console.log('✅ Updated Rewards page UI with new XP:', stats.stats.xp);
+          }
+        } catch (error) {
+          console.error('❌ Failed to update Rewards page UI:', error);
+        }
       }
       
       // Hide opening animation and mystery box
