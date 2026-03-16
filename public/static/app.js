@@ -2976,10 +2976,10 @@ class WorVox {
       // Get detailed pronunciation analysis
       let scores = this.calculateDetailedScores(originalSentence, transcription, audioBlob);
       
-      // Try streaming AI analysis (GPT-4o + faster)
-      if (transcription) {
+      // Try streaming AI analysis (GPT-4o + faster) - Always run for all users
+      if (transcription && transcription !== '(인식되지 않음)') {
         try {
-          console.log('⚡ Starting scenario streaming analysis...');
+          console.log('⚡ Starting scenario AI analysis...');
           const response = await fetch('/api/pronunciation/analyze-stream', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -3310,41 +3310,67 @@ class WorVox {
                   </div>
                 </div>
                 
-                <!-- Pronunciation Feedback (if available) -->
-                ${pronunciationFeedback ? `
-                  <div class="border-t pt-6 mt-6">
-                    <div class="flex items-center mb-3">
-                      <i class="fas fa-comments text-purple-600 mr-2"></i>
-                      <h4 class="text-lg font-bold text-gray-900">발음 교정 피드백</h4>
-                    </div>
-                    <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                      <p class="text-gray-800 leading-relaxed">${pronunciationFeedback}</p>
-                    </div>
-                    
-                    ${pronunciationIssues && pronunciationIssues.length > 0 ? `
-                      <div class="mt-4">
-                        <h5 class="text-sm font-semibold text-gray-700 mb-3">
-                          <i class="fas fa-lightbulb text-yellow-500 mr-1"></i>발음 개선 포인트:
-                        </h5>
-                        <div class="space-y-3">
-                          ${pronunciationIssues.map(issue => `
-                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                              <div class="font-semibold text-gray-800 mb-1">
-                                <i class="fas fa-volume-up text-yellow-600 mr-2"></i>"${issue.word}" 발음
-                              </div>
-                              <div class="text-sm text-gray-700 mb-2">
-                                <span class="text-red-600">문제:</span> ${issue.issue}
-                              </div>
-                              <div class="text-sm text-green-700">
-                                <i class="fas fa-check-circle mr-1"></i>${issue.tip}
-                              </div>
-                            </div>
-                          `).join('')}
-                        </div>
+                <!-- AI Pronunciation Feedback -->
+                <div class="border-t pt-6 mt-6">
+                  ${pronunciationFeedback && pronunciationFeedback.trim() ? `
+                    <!-- Premium AI Feedback Available -->
+                    <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-5 mb-4 border-2 border-purple-200">
+                      <div class="flex items-center mb-3">
+                        <i class="fas fa-robot text-purple-600 mr-2 text-xl"></i>
+                        <h4 class="text-lg font-bold text-gray-900">💎 AI 발음 코치 피드백</h4>
                       </div>
-                    ` : ''}
-                  </div>
-                ` : ''}
+                      <div class="bg-white rounded-lg p-4">
+                        <p class="text-gray-800 leading-relaxed whitespace-pre-line">${pronunciationFeedback}</p>
+                      </div>
+                      
+                      ${pronunciationIssues && pronunciationIssues.length > 0 ? `
+                        <div class="mt-4">
+                          <h5 class="text-sm font-semibold text-gray-700 mb-3">
+                            <i class="fas fa-lightbulb text-yellow-500 mr-1"></i>발음 개선 포인트:
+                          </h5>
+                          <div class="space-y-3">
+                            ${pronunciationIssues.map(issue => `
+                              <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                                <div class="font-semibold text-gray-800 mb-1">
+                                  <i class="fas fa-volume-up text-yellow-600 mr-2"></i>"${issue.word}" 발음
+                                </div>
+                                <div class="text-sm text-gray-700 mb-2">
+                                  <span class="text-red-600">문제:</span> ${issue.issue}
+                                </div>
+                                <div class="text-sm text-green-700">
+                                  <i class="fas fa-check-circle mr-1"></i>${issue.tip}
+                                </div>
+                              </div>
+                            `).join('')}
+                          </div>
+                        </div>
+                      ` : ''}
+                    </div>
+                  ` : `
+                    <!-- No AI Feedback - Show Basic Guidance -->
+                    <div class="bg-blue-50 rounded-xl p-5 border border-blue-200">
+                      <div class="flex items-center mb-3">
+                        <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                        <h4 class="text-lg font-bold text-gray-900">발음 연습 가이드</h4>
+                      </div>
+                      <div class="space-y-2 text-sm text-gray-700">
+                        <p><i class="fas fa-check text-green-600 mr-2"></i>원문과 비교하며 발음을 점검하세요</p>
+                        <p><i class="fas fa-check text-green-600 mr-2"></i>녹음을 들어보고 개선점을 찾아보세요</p>
+                        <p><i class="fas fa-check text-green-600 mr-2"></i>반복 연습으로 정확도를 높이세요</p>
+                        ${this.currentUser?.plan !== 'premium' ? `
+                          <div class="mt-4 p-3 bg-purple-100 border border-purple-300 rounded-lg">
+                            <p class="font-semibold text-purple-900 mb-1">
+                              <i class="fas fa-crown text-yellow-500 mr-1"></i>Premium 전용 기능
+                            </p>
+                            <p class="text-xs text-purple-700">
+                              AI 발음 코치가 상세한 피드백과 개선 포인트를 제공합니다
+                            </p>
+                          </div>
+                        ` : ''}
+                      </div>
+                    </div>
+                  `}
+                </div>
               </div>
               
               <!-- Action Buttons -->
