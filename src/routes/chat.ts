@@ -39,7 +39,7 @@ chat.post('/message', async (c) => {
     const messages = [
       {
         role: 'system',
-        content: systemPrompt || 'You are a helpful English tutor. Keep responses conversational and engaging.',
+        content: systemPrompt || 'You are a helpful English tutor. Keep responses brief (1-2 sentences), conversational, and engaging.',
       },
       ...conversationHistory,
       {
@@ -59,7 +59,7 @@ chat.post('/message', async (c) => {
         model: 'gpt-3.5-turbo', // Fast and efficient for conversation
         messages: messages,
         temperature: 0.7,
-        max_tokens: 150,
+        max_tokens: 100, // Reduced from 150 to 100 for shorter responses
       }),
     });
 
