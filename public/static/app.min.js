@@ -10504,18 +10504,26 @@ Proceed to payment?
                       
                       <!-- Opening Animation Container -->
                       <div id="boxOpening" class="hidden absolute inset-0">
-                        <div class="w-full h-full flex items-center justify-center">
-                          <div class="text-center">
-                            <div class="text-4xl animate-bounce">✨</div>
-                            <div class="text-base font-bold text-gray-800 mt-2">열는 중...</div>
+                        <div class="w-full h-full bg-gradient-to-br from-purple-600 via-pink-500 to-orange-500 rounded-xl shadow-xl flex items-center justify-center">
+                          <div class="text-center text-white">
+                            <div class="text-5xl mb-2 animate-bounce">✨</div>
+                            <div class="text-lg font-bold">Opening...</div>
+                            <div class="text-xs opacity-80 mt-1">Please wait</div>
                           </div>
                         </div>
                       </div>
+                      
+                      <!-- Result Display (Same position as box) -->
+                      <div id="boxResult" class="hidden"></div>
                     </div>
                   </div>
                   
-                  <!-- Result Display (Below box) -->
-                  <div id="boxResult" class="hidden text-center"></div>
+                  <!-- Close Button (Below box) -->
+                  <div id="closeButtonContainer" class="hidden flex justify-center mt-3">
+                    <button onclick="worvox.closeBoxResult()" class="bg-white text-orange-600 px-6 py-2 rounded-lg text-sm font-bold hover:bg-orange-50 transition-all shadow-lg">
+                      확인
+                    </button>
+                  </div>
                 </div>
 
                 <!-- Rewards Grid -->
@@ -10769,42 +10777,68 @@ Proceed to payment?
       
       // Award XP if XP prize
       let xpAwarded = 0;
-      if (selectedPrize.name === 'XP 50') {
-        xpAwarded = 50;
-        await this.awardXP(50, 'random_box', 'Random Box - XP 50');
-      } else if (selectedPrize.name === 'XP 300') {
-        xpAwarded = 300;
-        await this.awardXP(300, 'random_box', 'Random Box - XP 300');
+      try {
+        if (selectedPrize.name === 'XP 50') {
+          xpAwarded = 50;
+          const result = await this.awardXP(50, 'random_box', 'Random Box - XP 50');
+          if (result && result.success) {
+            console.log('✅ XP awarded successfully:', xpAwarded);
+            // Refresh user stats to update UI
+            await this.loadUsageFromServer();
+            await this.loadGamificationStats();
+          }
+        } else if (selectedPrize.name === 'XP 300') {
+          xpAwarded = 300;
+          const result = await this.awardXP(300, 'random_box', 'Random Box - XP 300');
+          if (result && result.success) {
+            console.log('✅ XP awarded successfully:', xpAwarded);
+            // Refresh user stats to update UI
+            await this.loadUsageFromServer();
+            await this.loadGamificationStats();
+          }
+        }
+      } catch (error) {
+        console.error('❌ Error awarding XP:', error);
+        // Still show the prize but with an error message
       }
       
       // Hide opening animation and mystery box
       boxOpening.classList.add('hidden');
       mysteryBox.classList.add('hidden');
       
-      // Show result (below box)
+      // Show result (in the same box position)
       boxResult.innerHTML = `
-        <div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white py-4 px-6 rounded-xl shadow-lg max-w-xs mx-auto">
-          <div class="text-5xl mb-3">${selectedPrize.icon}</div>
-          <div class="text-xl font-bold mb-2">축하합니다!</div>
-          <div class="text-base mb-2">${selectedPrize.name} 당첨!</div>
-          ${xpAwarded > 0 ? `<div class="text-sm mt-2 text-yellow-100">✨ +${xpAwarded} XP 획득!</div>` : ''}
-          <div class="text-sm mt-2 text-yellow-100">남은 횟수: ${this.availableSpins}회</div>
-          <button onclick="worvox.closeBoxResult()" class="mt-4 w-full bg-white text-orange-600 px-6 py-3 rounded-lg text-base font-bold hover:bg-orange-50 transition-all shadow-lg">
-            확인
-          </button>
+        <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-orange-500 text-white rounded-xl shadow-xl flex items-center justify-center">
+          <div class="text-center">
+            <div class="text-5xl mb-3">${selectedPrize.icon}</div>
+            <div class="text-lg font-bold mb-1">축하합니다!</div>
+            <div class="text-base mb-2">${selectedPrize.name} 당첨!</div>
+            ${xpAwarded > 0 ? `<div class="text-sm text-yellow-100">✨ +${xpAwarded} XP 획득!</div>` : ''}
+            <div class="text-xs opacity-80 mt-2">남은 횟수: ${this.availableSpins}회</div>
+          </div>
         </div>
       `;
       boxResult.classList.remove('hidden');
+      
+      // Show close button
+      const closeBtn = document.getElementById('closeButtonContainer');
+      if (closeBtn) {
+        closeBtn.classList.remove('hidden');
+      }
     }, 2000);
   }
   
   closeBoxResult() {
     const mysteryBox = document.getElementById('mysteryBox');
     const boxResult = document.getElementById('boxResult');
+    const closeBtn = document.getElementById('closeButtonContainer');
     
-    // Hide result
+    // Hide result and close button
     boxResult.classList.add('hidden');
     boxResult.innerHTML = '';
+    if (closeBtn) {
+      closeBtn.classList.add('hidden');
+    }
     
     // Show box again if spins remain
     if (this.availableSpins > 0) {
@@ -10813,11 +10847,14 @@ Proceed to payment?
       // Show empty state
       mysteryBox.classList.add('hidden');
       boxResult.innerHTML = `
-        <div class="bg-gray-100 rounded-xl py-6 px-6 text-center max-w-xs mx-auto">
-          <div class="text-4xl mb-3">🎁</div>
-          <p class="text-gray-700 text-base font-semibold mb-2">모든 기회를 사용했습니다!</p>
-          <p class="text-gray-500 text-sm">레벨업 보상으로 랜덤박스를 다시 받으세요!</p>
+        <div class="absolute inset-0 bg-gray-100 rounded-xl flex items-center justify-center">
+          <div class="text-center px-4">
+            <div class="text-4xl mb-3">🎁</div>
+            <p class="text-gray-700 text-base font-semibold mb-2">모든 기회를 사용했습니다!</p>
+            <p class="text-gray-500 text-sm">레벨업 보상으로 랜덤박스를 다시 받으세요!</p>
+          </div>
         </div>
+      `;
       `;
       boxResult.classList.remove('hidden');
     }
