@@ -10885,16 +10885,16 @@ Proceed to payment?
         this.availableSpins = (this.availableSpins || 0) + reward.spins;
         await this.saveSpinCount();
         this.updateSpinCount();
-        alert(`🎉 축하합니다!\n\n랜덤박스 ${reward.spins}회가 지급되었습니다!\n\n상단의 "랜덤박스 열기" 버튼을 눌러 행운을 시험해보세요!`);
+        alert('🎉 축하합니다!\n\n랜덤박스 ' + reward.spins + '회가 지급되었습니다!\n\n상단의 "랜덤박스 열기" 버튼을 눌러 행운을 시험해보세요!');
       } else if (reward.type === 'premium') {
-        alert(`🎉 축하합니다!\n\n프리미엄 ${reward.days}일 무료 체험권이 지급되었습니다!`);
+        alert('🎉 축하합니다!\n\n프리미엄 ' + reward.days + '일 무료 체험권이 지급되었습니다!');
       } else if (reward.type === 'xp+spin') {
         this.availableSpins = (this.availableSpins || 0) + reward.spins;
         await this.saveSpinCount();
         this.updateSpinCount();
-        alert(`🎉 축하합니다!\n\nLevel 83으로 즉시 상승 + 랜덤박스 ${reward.spins}회 기회가 지급되었습니다!`);
+        alert('🎉 축하합니다!\n\nLevel 83으로 즉시 상승 + 랜덤박스 ' + reward.spins + '회 기회가 지급되었습니다!');
       } else if (reward.type === 'coupon') {
-        alert(`✈️ 축하합니다!\n\n대한항공 ${reward.value} 쿠폰이 지급되었습니다!\n쿠폰은 이메일로 전송됩니다.`);
+        alert('✈️ 축하합니다!\n\n대한항공 ' + reward.value + ' 쿠폰이 지급되었습니다!\n쿠폰은 이메일로 전송됩니다.');
       }
     } catch (error) {
       console.error('Claim reward error:', error);
@@ -10924,15 +10924,12 @@ Proceed to payment?
     app.innerHTML = `
       <div class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
         <div class="bg-white rounded-3xl max-w-2xl w-full p-6 md:p-8 shadow-2xl">
-          <!-- Header -->
           <div class="text-center mb-6">
             <h2 class="text-3xl font-bold text-gray-800 mb-2">🎰 행운의 돌림판</h2>
             <p class="text-gray-600">남은 기회: <span id="remainingSpins" class="text-2xl font-bold text-indigo-600">${totalSpins}</span>회</p>
           </div>
           
-          <!-- Spin Wheel Container -->
           <div class="relative mb-6">
-            <!-- Wheel -->
             <div id="spinWheel" class="relative w-60 h-60 mx-auto rounded-full border-8 border-gray-800 shadow-2xl overflow-hidden" style="transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);">
               ${prizes.map((prize, index) => {
                 const angle = (360 / prizes.length) * index;
@@ -10949,21 +10946,17 @@ Proceed to payment?
               }).join('')}
             </div>
             
-            <!-- Pointer -->
             <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2 z-10">
               <div class="w-0 h-0 border-l-8 border-r-8 border-t-16 border-l-transparent border-r-transparent border-t-red-500"></div>
             </div>
             
-            <!-- Center Button -->
             <button id="spinButton" onclick="worvox.spinTheWheel()" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full shadow-2xl flex items-center justify-center text-white font-bold text-lg hover:scale-110 transition-all z-20 border-4 border-white">
               SPIN
             </button>
           </div>
           
-          <!-- Result Display -->
           <div id="spinResult" class="text-center mb-4 min-h-16"></div>
           
-          <!-- Close Button -->
           <button onclick="worvox.showRewards()" class="w-full py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-semibold transition-all">
             닫기
           </button>
