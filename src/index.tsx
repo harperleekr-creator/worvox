@@ -29,7 +29,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1773626865180'; // Update manually or via build script
+const BUILD_TIME = '1773627785942'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -2932,6 +2932,31 @@ app.get('/app', (c) => {
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
         <script src="/static/gamification.js?v=${version}"></script>
         <script src="/static/app.min.js?v=${version}"></script>
+        
+        <script>
+          // Auto-start the app after all scripts are loaded
+          window.addEventListener('load', function() {
+            if (window.worvox) {
+              // Check if user is logged in
+              const storedUser = localStorage.getItem('worvox_user');
+              if (storedUser) {
+                try {
+                  const user = JSON.parse(storedUser);
+                  window.worvox.currentUser = user;
+                  window.worvox.showDashboard();
+                } catch (e) {
+                  console.error('Failed to parse stored user:', e);
+                  window.worvox.showLoginPage();
+                }
+              } else {
+                window.worvox.showLoginPage();
+              }
+            } else {
+              console.error('WorVox app failed to initialize');
+              document.getElementById('app').innerHTML = '<div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: system-ui; color: #ef4444;"><div style="text-align: center;"><h1 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem;">앱 로딩 실패</h1><p>페이지를 새로고침해주세요 (Ctrl+Shift+R)</p></div></div>';
+            }
+          });
+        </script>
     </body>
     </html>
   `);
