@@ -10371,23 +10371,38 @@ Proceed to payment?
         if (userResponse.data.success) {
           this.currentUser = userResponse.data.data;
           localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
-          console.log('Refreshed current user:', this.currentUser);
+          console.log('✅ Refreshed current user:', this.currentUser);
+        } else {
+          console.warn('⚠️ User refresh returned unsuccessful:', userResponse.data);
         }
       } catch (error) {
-        console.warn('Could not refresh user data:', error);
+        console.error('❌ Could not refresh user data:', error);
+        console.error('Error details:', error.response?.data);
+        // Continue anyway with cached user data
       }
       
-      // Double-check user is still valid after refresh
+      // Verify user is still valid (but don't block if we have cached data)
       if (!this.currentUser || !this.currentUser.id) {
-        console.error('User data invalid after refresh');
-        alert('사용자 정보를 불러올 수 없습니다. 다시 로그인해주세요.');
+        console.error('❌ User data invalid - redirecting to login');
         this.showLogin();
         return;
       }
       
-      // Get user gamification stats
-      const stats = await gamificationManager.getStats(this.currentUser.id);
-      const userLevel = stats ? stats.stats.level : 1;
+      console.log('📊 Loading rewards for user:', this.currentUser.email || this.currentUser.id);
+      
+      // Get user gamification stats with error handling
+      let stats = null;
+      let userLevel = 1;
+      try {
+        stats = await gamificationManager.getStats(this.currentUser.id);
+        userLevel = stats ? stats.stats.level : 1;
+        console.log('✅ User level:', userLevel);
+      } catch (error) {
+        console.error('❌ Failed to load gamification stats:', error);
+        console.error('Error details:', error.response?.data);
+        // Continue with default level 1
+        userLevel = 1;
+      }
 
       // Define rewards (unlocked at level 30, 40, 50, etc.)
       const rewards = [
@@ -10573,8 +10588,23 @@ Proceed to payment?
       await this.loadSpinCount();
       this.updateSpinCount();
     } catch (error) {
-      console.error('Error loading rewards:', error);
-      alert('Failed to load rewards. Please try again.');
+      console.error('❌ Error loading rewards:', error);
+      console.error('Error details:', error.response?.data);
+      console.error('Stack trace:', error.stack);
+      // Show error in UI instead of alert
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        <div class="flex h-screen items-center justify-center bg-gray-50">
+          <div class="text-center p-8">
+            <i class="fas fa-exclamation-triangle text-6xl text-red-500 mb-4"></i>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">보상을 불러오는 중 오류가 발생했습니다</h2>
+            <p class="text-gray-600 mb-6">잠시 후 다시 시도해주세요.</p>
+            <button onclick="worvox.showTopicSelection()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-semibold">
+              홈으로 돌아가기
+            </button>
+          </div>
+        </div>
+      `;
     }
   }
   
