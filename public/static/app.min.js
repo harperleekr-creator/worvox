@@ -2720,14 +2720,31 @@ class WorVox {
       console.log('📡 TTS: Requesting audio for:', text);
       console.log('📡 TTS: API endpoint: /api/tts/speak');
       
-      // Call TTS API with correct endpoint
-      const response = await axios.post('/api/tts/speak', { text }, { 
+      // Get scenario name and premium status
+      const scenarioName = this.currentScenarioPractice.scenario?.topic || '';
+      const isPremium = this.currentUser?.plan === 'premium';
+      
+      console.log(`🎭 Scenario: "${scenarioName}", Premium: ${isPremium}`);
+      
+      // Call TTS API with scenario and premium info
+      const response = await axios.post('/api/tts/speak', { 
+        text,
+        scenario: scenarioName,
+        isPremium: isPremium
+      }, { 
         responseType: 'arraybuffer',
         headers: {
           'Content-Type': 'application/json'
         },
         timeout: 30000 // 30 second timeout
       });
+      
+      // Log voice provider info
+      const voiceProvider = response.headers['x-voice-provider'];
+      const voiceName = response.headers['x-voice-name'];
+      if (voiceProvider && voiceName) {
+        console.log(`🎙️ Voice: ${voiceName} (${voiceProvider})`);
+      }
       
       console.log('✅ TTS: Received audio response, size:', response.data.byteLength);
       console.log('✅ TTS: Response headers:', response.headers);
@@ -2791,8 +2808,16 @@ class WorVox {
     try {
       console.log('Playing reference audio:', text);
       
-      // Call TTS API
-      const response = await axios.post('/api/tts/speak', { text }, { 
+      // Get scenario name and premium status (if in scenario mode)
+      const scenarioName = this.currentScenarioPractice?.scenario?.topic || '';
+      const isPremium = this.currentUser?.plan === 'premium';
+      
+      // Call TTS API with scenario info
+      const response = await axios.post('/api/tts/speak', { 
+        text,
+        scenario: scenarioName,
+        isPremium: isPremium
+      }, { 
         responseType: 'arraybuffer',
         headers: {
           'Content-Type': 'application/json'
