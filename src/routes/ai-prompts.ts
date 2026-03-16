@@ -31,7 +31,7 @@ const systemPrompts = {
   beginner: {
     timer: `Generate ONE simple English sentence (5-10 words, basic vocabulary, present/past tense, topics: daily life/family/food). Return only the sentence.`,
 
-    scenario: `Generate 5 simple conversation sentences (3-8 words, basic vocabulary, situations: greeting/ordering/directions). Format: numbered 1-5, one per line.`,
+    scenario: `Generate 5 simple conversation sentences (3-8 words, basic vocabulary, situations: greeting/ordering/directions). IMPORTANT: Return ONLY the dialogue text without role labels (NO "Customer:", "Waiter:", etc.). Format: numbered 1-5, one per line.`,
 
     exam: `Generate 5 OPIC test questions:
 Q1-2: Simple (4-10 words, basic vocab, 10-20s answer)
@@ -43,7 +43,7 @@ Return numbered 1-5, one per line.`
   intermediate: {
     timer: `Generate ONE intermediate sentence (12-20 words, compound/complex grammar, topics: work/education/travel). Return only the sentence.`,
 
-    scenario: `Generate 5 intermediate conversation sentences (8-15 words, situations: workplace/interview/complaint). Format: numbered 1-5, one per line.`,
+    scenario: `Generate 5 intermediate conversation sentences (8-15 words, situations: workplace/interview/complaint). IMPORTANT: Return ONLY the dialogue text without role labels (NO "Manager:", "Employee:", etc.). Format: numbered 1-5, one per line.`,
 
     exam: `You are an English learning assistant. Generate 5 OPIC-style speaking test questions with SPECIFIC difficulty distribution:
 
@@ -82,7 +82,7 @@ Example format:
   advanced: {
     timer: `Generate ONE advanced sentence (18-30 words, sophisticated vocab, complex grammar, topics: business/technology/global issues). Return only the sentence.`,
 
-    scenario: `Generate 5 advanced conversation sentences (12-25 words, professional/academic tone, situations: negotiation/presentation). Format: numbered 1-5, one per line.`,
+    scenario: `Generate 5 advanced conversation sentences (12-25 words, professional/academic tone, situations: negotiation/presentation). IMPORTANT: Return ONLY the dialogue text without role labels (NO "Speaker:", "Presenter:", etc.). Format: numbered 1-5, one per line.`,
 
     exam: `Generate 5 OPIC advanced questions:
 Q1-2: Moderate (6-12 words, 20-30s answer)
@@ -184,7 +184,7 @@ aiPrompts.post('/generate', async (c) => {
     // Build user prompt with topic/description if provided
     let userPrompt = `Generate a ${mode} prompt for ${level} level.`;
     if (mode === 'scenario' && topic) {
-      userPrompt = `Generate a realistic 5-sentence conversation scenario about: "${topic}". Description: ${description || 'A typical situation'}. Make it appropriate for ${level} level English learners.`;
+      userPrompt = `Generate a realistic 5-sentence conversation scenario about: "${topic}". Description: ${description || 'A typical situation'}. Make it appropriate for ${level} level English learners. CRITICAL: Return ONLY the dialogue text (e.g., "Hello! How can I help you?") WITHOUT any role labels like "Waiter:", "Customer:", "Speaker:", etc.`;
     }
 
     // Call OpenAI API for English content
@@ -228,18 +228,34 @@ aiPrompts.post('/generate', async (c) => {
         translation: koreanTranslation
       };
     } else if (mode === 'scenario') {
-      // Parse numbered sentences
+      // Parse numbered sentences and remove role labels
       const sentences = generatedContent
         .split('\n')
         .filter(line => line.trim())
-        .map(line => line.replace(/^\d+\.\s*/, '').trim())
+        .map(line => {
+          // Remove numbering (e.g., "1. ")
+          let cleaned = line.replace(/^\d+\.\s*/, '').trim();
+          // Remove role labels (e.g., "Waiter: ", "Customer: ", "Speaker A: ")
+          cleaned = cleaned.replace(/^[A-Za-z\s]+:\s*/, '').trim();
+          // Remove quotes if present
+          cleaned = cleaned.replace(/^["']|["']$/g, '').trim();
+          return cleaned;
+        })
         .filter(s => s.length > 0);
       
-      // Parse Korean translations
+      // Parse Korean translations and remove role labels
       const translations = koreanTranslation
         .split('\n')
         .filter(line => line.trim())
-        .map(line => line.replace(/^\d+\.\s*/, '').trim())
+        .map(line => {
+          // Remove numbering
+          let cleaned = line.replace(/^\d+\.\s*/, '').trim();
+          // Remove Korean role labels (e.g., "웨이터: ", "고객: ")
+          cleaned = cleaned.replace(/^[가-힣\s]+:\s*/, '').trim();
+          // Remove quotes if present
+          cleaned = cleaned.replace(/^["']|["']$/g, '').trim();
+          return cleaned;
+        })
         .filter(s => s.length > 0);
       
       result = { 
