@@ -2169,7 +2169,7 @@ class WorVox {
                   </div>
                 </div>
                 ` : `
-                ${this.currentUser?.plan !== 'premium' ? `
+                ${!this.isPremiumUser() ? `
                 <div class="relative bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 shadow-lg mb-6 border-2 border-blue-200">
                   <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <i class="fas fa-robot text-blue-600"></i>
