@@ -1592,11 +1592,11 @@ class WorVox {
       isPremiumAnalysis: false,
       originalWords,
       spokenWords,
-      isLoading: this.isPremiumUser() && transcription && transcription !== '(인식되지 않음)'
+      isLoading: transcription && transcription !== '(인식되지 않음)'
     });
     
-    // 🚀 STEP 2: Streaming AI analysis (Premium only) - GPT-4o + Real-time
-    if (transcription && transcription !== '(인식되지 않음)' && this.isPremiumUser()) {
+    // 🚀 STEP 2: Streaming AI analysis - GPT-4o + Real-time (All users, same as scenario mode)
+    if (transcription && transcription !== '(인식되지 않음)') {
       (async () => {
         try {
           console.log('⚡ Starting streaming AI analysis (GPT-4o)...');
@@ -2124,11 +2124,11 @@ class WorVox {
                     </div>
                   </div>
                 </div>
-                ` : isPremiumAnalysis && feedback ? `
+                ` : feedback ? `
                 <div class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 shadow-lg mb-6 border-2 border-blue-200">
                   <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <i class="fas fa-robot text-blue-600"></i>
-                    💎 AI 코치 분석 (Premium)
+                    💎 AI 코치 분석
                   </h3>
                   <div class="space-y-4">
                     <!-- Pronunciation Feedback -->
@@ -2168,36 +2168,7 @@ class WorVox {
                     ` : ''}
                   </div>
                 </div>
-                ` : `
-                ${!this.isPremiumUser() ? `
-                <div class="relative bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 shadow-lg mb-6 border-2 border-blue-200">
-                  <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <i class="fas fa-robot text-blue-600"></i>
-                    AI 코치 분석 (Premium 전용)
-                  </h3>
-                  <div class="relative bg-white rounded-xl p-5">
-                    <!-- Blurred content -->
-                    <div class="text-gray-700 leading-relaxed blur-sm select-none pointer-events-none">
-                      발음과 유창성이 훌륭했습니다! 특히 문장 전체를 자연스럽게 전달하셨고, 강세와 리듬이 원어민에 가까웠어요. 다만 일부 자음 발음이 살짝 약했는데, 입술을 더 힘있게 사용하면 더 명확해집니다. 전반적으로 매우 좋은 발음이니 자신감을 가지고 계속 연습하세요!
-                    </div>
-                    <!-- Upgrade overlay -->
-                    <div class="absolute inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-xl">
-                      <div class="text-center p-6">
-                        <i class="fas fa-crown text-yellow-500 text-4xl mb-3"></i>
-                        <h4 class="text-lg font-bold text-gray-900 mb-2">상세한 AI 분석을 받아보세요!</h4>
-                        <p class="text-sm text-gray-600 mb-4">
-                          발음 문제점, 개선 방법, 격려 메시지까지<br>
-                          AI 코치의 1:1 맞춤 피드백
-                        </p>
-                        <button onclick="worvox.showPlan()" class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 px-6 rounded-xl transition-all">
-                          <i class="fas fa-crown mr-2"></i>Premium으로 분석 받기
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
                 ` : ''}
-                `}
                 
                 <!-- Actions -->
                 <div class="grid md:grid-cols-2 gap-4">
