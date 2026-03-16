@@ -416,7 +416,7 @@ class WorVox {
           "내년에 일본 여행을 계획하고 있습니다."
         ]
       },
-      { id: 31, title: "군사영어", category: "비즈니스", difficulty: "advanced", icon: "🎖️", description: "군사 작전 및 임무 관련 대화",
+      { id: 31, title: "Military English", category: "비즈니스", difficulty: "advanced", icon: "🎖️", description: "군사 작전 및 임무 관련 대화",
         sentences: [
           "Roger that, we're proceeding to the designated checkpoint.",
           "Request permission to engage the target.",
@@ -7158,7 +7158,7 @@ Proceed to payment?
                     <button onclick="worvox.startAIScenario('military')" 
                       class="bg-gradient-to-br from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 text-white p-3 rounded-lg shadow hover:shadow-lg transition-all transform hover:scale-105">
                       <div class="text-2xl mb-1">🪖</div>
-                      <div class="text-xs font-semibold">군사영어</div>
+                      <div class="text-xs font-semibold">Military English</div>
                     </button>
                     
                     <button onclick="worvox.startAIScenario('casual')" 
