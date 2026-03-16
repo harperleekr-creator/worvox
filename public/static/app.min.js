@@ -3030,9 +3030,11 @@ class WorVox {
     const totalSentences = this.currentScenarioPractice.scenario.sentences.length;
     const hasMore = sentenceNumber < totalSentences;
     
-    // Get audio URL from the latest result
-    const latestResult = this.currentScenarioPractice.results[this.currentScenarioPractice.results.length - 1];
-    const audioUrl = latestResult?.audioUrl || null;
+    // Get audio URL from parameter or latest result
+    if (!audioUrl) {
+      const latestResult = this.currentScenarioPractice.results[this.currentScenarioPractice.results.length - 1];
+      audioUrl = latestResult?.audioUrl || null;
+    }
     
     const app = document.getElementById('app');
     app.innerHTML = `
