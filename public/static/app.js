@@ -603,6 +603,21 @@ class WorVox {
     if (coinsDisplay) {
       coinsDisplay.textContent = `💰 ${stats.coins}`;
     }
+    
+    // ✅ Update dashboard stats (Streak, XP, Words)
+    const dashboardStreak = document.querySelector('#dashboard-streak');
+    if (dashboardStreak) {
+      dashboardStreak.textContent = stats.streak || 0;
+      console.log('📊 Dashboard streak updated:', stats.streak);
+    }
+    
+    const dashboardXP = document.querySelector('#dashboard-xp');
+    if (dashboardXP) {
+      dashboardXP.textContent = stats.totalXp || 0;
+      console.log('📊 Dashboard XP updated:', stats.totalXp);
+    }
+    
+    // Words count requires separate API call - will be updated by showTopicSelection
   }
 
   initGoogleSignIn() {
@@ -7110,17 +7125,17 @@ Proceed to payment?
                   <h2 class="text-base md:text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                     🔥 Streak | XP | Words
                   </h2>
-                  <div class="grid grid-cols-3 gap-3">
+                  <div class="grid grid-cols-3 gap-3" id="dashboard-stats-container">
                     <div class="text-center">
-                      <div class="text-xl md:text-2xl font-bold text-orange-500">${gamificationStats.streak || 0}</div>
+                      <div class="text-xl md:text-2xl font-bold text-orange-500" id="dashboard-streak">${gamificationStats.streak || 0}</div>
                       <div class="text-xs text-gray-500">Streak</div>
                     </div>
                     <div class="text-center">
-                      <div class="text-xl md:text-2xl font-bold text-purple-500">${gamificationStats.totalXp || 0}</div>
+                      <div class="text-xl md:text-2xl font-bold text-purple-500" id="dashboard-xp">${gamificationStats.totalXp || 0}</div>
                       <div class="text-xs text-gray-500">XP</div>
                     </div>
                     <div class="text-center">
-                      <div class="text-xl md:text-2xl font-bold text-blue-500">${stats.wordsLearned || 0}</div>
+                      <div class="text-xl md:text-2xl font-bold text-blue-500" id="dashboard-words">${stats.wordsLearned || 0}</div>
                       <div class="text-xs text-gray-500">Words</div>
                     </div>
                   </div>
@@ -7427,6 +7442,14 @@ Proceed to payment?
       
       // Load gamification stats after rendering
       await this.loadGamificationStats();
+      
+      // ✅ Update dashboard words count
+      const dashboardWords = document.querySelector('#dashboard-words');
+      if (dashboardWords && stats) {
+        const wordsLearned = stats.wordsLearned || 0;
+        dashboardWords.textContent = wordsLearned;
+        console.log('📊 Dashboard words updated:', wordsLearned);
+      }
       
       // Load latest report
       await this.loadLatestReport();
