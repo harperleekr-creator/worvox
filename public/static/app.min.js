@@ -458,12 +458,46 @@ class WorVox {
       this.currentUser = JSON.parse(savedUser);
       // Set user plan from currentUser
       this.userPlan = this.currentUser.plan || 'free';
+      
+      // 🔄 Sync user to DB (especially premium users)
+      await this.syncUserToDB();
+      
       // Load usage data from server
       await this.loadUsageFromServer();
       await this.loadGamificationStats();
       this.showTopicSelection();
     } else {
       this.showLogin();
+    }
+  }
+
+  async syncUserToDB() {
+    if (!this.currentUser) return;
+    
+    try {
+      console.log('🔄 Syncing user to DB:', this.currentUser.email);
+      
+      const response = await axios.post('/api/users/sync', {
+        id: this.currentUser.id,
+        username: this.currentUser.username || this.currentUser.email?.split('@')[0] || 'user',
+        email: this.currentUser.email,
+        plan: this.currentUser.plan || 'free',
+        level: this.currentUser.level || 'beginner',
+        use_ai_prompts: this.currentUser.use_ai_prompts || false
+      });
+      
+      if (response.data.success) {
+        console.log('✅ User synced to DB:', response.data);
+        
+        // Update currentUser.id if newly created
+        if (response.data.created && response.data.userId) {
+          this.currentUser.id = response.data.userId;
+          localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
+        }
+      }
+    } catch (error) {
+      console.error('❌ User sync failed (non-critical):', error);
+      // Don't block app initialization if sync fails
     }
   }
 
@@ -2447,7 +2481,8 @@ class WorVox {
           level: this.currentUser.level || 'intermediate',
           userId: this.currentUser.id,
           topic: scenario.title,
-          description: scenario.description
+          description: scenario.description,
+          useCache: false  // Always generate fresh scenarios for premium users
         });
         
         console.log('🤖 AI Response:', response.data);
@@ -3831,7 +3866,8 @@ class WorVox {
         const response = await axios.post('/api/ai-prompts/generate', {
           mode: 'exam',
           level: this.currentUser.level || 'intermediate',
-          userId: this.currentUser.id
+          userId: this.currentUser.id,
+          useCache: false  // Always generate fresh exam questions for premium users
         });
         
         console.log('🤖 AI Response:', response.data);

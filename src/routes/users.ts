@@ -716,4 +716,75 @@ users.post('/:id/cancel-subscription', async (c) => {
   }
 });
 
+// 🔄 Sync user from localStorage to DB (for premium users)
+users.post('/sync', async (c) => {
+  try {
+    const { id, username, email, plan, level, use_ai_prompts } = await c.req.json();
+
+    console.log('🔄 User sync request:', { id, username, email, plan, level, use_ai_prompts });
+
+    // Validate required fields
+    if (!username || !email) {
+      return c.json({ 
+        success: false, 
+        error: 'Username and email are required' 
+      }, 400);
+    }
+
+    // Check if user already exists in DB
+    const existingUser = await c.env.DB.prepare(
+      'SELECT id, plan, use_ai_prompts FROM users WHERE email = ?'
+    ).bind(email).first();
+
+    if (existingUser) {
+      console.log('✅ User already exists in DB:', existingUser);
+      
+      // Update plan and AI prompts if changed
+      if (existingUser.plan !== plan || existingUser.use_ai_prompts !== use_ai_prompts) {
+        await c.env.DB.prepare(
+          'UPDATE users SET plan = ?, use_ai_prompts = ?, level = ? WHERE email = ?'
+        ).bind(plan || 'free', use_ai_prompts ? 1 : 0, level || 'beginner', email).run();
+        
+        console.log('✅ User plan/settings updated in DB');
+      }
+      
+      return c.json({ 
+        success: true, 
+        userId: existingUser.id,
+        message: 'User synced successfully',
+        updated: existingUser.plan !== plan || existingUser.use_ai_prompts !== use_ai_prompts
+      });
+    }
+
+    // Insert new user
+    const result = await c.env.DB.prepare(
+      `INSERT INTO users (username, email, plan, level, use_ai_prompts, auth_provider) 
+       VALUES (?, ?, ?, ?, ?, 'local')`
+    ).bind(
+      username,
+      email,
+      plan || 'free',
+      level || 'beginner',
+      use_ai_prompts ? 1 : 0
+    ).run();
+
+    console.log('✅ New user inserted into DB:', result.meta);
+
+    return c.json({ 
+      success: true, 
+      userId: result.meta.last_row_id,
+      message: 'User created and synced successfully',
+      created: true
+    });
+
+  } catch (error) {
+    console.error('❌ User sync error:', error);
+    return c.json({ 
+      success: false,
+      error: 'Failed to sync user',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
 export default users;

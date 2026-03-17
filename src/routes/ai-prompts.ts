@@ -39,12 +39,33 @@ const systemPrompts = {
 - Examples of variety: "I need to buy some groceries today.", "Can you help me find my keys?", "What time does the store close?", "She's cooking dinner in the kitchen.", "We usually go to the park on weekends."
 Return ONLY the English sentence (no translation, no explanation).`,
 
-    scenario: `Generate 5 simple conversation sentences (3-8 words, basic vocabulary, situations: greeting/ordering/directions). IMPORTANT: Return ONLY the dialogue text without role labels (NO "Customer:", "Waiter:", etc.). Format: numbered 1-5, one per line.`,
+    scenario: `Generate 5 unique, simple conversation sentences for realistic dialogue practice. Requirements:
+- Length: 3-8 words per sentence
+- Vocabulary: Basic, everyday words (A1-A2 level)
+- Situations: Rotate between - greeting/introducing, restaurant/ordering, asking directions, shopping, making appointments, phone calls, hotel check-in, public transport, emergency help, basic small talk
+- Style: Natural, practical, realistic conversational English
+- CRITICAL: Each sentence should be DIFFERENT and context-appropriate - avoid repetitive greetings like "Hello, how are you?"
+- Examples: "Table for two, please.", "Where's the nearest subway station?", "Can I try this on?", "I'd like to make a reservation.", "Is this seat taken?"
+IMPORTANT: Return ONLY the dialogue text without role labels (NO "Customer:", "Waiter:", etc.). Format: numbered 1-5, one per line.`,
 
-    exam: `Generate 5 OPIC test questions:
-Q1-2: Simple (4-10 words, basic vocab, 10-20s answer)
-Q3-4: Intermediate (8-15 words, explanation needed, 30-60s)
-Q5: Role-play (15-30 words, start "Imagine you are...", 60-90s)
+    exam: `Generate 5 unique OPIC-style test questions with clear difficulty progression. Requirements:
+Q1-2: SIMPLE QUESTIONS (warm-up, 4-10 words each)
+- Basic vocabulary, simple present/past tense
+- Topics: Rotate between - personal background, daily routine, hobbies, family, hometown, food preferences, weekend activities, favorite things
+- CRITICAL: Avoid generic questions like "What is your name?" - make each unique
+- Examples: "What do you enjoy doing on weekends?", "Tell me about your hometown.", "What's your favorite type of food?"
+
+Q3-4: INTERMEDIATE QUESTIONS (detailed explanation, 8-15 words each)
+- Requires opinion, description, or explanation
+- Topics: Rotate between - work/study experience, travel memories, problem-solving, lifestyle changes, future plans, technology use, cultural observations
+- Examples: "Describe a memorable trip you've taken.", "How has technology changed your daily life?", "What are your career goals for the next five years?"
+
+Q5: ROLE-PLAY SCENARIO (realistic situation, 15-30 words)
+- Must start with "Imagine you are..." or "You're in a situation where..."
+- Scenarios: Rotate between - customer service complaint, making arrangements, giving advice, business meeting, negotiation, explaining a problem, apologizing, persuading
+- Examples: "Imagine you are calling a restaurant to complain about a wrong order. What would you say?", "You're in a situation where you need to reschedule an important meeting. Call your colleague to explain."
+
+CRITICAL: Generate DIFFERENT questions each time - avoid repetitive patterns.
 Return numbered 1-5, one per line.`
   },
 
@@ -59,40 +80,43 @@ Return numbered 1-5, one per line.`
 - Examples: "If I had known about the meeting earlier, I would have prepared better.", "The new software update has significantly improved our team's productivity.", "Many experts believe that remote work will become more common in the future."
 Return ONLY the English sentence.`,
 
-    scenario: `Generate 5 intermediate conversation sentences (8-15 words, situations: workplace/interview/complaint). IMPORTANT: Return ONLY the dialogue text without role labels (NO "Manager:", "Employee:", etc.). Format: numbered 1-5, one per line.`,
+    scenario: `Generate 5 unique, intermediate-level conversation sentences for professional/social situations. Requirements:
+- Length: 8-15 words per sentence
+- Vocabulary: Everyday + some advanced words (B1-B2 level)
+- Situations: Rotate between - workplace discussions, job interviews, customer complaints, business meetings, networking events, presentations, negotiations, project updates, performance reviews, team collaboration
+- Style: Professional yet natural, appropriate for real workplace/social scenarios
+- CRITICAL: Generate DIVERSE dialogues - avoid repetitive openings like "I think..." or "Could you..."
+- Examples: "We need to discuss the quarterly budget before Friday.", "I'd like to address some concerns about the project timeline.", "Could you walk me through your problem-solving approach?", "The client expressed interest in extending the contract.", "I appreciate your feedback on the proposal."
+IMPORTANT: Return ONLY the dialogue text without role labels (NO "Manager:", "Employee:", etc.). Format: numbered 1-5, one per line.`,
 
-    exam: `You are an English learning assistant. Generate 5 OPIC-style speaking test questions with SPECIFIC difficulty distribution:
+    exam: `Generate 5 unique OPIC-style test questions with clear difficulty progression for intermediate level. Requirements:
 
-CRITICAL Requirements:
-- Question 1-2: SIMPLE QUESTIONS (easy difficulty)
-  * Use basic vocabulary
-  * 5-10 words each
-  * Simple present/past tense
-  * Topics: background, daily life, preferences
-  * Should require 15-25 second answers
+Q1-2: SIMPLE-INTERMEDIATE QUESTIONS (warm-up, 5-10 words each)
+- Vocabulary: Everyday with occasional advanced terms
+- Topics: Rotate between - current job/studies, daily routines, leisure activities, travel experiences, personal interests, lifestyle preferences, cultural habits, technology use
+- CRITICAL: Make each question unique and engaging - avoid generic "What do you do?" style questions
+- Examples: "How do you typically spend your weekday evenings?", "What attracted you to your current field of work?", "Describe your ideal weekend getaway."
 
-- Question 3-4: INTERMEDIATE QUESTIONS (medium difficulty)
-  * Use everyday vocabulary with some advanced words
-  * 10-18 words each
-  * Require explanation, opinion, or detailed description
-  * Topics: work experience, education, travel, problem-solving, cultural topics
-  * Should require 45-75 second detailed answers
+Q3-4: ANALYTICAL QUESTIONS (detailed explanation, 10-18 words each)
+- Requires critical thinking, comparison, or detailed analysis
+- Topics: Rotate between - work-life balance, career development, social trends, environmental issues, education systems, technological impact, cultural differences, personal growth challenges
+- Examples: "How has remote work changed professional relationships in your industry?", "Compare traditional and modern approaches to learning a new language.", "What challenges do young professionals face in today's job market?"
 
-- Question 5: ROLE-PLAYING SCENARIO (hard difficulty)
-  * 20-35 words complex situation
-  * Real-life professional or social scenario
-  * Must start with "Imagine you are..." or "You're in a situation where..." or "I'm calling because..."
-  * Examples: business negotiation, complaint handling, making arrangements, giving advice
-  * Should require 90-120 second response with natural conversation
+Q5: COMPLEX ROLE-PLAY SCENARIO (realistic professional/social situation, 20-35 words)
+- Must start with "Imagine you are..." or "You're in a situation where..."
+- Scenarios: Rotate between - business negotiation, conflict resolution, giving constructive feedback, client presentation, team leadership, strategic planning, crisis management, cross-cultural communication
+- CRITICAL: Each scenario should be unique and contextually rich
+- Examples: "Imagine you are leading a project that's behind schedule. Your team is stressed, and the client is demanding results. How would you address both parties?", "You're in a situation where a colleague consistently misses deadlines, affecting team performance. You need to discuss this with them diplomatically. What would you say?"
 
+CRITICAL: Generate DIFFERENT questions each time - vary topics, contexts, and question styles.
 Format: Return ONLY 5 questions, one per line, numbered 1-5
 
 Example format:
-1. What is your current job or field of study?
-2. What do you usually do on weekends?
-3. Can you describe a challenging project you worked on and how you handled it?
-4. What are your thoughts on the importance of work-life balance in modern society?
-5. Imagine you are meeting with a potential business partner who is 30 minutes late to an important presentation. You have another meeting scheduled right after. Call them to politely express your concern and discuss how to proceed with the shortened time. What would you say?`
+1. What aspects of your job do you find most rewarding?
+2. How do you usually unwind after a stressful day?
+3. What role does technology play in maintaining your work-life balance?
+4. How do you think education systems can better prepare students for the modern workforce?
+5. Imagine you are meeting with a client who is unhappy with your team's recent deliverables. They're threatening to cancel the contract. You need to acknowledge their concerns, explain what went wrong, and propose a solution. What would you say?`
   },
 
   advanced: {
@@ -106,13 +130,44 @@ Example format:
 - Examples: "The integration of artificial intelligence into various sectors raises profound questions about the future of human employment and societal structures.", "Sustainable business practices require a fundamental shift in corporate mindset from short-term profit maximization to long-term stakeholder value creation."
 Return ONLY the English sentence.`,
 
-    scenario: `Generate 5 advanced conversation sentences (12-25 words, professional/academic tone, situations: negotiation/presentation). IMPORTANT: Return ONLY the dialogue text without role labels (NO "Speaker:", "Presenter:", etc.). Format: numbered 1-5, one per line.`,
+    scenario: `Generate 5 unique, advanced-level conversation sentences for high-level professional/academic contexts. Requirements:
+- Length: 12-25 words per sentence
+- Vocabulary: Academic, professional, sophisticated terminology (C1-C2 level)
+- Situations: Rotate between - executive negotiations, academic conferences, strategic presentations, policy debates, board meetings, research discussions, international diplomacy, crisis leadership, thought leadership talks, high-stakes consultations
+- Style: Formal, articulate, intellectually sophisticated yet natural
+- CRITICAL: Each sentence should demonstrate nuanced communication - avoid simple declarative statements
+- Examples: "We need to reassess our strategic positioning in light of the recent market disruptions.", "I'd like to propose a framework for evaluating the long-term sustainability of this initiative.", "The data suggests a paradigm shift in consumer behavior that we must address proactively.", "Could you elaborate on the methodological approach you employed in this research?", "Our stakeholders are seeking greater transparency regarding the decision-making process."
+IMPORTANT: Return ONLY the dialogue text without role labels (NO "Speaker:", "Presenter:", etc.). Format: numbered 1-5, one per line.`,
 
-    exam: `Generate 5 OPIC advanced questions:
-Q1-2: Moderate (6-12 words, 20-30s answer)
-Q3-4: Analytical (12-20 words, critical thinking, 60-90s)
-Q5: Complex role-play (25-40 words, start "Imagine you are...", 2-3min response)
-Return numbered 1-5, one per line.`
+    exam: `Generate 5 unique OPIC-style test questions for advanced level with sophisticated complexity. Requirements:
+
+Q1-2: MODERATE-ADVANCED QUESTIONS (contextual, 6-12 words each)
+- Vocabulary: Professional, nuanced terminology
+- Topics: Rotate between - career philosophy, professional achievements, industry trends, leadership experiences, innovation in your field, global perspectives, cultural adaptation, specialized expertise areas
+- CRITICAL: Questions should invite thoughtful, detailed responses - avoid surface-level topics
+- Examples: "What defines effective leadership in your professional context?", "How has globalization influenced your industry or field?", "Describe a pivotal decision that shaped your career path."
+
+Q3-4: ANALYTICAL-CRITICAL QUESTIONS (deep analysis, 12-20 words each)
+- Requires critical thinking, synthesis, evaluation, or comparative analysis
+- Topics: Rotate between - societal transformations, technological disruption, ethical frameworks, organizational change, sustainable development, cultural evolution, educational reform, economic paradigms, scientific advancement, policy implications
+- CRITICAL: Each question should invite nuanced, multi-dimensional analysis
+- Examples: "How do you evaluate the balance between technological innovation and privacy concerns in modern society?", "What are the most significant challenges facing organizations attempting to implement sustainable practices?", "Analyze the relationship between educational systems and workforce preparedness in the 21st century.", "How should industries navigate the tension between profitability and social responsibility?"
+
+Q5: COMPLEX MULTI-LAYERED ROLE-PLAY (sophisticated scenario, 25-40 words)
+- Must start with "Imagine you are..." or "You're in a situation where..."
+- Scenarios: Rotate between - executive crisis management, international negotiations, organizational transformation, ethical dilemma resolution, strategic pivot, stakeholder conflict, policy advocacy, cultural mediation, innovation championship, reputation management
+- CRITICAL: Scenarios must involve multiple competing interests and require diplomatic, strategic thinking
+- Examples: "Imagine you are a CEO announcing a major organizational restructuring that will result in layoffs. You must address employees, investors, and the media while maintaining morale and company reputation. How would you communicate this?", "You're in a situation where your company's product has caused unintended harm to a community. Environmental groups, shareholders, and regulators all have different demands. How would you navigate this complex situation?", "Imagine you are leading negotiations between two conflicting departments over resource allocation. Both have valid needs, but the budget can only support one priority. How would you facilitate a resolution?"
+
+CRITICAL: Generate intellectually diverse questions each time - vary complexity, perspectives, and contexts.
+Format: Return ONLY 5 questions, one per line, numbered 1-5
+
+Example format:
+1. How do you define success in your professional journey?
+2. What role does continuous learning play in your career?
+3. How do cultural differences impact international business negotiations in your experience?
+4. Evaluate the effectiveness of traditional hierarchical structures versus flat organizations in today's business environment.
+5. Imagine you are presenting a controversial strategic initiative to the board. Several directors have expressed skepticism, citing past failures. You must address their concerns, present evidence, and convince them to approve funding. How would you structure your argument?`
   }
 };
 
@@ -127,7 +182,7 @@ aiPrompts.post('/generate', async (c) => {
       baseUrl: c.env.OPENAI_API_BASE
     });
 
-    const { mode, level, userId, topic, description, useCache = true } = await c.req.json();
+    const { mode, level, userId, topic, description, useCache = false } = await c.req.json();
 
     // Validate input
     if (!mode || !level) {
