@@ -1546,7 +1546,8 @@ class WorVox {
     let accuracyScore = completeness; // Default based on word count
     let pronunciationScore = audioAnalysis?.pronunciationScore || 75; // From STT analysis
     let fluencyScore = audioAnalysis?.fluencyScore || 70; // From STT analysis
-    let feedback = ''
+    let feedback = '';
+    let pronunciationIssues = [];
     let isPremiumAnalysis = false;
     
     // Calculate initial average score for rating
@@ -1589,6 +1590,7 @@ class WorVox {
       ratingColor,
       ratingIcon,
       feedback: '', // No feedback yet
+      pronunciationIssues: [], // Empty initially
       isPremiumAnalysis: false,
       originalWords,
       spokenWords,
@@ -1659,7 +1661,7 @@ class WorVox {
                 pronunciationScore = scores.pronunciation;
                 fluencyScore = scores.fluency;
                 feedback = scores.pronunciationFeedback || '';
-                const pronunciationIssues = scores.pronunciationIssues || [];
+                pronunciationIssues = scores.pronunciationIssues || [];
             
                 isPremiumAnalysis = true;
                 
@@ -1751,7 +1753,7 @@ class WorVox {
                 pronunciationScore = data.pronunciation;
                 fluencyScore = data.fluency;
                 feedback = data.pronunciationFeedback || '';
-                const pronunciationIssues = data.pronunciationIssues || [];
+                pronunciationIssues = data.pronunciationIssues || [];
                 isPremiumAnalysis = true;
                 
                 const finalAverageScore = Math.round((accuracyScore + pronunciationScore + fluencyScore) / 3);
