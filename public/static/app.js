@@ -6981,6 +6981,8 @@ Proceed to payment?
 
   async showTopicSelection() {
     try {
+      console.log('🏠 showTopicSelection called');
+      
       // Ensure user is logged in (load from localStorage if needed)
       if (!this.currentUser) {
         const storedUser = localStorage.getItem('worvox_user');
@@ -6988,6 +6990,7 @@ Proceed to payment?
           try {
             this.currentUser = JSON.parse(storedUser);
             this.userPlan = this.currentUser.plan || 'free';
+            console.log('👤 Loaded user from localStorage:', this.currentUser.id);
           } catch (e) {
             console.error('Failed to parse stored user:', e);
             this.showLogin();
@@ -7000,6 +7003,8 @@ Proceed to payment?
         }
       }
       
+      console.log('📊 Starting to fetch dashboard data for user:', this.currentUser.id);
+      
       // Fetch topics
       const topicsResponse = await axios.get('/api/topics');
       this.topics = topicsResponse.data.topics; // Store for later use
@@ -7007,10 +7012,13 @@ Proceed to payment?
       // ✅ CRITICAL: Fetch latest gamification stats FIRST for real-time updates
       let gamificationStats = { streak: 0, xp: 0, totalXp: 0, level: 1, coins: 0 };
       try {
+        console.log('🔄 Fetching fresh gamification stats...');
         const gamifResponse = await axios.get(`/api/gamification/stats/${this.currentUser.id}`);
         if (gamifResponse.data.success) {
           gamificationStats = gamifResponse.data.stats;
           console.log('🔄 Fresh gamification stats loaded for dashboard:', gamificationStats);
+        } else {
+          console.warn('⚠️ Gamification API returned success=false');
         }
       } catch (error) {
         console.warn('⚠️ Failed to load gamification stats, using defaults:', error.message);
@@ -7019,9 +7027,16 @@ Proceed to payment?
       // Fetch user statistics
       const statsResponse = await axios.get(`/api/users/${this.currentUser.id}/stats`);
       const stats = statsResponse.data.stats;
+      console.log('📈 User stats loaded:', stats);
 
       // Calculate total words spoken (approximate)
       const totalWords = Math.floor(stats.totalMessages / 2) * 10;
+      
+      console.log('🎨 Rendering dashboard with data:', {
+        streak: gamificationStats.streak,
+        totalXp: gamificationStats.totalXp,
+        wordsLearned: stats.wordsLearned
+      });
 
       const app = document.getElementById('app');
       app.innerHTML = `
