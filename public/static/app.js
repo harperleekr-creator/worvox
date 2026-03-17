@@ -3127,6 +3127,9 @@ class WorVox {
       };
       
       // Try streaming AI analysis (GPT-4o + faster) - Always run for all users
+      console.log('🔍 Transcription:', transcription);
+      console.log('🔍 Original sentence:', originalSentence);
+      
       if (transcription && transcription !== '(인식되지 않음)') {
         try {
           console.log('⚡ Starting scenario AI analysis...');
@@ -3165,6 +3168,8 @@ class WorVox {
                 pronunciationIssues: result.pronunciationIssues || []
               };
               console.log('✅ Scenario streaming analysis:', scores);
+              console.log('📝 Pronunciation feedback:', scores.pronunciationFeedback);
+              console.log('📝 Pronunciation issues:', scores.pronunciationIssues);
             }
           } else {
             // Regular JSON response
@@ -3178,10 +3183,14 @@ class WorVox {
                 pronunciationIssues: data.pronunciationIssues || []
               };
               console.log('✅ Scenario analysis:', scores);
+              console.log('📝 Pronunciation feedback:', scores.pronunciationFeedback);
+              console.log('📝 Pronunciation issues:', scores.pronunciationIssues);
             }
           }
         } catch (error) {
-          console.warn('⚠️ Failed to get AI analysis, using basic scores:', error);
+          console.error('⚠️ Failed to get AI analysis, using basic scores:', error);
+          console.error('⚠️ Error details:', error.message);
+          console.error('⚠️ Error response:', error.response?.data);
         }
       }
       
@@ -3221,6 +3230,16 @@ class WorVox {
             
             // Refresh gamification stats to update UI
             await this.loadGamificationStats();
+            
+            // Update currentUser with latest data
+            if (xpResponse.data.user) {
+              this.currentUser.level = xpResponse.data.user.level;
+              this.currentUser.xp = xpResponse.data.user.xp;
+              this.currentUser.totalXp = xpResponse.data.user.totalXp;
+              this.currentUser.coins = xpResponse.data.user.coins;
+              localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
+              console.log('✅ User data updated:', this.currentUser);
+            }
             
             // Show XP notification
             this.showXPNotification(10, `시나리오 문장 완료!`);
@@ -3344,6 +3363,11 @@ class WorVox {
   
   // Show instant result after each sentence
   showInstantSentenceResult(scores, originalSentence, transcription, audioUrl = null) {
+    console.log('🎬 showInstantSentenceResult called');
+    console.log('📊 Scores received:', scores);
+    console.log('💬 Pronunciation feedback:', scores.pronunciationFeedback);
+    console.log('⚠️ Pronunciation issues:', scores.pronunciationIssues);
+    
     const { accuracy, pronunciation, fluency, pronunciationFeedback = '', pronunciationIssues = [] } = scores;
     const averageScore = Math.round((accuracy + pronunciation + fluency) / 3);
     
