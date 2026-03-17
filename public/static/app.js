@@ -1031,39 +1031,26 @@ class WorVox {
       try {
         console.log('🤖 Generating AI prompt for level:', this.currentUser.level);
         
-        // Check preloaded cache first
-        const cacheKey = `ai_prompt_${this.currentUser.level}_timer`;
-        if (this.preloadedPrompts && this.preloadedPrompts[cacheKey]) {
-          console.log('⚡ Using preloaded prompt!');
-          const cached = this.preloadedPrompts[cacheKey];
-          randomSentence = cached.sentence;
-          translation = cached.translation;
-          delete this.preloadedPrompts[cacheKey];
-          await new Promise(resolve => setTimeout(resolve, 500));
+        // Always generate fresh prompts for premium users (no preload cache)
+        const response = await axios.post('/api/ai-prompts/generate', {
+          mode: 'timer',
+          level: this.currentUser.level,
+          userId: this.currentUser.id,
+          useCache: false  // Always generate new sentences for premium users
+        });
+
+        console.log('🤖 AI Response:', response.data);
+
+        if (response.data.success && response.data.data.sentence) {
+          randomSentence = response.data.data.sentence;
+          translation = response.data.data.translation || '✨ AI가 생성한 맞춤형 문장';
+          console.log('✅ Using AI-generated prompt:', randomSentence);
+          console.log('✅ Korean translation:', translation);
         } else {
-          const response = await axios.post('/api/ai-prompts/generate', {
-            mode: 'timer',
-            level: this.currentUser.level,
-            userId: this.currentUser.id,
-            useCache: false  // Always generate new sentences for premium users
-          });
-
-          console.log('🤖 AI Response:', response.data);
-
-          if (response.data.success && response.data.data.sentence) {
-            randomSentence = response.data.data.sentence;
-            translation = response.data.data.translation || '✨ AI가 생성한 맞춤형 문장';
-            console.log('✅ Using AI-generated prompt:', randomSentence);
-            console.log('✅ Korean translation:', translation);
-          } else {
-            throw new Error('AI generation failed: ' + JSON.stringify(response.data));
-          }
-          
-          await new Promise(resolve => setTimeout(resolve, 500));
+          throw new Error('AI generation failed: ' + JSON.stringify(response.data));
         }
         
-        // Preload next prompt in background
-        this.preloadNextPrompt();
+        await new Promise(resolve => setTimeout(resolve, 500));
       } catch (error) {
         console.error('❌ AI prompt generation failed:', error);
         console.error('Error details:', error.response?.data);
