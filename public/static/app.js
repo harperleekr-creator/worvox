@@ -509,9 +509,14 @@ class WorVox {
     if (!this.currentUser || typeof gamificationManager === 'undefined') return;
     
     try {
+      console.log('📊 Loading gamification stats for user:', this.currentUser.id);
       const stats = await gamificationManager.getStats(this.currentUser.id);
       if (stats) {
+        console.log('✅ Stats loaded:', stats.stats);
         this.updateGamificationUI(stats.stats);
+        console.log('✅ UI updated with level:', stats.stats.level);
+      } else {
+        console.warn('⚠️ No stats returned');
       }
     } catch (error) {
       console.error('Error loading gamification stats:', error);
@@ -3132,8 +3137,10 @@ class WorVox {
       
       if (transcription && transcription !== '(인식되지 않음)') {
         try {
-          console.log('⚡ Starting scenario AI analysis...');
-          const response = await fetch('/api/pronunciation/analyze-stream', {
+          console.log('⚡ Starting scenario AI analysis (non-streaming)...');
+          
+          // Use non-streaming endpoint first for reliability
+          const response = await fetch('/api/pronunciation/analyze', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -3143,49 +3150,28 @@ class WorVox {
             })
           });
           
-          const contentType = response.headers.get('content-type');
-          
-          if (contentType?.includes('text/event-stream')) {
-            // Streaming response
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let streamBuffer = '';
-            
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              streamBuffer += decoder.decode(value);
-            }
-            
-            const jsonMatch = streamBuffer.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
-              const result = JSON.parse(jsonMatch[0]);
-              scores = {
-                accuracy: result.accuracy,
-                pronunciation: result.pronunciation,
-                fluency: result.fluency,
-                pronunciationFeedback: result.pronunciationFeedback || '',
-                pronunciationIssues: result.pronunciationIssues || []
-              };
-              console.log('✅ Scenario streaming analysis:', scores);
-              console.log('📝 Pronunciation feedback:', scores.pronunciationFeedback);
-              console.log('📝 Pronunciation issues:', scores.pronunciationIssues);
+          if (response.ok) {
+            try {
+              const data = await response.json();
+              if (data.success) {
+                scores = {
+                  accuracy: data.accuracy,
+                  pronunciation: data.pronunciation,
+                  fluency: data.fluency,
+                  pronunciationFeedback: data.pronunciationFeedback || '',
+                  pronunciationIssues: data.pronunciationIssues || []
+                };
+                console.log('✅ Scenario analysis:', scores);
+                console.log('📝 Pronunciation feedback:', scores.pronunciationFeedback);
+                console.log('📝 Pronunciation issues:', scores.pronunciationIssues);
+              } else {
+                console.warn('⚠️ AI analysis returned success: false, using basic scores');
+              }
+            } catch (jsonError) {
+              console.error('⚠️ Failed to parse JSON response:', jsonError);
             }
           } else {
-            // Regular JSON response
-            const data = await response.json();
-            if (data.success) {
-              scores = {
-                accuracy: data.accuracy,
-                pronunciation: data.pronunciation,
-                fluency: data.fluency,
-                pronunciationFeedback: data.pronunciationFeedback || '',
-                pronunciationIssues: data.pronunciationIssues || []
-              };
-              console.log('✅ Scenario analysis:', scores);
-              console.log('📝 Pronunciation feedback:', scores.pronunciationFeedback);
-              console.log('📝 Pronunciation issues:', scores.pronunciationIssues);
-            }
+            console.warn('⚠️ AI analysis request failed with status:', response.status);
           }
         } catch (error) {
           console.error('⚠️ Failed to get AI analysis, using basic scores:', error);
