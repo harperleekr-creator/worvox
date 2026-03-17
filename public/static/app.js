@@ -2355,7 +2355,7 @@ class WorVox {
                     class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl p-4 font-bold transition-all">
                     <i class="fas fa-redo mr-2"></i>다시 도전
                   </button>
-                  <button onclick="worvox.showTimerMode()" 
+                  <button onclick="worvox.showTopicSelection()" 
                     class="bg-white hover:bg-gray-50 border-2 border-purple-200 text-purple-600 rounded-xl p-4 font-bold transition-all">
                     <i class="fas fa-home mr-2"></i>돌아가기
                   </button>
@@ -3590,13 +3590,13 @@ class WorVox {
                     <i class="fas fa-arrow-right mr-2"></i>다음 문장
                   </button>
                 ` : `
-                  <button onclick="worvox.showScenarioMode()" 
+                  <button onclick="worvox.showTopicSelection()" 
                     class="flex-1 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-bold text-lg hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg">
                     <i class="fas fa-check-circle mr-2"></i>완료
                   </button>
                 `}
                 
-                <button onclick="worvox.showScenarioMode()" 
+                <button onclick="worvox.showTopicSelection()" 
                   class="px-6 py-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all">
                   <i class="fas fa-times mr-2"></i>종료
                 </button>
@@ -3869,9 +3869,9 @@ class WorVox {
                     class="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-xl p-4 font-bold transition-all">
                     <i class="fas fa-redo mr-2"></i>다시 연습하기
                   </button>
-                  <button onclick="worvox.showScenarioMode()" 
+                  <button onclick="worvox.showTopicSelection()" 
                     class="bg-white hover:bg-gray-50 border-2 border-blue-200 text-blue-600 rounded-xl p-4 font-bold transition-all">
-                    <i class="fas fa-home mr-2"></i>시나리오 선택
+                    <i class="fas fa-home mr-2"></i>홈으로
                   </button>
                 </div>
               </div>
