@@ -1599,6 +1599,7 @@ class WorVox {
     
     // 🚀 STEP 2: Streaming AI analysis - GPT-4o + Real-time (All users, same as scenario mode)
     if (transcription && transcription !== '(인식되지 않음)') {
+      // Fire async analysis (don't await to keep UI responsive)
       (async () => {
         try {
           console.log('⚡ Starting streaming AI analysis (GPT-4o)...');
@@ -1927,10 +1928,13 @@ class WorVox {
             }
           }
         } catch (error) {
-          console.warn('⚠️ All analysis attempts failed:', error);
+          console.error('❌ Timer AI analysis failed:', error);
+          console.error('❌ Error details:', error.message, error.stack);
           // Keep showing STT-based results
         }
-      })();
+      })().catch(err => {
+        console.error('❌ Unhandled async error in timer analysis:', err);
+      });
     }
   }
   
