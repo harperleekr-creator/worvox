@@ -7004,20 +7004,21 @@ Proceed to payment?
       const topicsResponse = await axios.get('/api/topics');
       this.topics = topicsResponse.data.topics; // Store for later use
 
-      // Fetch user statistics
-      const statsResponse = await axios.get(`/api/users/${this.currentUser.id}/stats`);
-      const stats = statsResponse.data.stats;
-
-      // Fetch gamification stats for streak, XP, and level
+      // ✅ CRITICAL: Fetch latest gamification stats FIRST for real-time updates
       let gamificationStats = { streak: 0, xp: 0, totalXp: 0, level: 1, coins: 0 };
       try {
         const gamifResponse = await axios.get(`/api/gamification/stats/${this.currentUser.id}`);
         if (gamifResponse.data.success) {
           gamificationStats = gamifResponse.data.stats;
+          console.log('🔄 Fresh gamification stats loaded for dashboard:', gamificationStats);
         }
       } catch (error) {
-        console.warn('Failed to load gamification stats:', error);
+        console.warn('⚠️ Failed to load gamification stats, using defaults:', error.message);
       }
+      
+      // Fetch user statistics
+      const statsResponse = await axios.get(`/api/users/${this.currentUser.id}/stats`);
+      const stats = statsResponse.data.stats;
 
       // Calculate total words spoken (approximate)
       const totalWords = Math.floor(stats.totalMessages / 2) * 10;
