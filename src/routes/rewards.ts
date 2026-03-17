@@ -106,12 +106,6 @@ rewards.post('/spin', async (c) => {
           'UPDATE users SET xp = xp + ?, total_xp = total_xp + ? WHERE id = ?'
         ).bind(xpAmount, xpAmount, userId).run();
 
-        // Record transaction
-        await c.env.DB.prepare(`
-          INSERT INTO xp_transactions (user_id, xp_amount, transaction_type, description)
-          VALUES (?, ?, 'random_box', ?)
-        `).bind(userId, xpAmount, `Random Box - ${selectedPrize.name_ko}`).run();
-
         console.log(`✅ User ${userId} won XP: ${xpAmount}`);
       }
     } else {
