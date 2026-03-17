@@ -7840,17 +7840,31 @@ Proceed to payment?
 
     // Auto-play AI greeting
     try {
+      console.log('🎙️ Requesting TTS for AI greeting...');
       const response = await axios.post('/api/tts/synthesize', {
         text: scenario.prompt,
-        userId: this.currentUser.id
+        isPremium: this.currentUser?.plan === 'premium',
+        scenario: scenario.title
+      }, {
+        responseType: 'arraybuffer'  // ✅ Receive binary audio data
       });
 
-      if (response.data.audioUrl) {
-        const audio = new Audio(response.data.audioUrl);
-        audio.play();
-      }
+      console.log('✅ TTS response received:', response.data.byteLength, 'bytes');
+
+      // Convert binary to Blob and create object URL
+      const audioBlob = new Blob([response.data], { type: 'audio/mpeg' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      const audio = new Audio(audioUrl);
+      audio.play();
+      console.log('🔊 Playing AI greeting audio');
+      
+      // Clean up object URL after playing
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+      };
     } catch (error) {
-      console.error('TTS error:', error);
+      console.error('❌ TTS error:', error);
     }
   }
 
