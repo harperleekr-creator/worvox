@@ -35,13 +35,14 @@ modeReports.post('/save', async (c) => {
     
     if (modeType === 'timer') {
       // Timer: 10 XP per sentence if accuracy >= 80%
-      const accuracy = reportData.accuracy || 0;
-      const sentenceCount = reportData.totalSentences || 0;
+      // Timer mode saves individual sentences, so totalSentences defaults to 1
+      const accuracy = reportData.accuracyScore || reportData.accuracy || 0;
+      const sentenceCount = reportData.totalSentences || 1; // Default to 1 for individual sentences
       
       if (accuracy >= 80) {
         xpToAward = sentenceCount * 10;
         activityType = 'timer';
-        details = `Timer mode: ${sentenceCount} sentences, ${accuracy}% accuracy`;
+        details = `Timer mode: ${sentenceCount} sentence(s), ${accuracy}% accuracy`;
       }
     } else if (modeType === 'scenario') {
       // Scenario: 10 XP per sentence
