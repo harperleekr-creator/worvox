@@ -1045,7 +1045,7 @@ class WorVox {
             mode: 'timer',
             level: this.currentUser.level,
             userId: this.currentUser.id,
-            useCache: true
+            useCache: false  // Always generate new sentences for premium users
           });
 
           console.log('🤖 AI Response:', response.data);
@@ -1101,7 +1101,7 @@ class WorVox {
         mode: 'timer',
         level: this.currentUser.level,
         userId: this.currentUser.id,
-        useCache: true
+        useCache: false  // Always generate new sentences for premium users
       });
       
       if (response.data.success && response.data.data.sentence) {
