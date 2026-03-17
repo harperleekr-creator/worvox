@@ -465,6 +465,10 @@ class WorVox {
       // Load usage data from server
       await this.loadUsageFromServer();
       await this.loadGamificationStats();
+      
+      // ⭐ Check daily attendance and award XP
+      await this.checkDailyAttendance();
+      
       this.showTopicSelection();
     } else {
       this.showLogin();
@@ -512,6 +516,62 @@ class WorVox {
     } catch (error) {
       console.error('Error loading gamification stats:', error);
     }
+  }
+
+  async checkDailyAttendance() {
+    if (!this.currentUser) return;
+    
+    try {
+      console.log('⭐ Checking daily attendance...');
+      const response = await axios.post('/api/gamification/attendance/check', {
+        userId: this.currentUser.id
+      });
+      
+      if (response.data.success && !response.data.alreadyChecked) {
+        console.log('✅ Daily attendance awarded:', response.data);
+        
+        // Show XP notification
+        const xpAwarded = response.data.xpAwarded || 0;
+        const streakDays = response.data.streakDays || 1;
+        const bonusMessage = response.data.bonusMessage || '';
+        
+        this.showXPNotification(
+          xpAwarded, 
+          `출석 체크 완료! ${streakDays}일 연속 출석 ${bonusMessage ? '\\n' + bonusMessage : ''}`
+        );
+        
+        // Refresh gamification stats to show updated XP
+        await this.loadGamificationStats();
+      }
+    } catch (error) {
+      console.error('Failed to check attendance:', error);
+      // Non-critical error, don't block app
+    }
+  }
+
+  showXPNotification(xp, message) {
+    // Create a floating XP notification
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-20 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-4 rounded-lg shadow-2xl z-50 animate-bounce';
+    notification.innerHTML = `
+      <div class="flex items-center gap-3">
+        <div class="text-3xl">🎉</div>
+        <div>
+          <div class="font-bold text-lg">+${xp} XP</div>
+          <div class="text-sm opacity-90">${message}</div>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 5 seconds
+    setTimeout(() => {
+      notification.style.transition = 'opacity 0.5s, transform 0.5s';
+      notification.style.opacity = '0';
+      notification.style.transform = 'translateY(-20px)';
+      setTimeout(() => notification.remove(), 500);
+    }, 5000);
   }
 
   updateGamificationUI(stats) {

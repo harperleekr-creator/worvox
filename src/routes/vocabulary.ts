@@ -368,9 +368,33 @@ vocabulary.post('/progress', async (c: Context<{ Bindings: Bindings }>) => {
         last_reviewed_at = datetime('now')
     `).bind(userId, wordId, isLearned ? 1 : 0, isLearned ? 1 : 0).run()
 
+    // Award XP for correct answer (5 XP, daily limit 100 XP)
+    let xpResult = null
+    if (isLearned) {
+      try {
+        const baseUrl = new URL(c.req.url).origin
+        const xpResponse = await fetch(`${baseUrl}/api/gamification/xp/add`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId,
+            xp: 5,
+            activityType: 'vocabulary',
+            details: 'Vocabulary quiz correct answer'
+          })
+        })
+        xpResult = await xpResponse.json()
+      } catch (xpError) {
+        console.error('Failed to award vocabulary XP:', xpError)
+        // Don't fail the whole request
+      }
+    }
+
     return c.json({
       success: true,
-      message: 'Progress updated'
+      message: 'Progress updated',
+      xpAwarded: isLearned ? 5 : 0,
+      xpResult
     })
   } catch (error: any) {
     console.error('Error updating progress:', error)

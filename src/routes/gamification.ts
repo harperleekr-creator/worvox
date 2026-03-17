@@ -25,6 +25,35 @@ const calculateLevel = (totalXP: number): number => {
   return level
 }
 
+// Check daily XP limit for activity type
+const checkDailyXPLimit = async (db: D1Database, userId: number, activityType: string, xpToAdd: number): Promise<{ allowed: boolean, currentXP: number, limit: number }> => {
+  const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD format
+  const dailyLimit = 100 // Daily XP limit per activity type
+  
+  // Get today's XP for this activity
+  const tracking = await db.prepare(`
+    SELECT xp_earned FROM daily_xp_tracking 
+    WHERE user_id = ? AND activity_type = ? AND date = ?
+  `).bind(userId, activityType, today).first() as any
+  
+  const currentXP = tracking?.xp_earned || 0
+  const newTotal = currentXP + xpToAdd
+  
+  if (newTotal > dailyLimit) {
+    return { allowed: false, currentXP, limit: dailyLimit }
+  }
+  
+  // Update or insert tracking record
+  await db.prepare(`
+    INSERT INTO daily_xp_tracking (user_id, activity_type, xp_earned, date)
+    VALUES (?, ?, ?, ?)
+    ON CONFLICT(user_id, activity_type, date) 
+    DO UPDATE SET xp_earned = xp_earned + ?
+  `).bind(userId, activityType, newTotal, today, xpToAdd).run()
+  
+  return { allowed: true, currentXP: newTotal, limit: dailyLimit }
+}
+
 // Add XP to user and update level
 gamification.post('/xp/add', async (c: Context<{ Bindings: Bindings }>) => {
   try {
@@ -34,6 +63,21 @@ gamification.post('/xp/add', async (c: Context<{ Bindings: Bindings }>) => {
     
     if (!userId || !xp) {
       return c.json({ success: false, error: 'Missing userId or xp' }, 400)
+    }
+    
+    // Check daily limit for specific activity types (not for random_box)
+    if (activityType && activityType !== 'random_box' && activityType !== 'attendance') {
+      const limitCheck = await checkDailyXPLimit(c.env.DB, userId, activityType, xp)
+      
+      if (!limitCheck.allowed) {
+        return c.json({ 
+          success: false, 
+          error: 'Daily XP limit reached',
+          currentXP: limitCheck.currentXP,
+          limit: limitCheck.limit,
+          message: `오늘 ${activityType} 활동으로 이미 ${limitCheck.limit} XP를 획득했습니다. 내일 다시 시도해주세요!`
+        }, 429)
+      }
     }
 
     // Get current user stats
@@ -282,6 +326,137 @@ gamification.post('/spin/use', async (c: Context<{ Bindings: Bindings }>) => {
   } catch (error) {
     console.error('Error using spin:', error)
     return c.json({ success: false, error: 'Failed to use spin' }, 500)
+  }
+})
+
+// Check daily attendance and award XP + streak bonus
+gamification.post('/attendance/check', async (c: Context<{ Bindings: Bindings }>) => {
+  try {
+    const { userId } = await c.req.json()
+    
+    if (!userId) {
+      return c.json({ success: false, error: 'Missing userId' }, 400)
+    }
+
+    const today = new Date().toISOString().split('T')[0]
+    
+    // Check if already logged in today
+    const todayAttendance = await c.env.DB.prepare(`
+      SELECT id FROM user_attendance 
+      WHERE user_id = ? AND login_date = ?
+    `).bind(userId, today).first()
+    
+    if (todayAttendance) {
+      return c.json({ 
+        success: true, 
+        alreadyChecked: true,
+        message: '오늘은 이미 출석 체크를 완료했습니다!'
+      })
+    }
+    
+    // Get yesterday's attendance to calculate streak
+    const yesterday = new Date()
+    yesterday.setDate(yesterday.getDate() - 1)
+    const yesterdayStr = yesterday.toISOString().split('T')[0]
+    
+    const yesterdayAttendance = await c.env.DB.prepare(`
+      SELECT streak_days FROM user_attendance 
+      WHERE user_id = ? AND login_date = ?
+    `).bind(userId, yesterdayStr).first() as any
+    
+    let streakDays = 1
+    let bonusXP = 0
+    let bonusMessage = ''
+    
+    if (yesterdayAttendance) {
+      streakDays = (yesterdayAttendance.streak_days || 0) + 1
+      
+      // Calculate streak bonus
+      if (streakDays === 3) {
+        bonusXP = 10
+        bonusMessage = '🎉 3일 연속 출석 보너스!'
+      } else if (streakDays === 7) {
+        bonusXP = 30
+        bonusMessage = '🔥 7일 연속 출석 보너스!'
+      } else if (streakDays === 30) {
+        bonusXP = 100
+        bonusMessage = '💎 30일 연속 출석 보너스!'
+      } else if (streakDays % 7 === 0) {
+        bonusXP = 30
+        bonusMessage = `🌟 ${streakDays}일 연속 출석 보너스!`
+      }
+    }
+    
+    const baseXP = 20 // Base daily login XP
+    const totalXP = baseXP + bonusXP
+    
+    // Record attendance
+    await c.env.DB.prepare(`
+      INSERT INTO user_attendance (user_id, login_date, xp_awarded, streak_days)
+      VALUES (?, ?, ?, ?)
+    `).bind(userId, today, totalXP, streakDays).run()
+    
+    // Award XP through gamification API
+    const xpResult = await fetch(c.req.url.replace('/attendance/check', '/xp/add'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId,
+        xp: totalXP,
+        activityType: 'attendance',
+        details: `Daily login (${streakDays} day streak)`
+      })
+    }).then(r => r.json())
+    
+    return c.json({
+      success: true,
+      alreadyChecked: false,
+      xpAwarded: totalXP,
+      baseXP,
+      bonusXP,
+      streakDays,
+      bonusMessage,
+      xpResult
+    })
+  } catch (error) {
+    console.error('Error checking attendance:', error)
+    return c.json({ success: false, error: 'Failed to check attendance' }, 500)
+  }
+})
+
+// Get user's current streak
+gamification.get('/attendance/streak/:userId', async (c: Context<{ Bindings: Bindings }>) => {
+  try {
+    const userId = c.req.param('userId')
+    
+    // Get most recent attendance
+    const attendance = await c.env.DB.prepare(`
+      SELECT streak_days, login_date 
+      FROM user_attendance 
+      WHERE user_id = ? 
+      ORDER BY login_date DESC 
+      LIMIT 1
+    `).bind(userId).first() as any
+    
+    if (!attendance) {
+      return c.json({ success: true, streakDays: 0 })
+    }
+    
+    // Check if streak is still active (logged in today or yesterday)
+    const today = new Date().toISOString().split('T')[0]
+    const yesterday = new Date()
+    yesterday.setDate(yesterday.getDate() - 1)
+    const yesterdayStr = yesterday.toISOString().split('T')[0]
+    
+    const isActive = attendance.login_date === today || attendance.login_date === yesterdayStr
+    
+    return c.json({
+      success: true,
+      streakDays: isActive ? (attendance.streak_days || 0) : 0
+    })
+  } catch (error) {
+    console.error('Error getting streak:', error)
+    return c.json({ success: false, error: 'Failed to get streak' }, 500)
   }
 })
 

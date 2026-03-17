@@ -28,9 +28,65 @@ modeReports.post('/save', async (c) => {
       'UPDATE sessions SET has_report = 1 WHERE id = ?'
     ).bind(sessionId).run();
 
+    // Calculate and award XP based on mode type
+    let xpToAward = 0;
+    let activityType = '';
+    let details = '';
+    
+    if (modeType === 'timer') {
+      // Timer: 10 XP per sentence if accuracy >= 80%
+      const accuracy = reportData.accuracy || 0;
+      const sentenceCount = reportData.totalSentences || 0;
+      
+      if (accuracy >= 80) {
+        xpToAward = sentenceCount * 10;
+        activityType = 'timer';
+        details = `Timer mode: ${sentenceCount} sentences, ${accuracy}% accuracy`;
+      }
+    } else if (modeType === 'scenario') {
+      // Scenario: 10 XP per sentence
+      const sentenceCount = reportData.totalSentences || 0;
+      xpToAward = sentenceCount * 10;
+      activityType = 'scenario';
+      details = `Scenario mode: ${sentenceCount} sentences completed`;
+    } else if (modeType === 'exam') {
+      // Exam: 30 XP per 5 sentences completed
+      const sentenceCount = reportData.totalSentences || 0;
+      const completedSets = Math.floor(sentenceCount / 5);
+      xpToAward = completedSets * 30;
+      activityType = 'exam';
+      details = `Exam mode: ${sentenceCount} sentences (${completedSets} sets)`;
+    }
+    
+    // Award XP if any
+    let xpResult = null;
+    if (xpToAward > 0) {
+      try {
+        // Call internal XP API
+        const baseUrl = new URL(c.req.url).origin;
+        const xpResponse = await fetch(`${baseUrl}/api/gamification/xp/add`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId,
+            xp: xpToAward,
+            activityType,
+            details
+          })
+        });
+        
+        xpResult = await xpResponse.json();
+      } catch (xpError) {
+        console.error('Failed to award XP:', xpError);
+        // Don't fail the whole request if XP fails
+      }
+    }
+
     return c.json({
       success: true,
-      reportId: result.meta.last_row_id
+      reportId: result.meta.last_row_id,
+      xpAwarded: xpToAward,
+      xpResult
     });
   } catch (error) {
     console.error('Save mode report error:', error);

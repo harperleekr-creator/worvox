@@ -91,6 +91,31 @@ chat.post('/message', async (c) => {
       await c.env.DB.prepare(
         'UPDATE sessions SET total_messages = total_messages + 2 WHERE id = ?'
       ).bind(sessionId).run();
+      
+      // Award XP for AI chat (2 XP per user message, daily limit 100 XP)
+      try {
+        // Get userId from session
+        const session = await c.env.DB.prepare(
+          'SELECT user_id FROM sessions WHERE id = ?'
+        ).bind(sessionId).first() as any;
+        
+        if (session?.user_id) {
+          const baseUrl = new URL(c.req.url).origin;
+          await fetch(`${baseUrl}/api/gamification/xp/add`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId: session.user_id,
+              xp: 2,
+              activityType: 'ai_chat',
+              details: 'AI conversation message'
+            })
+          });
+        }
+      } catch (xpError) {
+        console.error('Failed to award chat XP:', xpError);
+        // Don't fail the whole request
+      }
     }
 
     return c.json({
