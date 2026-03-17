@@ -714,6 +714,15 @@ class WorVox {
               <i class="fas fa-sign-out-alt"></i>
             </button>
           </div>
+          
+          <!-- My Prizes Button -->
+          <div class="mt-3">
+            <button onclick="worvox.showMyPrizes(); worvox.closeMobileSidebar();" 
+              class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-3 py-2 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-2">
+              <i class="fas fa-gift"></i>
+              <span>내 당첨 상품</span>
+            </button>
+          </div>
         </div>
       </div>
     `;
@@ -16188,7 +16197,7 @@ Proceed to payment?
     }
   }
 
-  // 📋 Show my prizes
+  // 📋 Show my prizes in modal
   async showMyPrizes() {
     if (!this.currentUser || !this.currentUser.id) {
       alert('로그인이 필요합니다.');
@@ -16199,70 +16208,82 @@ Proceed to payment?
       const response = await axios.get(`/api/rewards/my-prizes?userId=${this.currentUser.id}`);
       const prizes = response.data.prizes || [];
 
-      const app = document.getElementById('app');
-      app.innerHTML = `
-        ${this.getSidebar('rewards')}
-        <div class="flex-1 overflow-y-auto">
-          <div class="max-w-6xl mx-auto p-6">
-            <button onclick="worvox.showRewards()" class="mb-4 flex items-center text-purple-600 hover:text-purple-700">
-              <i class="fas fa-arrow-left mr-2"></i> 돌아가기
+      // Create modal
+      const modal = document.createElement('div');
+      modal.id = 'myPrizesModal';
+      modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto';
+      modal.onclick = (e) => {
+        if (e.target === modal) {
+          modal.remove();
+        }
+      };
+
+      modal.innerHTML = `
+        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto my-8" onclick="event.stopPropagation()">
+          <!-- Header -->
+          <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+            <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-3">
+              <i class="fas fa-gift text-purple-600"></i>
+              내 당첨 상품
+            </h2>
+            <button onclick="document.getElementById('myPrizesModal').remove()" 
+              class="text-gray-400 hover:text-gray-600 transition-colors">
+              <i class="fas fa-times text-2xl"></i>
             </button>
+          </div>
 
-            <div class="bg-white rounded-2xl p-8 shadow-lg">
-              <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-                <i class="fas fa-gift text-purple-600 mr-3"></i>
-                내 당첨 상품
-              </h2>
+          <!-- Content -->
+          <div class="p-6">
+            ${prizes.length === 0 ? `
+              <div class="text-center py-12">
+                <div class="text-6xl mb-4">🎁</div>
+                <p class="text-gray-600 mb-6">아직 당첨된 상품이 없습니다.</p>
+                <button 
+                  onclick="document.getElementById('myPrizesModal').remove(); worvox.showRewards();"
+                  class="bg-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-all">
+                  <i class="fas fa-gift mr-2"></i>
+                  랜덤박스 열기
+                </button>
+              </div>
+            ` : `
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                ${prizes.map(prize => `
+                  <div class="border border-gray-200 rounded-xl p-4 hover:shadow-lg transition-all">
+                    <div class="flex items-start gap-4">
+                      <div class="text-4xl">${prize.image_url}</div>
+                      <div class="flex-1">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2">${prize.name_ko}</h3>
+                        <p class="text-sm text-gray-600 mb-3">${prize.description || ''}</p>
+                        
+                        <div class="flex items-center gap-2 mb-3">
+                          <span class="px-3 py-1 text-xs rounded-full ${
+                            prize.claim_status === 'completed' ? 'bg-green-100 text-green-700' :
+                            prize.claim_status === 'contacted' ? 'bg-blue-100 text-blue-700' :
+                            'bg-yellow-100 text-yellow-700'
+                          }">
+                            ${
+                              prize.claim_status === 'completed' ? '✅ 수령 완료' :
+                              prize.claim_status === 'contacted' ? '📞 연락 완료' :
+                              '⏳ 수령 대기'
+                            }
+                          </span>
+                          ${prize.tracking_number ? `<span class="text-xs text-gray-500">운송장: ${prize.tracking_number}</span>` : ''}
+                        </div>
 
-              ${prizes.length === 0 ? `
-                <div class="text-center py-12">
-                  <div class="text-6xl mb-4">🎁</div>
-                  <p class="text-gray-600 mb-6">아직 당첨된 상품이 없습니다.</p>
-                  <button 
-                    onclick="worvox.showSpinWheel()"
-                    class="bg-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-all">
-                    상품 뽑기
-                  </button>
-                </div>
-              ` : `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  ${prizes.map(prize => `
-                    <div class="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all">
-                      <div class="flex items-start gap-4">
-                        <div class="text-5xl">${prize.image_url}</div>
-                        <div class="flex-1">
-                          <h3 class="text-lg font-bold text-gray-800 mb-2">${prize.name_ko}</h3>
-                          <p class="text-sm text-gray-600 mb-3">${prize.description || ''}</p>
-                          
-                          <div class="flex items-center gap-2 mb-3">
-                            <span class="px-3 py-1 text-xs rounded-full ${
-                              prize.claim_status === 'completed' ? 'bg-green-100 text-green-700' :
-                              prize.claim_status === 'contacted' ? 'bg-blue-100 text-blue-700' :
-                              'bg-yellow-100 text-yellow-700'
-                            }">
-                              ${
-                                prize.claim_status === 'completed' ? '✅ 수령 완료' :
-                                prize.claim_status === 'contacted' ? '📞 연락 완료' :
-                                '⏳ 수령 대기'
-                              }
-                            </span>
-                            ${prize.tracking_number ? `<span class="text-xs text-gray-500">운송장: ${prize.tracking_number}</span>` : ''}
-                          </div>
-
-                          <div class="text-xs text-gray-500">
-                            당첨일: ${new Date(prize.won_at).toLocaleDateString('ko-KR')}
-                          </div>
+                        <div class="text-xs text-gray-500">
+                          당첨일: ${new Date(prize.won_at).toLocaleDateString('ko-KR')}
                         </div>
                       </div>
                     </div>
-                  `).join('')}
-                </div>
-              `}
-            </div>
+                  </div>
+                `).join('')}
+              </div>
+            `}
           </div>
         </div>
-        ${this.getFooter()}
       `;
+
+      document.body.appendChild(modal);
 
     } catch (error) {
       console.error('Show my prizes error:', error);
