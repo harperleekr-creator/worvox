@@ -1849,7 +1849,7 @@ class WorVox {
               pronunciationScore = analysisResponse.data.pronunciation;
               fluencyScore = analysisResponse.data.fluency;
               feedback = analysisResponse.data.pronunciationFeedback || '';
-              const pronunciationIssues = analysisResponse.data.pronunciationIssues || [];
+              pronunciationIssues = analysisResponse.data.pronunciationIssues || [];
               isPremiumAnalysis = true;
               
               const finalAverageScore = Math.round((accuracyScore + pronunciationScore + fluencyScore) / 3);
