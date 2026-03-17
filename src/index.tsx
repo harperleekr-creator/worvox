@@ -30,7 +30,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1773736760418'; // Update manually or via build script
+const BUILD_TIME = '1773737399075'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -489,9 +489,12 @@ app.get('/trial-fail', (c) => {
 
 // Landing page - Branding page for non-logged users (same as /about but with app link)
 app.get('/landing', (c) => {
+  const lang = c.req.query('lang') || 'ko'; // Default to Korean
+  const isKorean = lang === 'ko';
+  
   return c.html(`
     <!DOCTYPE html>
-    <html lang="ko">
+    <html lang="${isKorean ? 'ko' : 'en'}">
     <head>
         <!-- Google tag (gtag.js) -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-1W0YMPPVH7"></script>
@@ -508,18 +511,18 @@ app.get('/landing', (c) => {
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <title>WorVox | AI 영어 스피킹 플랫폼 - 실시간 발음 교정 & 맞춤형 회화 연습</title>
+        <title>${isKorean ? 'WorVox | AI 영어 스피킹 플랫폼 - 실시간 발음 교정 & 맞춤형 회화 연습' : 'WorVox | AI English Speaking Platform - Real-time Pronunciation Correction & Personalized Practice'}</title>
         
         <!-- SEO Meta Tags -->
-        <meta name="description" content="WorVox AI 영어 스피킹 플랫폼 - GPT-4 기반 실시간 발음 교정, ElevenLabs TTS 음성 합성, 30가지 실전 시나리오로 영어 회화 실력 3배 향상. 월 1.9만원으로 24시간 무제한 학습. 2주 무료 체험 시작!">
-        <meta name="keywords" content="AI 영어 학습, 영어 발음 교정, 영어 회화 연습, OPIC 준비, 영어 말하기, GPT-4 영어, ElevenLabs, 실시간 피드백, 영어 학원 대체, 온라인 영어 과외, AI 영어 코치, 영어 공부 앱, 영어 스피킹, 발음 분석, 맞춤형 영어 학습">
+        <meta name="description" content="${isKorean ? 'WorVox AI 영어 스피킹 플랫폼 - GPT-4 기반 실시간 발음 교정, ElevenLabs TTS 음성 합성, 30가지 실전 시나리오로 영어 회화 실력 3배 향상. 월 1.9만원으로 24시간 무제한 학습. 2주 무료 체험 시작!' : 'WorVox AI English Speaking Platform - GPT-4 based real-time pronunciation correction, ElevenLabs TTS voice synthesis, 30 practical scenarios to improve your English conversation skills 3x faster. 24/7 unlimited learning for $15/month. Start 2-week free trial!'}">
+        <meta name="keywords" content="${isKorean ? 'AI 영어 학습, 영어 발음 교정, 영어 회화 연습, OPIC 준비, 영어 말하기, GPT-4 영어, ElevenLabs, 실시간 피드백, 영어 학원 대체, 온라인 영어 과외, AI 영어 코치, 영어 공부 앱, 영어 스피킹, 발음 분석, 맞춤형 영어 학습' : 'AI English learning, pronunciation correction, conversation practice, OPIC prep, speaking English, GPT-4 English, ElevenLabs, real-time feedback, online English tutor, AI English coach, English study app, speaking practice, pronunciation analysis, personalized learning'}">
         <meta name="robots" content="index, follow">
         
         <!-- Open Graph -->
         <meta property="og:type" content="website">
         <meta property="og:url" content="https://worvox.com">
-        <meta property="og:title" content="WorVox - AI 영어 스피킹 플랫폼 | 실시간 발음 교정 & 회화 연습">
-        <meta property="og:description" content="GPT-4 기반 AI로 영어 회화 실력 3배 향상! 실시간 발음 교정, 30가지 실전 시나리오, OPIC 준비. 월 1.9만원, 2주 무료 체험!">
+        <meta property="og:title" content="${isKorean ? 'WorVox - AI 영어 스피킹 플랫폼 | 실시간 발음 교정 & 회화 연습' : 'WorVox - AI English Speaking Platform | Real-time Pronunciation Correction'}">
+        <meta property="og:description" content="${isKorean ? 'GPT-4 기반 AI로 영어 회화 실력 3배 향상! 실시간 발음 교정, 30가지 실전 시나리오, OPIC 준비. 월 1.9만원, 2주 무료 체험!' : 'Improve your English conversation skills 3x faster with GPT-4 AI! Real-time pronunciation correction, 30 practical scenarios, OPIC prep. $15/month, 2-week free trial!'}">
         <meta property="og:image" content="https://worvox.com/logo.png">
         
         <link rel="canonical" href="https://worvox.com">
@@ -537,16 +540,20 @@ app.get('/landing', (c) => {
         <nav class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
-                    <a href="/landing" class="flex items-center space-x-1 sm:space-x-2">
+                    <a href="/landing?lang=${isKorean ? 'ko' : 'en'}" class="flex items-center space-x-1 sm:space-x-2">
                         <img src="/static/logo.webp" alt="WorVox Logo" class="h-6 w-6 sm:h-8 sm:w-8">
                         <span class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 text-transparent bg-clip-text">WorVox</span>
                     </a>
                     <div class="flex items-center gap-2 sm:gap-4">
+                        <a href="/landing?lang=${isKorean ? 'en' : 'ko'}" class="flex items-center gap-1 text-gray-700 hover:text-purple-600 font-medium transition text-sm border-2 border-purple-200 hover:border-purple-400 rounded-lg px-3 py-1.5">
+                            <i class="fas fa-globe"></i>
+                            <span>${isKorean ? 'ENG' : 'KOR'}</span>
+                        </a>
                         <a href="/pricing" class="text-gray-700 hover:text-purple-600 font-medium transition text-sm sm:text-base">
-                            <i class="fas fa-tag mr-1 sm:mr-2"></i><span class="hidden xs:inline">요금제</span><span class="xs:hidden">요금</span>
+                            <i class="fas fa-tag mr-1 sm:mr-2"></i><span class="hidden xs:inline">${isKorean ? '요금제' : 'Pricing'}</span><span class="xs:hidden">${isKorean ? '요금' : 'Price'}</span>
                         </a>
                         <a href="/app" class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-3 sm:px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition transform hover:scale-105 text-sm sm:text-base whitespace-nowrap">
-                            <i class="fas fa-sign-in-alt mr-1 sm:mr-2"></i><span class="hidden sm:inline">로그인 / 시작하기</span><span class="sm:hidden">로그인</span>
+                            <i class="fas fa-sign-in-alt mr-1 sm:mr-2"></i><span class="hidden sm:inline">${isKorean ? '로그인 / 시작하기' : 'Login / Get Started'}</span><span class="sm:hidden">${isKorean ? '로그인' : 'Login'}</span>
                         </a>
                     </div>
                 </div>
@@ -559,20 +566,21 @@ app.get('/landing', (c) => {
                 <!-- Quick Identity Badge -->
                 <div class="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-semibold mb-6 animate-pulse">
                     <span class="text-lg">🎯</span>
-                    <span>영어 말하기가 두려운 당신을 위한</span>
+                    <span>${isKorean ? '영어 말하기가 두려운 당신을 위한' : 'For Those Who Fear Speaking English'}</span>
                 </div>
                 
                 <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
                     <span class="bg-gradient-to-r from-purple-600 to-blue-600 text-transparent bg-clip-text">
-                        AI 영어 스피킹 플랫폼
+                        ${isKorean ? 'AI 영어 스피킹 플랫폼' : 'AI English Speaking Platform'}
                     </span>
                     <br/>
-                    <span class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl">실시간 발음 교정 & 맞춤형 회화 연습</span>
+                    <span class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl">${isKorean ? '실시간 발음 교정 & 맞춤형 회화 연습' : 'Real-time Pronunciation & Personalized Practice'}</span>
                 </h1>
                 <p class="text-base sm:text-lg md:text-xl text-gray-600 mb-8 leading-relaxed px-2">
-                    GPT-4 기반 AI로 <strong>영어 회화 실력 3배 향상</strong>!<br class="hidden sm:block"/>
-                    <span class="block sm:inline">실시간 발음 분석, 30가지 실전 시나리오,</span>
-                    <span class="block sm:inline">OPIC 준비까지 - 월 1.9만원</span>
+                    ${isKorean 
+                      ? 'GPT-4 기반 AI로 <strong>영어 회화 실력 3배 향상</strong>!<br class="hidden sm:block"/><span class="block sm:inline">실시간 발음 분석, 30가지 실전 시나리오,</span><span class="block sm:inline">OPIC 준비까지 - 월 1.9만원</span>'
+                      : 'Improve your <strong>English conversation skills 3x faster</strong> with GPT-4 AI!<br class="hidden sm:block"/><span class="block sm:inline">Real-time pronunciation analysis, 30 practical scenarios,</span><span class="block sm:inline">OPIC prep - $15/month</span>'
+                    }
                 </p>
                 
                 <!-- Social Proof -->
@@ -594,10 +602,10 @@ app.get('/landing', (c) => {
                 <a href="/app" 
                    class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:shadow-xl transition transform hover:scale-105"
                    onclick="gtag('event', 'cta_click', { 'event_category': 'engagement', 'event_label': 'hero_cta_start_trial', 'value': 1 })">
-                    <i class="fas fa-rocket mr-2"></i>2주 무료 체험 시작
+                    <i class="fas fa-rocket mr-2"></i>${isKorean ? '2주 무료 체험 시작' : 'Start 2-Week Free Trial'}
                 </a>
                 <p class="mt-4 text-sm text-gray-500">
-                    <i class="fas fa-check-circle text-green-600 mr-1"></i>신용카드 등록 없이 바로 시작
+                    <i class="fas fa-check-circle text-green-600 mr-1"></i>${isKorean ? '신용카드 등록 없이 바로 시작' : 'No credit card required'}
                 </p>
             </div>
         </section>
@@ -2979,10 +2987,16 @@ app.get('/app', (c) => {
 // Main page
 app.get('/', (c) => {
   const version = BUILD_TIME;
+  const lang = c.req.query('lang') || 'ko'; // Default to Korean
+  const isKorean = lang === 'ko';
+  
+  // Language toggle function
+  const toggleLang = isKorean ? 'en' : 'ko';
+  const langButton = isKorean ? 'ENG' : 'KOR';
   
   return c.html(`
     <!DOCTYPE html>
-    <html lang="en">
+    <html lang="${isKorean ? 'ko' : 'en'}">
     <head>
         <!-- Google tag (gtag.js) - MUST BE FIRST -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-1W0YMPPVH7"></script>
@@ -3001,22 +3015,22 @@ app.get('/', (c) => {
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <title>WorVox - 실전 영어회화 플랫폼 | AI 발음 분석 & 1:1 전화영어</title>
+        <title>${isKorean ? 'WorVox - 실전 영어회화 플랫폼 | AI 발음 분석 & 1:1 전화영어' : 'WorVox - Real English Conversation Platform | AI Pronunciation Analysis & 1:1 Live Speaking'}</title>
         
         <!-- SEO Meta Tags -->
-        <meta name="description" content="WorVox는 AI 기반 발음 분석과 원어민급 강사진의 1:1 전화영어를 제공하는 실전 영어회화 플랫폼입니다. 실시간 발음 교정, 맞춤형 피드백, 6명의 전문 강사진. 무료 체험으로 시작하세요!">
-        <meta name="keywords" content="영어회화, 전화영어, 1:1 영어, AI 발음 분석, 영어 스피킹, 실전 영어, 영어 회화 학습, 원어민 영어, 발음 교정, 영어 공부, 온라인 영어, 영어 튜터, 영어 과외, 실시간 발음 분석, 영어 말하기 연습">
+        <meta name="description" content="${isKorean ? 'WorVox는 AI 기반 발음 분석과 원어민급 강사진의 1:1 전화영어를 제공하는 실전 영어회화 플랫폼입니다. 실시간 발음 교정, 맞춤형 피드백, 6명의 전문 강사진. 무료 체험으로 시작하세요!' : 'WorVox is a real English conversation platform offering AI-based pronunciation analysis and 1:1 live speaking lessons with native-level instructors. Real-time pronunciation correction, personalized feedback, 6 professional teachers. Start with a free trial!'}">
+        <meta name="keywords" content="${isKorean ? '영어회화, 전화영어, 1:1 영어, AI 발음 분석, 영어 스피킹, 실전 영어, 영어 회화 학습, 원어민 영어, 발음 교정, 영어 공부, 온라인 영어, 영어 튜터, 영어 과외, 실시간 발음 분석, 영어 말하기 연습' : 'English conversation, online English, 1:1 English, AI pronunciation analysis, English speaking, practical English, English learning, native speaker, pronunciation correction, English study, online English tutoring, real-time pronunciation analysis, English practice'}">
         <meta name="author" content="WorVox Team">
         <meta name="robots" content="index, follow">
-        <meta name="language" content="Korean">
-        <meta name="geo.region" content="KR">
-        <meta name="geo.placename" content="South Korea">
+        <meta name="language" content="${isKorean ? 'Korean' : 'English'}">
+        <meta name="geo.region" content="${isKorean ? 'KR' : 'US'}">
+        <meta name="geo.placename" content="${isKorean ? 'South Korea' : 'United States'}">
         
         <!-- Open Graph (Facebook, LinkedIn) -->
         <meta property="og:type" content="website">
         <meta property="og:url" content="https://worvox.com">
-        <meta property="og:title" content="WorVox - 실전 영어회화 플랫폼 | AI 발음 분석 & 1:1 전화영어">
-        <meta property="og:description" content="AI 기반 실시간 발음 분석과 원어민급 강사진의 1:1 전화영어. 맞춤형 피드백으로 영어 실력 향상. 무료 체험 시작하세요!">
+        <meta property="og:title" content="${isKorean ? 'WorVox - 실전 영어회화 플랫폼 | AI 발음 분석 & 1:1 전화영어' : 'WorVox - Real English Conversation Platform'}">
+        <meta property="og:description" content="${isKorean ? 'AI 기반 실시간 발음 분석과 원어민급 강사진의 1:1 전화영어. 맞춤형 피드백으로 영어 실력 향상. 무료 체험 시작하세요!' : 'AI-powered real-time pronunciation analysis and 1:1 live speaking with native-level instructors. Improve your English with personalized feedback. Start your free trial!'}">
         <meta property="og:image" content="https://worvox.com/og-image.jpg">
         <meta property="og:image:width" content="2752">
         <meta property="og:image:height" content="1536">
