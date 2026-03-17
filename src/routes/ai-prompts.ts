@@ -29,7 +29,15 @@ const getOpenAIClient = (env: any) => {
 // System prompts for each level
 const systemPrompts = {
   beginner: {
-    timer: `Generate ONE simple English sentence (5-10 words, basic vocabulary, present/past tense, topics: daily life/family/food). Return only the sentence.`,
+    timer: `Generate ONE simple, unique English sentence for speaking practice. Requirements:
+- Length: 5-12 words
+- Grammar: Simple present, past, or future tense
+- Vocabulary: Common, everyday words (A1-A2 level)
+- Topics: Rotate between different themes - daily routines, food & drinks, family & friends, shopping, weather, hobbies, travel, health, home, school/work
+- Style: Natural, conversational, practical for real-life use
+- CRITICAL: Generate a DIFFERENT sentence each time - avoid repetitive patterns like "Set a timer..."
+- Examples of variety: "I need to buy some groceries today.", "Can you help me find my keys?", "What time does the store close?", "She's cooking dinner in the kitchen.", "We usually go to the park on weekends."
+Return ONLY the English sentence (no translation, no explanation).`,
 
     scenario: `Generate 5 simple conversation sentences (3-8 words, basic vocabulary, situations: greeting/ordering/directions). IMPORTANT: Return ONLY the dialogue text without role labels (NO "Customer:", "Waiter:", etc.). Format: numbered 1-5, one per line.`,
 
@@ -41,7 +49,15 @@ Return numbered 1-5, one per line.`
   },
 
   intermediate: {
-    timer: `Generate ONE intermediate sentence (12-20 words, compound/complex grammar, topics: work/education/travel). Return only the sentence.`,
+    timer: `Generate ONE unique intermediate-level English sentence for speaking practice. Requirements:
+- Length: 12-20 words
+- Grammar: Mix of compound/complex sentences, various tenses, conditionals, passive voice
+- Vocabulary: Everyday + some advanced words (B1-B2 level)
+- Topics: Rotate between - work/career, education/learning, technology, travel/culture, social issues, environment, health & wellness, relationships, current events, personal development
+- Style: More sophisticated than beginner, but still natural and conversational
+- CRITICAL: Generate DIVERSE content - avoid repetitive sentence structures
+- Examples: "If I had known about the meeting earlier, I would have prepared better.", "The new software update has significantly improved our team's productivity.", "Many experts believe that remote work will become more common in the future."
+Return ONLY the English sentence.`,
 
     scenario: `Generate 5 intermediate conversation sentences (8-15 words, situations: workplace/interview/complaint). IMPORTANT: Return ONLY the dialogue text without role labels (NO "Manager:", "Employee:", etc.). Format: numbered 1-5, one per line.`,
 
@@ -80,7 +96,15 @@ Example format:
   },
 
   advanced: {
-    timer: `Generate ONE advanced sentence (18-30 words, sophisticated vocab, complex grammar, topics: business/technology/global issues). Return only the sentence.`,
+    timer: `Generate ONE unique advanced-level English sentence for speaking practice. Requirements:
+- Length: 18-30 words
+- Grammar: Complex structures - multiple clauses, advanced conditionals, subjunctive mood, sophisticated connectors
+- Vocabulary: Academic, professional, nuanced terminology (C1-C2 level)
+- Topics: Rotate between - global economics, scientific research, political analysis, philosophical concepts, advanced business strategy, cultural criticism, innovation & disruption, ethical dilemmas, sustainability, leadership theory
+- Style: Formal, articulate, intellectually engaging
+- CRITICAL: Each sentence should present unique, thought-provoking content
+- Examples: "The integration of artificial intelligence into various sectors raises profound questions about the future of human employment and societal structures.", "Sustainable business practices require a fundamental shift in corporate mindset from short-term profit maximization to long-term stakeholder value creation."
+Return ONLY the English sentence.`,
 
     scenario: `Generate 5 advanced conversation sentences (12-25 words, professional/academic tone, situations: negotiation/presentation). IMPORTANT: Return ONLY the dialogue text without role labels (NO "Speaker:", "Presenter:", etc.). Format: numbered 1-5, one per line.`,
 
