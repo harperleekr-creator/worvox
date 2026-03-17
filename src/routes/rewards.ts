@@ -3,6 +3,23 @@ import type { Bindings } from '../types';
 
 const rewards = new Hono<{ Bindings: Bindings }>();
 
+// XP calculation functions (same as gamification.ts)
+const getXPForLevel = (level: number): number => {
+  return Math.floor(100 * Math.pow(1.5, level - 1));
+};
+
+const calculateLevel = (totalXP: number): number => {
+  let level = 1;
+  let xpNeeded = 0;
+  
+  while (totalXP >= xpNeeded + getXPForLevel(level)) {
+    xpNeeded += getXPForLevel(level);
+    level++;
+  }
+  
+  return level;
+};
+
 // 🎁 Get available prizes for user's level
 rewards.get('/prizes', async (c) => {
   try {
@@ -97,16 +114,75 @@ rewards.post('/spin', async (c) => {
     const isXPPrize = selectedPrize.category === 'xp';
 
     if (isXPPrize) {
-      // For XP prizes: award XP directly
+      // For XP prizes: award XP directly and check level up
       const xpAmount = parseInt(selectedPrize.name.match(/\d+/)?.[0] || '0');
       
       if (xpAmount > 0) {
-        // Add XP to user
-        await c.env.DB.prepare(
-          'UPDATE users SET xp = xp + ?, total_xp = total_xp + ? WHERE id = ?'
-        ).bind(xpAmount, xpAmount, userId).run();
+        // Get current user stats
+        const currentUser = await c.env.DB.prepare(`
+          SELECT user_level, xp, total_xp, coins FROM users WHERE id = ?
+        `).bind(userId).first() as any;
 
-        console.log(`✅ User ${userId} won XP: ${xpAmount}`);
+        if (!currentUser) {
+          throw new Error('User not found');
+        }
+
+        // Calculate new XP and level
+        const newTotalXP = (currentUser.total_xp || 0) + xpAmount;
+        const newLevel = calculateLevel(newTotalXP);
+        const oldLevel = currentUser.user_level || 1;
+        const leveledUp = newLevel > oldLevel;
+
+        // Calculate current level progress
+        let xpForCurrentLevel = 0;
+        for (let i = 1; i < newLevel; i++) {
+          xpForCurrentLevel += getXPForLevel(i);
+        }
+        const currentLevelXP = newTotalXP - xpForCurrentLevel;
+
+        // Calculate coin rewards (1 coin per 10 XP)
+        const coinsEarned = Math.floor(xpAmount / 10);
+        const newCoins = (currentUser.coins || 0) + coinsEarned;
+
+        // Calculate spin count increase if leveled up
+        let spinCountIncrease = 0;
+        if (leveledUp) {
+          spinCountIncrease = newLevel - oldLevel; // 1 spin per level
+        }
+
+        // Update user stats with level up
+        await c.env.DB.prepare(`
+          UPDATE users 
+          SET user_level = ?, 
+              xp = ?, 
+              total_xp = ?, 
+              coins = ?,
+              spin_count = spin_count + ?
+          WHERE id = ?
+        `).bind(newLevel, currentLevelXP, newTotalXP, newCoins, spinCountIncrease, userId).run();
+
+        // Log activity
+        await c.env.DB.prepare(`
+          INSERT INTO user_activity_log (user_id, activity_type, xp_gained, coins_gained, details)
+          VALUES (?, ?, ?, ?, ?)
+        `).bind(userId, 'random_box', xpAmount, coinsEarned, `Random Box - ${selectedPrize.name_ko}`).run();
+
+        // Award level-up badge if leveled up
+        if (leveledUp) {
+          await c.env.DB.prepare(`
+            INSERT OR IGNORE INTO user_badges (user_id, badge_name, badge_description, badge_icon)
+            VALUES (?, ?, ?, ?)
+          `).bind(
+            userId,
+            `Level ${newLevel}`,
+            `Reached level ${newLevel}!`,
+            '🏆'
+          ).run();
+
+          console.log(`🎉 User ${userId} leveled up: ${oldLevel} → ${newLevel} (+${spinCountIncrease} spins)`);
+        }
+
+        console.log(`✅ User ${userId} won XP: ${xpAmount} (Level: ${oldLevel} → ${newLevel})`);
       }
     } else {
       // For physical/digital prizes: record the win
