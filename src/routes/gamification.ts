@@ -168,7 +168,7 @@ gamification.get('/stats/:userId', async (c: Context<{ Bindings: Bindings }>) =>
     const userId = c.req.param('userId')
 
     const user = await c.env.DB.prepare(`
-      SELECT user_level, xp, total_xp, coins, current_streak, longest_streak
+      SELECT user_level, xp, total_xp, coins, current_streak, longest_streak, total_words_practiced
       FROM users
       WHERE id = ?
     `).bind(userId).first() as any
@@ -208,7 +208,8 @@ gamification.get('/stats/:userId', async (c: Context<{ Bindings: Bindings }>) =>
         progress: Math.round(progress),
         coins: user.coins || 0,
         currentStreak: user.current_streak || 0,
-        longestStreak: user.longest_streak || 0
+        longestStreak: user.longest_streak || 0,
+        wordsLearned: user.total_words_practiced || 0  // ✅ Add words tracking
       },
       badges: badges || [],
       recentActivity: recentActivity || []
@@ -457,6 +458,43 @@ gamification.get('/attendance/streak/:userId', async (c: Context<{ Bindings: Bin
   } catch (error) {
     console.error('Error getting streak:', error)
     return c.json({ success: false, error: 'Failed to get streak' }, 500)
+  }
+})
+
+// Update words practiced count
+gamification.post('/words/add', async (c: Context<{ Bindings: Bindings }>) => {
+  try {
+    const { userId, words, activityType } = await c.req.json()
+
+    if (!userId || typeof words !== 'number' || words <= 0) {
+      return c.json({ success: false, error: 'Valid userId and words count required' }, 400)
+    }
+
+    console.log(`📝 Adding ${words} words for user ${userId} (${activityType})`)
+
+    // Update user's total words
+    await c.env.DB.prepare(`
+      UPDATE users 
+      SET total_words_practiced = total_words_practiced + ?
+      WHERE id = ?
+    `).bind(words, userId).run()
+
+    // Get updated count
+    const user = await c.env.DB.prepare(`
+      SELECT total_words_practiced FROM users WHERE id = ?
+    `).bind(userId).first() as any
+
+    console.log(`✅ Words updated: ${user?.total_words_practiced || 0}`)
+
+    return c.json({
+      success: true,
+      totalWords: user?.total_words_practiced || 0,
+      wordsAdded: words
+    })
+
+  } catch (error) {
+    console.error('Error adding words:', error)
+    return c.json({ success: false, error: 'Failed to add words' }, 500)
   }
 })
 

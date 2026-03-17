@@ -522,7 +522,8 @@ class WorVox {
           xpForNextLevel: stats.stats.xpForNextLevel || 100,
           progress: stats.stats.progress || 0,
           coins: stats.stats.coins || 0,
-          streak: stats.stats.currentStreak || 0  // ✅ API returns 'currentStreak'
+          streak: stats.stats.currentStreak || 0,  // ✅ API returns 'currentStreak'
+          wordsLearned: stats.stats.wordsLearned || 0  // ✅ Now available from API
         };
         
         this.updateGamificationUI(mappedStats);
@@ -3256,6 +3257,20 @@ class WorVox {
             
             // Show XP notification
             this.showXPNotification(10, `시나리오 문장 완료!`);
+            
+            // ✅ Add words count (estimate 10 words per sentence)
+            try {
+              const wordsResponse = await axios.post('/api/gamification/words/add', {
+                userId: this.currentUser.id,
+                words: 10,
+                activityType: 'scenario'
+              });
+              if (wordsResponse.data.success) {
+                console.log('✅ Words added:', wordsResponse.data.wordsAdded, '| Total:', wordsResponse.data.totalWords);
+              }
+            } catch (error) {
+              console.error('❌ Failed to add words:', error);
+            }
           } else if (xpResponse.data.error === 'Daily XP limit reached') {
             console.log('⚠️ Daily XP limit reached for scenario mode');
           }
@@ -4970,6 +4985,21 @@ class WorVox {
               
               // Show XP notification
               this.showXPNotification(xpToAward, `시험 완료!`);
+              
+              // ✅ Add words count (estimate 15 words per exam question)
+              try {
+                const totalWords = completedQuestions * 15;
+                const wordsResponse = await axios.post('/api/gamification/words/add', {
+                  userId: this.currentUser.id,
+                  words: totalWords,
+                  activityType: 'exam'
+                });
+                if (wordsResponse.data.success) {
+                  console.log('✅ Words added:', wordsResponse.data.wordsAdded, '| Total:', wordsResponse.data.totalWords);
+                }
+              } catch (error) {
+                console.error('❌ Failed to add words:', error);
+              }
               
               // Update XP card in result screen (will be shown after render)
               setTimeout(() => {
@@ -7034,7 +7064,8 @@ Proceed to payment?
             xp: rawStats.xp || 0,
             totalXp: rawStats.totalXP || 0,  // ✅ API returns 'totalXP'
             level: rawStats.level || 1,
-            coins: rawStats.coins || 0
+            coins: rawStats.coins || 0,
+            wordsLearned: rawStats.wordsLearned || 0  // ✅ Now available from API
           };
           console.log('🔄 Fresh gamification stats loaded for dashboard:', gamificationStats);
         } else {
@@ -7049,14 +7080,15 @@ Proceed to payment?
       const stats = statsResponse.data.stats;
       console.log('📈 User stats loaded:', stats);
 
-      // ✅ Calculate total words spoken (approximate) and add to stats
-      stats.wordsLearned = Math.floor((stats.totalMessages || 0) / 2) * 10;
-      const totalWords = stats.wordsLearned;
+      // ✅ Use wordsLearned from gamificationStats (priority), fallback to calculated value
+      const wordsLearned = gamificationStats.wordsLearned || Math.floor((stats.totalMessages || 0) / 2) * 10;
+      stats.wordsLearned = wordsLearned;
+      const totalWords = wordsLearned;
       
       console.log('🎨 Rendering dashboard with data:', {
         streak: gamificationStats.streak,
         totalXp: gamificationStats.totalXp,
-        wordsLearned: stats.wordsLearned
+        wordsLearned: wordsLearned
       });
 
       const app = document.getElementById('app');
@@ -8023,6 +8055,23 @@ Proceed to payment?
       
       // Add AI message to UI (without audio yet)
       this.addMessage(aiMessage, 'assistant');
+      
+      // ✅ Add words count (estimate based on transcription length)
+      if (this.currentUser) {
+        try {
+          const wordCount = transcription.split(/\s+/).length;
+          const wordsResponse = await axios.post('/api/gamification/words/add', {
+            userId: this.currentUser.id,
+            words: wordCount,
+            activityType: 'ai_conversation'
+          });
+          if (wordsResponse.data.success) {
+            console.log('✅ Words added:', wordsResponse.data.wordsAdded, '| Total:', wordsResponse.data.totalWords);
+          }
+        } catch (error) {
+          console.error('❌ Failed to add words:', error);
+        }
+      }
 
       // Step 3: Generate speech for AI response
       console.log('Sending to TTS API...');
