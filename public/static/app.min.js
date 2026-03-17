@@ -2178,10 +2178,14 @@ class WorVox {
                 ` : ''}
                 
                 <!-- Actions -->
-                <div class="grid md:grid-cols-2 gap-4">
+                <div class="grid md:grid-cols-3 gap-4">
+                  <button onclick="worvox.startTimerChallenge(${timeLimit})" 
+                    class="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-xl p-4 font-bold transition-all">
+                    <i class="fas fa-arrow-right mr-2"></i>다음 문장
+                  </button>
                   <button onclick="worvox.startTimerChallenge(${timeLimit})" 
                     class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl p-4 font-bold transition-all">
-                    <i class="fas fa-redo mr-2"></i>다시 도전하기
+                    <i class="fas fa-redo mr-2"></i>다시 도전
                   </button>
                   <button onclick="worvox.showTimerMode()" 
                     class="bg-white hover:bg-gray-50 border-2 border-purple-200 text-purple-600 rounded-xl p-4 font-bold transition-all">
