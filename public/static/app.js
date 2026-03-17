@@ -2267,6 +2267,34 @@ class WorVox {
                 </div>
                 ` : ''}
                 
+                ${accuracyScore >= 80 && !isLoading ? `
+                  <!-- XP Reward Notification -->
+                  <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-5 border-2 border-yellow-300 mb-6">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-3">
+                        <div class="text-4xl animate-bounce">🎉</div>
+                        <div>
+                          <div class="font-bold text-xl text-gray-900">+10 XP 획득!</div>
+                          <div class="text-sm text-gray-600">정확도 ${accuracyScore}% (80% 이상 달성)</div>
+                          <div class="text-xs text-gray-500 mt-1">일일 최대 100 XP</div>
+                        </div>
+                      </div>
+                      <div class="text-3xl font-bold text-yellow-600">+10</div>
+                    </div>
+                  </div>
+                ` : accuracyScore < 80 && !isLoading ? `
+                  <!-- Need Improvement Notice -->
+                  <div class="bg-blue-50 rounded-xl p-4 border border-blue-200 mb-6">
+                    <div class="flex items-center gap-3">
+                      <div class="text-3xl">💪</div>
+                      <div>
+                        <div class="font-semibold text-gray-900">조금만 더 연습하세요!</div>
+                        <div class="text-sm text-gray-600">정확도 80% 이상이면 10 XP를 받을 수 있습니다</div>
+                      </div>
+                    </div>
+                  </div>
+                ` : ''}
+                
                 <!-- Actions -->
                 <div class="grid md:grid-cols-3 gap-4">
                   <button onclick="worvox.startTimerChallenge(${timeLimit})" 
@@ -3128,6 +3156,33 @@ class WorVox {
         pronunciationIssues: scores.pronunciationIssues || []
       });
       
+      // Award XP immediately for this sentence (10 XP per sentence, daily limit 100 XP)
+      if (this.currentUser) {
+        try {
+          console.log('🎯 Awarding XP for scenario sentence...');
+          const xpResponse = await axios.post('/api/gamification/xp/add', {
+            userId: this.currentUser.id,
+            xp: 10,
+            activityType: 'scenario',
+            details: `Scenario: ${this.currentScenarioPractice.scenario.title} - Sentence ${this.currentScenarioPractice.currentSentenceIndex + 1}`
+          });
+          
+          if (xpResponse.data.success) {
+            console.log('✅ XP awarded:', xpResponse.data);
+            
+            // Refresh gamification stats to update UI
+            await this.loadGamificationStats();
+            
+            // Show XP notification
+            this.showXPNotification(10, `시나리오 문장 완료!`);
+          } else if (xpResponse.data.error === 'Daily XP limit reached') {
+            console.log('⚠️ Daily XP limit reached for scenario mode');
+          }
+        } catch (error) {
+          console.error('❌ Failed to award XP:', error);
+        }
+      }
+      
       // Show instant result for this sentence
       this.showInstantSentenceResult(scores, originalSentence, transcription, audioUrl);
       
@@ -3420,25 +3475,35 @@ class WorVox {
                       ` : ''}
                     </div>
                   ` : `
-                    <!-- No AI Feedback - Show Basic Guidance -->
-                    <div class="bg-blue-50 rounded-xl p-5 border border-blue-200">
+                    <!-- Analyzing... or No AI Feedback Yet -->
+                    <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-5 border-2 border-purple-200 mb-4">
                       <div class="flex items-center mb-3">
-                        <i class="fas fa-info-circle text-blue-600 mr-2"></i>
-                        <h4 class="text-lg font-bold text-gray-900">발음 연습 가이드</h4>
+                        <i class="fas fa-robot text-purple-600 mr-2 text-xl animate-pulse"></i>
+                        <h4 class="text-lg font-bold text-gray-900">💎 AI 발음 분석 중...</h4>
                       </div>
-                      <div class="space-y-2 text-sm text-gray-700">
-                        <p><i class="fas fa-check text-green-600 mr-2"></i>원문과 비교하며 발음을 점검하세요</p>
-                        <p><i class="fas fa-check text-green-600 mr-2"></i>녹음을 들어보고 개선점을 찾아보세요</p>
-                        <p><i class="fas fa-check text-green-600 mr-2"></i>반복 연습으로 정확도를 높이세요</p>
-                        ${this.currentUser?.plan !== 'premium' ? `
-                          <div class="mt-4 p-3 bg-purple-100 border border-purple-300 rounded-lg">
-                            <p class="font-semibold text-purple-900 mb-1">
-                              <i class="fas fa-crown text-yellow-500 mr-1"></i>Premium 전용 기능
-                            </p>
-                            <p class="text-xs text-purple-700">
-                              AI 발음 코치가 상세한 피드백과 개선 포인트를 제공합니다
-                            </p>
-                          </div>
+                      <div class="bg-white rounded-lg p-4">
+                        <div class="flex items-center gap-3">
+                          <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-600"></div>
+                          <p class="text-gray-700">AI가 당신의 발음을 상세히 분석하고 있습니다...</p>
+                        </div>
+                      </div>
+                    </div>
+                  `}
+                  
+                  <!-- XP Reward Notification -->
+                  <div class="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-4 border-2 border-yellow-300 mb-4">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-3">
+                        <div class="text-3xl">🎉</div>
+                        <div>
+                          <div class="font-bold text-lg text-gray-900">+10 XP 획득!</div>
+                          <div class="text-sm text-gray-600">문장 완료 보상 (일일 최대 100 XP)</div>
+                        </div>
+                      </div>
+                      <div class="text-2xl font-bold text-yellow-600">+10</div>
+                    </div>
+                  </div>
+                </div>
                         ` : ''}
                       </div>
                     </div>
