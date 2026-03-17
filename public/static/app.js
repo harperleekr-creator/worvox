@@ -10753,26 +10753,49 @@ Proceed to payment?
                   </div>
                 </div>
                 
-                <!-- Prize Spin Wheel Button -->
+                <!-- Random Box Info Banner -->
                 <div class="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 rounded-2xl p-6 mb-4 shadow-xl">
-                  <div class="flex items-center justify-between">
-                    <div class="text-white">
-                      <h3 class="text-2xl font-bold mb-2">🎁 상품 뽑기</h3>
-                      <p class="text-sm opacity-90">레벨업 보상으로 실제 상품을 받으세요!</p>
-                      <p class="text-xs opacity-75 mt-1">스타벅스 기프트카드, 아이패드, 프리미엄 구독권 등</p>
-                    </div>
-                    <button 
-                      onclick="worvox.showSpinWheel()"
-                      class="bg-white text-purple-600 px-8 py-4 rounded-xl text-lg font-bold hover:bg-purple-50 transition-all shadow-lg hover:shadow-xl hover:scale-105 transform">
-                      <i class="fas fa-gift mr-2"></i>
-                      상품 뽑기!
-                    </button>
+                  <div class="text-center text-white">
+                    <h3 class="text-2xl font-bold mb-2">🎁 랜덤박스에서</h3>
+                    <p class="text-lg font-semibold mb-1">스타벅스 음료 쿠폰 / 신세계 상품권 / 아이패드 미니</p>
+                    <p class="text-sm opacity-90">등 다양한 상품을 얻어가세요!</p>
                   </div>
                 </div>
                 
                 <!-- Random Box Section -->
                 <div id="randomBoxSection" class="bg-white rounded-xl shadow-lg p-4 mb-4">
                   <h3 class="text-lg font-bold text-gray-800 mb-3 text-center">🎁 행운의 랜덤박스</h3>
+                  
+                  <!-- Prize Preview Grid -->
+                  <div class="mb-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-3 text-center">🎁 당첨 가능 상품</h4>
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                      <div class="bg-white rounded-lg p-2 shadow-sm">
+                        <div class="text-2xl mb-1">💎</div>
+                        <div class="text-xs font-semibold text-gray-700">50~200 XP</div>
+                      </div>
+                      <div class="bg-white rounded-lg p-2 shadow-sm">
+                        <div class="text-2xl mb-1">⭐</div>
+                        <div class="text-xs font-semibold text-gray-700">프리미엄 1~3개월</div>
+                      </div>
+                      <div class="bg-white rounded-lg p-2 shadow-sm">
+                        <div class="text-2xl mb-1">☕</div>
+                        <div class="text-xs font-semibold text-gray-700">스타벅스 쿠폰</div>
+                      </div>
+                      <div class="bg-white rounded-lg p-2 shadow-sm">
+                        <div class="text-2xl mb-1">🎁</div>
+                        <div class="text-xs font-semibold text-gray-700">신세계 상품권</div>
+                      </div>
+                      <div class="bg-white rounded-lg p-2 shadow-sm">
+                        <div class="text-2xl mb-1">🎧</div>
+                        <div class="text-xs font-semibold text-gray-700">에어팟 프로</div>
+                      </div>
+                      <div class="bg-white rounded-lg p-2 shadow-sm">
+                        <div class="text-2xl mb-1">📱</div>
+                        <div class="text-xs font-semibold text-gray-700">아이패드 미니</div>
+                      </div>
+                    </div>
+                  </div>
                   
                   <!-- Box Container (Fixed Height) -->
                   <div class="flex justify-center items-center mb-3">
@@ -11009,7 +11032,6 @@ Proceed to payment?
       if (storedUser) {
         this.currentUser = JSON.parse(storedUser);
       } else {
-        
         this.showLogin();
         return;
       }
@@ -11029,125 +11051,100 @@ Proceed to payment?
     mysteryBox.classList.add('hidden');
     boxOpening.classList.remove('hidden');
     
-    // Prizes with probabilities
-    const prizes = [
-      { name: 'XP 50', probability: 55, icon: '⚡' },
-      { name: 'XP 300', probability: 40, icon: '💫' },
-      { name: '스타벅스 아메리카노', probability: 4.9, icon: '☕' },
-      { name: '스타벅스 1만원권', probability: 0.025, icon: '🎫' },
-      { name: '로지텍 무선 키보드', probability: 0.025, icon: '⌨️' },
-      { name: '삼성 버즈', probability: 0.025, icon: '🎧' },
-      { name: '에어팟 프로', probability: 0.013, icon: '🎵' },
-      { name: '아이패드 프로', probability: 0.012, icon: '📱' }
-    ];
-    
-    // Select prize based on probability
-    const random = Math.random() * 100;
-    let cumulative = 0;
-    let selectedPrize = prizes[0];
-    
-    for (let i = 0; i < prizes.length; i++) {
-      cumulative += prizes[i].probability;
-      if (random <= cumulative) {
-        selectedPrize = prizes[i];
-        break;
-      }
-    }
-    
-    // Wait for animation (2 seconds)
-    setTimeout(async () => {
-      // Decrease available count
-      this.availableSpins--;
-      await this.saveSpinCount();
-      this.updateSpinCount();
+    try {
+      // Call backend API to spin and get prize
+      console.log('🎲 Calling spin API...');
+      const response = await axios.post('/api/rewards/spin', {
+        userId: this.currentUser.id
+      });
       
-      // Award XP if XP prize
-      let xpAwarded = 0;
-      let xpAwardSuccess = false;
-      try {
-        if (selectedPrize.name === 'XP 50') {
-          xpAwarded = 50;
-          const result = await this.awardXP(50, 'random_box', 'Random Box - XP 50');
-          if (result && result.success) {
-            console.log('✅ XP awarded successfully:', xpAwarded);
-            xpAwardSuccess = true;
-            // Refresh user stats to update UI
-            await this.loadUsageFromServer();
-            await this.loadGamificationStats();
-          }
-        } else if (selectedPrize.name === 'XP 300') {
-          xpAwarded = 300;
-          const result = await this.awardXP(300, 'random_box', 'Random Box - XP 300');
-          if (result && result.success) {
-            console.log('✅ XP awarded successfully:', xpAwarded);
-            xpAwardSuccess = true;
-            // Refresh user stats to update UI
-            await this.loadUsageFromServer();
-            await this.loadGamificationStats();
-          }
-        }
-      } catch (error) {
-        console.error('❌ Error awarding XP:', error);
-        // Still show the prize but with an error message
+      console.log('🎁 Spin result:', response.data);
+      
+      if (!response.data.success) {
+        throw new Error(response.data.error || 'Failed to spin');
       }
       
-      // Update Rewards page Level Card in real-time if XP was awarded
-      if (xpAwardSuccess && xpAwarded > 0) {
-        try {
-          const stats = await gamificationManager.getStats(this.currentUser.id);
-          if (stats) {
-            // Update Level display
-            const levelCards = document.querySelectorAll('.bg-gradient-to-r.from-indigo-600 h2');
-            if (levelCards.length > 0) {
-              levelCards[0].textContent = `Level ${stats.stats.level}`;
-            }
-            
-            // Update XP progress bar
-            const progressBar = document.querySelector('.bg-yellow-400');
-            if (progressBar) {
-              progressBar.style.width = `${stats.stats.progress}%`;
-            }
-            
-            // Update XP text
-            const xpTexts = document.querySelectorAll('.text-xs.text-indigo-100');
-            for (let elem of xpTexts) {
-              if (elem.textContent.includes('XP')) {
-                elem.textContent = `${stats.stats.xp} / ${stats.stats.xpForNextLevel} XP`;
-                break;
+      const prize = response.data.prize;
+      
+      // Wait for animation (2 seconds)
+      setTimeout(async () => {
+        // Update available spins count from server
+        this.availableSpins = response.data.remainingSpins;
+        await this.saveSpinCount();
+        this.updateSpinCount();
+        
+        // Hide opening animation and mystery box
+        boxOpening.classList.add('hidden');
+        mysteryBox.classList.add('hidden');
+        
+        // Check if it's an XP reward
+        const isXP = prize.name.includes('XP');
+        
+        if (isXP) {
+          // XP Reward - show immediately and allow closing to draw again
+          const xpAmount = parseInt(prize.name.match(/\d+/)[0]);
+          
+          // Refresh user stats to update UI
+          await this.loadUsageFromServer();
+          await this.loadGamificationStats();
+          
+          // Update Rewards page Level Card in real-time
+          try {
+            const stats = await gamificationManager.getStats(this.currentUser.id);
+            if (stats) {
+              const levelCards = document.querySelectorAll('.bg-gradient-to-r.from-indigo-600 h2');
+              if (levelCards.length > 0) {
+                levelCards[0].textContent = `Level ${stats.stats.level}`;
               }
+              
+              const progressBar = document.querySelector('.bg-yellow-400');
+              if (progressBar) {
+                progressBar.style.width = `${stats.stats.progress}%`;
+              }
+              
+              const xpTexts = document.querySelectorAll('.text-xs.text-indigo-100');
+              for (let elem of xpTexts) {
+                if (elem.textContent.includes('XP')) {
+                  elem.textContent = `${stats.stats.xp} / ${stats.stats.xpForNextLevel} XP`;
+                  break;
+                }
+              }
+              
+              console.log('✅ Updated Rewards page UI with new XP:', stats.stats.xp);
             }
-            
-            console.log('✅ Updated Rewards page UI with new XP:', stats.stats.xp);
+          } catch (error) {
+            console.error('❌ Failed to update Rewards page UI:', error);
           }
-        } catch (error) {
-          console.error('❌ Failed to update Rewards page UI:', error);
+          
+          boxResult.innerHTML = `
+            <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-orange-500 text-white rounded-xl shadow-xl flex items-center justify-center">
+              <div class="text-center">
+                <div class="text-5xl mb-3">💎</div>
+                <div class="text-lg font-bold mb-1">축하합니다!</div>
+                <div class="text-base mb-2">${prize.name} 당첨!</div>
+                <div class="text-sm text-yellow-100">✨ +${xpAmount} XP 획득!</div>
+                <div class="text-xs opacity-80 mt-2">남은 횟수: ${this.availableSpins}회</div>
+              </div>
+            </div>
+          `;
+          boxResult.classList.remove('hidden');
+          
+          const closeBtn = document.getElementById('closeButtonContainer');
+          if (closeBtn) {
+            closeBtn.classList.remove('hidden');
+          }
+        } else {
+          // Physical/Digital Prize - show claim form
+          this.showPrizeClaimForm(prize);
         }
-      }
+      }, 2000);
       
-      // Hide opening animation and mystery box
+    } catch (error) {
+      console.error('❌ Failed to spin:', error);
       boxOpening.classList.add('hidden');
-      mysteryBox.classList.add('hidden');
-      
-      // Show result (in the same box position)
-      boxResult.innerHTML = `
-        <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-orange-500 text-white rounded-xl shadow-xl flex items-center justify-center">
-          <div class="text-center">
-            <div class="text-5xl mb-3">${selectedPrize.icon}</div>
-            <div class="text-lg font-bold mb-1">축하합니다!</div>
-            <div class="text-base mb-2">${selectedPrize.name} 당첨!</div>
-            ${xpAwarded > 0 ? `<div class="text-sm text-yellow-100">✨ +${xpAwarded} XP 획득!</div>` : ''}
-            <div class="text-xs opacity-80 mt-2">남은 횟수: ${this.availableSpins}회</div>
-          </div>
-        </div>
-      `;
-      boxResult.classList.remove('hidden');
-      
-      // Show close button
-      const closeBtn = document.getElementById('closeButtonContainer');
-      if (closeBtn) {
-        closeBtn.classList.remove('hidden');
-      }
-    }, 2000);
+      mysteryBox.classList.remove('hidden');
+      alert('랜덤박스 열기에 실패했습니다. 다시 시도해주세요.');
+    }
   }
   
   closeBoxResult() {
@@ -11178,6 +11175,139 @@ Proceed to payment?
         </div>
       `;
       boxResult.classList.remove('hidden');
+    }
+  }
+  
+  showPrizeClaimForm(prize) {
+    const boxResult = document.getElementById('boxResult');
+    const isPhysical = prize.category === 'physical';
+    
+    boxResult.innerHTML = `
+      <div class="absolute inset-0 bg-white rounded-xl shadow-xl p-6 overflow-y-auto">
+        <div class="text-center mb-6">
+          <div class="text-5xl mb-3">🎉</div>
+          <h3 class="text-2xl font-bold text-gray-800 mb-2">축하합니다!</h3>
+          <p class="text-lg text-gray-700 mb-1">${prize.name_ko} 당첨!</p>
+          <p class="text-sm text-gray-500">${prize.description}</p>
+        </div>
+        
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+          <p class="text-sm text-yellow-800">
+            <i class="fas fa-info-circle mr-2"></i>
+            아래 정보를 입력하시면 상품 수령을 위해 연락드리겠습니다.
+          </p>
+        </div>
+        
+        <form id="prizeClaimForm" class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">이름 *</label>
+            <input type="text" id="claimName" required 
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              placeholder="홍길동">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">이메일 *</label>
+            <input type="email" id="claimEmail" required 
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              placeholder="example@email.com"
+              value="${this.currentUser.email || ''}">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">전화번호 *</label>
+            <input type="tel" id="claimPhone" required 
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              placeholder="010-1234-5678">
+          </div>
+          
+          ${isPhysical ? `
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">배송지 주소 *</label>
+            <textarea id="claimAddress" required rows="3"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              placeholder="서울특별시 강남구 테헤란로 123&#10;우편번호: 12345"></textarea>
+          </div>
+          ` : ''}
+          
+          <div class="flex gap-3 mt-6">
+            <button type="submit" 
+              class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 rounded-lg font-bold hover:shadow-lg transition-all">
+              <i class="fas fa-paper-plane mr-2"></i>
+              제출하기
+            </button>
+          </div>
+        </form>
+      </div>
+    `;
+    boxResult.classList.remove('hidden');
+    
+    // Add form submit handler
+    document.getElementById('prizeClaimForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await this.submitPrizeClaim(prize);
+    });
+  }
+  
+  async submitPrizeClaim(prize) {
+    const name = document.getElementById('claimName').value.trim();
+    const email = document.getElementById('claimEmail').value.trim();
+    const phone = document.getElementById('claimPhone').value.trim();
+    const addressElem = document.getElementById('claimAddress');
+    const address = addressElem ? addressElem.value.trim() : '';
+    
+    if (!name || !email || !phone) {
+      alert('모든 필수 항목을 입력해주세요.');
+      return;
+    }
+    
+    if (prize.category === 'physical' && !address) {
+      alert('배송지 주소를 입력해주세요.');
+      return;
+    }
+    
+    try {
+      const response = await axios.post('/api/rewards/claim', {
+        userId: this.currentUser.id,
+        prizeId: prize.id,
+        name,
+        email,
+        phone,
+        address
+      });
+      
+      if (response.data.success) {
+        // Show success message
+        const boxResult = document.getElementById('boxResult');
+        boxResult.innerHTML = `
+          <div class="absolute inset-0 bg-gradient-to-br from-green-400 to-blue-500 text-white rounded-xl shadow-xl flex items-center justify-center">
+            <div class="text-center px-6">
+              <div class="text-5xl mb-4">✅</div>
+              <h3 class="text-2xl font-bold mb-3">제출 완료!</h3>
+              <p class="text-base mb-4">
+                ${prize.name_ko} 수령을 위해<br>
+                곧 연락드리겠습니다!
+              </p>
+              <div class="space-y-3 mt-6">
+                <button onclick="worvox.showMyPrizes()" 
+                  class="w-full bg-white text-blue-600 px-6 py-3 rounded-lg font-bold hover:bg-blue-50 transition-all shadow-lg">
+                  <i class="fas fa-gift mr-2"></i>
+                  내 상품 보기
+                </button>
+                <button onclick="worvox.closeBoxResult()" 
+                  class="w-full bg-white bg-opacity-20 text-white px-6 py-3 rounded-lg font-bold hover:bg-opacity-30 transition-all">
+                  닫기
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        throw new Error(response.data.error || '제출 실패');
+      }
+    } catch (error) {
+      console.error('❌ Failed to submit claim:', error);
+      alert('제출에 실패했습니다. 다시 시도해주세요.');
     }
   }
 
