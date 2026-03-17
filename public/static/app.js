@@ -10753,6 +10753,23 @@ Proceed to payment?
                   </div>
                 </div>
                 
+                <!-- Prize Spin Wheel Button -->
+                <div class="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 rounded-2xl p-6 mb-4 shadow-xl">
+                  <div class="flex items-center justify-between">
+                    <div class="text-white">
+                      <h3 class="text-2xl font-bold mb-2">🎁 상품 뽑기</h3>
+                      <p class="text-sm opacity-90">레벨업 보상으로 실제 상품을 받으세요!</p>
+                      <p class="text-xs opacity-75 mt-1">스타벅스 기프트카드, 아이패드, 프리미엄 구독권 등</p>
+                    </div>
+                    <button 
+                      onclick="worvox.showSpinWheel()"
+                      class="bg-white text-purple-600 px-8 py-4 rounded-xl text-lg font-bold hover:bg-purple-50 transition-all shadow-lg hover:shadow-xl hover:scale-105 transform">
+                      <i class="fas fa-gift mr-2"></i>
+                      상품 뽑기!
+                    </button>
+                  </div>
+                </div>
+                
                 <!-- Random Box Section -->
                 <div id="randomBoxSection" class="bg-white rounded-xl shadow-lg p-4 mb-4">
                   <h3 class="text-lg font-bold text-gray-800 mb-3 text-center">🎁 행운의 랜덤박스</h3>
