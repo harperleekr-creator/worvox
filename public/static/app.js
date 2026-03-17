@@ -7049,8 +7049,9 @@ Proceed to payment?
       const stats = statsResponse.data.stats;
       console.log('📈 User stats loaded:', stats);
 
-      // Calculate total words spoken (approximate)
-      const totalWords = Math.floor(stats.totalMessages / 2) * 10;
+      // ✅ Calculate total words spoken (approximate) and add to stats
+      stats.wordsLearned = Math.floor((stats.totalMessages || 0) / 2) * 10;
+      const totalWords = stats.wordsLearned;
       
       console.log('🎨 Rendering dashboard with data:', {
         streak: gamificationStats.streak,
