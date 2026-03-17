@@ -58,9 +58,9 @@ rewards.post('/spin', async (c) => {
 
     // Get available prizes for user's level
     const prizes = await c.env.DB.prepare(`
-      SELECT id, name, name_ko, description, image_url, category, probability, required_level
+      SELECT id, name, name_ko, description, image_url, category, probability, required_level, stock
       FROM reward_prizes
-      WHERE is_active = 1 AND required_level <= ? AND stock > 0
+      WHERE is_active = 1 AND required_level <= ? AND (stock > 0 OR stock = -1)
     `).bind(user.user_level).all();
 
     if (!prizes.results || prizes.results.length === 0) {
@@ -93,18 +93,41 @@ rewards.post('/spin', async (c) => {
       'UPDATE users SET spin_count = spin_count - 1 WHERE id = ?'
     ).bind(userId).run();
 
-    // Record the win
-    await c.env.DB.prepare(`
-      INSERT INTO user_prize_wins (user_id, prize_id, claim_status)
-      VALUES (?, ?, 'pending')
-    `).bind(userId, selectedPrize.id).run();
+    // Check if it's an XP prize
+    const isXPPrize = selectedPrize.category === 'xp';
 
-    // Decrease stock
-    await c.env.DB.prepare(
-      'UPDATE reward_prizes SET stock = stock - 1 WHERE id = ?'
-    ).bind(selectedPrize.id).run();
+    if (isXPPrize) {
+      // For XP prizes: award XP directly
+      const xpAmount = parseInt(selectedPrize.name.match(/\d+/)?.[0] || '0');
+      
+      if (xpAmount > 0) {
+        // Add XP to user
+        await c.env.DB.prepare(
+          'UPDATE users SET xp = xp + ?, total_xp = total_xp + ? WHERE id = ?'
+        ).bind(xpAmount, xpAmount, userId).run();
 
-    console.log(`✅ User ${userId} won prize: ${selectedPrize.name_ko}`);
+        // Record transaction
+        await c.env.DB.prepare(`
+          INSERT INTO xp_transactions (user_id, xp_amount, transaction_type, description)
+          VALUES (?, ?, 'random_box', ?)
+        `).bind(userId, xpAmount, `Random Box - ${selectedPrize.name_ko}`).run();
+
+        console.log(`✅ User ${userId} won XP: ${xpAmount}`);
+      }
+    } else {
+      // For physical/digital prizes: record the win
+      await c.env.DB.prepare(`
+        INSERT INTO user_prize_wins (user_id, prize_id, claim_status)
+        VALUES (?, ?, 'pending')
+      `).bind(userId, selectedPrize.id).run();
+
+      // Decrease stock (only for non-XP prizes)
+      await c.env.DB.prepare(
+        'UPDATE reward_prizes SET stock = stock - 1 WHERE id = ? AND stock > 0'
+      ).bind(selectedPrize.id).run();
+
+      console.log(`✅ User ${userId} won prize: ${selectedPrize.name_ko}`);
+    }
 
     return c.json({
       success: true,
@@ -167,12 +190,27 @@ rewards.get('/my-prizes', async (c) => {
 // 📝 Submit claim information
 rewards.post('/claim', async (c) => {
   try {
-    const { winId, contactInfo, shippingAddress } = await c.req.json();
+    const { userId, prizeId, name, email, phone, address } = await c.req.json();
 
-    if (!winId) {
-      return c.json({ success: false, error: 'Win ID required' }, 400);
+    if (!userId || !prizeId) {
+      return c.json({ success: false, error: 'User ID and Prize ID required' }, 400);
     }
 
+    // Find the win record
+    const win = await c.env.DB.prepare(`
+      SELECT id FROM user_prize_wins
+      WHERE user_id = ? AND prize_id = ? AND claim_status = 'pending'
+      ORDER BY won_at DESC
+      LIMIT 1
+    `).bind(userId, prizeId).first();
+
+    if (!win) {
+      return c.json({ success: false, error: 'Win record not found' }, 404);
+    }
+
+    // Update claim information
+    const contactInfo = JSON.stringify({ name, email, phone });
+    
     await c.env.DB.prepare(`
       UPDATE user_prize_wins
       SET 
@@ -182,12 +220,12 @@ rewards.post('/claim', async (c) => {
         claimed_at = datetime('now')
       WHERE id = ?
     `).bind(
-      JSON.stringify(contactInfo),
-      shippingAddress || null,
-      winId
+      contactInfo,
+      address || null,
+      win.id
     ).run();
 
-    console.log(`✅ Prize claim submitted for win ID: ${winId}`);
+    console.log(`✅ Prize claim submitted for user ${userId}, prize ${prizeId}`);
 
     return c.json({
       success: true,
@@ -198,7 +236,8 @@ rewards.post('/claim', async (c) => {
     console.error('❌ Claim error:', error);
     return c.json({
       success: false,
-      error: 'Failed to submit claim'
+      error: 'Failed to submit claim',
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, 500);
   }
 });
