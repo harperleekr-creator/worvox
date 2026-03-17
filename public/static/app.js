@@ -513,7 +513,19 @@ class WorVox {
       const stats = await gamificationManager.getStats(this.currentUser.id);
       if (stats) {
         console.log('✅ Stats loaded:', stats.stats);
-        this.updateGamificationUI(stats.stats);
+        
+        // ✅ Map API response to expected format for UI update
+        const mappedStats = {
+          level: stats.stats.level || 1,
+          xp: stats.stats.xp || 0,
+          totalXp: stats.stats.totalXP || 0,  // ✅ API returns 'totalXP'
+          xpForNextLevel: stats.stats.xpForNextLevel || 100,
+          progress: stats.stats.progress || 0,
+          coins: stats.stats.coins || 0,
+          streak: stats.stats.currentStreak || 0  // ✅ API returns 'currentStreak'
+        };
+        
+        this.updateGamificationUI(mappedStats);
         console.log('✅ UI updated with level:', stats.stats.level);
       } else {
         console.warn('⚠️ No stats returned');
@@ -7015,7 +7027,15 @@ Proceed to payment?
         console.log('🔄 Fetching fresh gamification stats...');
         const gamifResponse = await axios.get(`/api/gamification/stats/${this.currentUser.id}`);
         if (gamifResponse.data.success) {
-          gamificationStats = gamifResponse.data.stats;
+          const rawStats = gamifResponse.data.stats;
+          // ✅ Map API response to expected format
+          gamificationStats = {
+            streak: rawStats.currentStreak || 0,  // ✅ API returns 'currentStreak'
+            xp: rawStats.xp || 0,
+            totalXp: rawStats.totalXP || 0,  // ✅ API returns 'totalXP'
+            level: rawStats.level || 1,
+            coins: rawStats.coins || 0
+          };
           console.log('🔄 Fresh gamification stats loaded for dashboard:', gamificationStats);
         } else {
           console.warn('⚠️ Gamification API returned success=false');
