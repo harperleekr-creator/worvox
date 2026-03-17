@@ -1956,7 +1956,8 @@ class WorVox {
       isPremiumAnalysis,
       originalWords,
       spokenWords,
-      isLoading = false
+      isLoading = false,
+      grammarScore = 85  // Default grammar score
     } = data;
     
     const app = document.getElementById('app');
