@@ -15872,6 +15872,337 @@ Proceed to payment?
       alert('사용자 정보 로딩 실패: ' + (error.response?.data?.error || error.response?.data?.details || error.message));
     }
   }
+
+  // 🎁 Show prize draw wheel
+  async showSpinWheel() {
+    if (!this.currentUser || !this.currentUser.id) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    try {
+      // Get available prizes
+      const prizesResponse = await axios.get(`/api/rewards/prizes?level=${this.currentUser.user_level || 1}`);
+      const prizes = prizesResponse.data.prizes || [];
+
+      if (prizes.length === 0) {
+        alert('현재 레벨에서 사용 가능한 상품이 없습니다.');
+        return;
+      }
+
+      // Get user's spin count
+      const userResponse = await axios.get(`/api/users/${this.currentUser.id}`);
+      const spinCount = userResponse.data.user?.spin_count || 0;
+
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        ${this.getSidebar('rewards')}
+        <div class="flex-1 overflow-y-auto">
+          <div class="max-w-6xl mx-auto p-6">
+            <button onclick="worvox.showRewards()" class="mb-4 flex items-center text-purple-600 hover:text-purple-700">
+              <i class="fas fa-arrow-left mr-2"></i> 돌아가기
+            </button>
+
+            <div class="bg-gradient-to-br from-purple-50 via-pink-50 to-purple-100 rounded-2xl p-8 mb-8">
+              <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">
+                  🎁 상품 뽑기
+                </h2>
+                <p class="text-gray-600">레벨업할 때마다 뽑기 기회를 얻습니다!</p>
+                <div class="mt-4 inline-flex items-center bg-white px-6 py-3 rounded-full shadow-lg">
+                  <span class="text-2xl font-bold text-purple-600">${spinCount}</span>
+                  <span class="ml-2 text-gray-600">회 남음</span>
+                </div>
+              </div>
+
+              ${spinCount > 0 ? `
+                <div class="text-center mb-8">
+                  <button 
+                    onclick="worvox.spinWheel()"
+                    class="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 text-white px-12 py-4 rounded-2xl text-xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 animate-pulse">
+                    <i class="fas fa-gift mr-3"></i>
+                    지금 뽑기!
+                  </button>
+                </div>
+              ` : `
+                <div class="text-center mb-8 bg-white p-6 rounded-xl">
+                  <p class="text-gray-600 mb-4">💪 레벨업하여 뽑기 기회를 얻으세요!</p>
+                  <button 
+                    onclick="worvox.showTopicSelection()"
+                    class="bg-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-all">
+                    학습 시작하기
+                  </button>
+                </div>
+              `}
+
+              <div class="bg-white rounded-xl p-6 shadow-lg">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                  <i class="fas fa-star text-yellow-500 mr-2"></i>
+                  상품이 기다려요!
+                </h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  ${prizes.map(prize => `
+                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-lg text-center border-2 ${prize.required_level <= (this.currentUser.user_level || 1) ? 'border-purple-300' : 'border-gray-300 opacity-50'}">
+                      <div class="text-4xl mb-2">${prize.image_url}</div>
+                      <div class="text-sm font-semibold text-gray-800 mb-1">${prize.name_ko}</div>
+                      <div class="text-xs text-gray-600">Lv.${prize.required_level}+</div>
+                      ${prize.stock <= 10 ? `<div class="text-xs text-red-500 mt-1">⚠️ 재고 ${prize.stock}개</div>` : ''}
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+
+            <div id="prizeResult"></div>
+          </div>
+        </div>
+        ${this.getFooter()}
+      `;
+
+    } catch (error) {
+      console.error('Show spin wheel error:', error);
+      alert('상품 정보를 불러오는데 실패했습니다.');
+    }
+  }
+
+  // 🎲 Spin the wheel
+  async spinWheel() {
+    if (!this.currentUser || !this.currentUser.id) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    try {
+      const response = await axios.post('/api/rewards/spin', {
+        userId: this.currentUser.id
+      });
+
+      if (response.data.success) {
+        const prize = response.data.prize;
+        
+        // Show winning animation and prize
+        const resultDiv = document.getElementById('prizeResult');
+        resultDiv.innerHTML = `
+          <div class="bg-white rounded-2xl p-8 shadow-2xl text-center animate-bounce-in">
+            <div class="text-6xl mb-4">🎉</div>
+            <h3 class="text-3xl font-bold text-purple-600 mb-4">축하합니다!</h3>
+            <div class="text-7xl mb-4">${prize.image_url}</div>
+            <h4 class="text-2xl font-bold text-gray-800 mb-2">${prize.name_ko}</h4>
+            <p class="text-gray-600 mb-6">${prize.description || ''}</p>
+            
+            <div class="bg-yellow-50 border-2 border-yellow-300 rounded-xl p-6 mb-6">
+              <h5 class="font-bold text-gray-800 mb-3">📝 상품 수령 방법</h5>
+              <p class="text-sm text-gray-700 mb-4">
+                ${prize.category === 'digital' 
+                  ? '디지털 상품은 이메일로 전송됩니다. 아래 버튼을 눌러 연락처를 입력해주세요!' 
+                  : prize.category === 'service'
+                  ? '서비스 상품은 자동으로 계정에 적용됩니다. 감사합니다!'
+                  : '실물 상품은 배송이 필요합니다. 아래 버튼을 눌러 배송지를 입력해주세요!'}
+              </p>
+              ${prize.category !== 'service' ? `
+                <button 
+                  onclick="worvox.showClaimForm(${response.data.winId || 'null'})"
+                  class="bg-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-all">
+                  <i class="fas fa-envelope mr-2"></i>
+                  연락처 입력하기
+                </button>
+              ` : ''}
+            </div>
+
+            <div class="flex gap-4 justify-center">
+              <button 
+                onclick="worvox.showMyPrizes()"
+                class="bg-purple-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-all">
+                <i class="fas fa-list mr-2"></i>
+                내 상품 보기
+              </button>
+              <button 
+                onclick="worvox.showSpinWheel()"
+                class="bg-gray-200 text-gray-800 px-6 py-3 rounded-xl font-semibold hover:bg-gray-300 transition-all">
+                <i class="fas fa-redo mr-2"></i>
+                다시 뽑기
+              </button>
+            </div>
+          </div>
+        `;
+
+        // Scroll to result
+        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        alert(response.data.message);
+
+      } else {
+        alert(response.data.message || '뽑기에 실패했습니다.');
+      }
+
+    } catch (error) {
+      console.error('Spin wheel error:', error);
+      alert(error.response?.data?.message || '뽑기에 실패했습니다.');
+    }
+  }
+
+  // 📋 Show my prizes
+  async showMyPrizes() {
+    if (!this.currentUser || !this.currentUser.id) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    try {
+      const response = await axios.get(`/api/rewards/my-prizes?userId=${this.currentUser.id}`);
+      const prizes = response.data.prizes || [];
+
+      const app = document.getElementById('app');
+      app.innerHTML = `
+        ${this.getSidebar('rewards')}
+        <div class="flex-1 overflow-y-auto">
+          <div class="max-w-6xl mx-auto p-6">
+            <button onclick="worvox.showRewards()" class="mb-4 flex items-center text-purple-600 hover:text-purple-700">
+              <i class="fas fa-arrow-left mr-2"></i> 돌아가기
+            </button>
+
+            <div class="bg-white rounded-2xl p-8 shadow-lg">
+              <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <i class="fas fa-gift text-purple-600 mr-3"></i>
+                내 당첨 상품
+              </h2>
+
+              ${prizes.length === 0 ? `
+                <div class="text-center py-12">
+                  <div class="text-6xl mb-4">🎁</div>
+                  <p class="text-gray-600 mb-6">아직 당첨된 상품이 없습니다.</p>
+                  <button 
+                    onclick="worvox.showSpinWheel()"
+                    class="bg-purple-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-purple-700 transition-all">
+                    상품 뽑기
+                  </button>
+                </div>
+              ` : `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  ${prizes.map(prize => `
+                    <div class="border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all">
+                      <div class="flex items-start gap-4">
+                        <div class="text-5xl">${prize.image_url}</div>
+                        <div class="flex-1">
+                          <h3 class="text-lg font-bold text-gray-800 mb-2">${prize.name_ko}</h3>
+                          <p class="text-sm text-gray-600 mb-3">${prize.description || ''}</p>
+                          
+                          <div class="flex items-center gap-2 mb-3">
+                            <span class="px-3 py-1 text-xs rounded-full ${
+                              prize.claim_status === 'completed' ? 'bg-green-100 text-green-700' :
+                              prize.claim_status === 'contacted' ? 'bg-blue-100 text-blue-700' :
+                              'bg-yellow-100 text-yellow-700'
+                            }">
+                              ${
+                                prize.claim_status === 'completed' ? '✅ 수령 완료' :
+                                prize.claim_status === 'contacted' ? '📞 연락 완료' :
+                                '⏳ 수령 대기'
+                              }
+                            </span>
+                            ${prize.tracking_number ? `<span class="text-xs text-gray-500">운송장: ${prize.tracking_number}</span>` : ''}
+                          </div>
+
+                          <div class="text-xs text-gray-500">
+                            당첨일: ${new Date(prize.won_at).toLocaleDateString('ko-KR')}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              `}
+            </div>
+          </div>
+        </div>
+        ${this.getFooter()}
+      `;
+
+    } catch (error) {
+      console.error('Show my prizes error:', error);
+      alert('당첨 내역을 불러오는데 실패했습니다.');
+    }
+  }
+
+  // 📝 Show claim form
+  showClaimForm(winId) {
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+    modal.innerHTML = `
+      <div class="bg-white rounded-2xl p-8 max-w-md w-full">
+        <h3 class="text-2xl font-bold text-gray-800 mb-6">상품 수령 정보 입력</h3>
+        
+        <form id="claimForm" class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">이름 *</label>
+            <input type="text" name="name" required 
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">이메일 *</label>
+            <input type="email" name="email" required 
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              value="${this.currentUser.email || ''}">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">전화번호 *</label>
+            <input type="tel" name="phone" required 
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              placeholder="010-1234-5678">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">배송지 주소 (실물 상품일 경우)</label>
+            <textarea name="address" rows="3"
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              placeholder="서울시 강남구..."></textarea>
+          </div>
+
+          <div class="flex gap-3 mt-6">
+            <button type="submit"
+              class="flex-1 bg-purple-600 text-white py-3 rounded-xl font-semibold hover:bg-purple-700 transition-all">
+              제출하기
+            </button>
+            <button type="button" onclick="this.closest('.fixed').remove()"
+              class="flex-1 bg-gray-200 text-gray-800 py-3 rounded-xl font-semibold hover:bg-gray-300 transition-all">
+              취소
+            </button>
+          </div>
+        </form>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    document.getElementById('claimForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      
+      try {
+        const response = await axios.post('/api/rewards/claim', {
+          winId: winId,
+          contactInfo: {
+            name: formData.get('name'),
+            email: formData.get('email'),
+            phone: formData.get('phone')
+          },
+          shippingAddress: formData.get('address')
+        });
+
+        if (response.data.success) {
+          alert(response.data.message);
+          modal.remove();
+          this.showMyPrizes();
+        } else {
+          alert('제출 실패: ' + response.data.error);
+        }
+      } catch (error) {
+        console.error('Claim submission error:', error);
+        alert('제출에 실패했습니다.');
+      }
+    });
+  }
 }
 
 // Initialize app

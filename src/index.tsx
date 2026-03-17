@@ -14,6 +14,7 @@ import history from './routes/history';
 import vocabulary from './routes/vocabulary';
 import preview from './routes/preview';
 import gamification from './routes/gamification';
+import rewards from './routes/rewards';
 import usage from './routes/usage';
 import analysis from './routes/analysis';
 import payments from './routes/payments';
@@ -29,7 +30,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1773719451292'; // Update manually or via build script
+const BUILD_TIME = '1773725662272'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -167,6 +168,7 @@ app.route('/api/topics', topics);
 app.route('/api/history', history);
 app.route('/api/vocabulary', vocabulary);
 app.route('/api/gamification', gamification);
+app.route('/api/rewards', rewards);
 app.route('/api/usage', usage);
 app.route('/api/analysis', analysis);
 app.route('/api/payments', payments);
