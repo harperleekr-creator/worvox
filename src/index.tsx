@@ -30,7 +30,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1773733264121'; // Update manually or via build script
+const BUILD_TIME = '1773735160561'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -2828,7 +2828,7 @@ app.get('/test', (c) => {
         console.log("Window loaded");
     </script>
     
-    <script src="/static/app.min.js"></script>
+    <script src="/static/app.min.js?v=${BUILD_TIME}"></script>
     
     <script>
         console.log("=== After app.min.js ===");

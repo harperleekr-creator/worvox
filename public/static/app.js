@@ -658,6 +658,28 @@ class WorVox {
 
   // UI Rendering Methods
   getSidebar(activeItem = 'home') {
+    // Refresh user data from localStorage to ensure latest values
+    const savedUser = localStorage.getItem('worvox_user');
+    if (savedUser) {
+      try {
+        const latestUser = JSON.parse(savedUser);
+        // Update currentUser with latest data
+        this.currentUser = {...this.currentUser, ...latestUser};
+      } catch (e) {
+        console.error('Failed to parse saved user:', e);
+      }
+    }
+    
+    // Get current user stats for display
+    const currentLevel = this.currentUser?.user_level || 1;
+    const currentXP = this.currentUser?.xp || 0;
+    const totalXP = this.currentUser?.total_xp || 0;
+    const coins = this.currentUser?.coins || 0;
+    
+    // Calculate XP for next level
+    const xpForNextLevel = Math.floor(100 * Math.pow(1.5, currentLevel - 1));
+    const xpProgress = Math.min(100, Math.round((currentXP / xpForNextLevel) * 100));
+    
     return `
       <!-- Mobile Sidebar Overlay -->
       <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden" onclick="worvox.toggleMobileSidebar()"></div>
@@ -748,14 +770,14 @@ class WorVox {
           <div class="mb-3 bg-gray-800 rounded-lg p-3">
             <div class="flex items-center justify-between mb-2">
               <span class="text-xs text-gray-400">레벨</span>
-              <span id="user-level" class="text-sm font-bold text-yellow-400">Lv.1</span>
+              <span id="user-level" class="text-sm font-bold text-yellow-400">Lv.${currentLevel}</span>
             </div>
             <div class="w-full bg-gray-700 rounded-full h-2 mb-1">
-              <div id="xp-progress-bar" class="bg-gradient-to-r from-yellow-400 to-yellow-600 h-2 rounded-full transition-all" style="width: 0%"></div>
+              <div id="xp-progress-bar" class="bg-gradient-to-r from-yellow-400 to-yellow-600 h-2 rounded-full transition-all" style="width: ${xpProgress}%"></div>
             </div>
             <div class="flex items-center justify-between text-xs">
-              <span id="xp-text" class="text-gray-400">0 / 100 XP</span>
-              <span id="user-coins" class="text-yellow-400">💰 0</span>
+              <span id="xp-text" class="text-gray-400">${currentXP} / ${xpForNextLevel} XP</span>
+              <span id="user-coins" class="text-yellow-400">💰 ${coins}</span>
             </div>
           </div>
           
@@ -1170,6 +1192,22 @@ class WorVox {
     this.renderTimerChallenge(seconds, randomSentence, translation);
   }
 
+  // Retry the same timer challenge without generating a new sentence
+  retryTimerChallenge() {
+    if (!this.currentTimerChallenge) {
+      console.error('No current timer challenge to retry');
+      alert('다시 시도할 문장이 없습니다. 새 문장을 시작하세요.');
+      return;
+    }
+    
+    console.log('🔄 Retrying timer challenge:', this.currentTimerChallenge);
+    this.renderTimerChallenge(
+      this.currentTimerChallenge.seconds,
+      this.currentTimerChallenge.sentence,
+      this.currentTimerChallenge.translation
+    );
+  }
+
   // 🚀 Option C: Preload next prompt in background
   async preloadNextPrompt() {
     if (this.isPreloading || !this.currentUser) return;
@@ -1285,6 +1323,13 @@ class WorVox {
   }
 
   renderTimerChallenge(seconds, randomSentence, translation) {
+    // Store current sentence for retry functionality
+    this.currentTimerChallenge = {
+      seconds: seconds,
+      sentence: randomSentence,
+      translation: translation
+    };
+    
     const app = document.getElementById('app');
     app.innerHTML = `
       <div class="flex h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-pink-900">
@@ -2301,7 +2346,7 @@ class WorVox {
                     class="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-xl p-4 font-bold transition-all">
                     <i class="fas fa-arrow-right mr-2"></i>다음 문장
                   </button>
-                  <button onclick="worvox.startTimerChallenge(${timeLimit})" 
+                  <button onclick="worvox.retryTimerChallenge()" 
                     class="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl p-4 font-bold transition-all">
                     <i class="fas fa-redo mr-2"></i>다시 도전
                   </button>
@@ -3074,8 +3119,12 @@ class WorVox {
       const audioAnalysis = sttResponse.data.analysis || null;
       const originalSentence = this.currentScenarioPractice.scenario.sentences[this.currentScenarioPractice.currentSentenceIndex];
       
-      // Get detailed pronunciation analysis
-      let scores = this.calculateDetailedScores(originalSentence, transcription, audioBlob);
+      // Get detailed pronunciation analysis (initialize with default empty feedback)
+      let scores = {
+        ...this.calculateDetailedScores(originalSentence, transcription, audioBlob),
+        pronunciationFeedback: '',
+        pronunciationIssues: []
+      };
       
       // Try streaming AI analysis (GPT-4o + faster) - Always run for all users
       if (transcription && transcription !== '(인식되지 않음)') {
@@ -3440,8 +3489,8 @@ class WorVox {
                 
                 <!-- AI Pronunciation Feedback -->
                 <div class="border-t pt-6 mt-6">
-                  ${pronunciationFeedback && pronunciationFeedback.trim() ? `
-                    <!-- Premium AI Feedback Available -->
+                  ${pronunciationFeedback && pronunciationFeedback.trim() && pronunciationFeedback !== '' ? `
+                    <!-- AI Feedback Available -->
                     <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-5 mb-4 border-2 border-purple-200">
                       <div class="flex items-center mb-3">
                         <i class="fas fa-robot text-purple-600 mr-2 text-xl"></i>
@@ -3475,16 +3524,33 @@ class WorVox {
                       ` : ''}
                     </div>
                   ` : `
-                    <!-- Analyzing... or No AI Feedback Yet -->
-                    <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl p-5 border-2 border-purple-200 mb-4">
+                    <!-- Basic Pronunciation Guide -->
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border-2 border-blue-200">
                       <div class="flex items-center mb-3">
-                        <i class="fas fa-robot text-purple-600 mr-2 text-xl animate-pulse"></i>
-                        <h4 class="text-lg font-bold text-gray-900">💎 AI 발음 분석 중...</h4>
+                        <i class="fas fa-lightbulb text-blue-600 mr-2 text-xl"></i>
+                        <h4 class="text-lg font-bold text-gray-900">발음 연습 가이드</h4>
                       </div>
-                      <div class="bg-white rounded-lg p-4">
-                        <div class="flex items-center gap-3">
-                          <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-600"></div>
-                          <p class="text-gray-700">AI가 당신의 발음을 상세히 분석하고 있습니다...</p>
+                      <div class="bg-white rounded-lg p-4 space-y-3">
+                        <div class="flex items-start gap-3">
+                          <i class="fas fa-volume-up text-blue-600 mt-1"></i>
+                          <div>
+                            <p class="font-semibold text-gray-800 mb-1">1. 원문을 천천히 따라 읽어보세요</p>
+                            <p class="text-sm text-gray-600">각 단어의 발음에 집중하며 여러 번 반복합니다.</p>
+                          </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                          <i class="fas fa-microphone text-purple-600 mt-1"></i>
+                          <div>
+                            <p class="font-semibold text-gray-800 mb-1">2. 자연스러운 속도로 녹음해보세요</p>
+                            <p class="text-sm text-gray-600">너무 빠르거나 느리지 않게, 편안한 속도로 말합니다.</p>
+                          </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                          <i class="fas fa-redo text-green-600 mt-1"></i>
+                          <div>
+                            <p class="font-semibold text-gray-800 mb-1">3. 내 발음과 원문을 비교하세요</p>
+                            <p class="text-sm text-gray-600">다른 부분을 찾아내고 개선할 점을 파악합니다.</p>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -3503,11 +3569,6 @@ class WorVox {
                       <div class="text-2xl font-bold text-yellow-600">+10</div>
                     </div>
                   </div>
-                </div>
-                        ` : ''}
-                      </div>
-                    </div>
-                  `}
                 </div>
               </div>
               
@@ -4848,6 +4909,47 @@ class WorVox {
           reportData: reportData
         });
         console.log('✅ Exam report saved successfully');
+        
+        // Award XP for exam completion (30 XP per 5 questions, daily limit 100 XP)
+        try {
+          const completedQuestions = answersWithImprovement.length;
+          // Award 30 XP for each set of 5 completed questions
+          if (completedQuestions >= 5) {
+            const xpToAward = Math.floor(completedQuestions / 5) * 30;
+            console.log(`🎯 Awarding ${xpToAward} XP for completing ${completedQuestions} exam questions...`);
+            
+            const xpResponse = await axios.post('/api/gamification/xp/add', {
+              userId: this.currentUser.id,
+              xp: xpToAward,
+              activityType: 'exam',
+              details: `Exam completed: ${completedQuestions} questions`
+            });
+            
+            if (xpResponse.data.success) {
+              console.log('✅ XP awarded:', xpResponse.data);
+              
+              // Refresh gamification stats
+              await this.loadGamificationStats();
+              
+              // Show XP notification
+              this.showXPNotification(xpToAward, `시험 완료!`);
+              
+              // Update XP card in result screen (will be shown after render)
+              setTimeout(() => {
+                const xpCard = document.getElementById('exam-xp-card');
+                const xpValue = document.getElementById('exam-xp-value');
+                if (xpCard && xpValue) {
+                  xpValue.textContent = `+${xpToAward} XP`;
+                  xpCard.classList.remove('hidden');
+                }
+              }, 100);
+            } else if (xpResponse.data.error === 'Daily XP limit reached') {
+              console.log('⚠️ Daily XP limit reached for exam mode');
+            }
+          }
+        } catch (error) {
+          console.error('❌ Failed to award XP:', error);
+        }
       } catch (error) {
         console.warn('⚠️ Failed to save exam report:', error);
       }
@@ -4882,7 +4984,19 @@ class WorVox {
                     <div class="inline-block ${opicBg} ${opicColor} px-6 py-3 rounded-xl font-bold text-xl mb-2">
                       ${opicLevel}
                     </div>
-                    <p class="text-gray-600">${opicDescription}</p>
+                    <p class="text-gray-600 mb-4">${opicDescription}</p>
+                    
+                    <!-- XP Award Card (if XP was awarded) -->
+                    <div id="exam-xp-card" class="hidden bg-gradient-to-r from-purple-100 to-blue-100 rounded-xl p-4 mb-4 border-2 border-purple-300">
+                      <div class="flex items-center justify-center gap-3">
+                        <i class="fas fa-star text-yellow-500 text-2xl"></i>
+                        <div>
+                          <div class="text-sm text-gray-700 font-semibold">XP 획득!</div>
+                          <div id="exam-xp-value" class="text-xl font-bold text-purple-600">+30 XP</div>
+                        </div>
+                        <i class="fas fa-star text-yellow-500 text-2xl"></i>
+                      </div>
+                    </div>
                   </div>
                   
                   <!-- Average Scores -->
@@ -6869,6 +6983,17 @@ Proceed to payment?
       const statsResponse = await axios.get(`/api/users/${this.currentUser.id}/stats`);
       const stats = statsResponse.data.stats;
 
+      // Fetch gamification stats for streak, XP, and level
+      let gamificationStats = { streak: 0, xp: 0, totalXp: 0, level: 1, coins: 0 };
+      try {
+        const gamifResponse = await axios.get(`/api/gamification/stats/${this.currentUser.id}`);
+        if (gamifResponse.data.success) {
+          gamificationStats = gamifResponse.data.stats;
+        }
+      } catch (error) {
+        console.warn('Failed to load gamification stats:', error);
+      }
+
       // Calculate total words spoken (approximate)
       const totalWords = Math.floor(stats.totalMessages / 2) * 10;
 
@@ -6977,11 +7102,11 @@ Proceed to payment?
                   </h2>
                   <div class="grid grid-cols-3 gap-3">
                     <div class="text-center">
-                      <div class="text-xl md:text-2xl font-bold text-orange-500">${stats.todayMessages || 0}</div>
+                      <div class="text-xl md:text-2xl font-bold text-orange-500">${gamificationStats.streak || 0}</div>
                       <div class="text-xs text-gray-500">Streak</div>
                     </div>
                     <div class="text-center">
-                      <div class="text-xl md:text-2xl font-bold text-purple-500">${stats.totalXp || 0}</div>
+                      <div class="text-xl md:text-2xl font-bold text-purple-500">${gamificationStats.totalXp || 0}</div>
                       <div class="text-xs text-gray-500">XP</div>
                     </div>
                     <div class="text-center">
