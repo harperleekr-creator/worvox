@@ -82,7 +82,7 @@ gamification.post('/xp/add', async (c: Context<{ Bindings: Bindings }>) => {
 
     // Get current user stats
     const user = await c.env.DB.prepare(`
-      SELECT user_level, xp as current_xp, total_xp, coins 
+      SELECT user_level, xp as current_xp, total_xp, coins, daily_xp, last_xp_reset
       FROM users 
       WHERE id = ?
     `).bind(userId).first() as any
@@ -97,6 +97,27 @@ gamification.post('/xp/add', async (c: Context<{ Bindings: Bindings }>) => {
         message: `User with id ${userId} not found in database` 
       }, 404)
     }
+
+    // Check if daily XP needs to be reset (midnight UTC)
+    const today = new Date().toISOString().split('T')[0]
+    const lastReset = user.last_xp_reset
+    let currentDailyXP = user.daily_xp || 0
+    
+    if (lastReset !== today) {
+      // Save yesterday's XP to history before reset
+      if (lastReset && currentDailyXP > 0) {
+        await c.env.DB.prepare(`
+          INSERT OR REPLACE INTO daily_xp_history (user_id, date, total_xp, activity_count)
+          VALUES (?, ?, ?, 1)
+        `).bind(userId, lastReset, currentDailyXP).run()
+      }
+      
+      // Reset daily XP at midnight
+      currentDailyXP = 0
+      console.log(`🌅 Daily XP reset for user ${userId}: ${lastReset} -> ${today}`)
+    }
+    
+    const newDailyXP = currentDailyXP + xp
 
     const newTotalXP = (user.total_xp || 0) + xp
     const newLevel = calculateLevel(newTotalXP)
@@ -115,15 +136,17 @@ gamification.post('/xp/add', async (c: Context<{ Bindings: Bindings }>) => {
     const coinsEarned = Math.floor(xp / 10)
     const newCoins = (user.coins || 0) + coinsEarned
 
-    // Update user stats
+    // Update user stats (including daily_xp and last_xp_reset)
     await c.env.DB.prepare(`
       UPDATE users 
       SET user_level = ?, 
           xp = ?, 
           total_xp = ?, 
-          coins = ?
+          coins = ?,
+          daily_xp = ?,
+          last_xp_reset = ?
       WHERE id = ?
-    `).bind(newLevel, currentLevelXP, newTotalXP, newCoins, userId).run()
+    `).bind(newLevel, currentLevelXP, newTotalXP, newCoins, newDailyXP, today, userId).run()
 
     // Log activity
     await c.env.DB.prepare(`
@@ -154,7 +177,8 @@ gamification.post('/xp/add', async (c: Context<{ Bindings: Bindings }>) => {
       currentLevelXP,
       xpNeededForNextLevel,
       totalXP: newTotalXP,
-      totalCoins: newCoins
+      totalCoins: newCoins,
+      dailyXP: newDailyXP
     })
   } catch (error) {
     console.error('Error adding XP:', error)
@@ -168,13 +192,23 @@ gamification.get('/stats/:userId', async (c: Context<{ Bindings: Bindings }>) =>
     const userId = c.req.param('userId')
 
     const user = await c.env.DB.prepare(`
-      SELECT user_level, xp, total_xp, coins, current_streak, longest_streak, total_words_practiced
+      SELECT user_level, xp, total_xp, coins, current_streak, longest_streak, total_words_practiced, daily_xp, last_xp_reset
       FROM users
       WHERE id = ?
     `).bind(userId).first() as any
 
     if (!user) {
       return c.json({ success: false, error: 'User not found' }, 404)
+    }
+
+    // Check if daily XP needs to be reset
+    const today = new Date().toISOString().split('T')[0]
+    const lastReset = user.last_xp_reset
+    let dailyXP = user.daily_xp || 0
+    
+    if (lastReset !== today) {
+      // Daily XP has been reset - show 0
+      dailyXP = 0
     }
 
     const level = user.user_level || 1
@@ -204,12 +238,13 @@ gamification.get('/stats/:userId', async (c: Context<{ Bindings: Bindings }>) =>
         level: user.user_level || 1,
         xp: user.xp || 0,
         totalXP: user.total_xp || 0,
+        dailyXP: dailyXP,  // ✅ Add daily XP tracking
         xpForNextLevel,
         progress: Math.round(progress),
         coins: user.coins || 0,
         currentStreak: user.current_streak || 0,
         longestStreak: user.longest_streak || 0,
-        wordsLearned: user.total_words_practiced || 0  // ✅ Add words tracking
+        wordsLearned: user.total_words_practiced || 0
       },
       badges: badges || [],
       recentActivity: recentActivity || []

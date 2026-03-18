@@ -521,6 +521,7 @@ class WorVox {
           level: stats.stats.level || 1,
           xp: stats.stats.xp || 0,
           totalXp: stats.stats.totalXP || 0,  // ✅ API returns 'totalXP'
+          dailyXp: stats.stats.dailyXP || 0,  // ✅ Add daily XP tracking
           xpForNextLevel: stats.stats.xpForNextLevel || 100,
           progress: stats.stats.progress || 0,
           coins: stats.stats.coins || 0,
@@ -619,17 +620,23 @@ class WorVox {
       coinsDisplay.textContent = `💰 ${stats.coins}`;
     }
     
-    // ✅ Update dashboard stats (Streak, XP, Words)
+    // ✅ Update dashboard stats (Streak, Daily XP, Total XP, Words)
     const dashboardStreak = document.querySelector('#dashboard-streak');
     if (dashboardStreak) {
       dashboardStreak.textContent = stats.streak || 0;
       console.log('📊 Dashboard streak updated:', stats.streak);
     }
     
+    const dashboardDailyXP = document.querySelector('#dashboard-daily-xp');
+    if (dashboardDailyXP) {
+      dashboardDailyXP.textContent = stats.dailyXp || 0;
+      console.log('📊 Dashboard daily XP updated:', stats.dailyXp);
+    }
+    
     const dashboardXP = document.querySelector('#dashboard-xp');
     if (dashboardXP) {
       dashboardXP.textContent = stats.totalXp || 0;
-      console.log('📊 Dashboard XP updated:', stats.totalXp);
+      console.log('📊 Dashboard total XP updated:', stats.totalXp);
     }
     
     // Words count requires separate API call - will be updated by showTopicSelection
@@ -7065,6 +7072,7 @@ Proceed to payment?
             streak: rawStats.currentStreak || 0,  // ✅ API returns 'currentStreak'
             xp: rawStats.xp || 0,
             totalXp: rawStats.totalXP || 0,  // ✅ API returns 'totalXP'
+            dailyXp: rawStats.dailyXP || 0,  // ✅ Add daily XP tracking
             level: rawStats.level || 1,
             coins: rawStats.coins || 0,
             wordsLearned: rawStats.wordsLearned || 0  // ✅ Now available from API
@@ -7194,16 +7202,20 @@ Proceed to payment?
                 <!-- Stats Section -->
                 <div class="mb-5">
                   <h2 class="text-base md:text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                    🔥 Streak | XP | Words
+                    🔥 Streak | 오늘 XP | 전체 XP | Words
                   </h2>
-                  <div class="grid grid-cols-3 gap-3" id="dashboard-stats-container">
+                  <div class="grid grid-cols-4 gap-3" id="dashboard-stats-container">
                     <div class="text-center">
                       <div class="text-xl md:text-2xl font-bold text-orange-500" id="dashboard-streak">${gamificationStats.streak || 0}</div>
                       <div class="text-xs text-gray-500">Streak</div>
                     </div>
                     <div class="text-center">
+                      <div class="text-xl md:text-2xl font-bold text-green-500" id="dashboard-daily-xp">${gamificationStats.dailyXp || 0}</div>
+                      <div class="text-xs text-gray-500">오늘 XP</div>
+                    </div>
+                    <div class="text-center">
                       <div class="text-xl md:text-2xl font-bold text-purple-500" id="dashboard-xp">${gamificationStats.totalXp || 0}</div>
-                      <div class="text-xs text-gray-500">XP</div>
+                      <div class="text-xs text-gray-500">전체 XP</div>
                     </div>
                     <div class="text-center">
                       <div class="text-xl md:text-2xl font-bold text-blue-500" id="dashboard-words">${stats.wordsLearned || 0}</div>
