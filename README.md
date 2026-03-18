@@ -1,6 +1,76 @@
 # WorVox - AI English Learning Platform
 
-## 🔔 최신 업데이트 (2026-03-06 17:00 UTC) - ✅ Production 배포 완료
+## 🔔 최신 업데이트 (2026-03-18 08:40 UTC) - ✅ Production 배포 완료
+
+### 📊 일일 XP 추적 & Streak 로딩 순서 수정 - Commit `bfcc638` ✅
+
+**배포 정보**
+- **Production**: https://worvox.com ✅ 
+- **Preview**: https://9d4262d9.worvox.pages.dev ✅
+- **GitHub Commit**: https://github.com/harperleekr-creator/worvox/commit/bfcc638
+
+#### 1. ✅ 일일 XP 추적 기능 추가
+- **자정마다 자동 초기화**:
+  - UTC 00:00 기준으로 daily_xp 초기화
+  - 전날 XP는 `daily_xp_history` 테이블에 자동 저장
+  - 하루 동안 획득한 XP를 명확히 확인 가능
+
+- **대시보드 표시**:
+  ```
+  🔥 Streak | 오늘 XP | 전체 XP | Words
+       0        150      6,431      250
+  ```
+  - **Streak**: 연속 출석 일수 (매일 로그인 시 +1)
+  - **오늘 XP**: 오늘 획득한 XP (자정 리셋)
+  - **전체 XP**: 누적 총 XP
+  - **Words**: 학습한 총 단어 수
+
+- **DB 스키마**:
+  ```sql
+  -- users 테이블에 추가된 컬럼
+  daily_xp INTEGER DEFAULT 0           -- 오늘 획득한 XP
+  last_xp_reset TEXT                   -- 마지막 리셋 날짜 (YYYY-MM-DD)
+  
+  -- 일일 XP 히스토리 테이블
+  daily_xp_history (
+    id, user_id, date, total_xp, activity_count, created_at
+  )
+  ```
+
+#### 2. ✅ Streak 로딩 순서 수정
+- **문제점**: 출석 체크 이전에 gamification stats를 로드하여 Streak가 업데이트되지 않음
+- **해결책**:
+  ```
+  출석 체크 (Streak 업데이트)
+       ↓
+  Gamification Stats 로드 (최신 Streak)
+       ↓
+  대시보드 렌더링 (정확한 Streak 표시)
+  ```
+
+#### 3. ✅ 작동 원리
+- **XP 획득 시**:
+  1. 현재 날짜와 `last_xp_reset` 비교
+  2. 날짜가 다르면 어제 XP를 히스토리에 저장 후 `daily_xp = 0` 초기화
+  3. 새로운 XP를 `daily_xp`와 `total_xp`에 모두 추가
+  4. `last_xp_reset`를 오늘 날짜로 업데이트
+
+- **Streak 계산**:
+  1. 로그인 시 출석 체크 API 호출
+  2. 어제 출석 기록이 있으면 `current_streak + 1`
+  3. 없으면 `current_streak = 1` (리셋)
+  4. `users` 테이블의 `current_streak` 업데이트
+
+#### 4. ✅ 업데이트된 파일
+- `migrations/0042_add_daily_xp_tracking.sql` - 새 마이그레이션
+- `src/routes/gamification.ts` - 일일 XP 로직 & Streak 업데이트
+- `public/static/app.js` - 대시보드 UI & 로딩 순서 수정
+- `public/static/app.min.js` - 재빌드
+- `public/static/force-reload.js` - 버전 업데이트
+
+---
+
+## 🔔 이전 업데이트 (2026-03-06 17:00 UTC)
 
 ### 🎰 Rewards 페이지 개선 - 돌림판 직접 표시 - Commit `21f7653` ✅
 
