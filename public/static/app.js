@@ -9802,12 +9802,6 @@ Proceed to payment?
                       <td class="px-6 py-4 text-center text-sm text-emerald-600 font-semibold">무제한</td>
                       <td class="px-6 py-4 text-center text-sm text-indigo-600 font-semibold">무제한</td>
                     </tr>
-                    <tr>
-                      <td class="px-6 py-4 text-sm text-gray-700 pl-10">단어 검색 (AI 생성)</td>
-                      <td class="px-6 py-4 text-center text-sm">하루 10회</td>
-                      <td class="px-6 py-4 text-center text-sm text-emerald-600 font-semibold">무제한</td>
-                      <td class="px-6 py-4 text-center text-sm text-indigo-600 font-semibold">무제한</td>
-                    </tr>
                     <tr class="bg-gray-50">
                       <td class="px-6 py-4 text-sm text-gray-700 pl-10">대화 주제</td>
                       <td class="px-6 py-4 text-center text-sm">기본 2개</td>
@@ -10419,8 +10413,7 @@ Proceed to payment?
   showUpgradeBanner(feature, current, limit) {
     const featureNames = {
       aiConversations: 'AI 영어 대화',
-      pronunciationPractice: '발음 연습',
-      wordSearch: '단어 검색'
+      pronunciationPractice: '발음 연습'
     };
     
     const banner = document.createElement('div');
@@ -10466,8 +10459,7 @@ Proceed to payment?
   showUsageWarning(feature, current, limit) {
     const featureNames = {
       aiConversations: 'AI 영어 대화',
-      pronunciationPractice: '발음 연습',
-      wordSearch: '단어 검색'
+      pronunciationPractice: '발음 연습'
     };
     
     const remaining = limit - current;
@@ -12056,10 +12048,6 @@ Proceed to payment?
                         </li>
                         <li class="flex items-start">
                           <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
-                          <span class="text-gray-700">단어 검색 <strong>제한</strong></span>
-                        </li>
-                        <li class="flex items-start">
-                          <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
                           <span class="text-gray-700">기본 학습 기능</span>
                         </li>
                         <li class="flex items-start">
@@ -12334,13 +12322,6 @@ Proceed to payment?
                       <div class="p-6">
                         <table class="w-full text-sm">
                           <tbody class="divide-y divide-gray-100">
-                            <tr>
-                              <td class="py-3 text-gray-700">단어 검색</td>
-                              <td class="py-3 text-right">
-                                <span class="text-gray-600">Free: 일 10개</span><br>
-                                <span class="text-blue-600 font-semibold">Core+: 무제한</span>
-                              </td>
-                            </tr>
                             <tr>
                               <td class="py-3 text-gray-700">개인 단어장</td>
                               <td class="py-3 text-right">
@@ -12653,13 +12634,6 @@ Proceed to payment?
                           <td colspan="5" class="px-6 py-3 text-sm font-bold text-gray-700 uppercase">
                             <i class="fas fa-book text-blue-500 mr-2"></i>단어 학습
                           </td>
-                        </tr>
-                        <tr class="hover:bg-gray-50">
-                          <td class="px-6 py-4 text-sm text-gray-700">단어 검색</td>
-                          <td class="px-6 py-4 text-center text-sm text-gray-600">일 10개</td>
-                          <td class="px-6 py-4 text-center text-sm font-semibold text-blue-600">무제한</td>
-                          <td class="px-6 py-4 text-center text-sm font-semibold text-purple-600">무제한</td>
-                          <td class="px-6 py-4 text-center text-sm font-semibold text-yellow-600">무제한</td>
                         </tr>
                         <tr class="hover:bg-gray-50">
                           <td class="px-6 py-4 text-sm text-gray-700">개인 단어장</td>
@@ -16284,7 +16258,6 @@ Proceed to payment?
         const featureNames = {
           aiConversations: 'AI 대화',
           pronunciationPractice: '발음 연습',
-          wordSearch: '단어 검색',
           timerMode: '타이머 모드',
           scenarioMode: '시나리오 모드'
         };
