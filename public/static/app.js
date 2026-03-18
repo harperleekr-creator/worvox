@@ -464,10 +464,12 @@ class WorVox {
       
       // Load usage data from server
       await this.loadUsageFromServer();
-      await this.loadGamificationStats();
       
-      // ⭐ Check daily attendance and award XP
+      // ⭐ Check daily attendance and award XP (BEFORE loading gamification stats)
       await this.checkDailyAttendance();
+      
+      // Load gamification stats AFTER attendance check to get updated streak
+      await this.loadGamificationStats();
       
       this.showTopicSelection();
     } else {
@@ -558,8 +560,8 @@ class WorVox {
           `출석 체크 완료! ${streakDays}일 연속 출석 ${bonusMessage ? '\\n' + bonusMessage : ''}`
         );
         
-        // Refresh gamification stats to show updated XP
-        await this.loadGamificationStats();
+        // Gamification stats will be loaded after attendance check completes
+        console.log(`🔥 Attendance check completed: ${streakDays} day streak, ${xpAwarded} XP`);
       }
     } catch (error) {
       console.error('Failed to check attendance:', error);

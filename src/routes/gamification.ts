@@ -397,6 +397,17 @@ gamification.post('/attendance/check', async (c: Context<{ Bindings: Bindings }>
       VALUES (?, ?, ?, ?)
     `).bind(userId, today, totalXP, streakDays).run()
     
+    // ✅ Update user's current_streak and longest_streak in users table
+    await c.env.DB.prepare(`
+      UPDATE users 
+      SET 
+        current_streak = ?,
+        longest_streak = MAX(longest_streak, ?)
+      WHERE id = ?
+    `).bind(streakDays, streakDays, userId).run()
+    
+    console.log(`✅ Attendance recorded for user ${userId}: ${streakDays} day streak, ${totalXP} XP awarded`)
+    
     // Award XP through gamification API
     const xpResult = await fetch(c.req.url.replace('/attendance/check', '/xp/add'), {
       method: 'POST',

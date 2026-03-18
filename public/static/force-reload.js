@@ -1,3 +1,3 @@
 // Force reload marker - change this to bust cache
-const VERSION = "2026-03-17-add-words-tracking-all-modes";
+const VERSION = "2026-03-17-fix-streak-loading-order";
 console.log("App version:", VERSION);
