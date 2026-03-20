@@ -63,21 +63,30 @@ window.showDailyGoalsDashboard = function() {
 };
 
 // Add daily goals button to the app UI
+window.addDailyGoalsButton = function() {
+  // Check if button already exists
+  if (document.getElementById('daily-goals-btn')) {
+    return;
+  }
+  
+  const button = document.createElement('button');
+  button.id = 'daily-goals-btn';
+  button.className = 'fixed bottom-20 right-4 md:bottom-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all z-40';
+  button.innerHTML = '<i class="fas fa-trophy text-xl"></i>';
+  button.title = '일일 목표 대시보드';
+  button.onclick = window.showDailyGoalsDashboard;
+  
+  document.body.appendChild(button);
+  console.log('✅ Daily goals button added!');
+};
+
 window.addEventListener('load', () => {
   setTimeout(() => {
-    // Try to add button to sidebar or header
-    const sidebar = document.querySelector('[role="navigation"]') || 
-                   document.querySelector('.sidebar') ||
-                   document.querySelector('nav');
-    
-    if (sidebar) {
-      const button = document.createElement('button');
-      button.className = 'fixed bottom-20 right-4 md:bottom-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all z-40 animate-bounce';
-      button.innerHTML = '<i class="fas fa-trophy text-xl"></i>';
-      button.title = '일일 목표 대시보드';
-      button.onclick = window.showDailyGoalsDashboard;
-      
-      document.body.appendChild(button);
+    // Check if user is logged in before showing button
+    if (window.worvox?.currentUser) {
+      window.addDailyGoalsButton();
+    } else {
+      console.log('⏳ User not logged in yet, button will be added after login');
     }
-  }, 2000);
+  }, 3000); // Wait 3 seconds for app to initialize
 });

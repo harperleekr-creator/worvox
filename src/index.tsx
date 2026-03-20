@@ -31,7 +31,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1773991248451'; // Update manually or via build script
+const BUILD_TIME = '1773991721037'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -3017,6 +3017,11 @@ app.get('/app', (c) => {
                       } catch (e) {
                         console.warn('Failed to load daily goals:', e);
                       }
+                    }
+                    
+                    // Add daily goals button after user is loaded
+                    if (window.addDailyGoalsButton) {
+                      window.addDailyGoalsButton();
                     }
                   } catch (e) {
                     console.warn('Failed to load user data:', e);
