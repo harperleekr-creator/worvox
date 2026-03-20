@@ -27,11 +27,12 @@ import emailNotifications from './routes/email-notifications';
 import emails from './routes/emails';
 import hiing from './routes/hiing';
 import dailyGoals from './routes/daily-goals';
+import notifications from './routes/notifications';
 import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1773991721037'; // Update manually or via build script
+const BUILD_TIME = '1773992715246'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -182,6 +183,7 @@ app.route('/api/email-notifications', emailNotifications);
 app.route('/api/emails', emails);
 app.route('/api/hiing', hiing);
 app.route('/api/daily-goals', dailyGoals);
+app.route('/api/notifications', notifications);
 
 // Preview routes
 app.route('/preview', preview);

@@ -1,8 +1,12 @@
 import { Hono } from 'hono'
 import type { Context } from 'hono'
+import { sendBookingConfirmation, sendLessonCompletion } from './notification-helpers'
 
 type Bindings = {
   DB: D1Database
+  RESEND_API_KEY?: string
+  KAKAO_API_KEY?: string
+  API_BASE_URL?: string
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
@@ -109,8 +113,18 @@ app.post('/schedule', async (c: Context) => {
       SELECT * FROM hiing_sessions WHERE id = ?
     `).bind(insertResult.meta.last_row_id).first()
 
-    // TODO: Send email/SMS to teacher
-    // TODO: Send confirmation to student
+    // Get user info for notifications
+    const user = await DB.prepare(`
+      SELECT * FROM users WHERE id = ?
+    `).bind(userId).first()
+
+    // Send booking confirmation notifications (email + SMS)
+    try {
+      await sendBookingConfirmation(c.env, session, user, teacher);
+    } catch (error) {
+      console.error('Failed to send booking notifications:', error);
+      // Continue even if notifications fail
+    }
 
     return c.json({
       success: true,
@@ -119,7 +133,7 @@ app.post('/schedule', async (c: Context) => {
         name: teacher.name,
         phone: teacher.phone_number
       },
-      message: 'Booking confirmed! Teacher will call you at scheduled time.'
+      message: 'Booking confirmed! Notifications sent to both student and teacher.'
     })
   } catch (error: any) {
     console.error('Schedule error:', error)
@@ -215,6 +229,19 @@ app.post('/teacher/complete', async (c: Context) => {
       WHERE user_id = ?
       AND (expires_at IS NULL OR expires_at > datetime('now'))
     `).bind(session.user_id).first() as any
+
+    // Get user info for completion notification
+    const user = await DB.prepare(`
+      SELECT * FROM users WHERE id = ?
+    `).bind(session.user_id).first()
+
+    // Send lesson completion notification
+    try {
+      await sendLessonCompletion(c.env, session, user, teacher, totalCredits?.total || 0);
+    } catch (error) {
+      console.error('Failed to send completion notification:', error);
+      // Continue even if notification fails
+    }
 
     return c.json({
       success: true,
