@@ -26,11 +26,12 @@ import aiPrompts from './routes/ai-prompts';
 import emailNotifications from './routes/email-notifications';
 import emails from './routes/emails';
 import hiing from './routes/hiing';
+import dailyGoals from './routes/daily-goals';
 import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1773981822868'; // Update manually or via build script
+const BUILD_TIME = '1773991248451'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -180,6 +181,7 @@ app.route('/api/ai-prompts', aiPrompts);
 app.route('/api/email-notifications', emailNotifications);
 app.route('/api/emails', emails);
 app.route('/api/hiing', hiing);
+app.route('/api/daily-goals', dailyGoals);
 
 // Preview routes
 app.route('/preview', preview);
@@ -2987,6 +2989,8 @@ app.get('/app', (c) => {
         
         <!-- App Scripts -->
         <script src="/static/gamification.js?v=${version}"></script>
+        <script src="/static/daily-goals.js?v=${version}"></script>
+        <script src="/static/daily-goals-integration.js?v=${version}"></script>
         <script src="/static/app.min.js?v=${version}"></script>
         
         <script>
@@ -3005,6 +3009,15 @@ app.get('/app', (c) => {
                   try {
                     await window.worvox.loadUsageFromServer();
                     await window.worvox.loadGamificationStats();
+                    
+                    // Initialize daily goals system
+                    if (window.dailyGoalsManager) {
+                      try {
+                        await window.dailyGoalsManager.init(user.id, user.goal_level || 'balanced');
+                      } catch (e) {
+                        console.warn('Failed to load daily goals:', e);
+                      }
+                    }
                   } catch (e) {
                     console.warn('Failed to load user data:', e);
                   }
