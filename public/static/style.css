@@ -1,4 +1,20 @@
-/* Custom styles for HeySpeak */
+/* Custom styles for WorVox */
+
+/* CSS Variables */
+:root {
+  /* Mobile viewport height fix (set by JavaScript) */
+  --vh: 1vh;
+  
+  /* Touch target sizes */
+  --touch-target-min: 44px;
+  
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+}
 
 * {
   box-sizing: border-box;
@@ -11,13 +27,16 @@ body {
   /* Prevent text selection on mobile */
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
+  /* Use custom viewport height */
+  min-height: 100vh;
+  min-height: calc(var(--vh, 1vh) * 100);
 }
 
 /* Mobile touch optimization */
 button, a, [role="button"] {
   /* Better touch targets (min 44x44px recommended) */
-  min-height: 44px;
-  min-width: 44px;
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
   /* Prevent double-tap zoom */
   touch-action: manipulation;
   /* Remove tap highlight */
@@ -32,7 +51,13 @@ html {
 
 /* Prevent overscroll bounce on iOS */
 body {
-  overscroll-behavior-y: none;
+  overscroll-behavior-y: contain;
+}
+
+/* Full height containers using custom vh */
+.full-height {
+  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
 }
 
 /* Recording animation */

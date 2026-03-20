@@ -30,7 +30,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1773978433924'; // Update manually or via build script
+const BUILD_TIME = '1773979303299'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -2989,7 +2989,8 @@ app.get('/app', (c) => {
         <!-- Core Utilities -->
         <script src="/static/toast.js?v=${version}"></script>
         <script src="/static/error-handler.js?v=${version}"></script>
-
+        <script src="/static/mobile-utils.js?v=${version}"></script>
+        <script src="/static/module-loader.js?v=${version}"></script>
         
         <!-- App Scripts -->
         <script src="/static/gamification.js?v=${version}"></script>
