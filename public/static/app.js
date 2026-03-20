@@ -7160,7 +7160,7 @@ Proceed to payment?
                   <h1 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-1">
                     Welcome back <span class="text-amber-500">👋</span>
                   </h1>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">${this.currentUser.username || this.currentUser.email?.split('@')[0] || 'User'}</p>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">${this.currentUser.email === 'harperleekr@gmail.com' ? 'Harper' : (this.currentUser.username || this.currentUser.email?.split('@')[0] || 'User')}</p>
                 </div>
                 
                 <!-- Today's Goal Card -->
