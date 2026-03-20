@@ -1,7 +1,24 @@
-# robots.txt for WorVox
 User-agent: *
 Allow: /
+
+# 크롤링 제외할 경로
 Disallow: /api/
 Disallow: /admin/
+Disallow: /teacher/
+Disallow: /*.json$
 
+# 검색 엔진별 설정
+User-agent: Googlebot
+Allow: /
+Allow: /static/
+
+User-agent: Yeti
+Allow: /
+Allow: /static/
+
+User-agent: Bingbot
+Allow: /
+Allow: /static/
+
+# Sitemap 위치
 Sitemap: https://worvox.com/sitemap.xml

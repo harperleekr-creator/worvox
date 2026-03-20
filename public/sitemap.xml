@@ -1,15 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0">
+  
+  <!-- 메인 페이지 -->
   <url>
     <loc>https://worvox.com/</loc>
-    <lastmod>2026-03-02</lastmod>
+    <lastmod>2026-03-20</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <mobile:mobile/>
+    <xhtml:link rel="alternate" hreflang="ko" href="https://worvox.com/?lang=ko" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://worvox.com/?lang=en" />
   </url>
+
+  <!-- 앱 페이지 -->
+  <url>
+    <loc>https://worvox.com/app</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <mobile:mobile/>
+  </url>
+
+  <!-- 소개 페이지 -->
+  <url>
+    <loc>https://worvox.com/about</loc>
+    <lastmod>2026-03-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <mobile:mobile/>
+  </url>
+
+  <!-- 가격 정책 -->
   <url>
     <loc>https://worvox.com/pricing</loc>
-    <lastmod>2026-03-02</lastmod>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-03-18</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <mobile:mobile/>
   </url>
+
+  <!-- 블로그/학습 자료 (향후 확장용) -->
+  <url>
+    <loc>https://worvox.com/blog</loc>
+    <lastmod>2026-03-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <mobile:mobile/>
+  </url>
+
+  <!-- 이용약관 -->
+  <url>
+    <loc>https://worvox.com/terms</loc>
+    <lastmod>2026-03-10</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <!-- 개인정보처리방침 -->
+  <url>
+    <loc>https://worvox.com/privacy</loc>
+    <lastmod>2026-03-10</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <!-- 환불 정책 -->
+  <url>
+    <loc>https://worvox.com/refund</loc>
+    <lastmod>2026-03-10</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
 </urlset>

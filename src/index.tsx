@@ -30,7 +30,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1773823751940'; // Update manually or via build script
+const BUILD_TIME = '1773978433924'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -206,6 +206,9 @@ app.get('/payment/success', (c) => {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>결제 성공 - WorVox</title>
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json">
+        
         <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body class="bg-gray-50">
@@ -304,6 +307,9 @@ app.get('/payment/fail', (c) => {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>결제 실패 - WorVox</title>
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json">
+        
         <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body class="bg-gray-50">
@@ -362,6 +368,9 @@ app.get('/trial-success', (c) => {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>무료 체험 시작 - WorVox</title>
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json">
+        
         <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body class="bg-gradient-to-br from-green-50 to-emerald-50">
@@ -465,6 +474,9 @@ app.get('/trial-fail', (c) => {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>무료 체험 실패 - WorVox</title>
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json">
+        
         <script src="https://cdn.tailwindcss.com"></script>
     </head>
     <body class="bg-gray-50">
@@ -526,6 +538,9 @@ app.get('/landing', (c) => {
         <meta property="og:image" content="https://worvox.com/logo.png">
         
         <link rel="canonical" href="https://worvox.com">
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json">
+        
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
           // Configure Tailwind for dark mode
@@ -1965,6 +1980,9 @@ app.get('/about', (c) => {
         <meta property="og:image" content="https://worvox.com/logo.png">
         
         <link rel="canonical" href="https://worvox.com/about">
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json">
+        
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
           // Configure Tailwind for dark mode
@@ -2309,6 +2327,9 @@ app.get('/pricing', (c) => {
         <meta property="og:image" content="https://worvox.com/logo.png">
         
         <link rel="canonical" href="https://worvox.com/pricing">
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json">
+        
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
           // Configure Tailwind for dark mode
@@ -2905,6 +2926,9 @@ app.get('/app', (c) => {
         <link rel="dns-prefetch" href="https://js.tosspayments.com">
         <link rel="dns-prefetch" href="https://accounts.google.com">
         
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json">
+        
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
           // Configure Tailwind for dark mode
@@ -2914,6 +2938,10 @@ app.get('/app', (c) => {
         </script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
         <link href="/static/style.css?v=${version}" rel="stylesheet">
+        <link href="/static/skeleton.css?v=${version}" rel="stylesheet">
+        
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json">
         
         <!-- Toss Payments SDK -->
         <script src="https://js.tosspayments.com/v2/standard"></script>
@@ -2927,12 +2955,28 @@ app.get('/app', (c) => {
         <script>
           // Simple cache management - no forced reload needed
           (function() {
-            // Clear Service Worker caches only
-            if ('caches' in window) {
-              caches.keys().then(names => {
-                names.forEach(name => caches.delete(name));
+            // Register Service Worker for PWA support
+            if ('serviceWorker' in navigator) {
+              window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                  .then(registration => {
+                    console.log('✅ Service Worker registered:', registration.scope);
+                    
+                    // Check for updates periodically
+                    setInterval(() => {
+                      registration.update();
+                    }, 60000); // Check every 60 seconds
+                  })
+                  .catch(error => {
+                    console.warn('❌ Service Worker registration failed:', error);
+                  });
               });
+            } else {
+              console.warn('⚠️ Service Workers not supported in this browser');
             }
+            
+            // Clear old Service Worker caches only (don't clear new PWA cache)
+            // No need to delete all caches - SW handles versioning
             
             // Just log the version - files auto-update via ?v= param
             console.log('WorVox v${APP_VERSION} (build ${BUILD_TIME})');
@@ -2941,6 +2985,13 @@ app.get('/app', (c) => {
         
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+        
+        <!-- Core Utilities -->
+        <script src="/static/toast.js?v=${version}"></script>
+        <script src="/static/error-handler.js?v=${version}"></script>
+
+        
+        <!-- App Scripts -->
         <script src="/static/gamification.js?v=${version}"></script>
         <script src="/static/app.min.js?v=${version}"></script>
         
@@ -3126,6 +3177,9 @@ app.get('/', (c) => {
         <link rel="dns-prefetch" href="https://js.tosspayments.com">
         <link rel="dns-prefetch" href="https://accounts.google.com">
         
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json">
+        
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
           // Configure Tailwind for dark mode
@@ -3167,6 +3221,13 @@ app.get('/', (c) => {
         
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+        
+        <!-- Core Utilities -->
+        <script src="/static/toast.js?v=${version}"></script>
+        <script src="/static/error-handler.js?v=${version}"></script>
+
+        
+        <!-- App Scripts -->
         <script src="/static/gamification.js?v=${version}"></script>
         <script src="/static/app.min.js?v=${version}"></script>
         
@@ -3206,6 +3267,9 @@ app.get('/admin/hiing-dashboard', (c) => {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Admin Dashboard - WorVox Live Speaking</title>
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json">
+        
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
@@ -3653,6 +3717,9 @@ app.get('/admin/dashboard', (c) => {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Admin Dashboard - WorVox Live Speaking</title>
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json">
+        
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
         <style>
@@ -3913,6 +3980,9 @@ app.get('/teacher/:teacherCode', (c) => {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Teacher Portal - WorVox Live Speaking</title>
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json">
+        
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
     </head>
