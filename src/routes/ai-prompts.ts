@@ -71,13 +71,13 @@ Return numbered 1-5, one per line.`
 
   intermediate: {
     timer: `Generate ONE unique intermediate-level English sentence for speaking practice. Requirements:
-- Length: 12-20 words
+- Length: 8-15 words (MUST be concise for timed challenge)
 - Grammar: Mix of compound/complex sentences, various tenses, conditionals, passive voice
-- Vocabulary: Everyday + some advanced words (B1-B2 level)
+- Vocabulary: Everyday + some advanced words (B1-B2 level) - maintain sophisticated vocabulary despite shorter length
 - Topics: Rotate between - work/career, education/learning, technology, travel/culture, social issues, environment, health & wellness, relationships, current events, personal development
-- Style: More sophisticated than beginner, but still natural and conversational
+- Style: More sophisticated than beginner, concise yet natural
 - CRITICAL: Generate DIVERSE content - avoid repetitive sentence structures
-- Examples: "If I had known about the meeting earlier, I would have prepared better.", "The new software update has significantly improved our team's productivity.", "Many experts believe that remote work will become more common in the future."
+- Examples: "Remote work has significantly improved productivity.", "I should have prepared better for the meeting.", "This software update enhanced our team's efficiency.", "Climate change requires immediate global action."
 Return ONLY the English sentence.`,
 
     scenario: `Generate 5 unique, intermediate-level conversation sentences for professional/social situations. Requirements:
@@ -121,13 +121,13 @@ Example format:
 
   advanced: {
     timer: `Generate ONE unique advanced-level English sentence for speaking practice. Requirements:
-- Length: 18-30 words
-- Grammar: Complex structures - multiple clauses, advanced conditionals, subjunctive mood, sophisticated connectors
-- Vocabulary: Academic, professional, nuanced terminology (C1-C2 level)
+- Length: 10-18 words (MUST be concise for timed challenge)
+- Grammar: Complex structures - advanced conditionals, subjunctive mood, sophisticated connectors
+- Vocabulary: Academic, professional, nuanced terminology (C1-C2 level) - maintain sophisticated vocabulary despite shorter length
 - Topics: Rotate between - global economics, scientific research, political analysis, philosophical concepts, advanced business strategy, cultural criticism, innovation & disruption, ethical dilemmas, sustainability, leadership theory
-- Style: Formal, articulate, intellectually engaging
-- CRITICAL: Each sentence should present unique, thought-provoking content
-- Examples: "The integration of artificial intelligence into various sectors raises profound questions about the future of human employment and societal structures.", "Sustainable business practices require a fundamental shift in corporate mindset from short-term profit maximization to long-term stakeholder value creation."
+- Style: Formal, articulate, intellectually engaging yet concise
+- CRITICAL: Each sentence should present unique, thought-provoking content in fewer words
+- Examples: "AI integration raises profound questions about future employment.", "Sustainable practices require fundamental corporate mindset shifts.", "Technological disruption necessitates adaptive organizational strategies.", "Ethical frameworks must evolve with emerging biotechnology."
 Return ONLY the English sentence.`,
 
     scenario: `Generate 5 unique, advanced-level conversation sentences for high-level professional/academic contexts. Requirements:
