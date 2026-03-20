@@ -1,6 +1,231 @@
 # WorVox - AI English Learning Platform
 
-## 🔔 최신 업데이트 (2026-03-18 08:40 UTC) - ✅ Production 배포 완료
+## 🔔 최신 업데이트 (2026-03-20 03:50 UTC) - ✅ Phase 1+2 배포 완료
+
+### 🚀 Phase 1+2: UX/UI 개선, PWA, SEO 최적화 - Commit `64af7c4` ✅
+
+**배포 정보**
+- **Production**: https://worvox.com ✅ 
+- **Preview**: https://b8dc5366.worvox.pages.dev ✅
+- **GitHub Commit**: https://github.com/harperleekr-creator/worvox/commit/64af7c4
+- **Build Time**: `1773978433924` (2026-03-20T03:47:13.924Z)
+
+#### 1. ✅ Toast 알림 시스템 (Phase 1)
+**파일**: `public/static/toast.js`
+
+- **4가지 타입 지원**: success, error, warning, info, loading
+- **자동 닫힘**: 4-5초 후 자동 제거 (loading 타입 제외)
+- **애니메이션**: 오른쪽에서 슬라이드 인/아웃
+- **모바일 최적화**: 반응형 디자인, 터치 친화적
+- **다크 모드 지원**: 자동 색상 전환
+
+**사용 예시**:
+```javascript
+window.toast.success('저장되었습니다!');
+window.toast.error('오류가 발생했습니다');
+window.toast.warning('주의: 제한 횟수 초과');
+const loadingToast = window.toast.loading('처리 중...');
+// 작업 완료 후
+window.toast.remove(loadingToast);
+```
+
+#### 2. ✅ 전역 에러 핸들링 & 재시도 로직 (Phase 1)
+**파일**: `public/static/error-handler.js`
+
+- **Unhandled Promise 자동 처리**
+- **Axios 인터셉터**: API 오류 자동 캐치 및 친화적 메시지 표시
+- **HTTP 상태 코드별 처리**:
+  - `401`: 로그인 필요 → 2초 후 자동 로그인 페이지 이동
+  - `429`: Rate limit → 재시도 안내
+  - `500-503`: 서버 오류 → 재시도 권장
+- **재시도 로직**:
+  ```javascript
+  await errorHandler.retry(async () => {
+    return await apiCall();
+  }, { maxRetries: 3, retryDelay: 1000 });
+  ```
+- **안전한 API 호출 헬퍼**:
+  ```javascript
+  await errorHandler.safeApiCall(
+    () => axios.post('/api/data'),
+    { 
+      showLoading: true,
+      successMessage: '저장 완료!',
+      retry: true
+    }
+  );
+  ```
+
+#### 3. ✅ Skeleton Loading UI (Phase 1)
+**파일**: `public/static/skeleton.css`
+
+- **다양한 스켈레톤 컴포넌트**:
+  - `.skeleton-text`: 텍스트 로딩
+  - `.skeleton-title`: 제목 로딩
+  - `.skeleton-avatar`: 아바타 로딩
+  - `.skeleton-button`: 버튼 로딩
+  - `.skeleton-card`: 카드 로딩
+  - `.skeleton-dashboard`: 대시보드 그리드 로딩
+  - `.skeleton-history-item`: 히스토리 아이템 로딩
+  - `.skeleton-table`: 테이블 로딩
+
+- **3가지 애니메이션 효과**:
+  - `skeleton-loading`: 그라디언트 슬라이드 (기본)
+  - `skeleton-pulse`: 페이드 인/아웃
+  - `skeleton-shimmer`: 프리미엄 반짝임 효과
+
+- **다크 모드 지원**: 자동 색상 전환
+- **모바일 반응형**: 작은 화면 최적화
+
+**사용 예시**:
+```html
+<!-- 대시보드 로딩 -->
+<div class="skeleton-dashboard">
+  <div class="skeleton-stat-card">
+    <div class="skeleton skeleton-title"></div>
+    <div class="skeleton skeleton-text"></div>
+  </div>
+</div>
+
+<!-- 히스토리 로딩 -->
+<div class="skeleton-history-item">
+  <div class="skeleton skeleton-avatar"></div>
+  <div>
+    <div class="skeleton skeleton-text"></div>
+    <div class="skeleton skeleton-text"></div>
+  </div>
+</div>
+```
+
+#### 4. ✅ PWA & Service Worker (Phase 2)
+**파일**: `public/sw.js`, `public/manifest.json`
+
+- **Progressive Web App 기능**:
+  - 홈 화면에 추가 가능
+  - 오프라인 지원
+  - 백그라운드 동기화 (향후 확장)
+  - 푸시 알림 준비 완료
+
+- **Service Worker 캐싱 전략**:
+  - **정적 자원**: Cache First (빠른 로딩)
+  - **API 요청**: Network First + Cache Fallback (최신 데이터 우선)
+  - **캐시 버전 관리**: 자동 업데이트 및 구버전 삭제
+  - **API 캐시 만료**: 5분 (신선도 유지)
+
+- **캐시 대상**:
+  - `/` (홈), `/app` (앱 페이지)
+  - JavaScript, CSS 파일
+  - 이미지, 아이콘, Manifest
+  - 특정 API 엔드포인트 (topics, stats, gamification)
+
+- **캐시 제외**:
+  - 실시간 데이터 (chat, pronunciation, audio)
+  - 결제 관련 API
+  - 관리자 페이지
+
+- **Manifest 앱 정보**:
+  - 이름: "WorVox - AI 영어 스피킹 플랫폼"
+  - 테마 색상: `#a855f7` (보라색)
+  - 아이콘: 192x192, 512x512
+  - 시작 URL: `/app`
+  - 디스플레이: standalone (독립 앱처럼 실행)
+  - 바로가기: AI 대화, 시나리오 모드, 타이머 모드
+
+#### 5. ✅ SEO 최적화 (Phase 2)
+**파일**: `public/sitemap.xml`, `public/robots.txt`
+
+- **sitemap.xml**:
+  - 모든 주요 페이지 등록 (/, /app, /about, /pricing, /blog)
+  - 모바일 친화적 태그 (`<mobile:mobile/>`)
+  - 다국어 지원 (`hreflang="ko"`, `hreflang="en"`)
+  - 업데이트 빈도 및 우선순위 지정
+  - 최종 수정일 명시
+
+- **robots.txt**:
+  - 모든 검색 엔진 크롤링 허용
+  - API, 관리자, 강사 페이지 크롤링 제외
+  - Googlebot, Yeti, Bingbot 최적화
+  - Sitemap 위치 명시
+
+- **Schema.org JSON-LD** (이미 구현됨):
+  - `EducationalOrganization`: 교육 기관 정보
+  - `SoftwareApplication`: 앱 정보
+  - `AggregateRating`: 평점 (4.8/5.0, 127건)
+  - `Offer`: 가격 정보 (19,000-174,240원)
+
+#### 6. 📊 성능 개선 결과
+
+**Before (Phase 1 이전)**:
+- ❌ 에러 발생 시 alert() 팝업 (사용자 경험 저하)
+- ❌ 로딩 상태 없음 (빈 화면)
+- ❌ 오프라인 지원 없음
+- ❌ SEO 최적화 부족
+- ❌ 재시도 로직 없음
+
+**After (Phase 1+2 완료)**:
+- ✅ Toast 알림으로 부드러운 피드백
+- ✅ Skeleton UI로 로딩 상태 명확히 표시
+- ✅ PWA로 오프라인 지원 & 빠른 로딩
+- ✅ SEO 최적화로 검색 노출 향상
+- ✅ 자동 재시도 로직으로 네트워크 오류 대응
+
+#### 7. 🛠️ 업데이트된 파일 목록
+
+**새로 생성된 파일**:
+- `public/static/toast.js` - Toast 알림 시스템
+- `public/static/error-handler.js` - 전역 에러 핸들러
+- `public/static/skeleton.css` - Skeleton 로딩 UI
+- `public/sw.js` - Service Worker
+- `public/manifest.json` - PWA Manifest
+- `public/sitemap.xml` - 사이트맵
+- `public/robots.txt` - 크롤링 정책
+
+**수정된 파일**:
+- `src/index.tsx` - PWA manifest 링크, Service Worker 등록
+- `dist/_worker.js` - 재빌드 (580.20 kB)
+
+#### 8. 📱 사용자 경험 개선 사항
+
+1. **에러 처리**:
+   - Before: `alert("오류 발생")` → 브라우저 기본 팝업
+   - After: Toast 알림 → 부드러운 슬라이드 인/아웃
+
+2. **로딩 상태**:
+   - Before: 빈 화면 또는 스피너만 표시
+   - After: 실제 UI와 유사한 Skeleton 표시
+
+3. **오프라인 지원**:
+   - Before: 오프라인 시 페이지 로드 실패
+   - After: 캐시된 콘텐츠 제공, "Offline" 안내
+
+4. **재시도 로직**:
+   - Before: 네트워크 오류 시 사용자가 수동 새로고침
+   - After: 자동 3회 재시도, 실패 시 Toast 안내
+
+5. **PWA 설치**:
+   - 모바일: "홈 화면에 추가" → 독립 앱처럼 실행
+   - 데스크톱: Chrome "설치" 버튼 → 창 모드 실행
+
+#### 9. 🔮 다음 단계 (Phase 3 - 향후)
+
+**Mobile UX 개선** (High Priority):
+- 터치 제스처: 스와이프 네비게이션
+- 키보드 최적화: 자동 포커스, 엔터 키 전송
+- 오디오 최적화: 모바일 녹음 품질 향상
+
+**Accessibility 업그레이드** (Medium Priority):
+- ARIA labels: 스크린 리더 지원
+- 키보드 네비게이션: Tab, Enter, Esc 키 지원
+- WCAG 2.1 AA 준수: 색상 대비, 포커스 상태, 텍스트 크기
+
+**Analytics & A/B Testing** (Medium Priority):
+- GA4 이벤트 추적: 사용자 행동 분석
+- A/B 테스트: 기능 개선 효과 측정
+- 사용자 피드백 수집: 만족도 조사
+
+---
+
+## 🔔 이전 업데이트 (2026-03-18 08:40 UTC)
 
 ### 📊 일일 XP 추적 & Streak 로딩 순서 수정 - Commit `bfcc638` ✅
 
