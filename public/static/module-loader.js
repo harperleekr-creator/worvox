@@ -69,11 +69,13 @@ class ModuleLoader {
   init() {
     console.log('📦 Module Loader initialized');
     
-    // 프리로드가 필요한 모듈 미리 로드
-    this.preloadModules();
+    // 현재 모듈 파일이 없으므로 프리로드 비활성화
+    // this.preloadModules();
     
-    // 네트워크 상태 확인
-    this.checkNetworkAndPreload();
+    // 네트워크 상태 확인도 비활성화
+    // this.checkNetworkAndPreload();
+    
+    console.log('ℹ️ Module Loader ready (preload disabled until modules are created)');
   }
 
   /**
@@ -198,9 +200,9 @@ class ModuleLoader {
       };
 
       script.onerror = (error) => {
-        console.error(`❌ Script load error: ${url}`, error);
+        console.warn(`⚠️ Module not found (expected): ${url}`);
         document.head.removeChild(script);
-        reject(new Error(`Failed to load script: ${url}`));
+        reject(new Error(`Module not available: ${moduleName}`));
       };
 
       document.head.appendChild(script);
@@ -318,9 +320,13 @@ class ModuleLoader {
     } catch (error) {
       this.hideLoadingUI(toastId);
       
-      if (window.toast) {
-        window.toast.error(`모듈 로드 실패: ${moduleName}`);
-      }
+      // 모듈이 아직 생성되지 않은 경우 조용히 처리
+      console.warn(`ℹ️ Module '${moduleName}' not available yet`);
+      
+      // Toast 에러 표시 안 함
+      // if (window.toast) {
+      //   window.toast.error(`모듈 로드 실패: ${moduleName}`);
+      // }
       
       throw error;
     }
