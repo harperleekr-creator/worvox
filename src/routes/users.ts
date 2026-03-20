@@ -71,7 +71,24 @@ users.post('/google-login', async (c) => {
     
     const googleId = payload.sub;
     const email = payload.email;
-    const name = payload.name || email?.split('@')[0] || 'User';
+    
+    // Ensure proper UTF-8 handling for name
+    let name = 'User';
+    try {
+      if (payload.name) {
+        // Try to properly decode the name
+        name = payload.name;
+        console.log('👤 Original name:', name);
+        console.log('👤 Name length:', name.length);
+        console.log('👤 Name charCodes:', Array.from(name).map(c => c.charCodeAt(0)));
+      } else if (email) {
+        name = email.split('@')[0];
+      }
+    } catch (nameError) {
+      console.error('❌ Name processing error:', nameError);
+      name = email?.split('@')[0] || 'User';
+    }
+    
     const picture = payload.picture || null;
 
     if (!googleId || !email) {
