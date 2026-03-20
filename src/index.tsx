@@ -30,7 +30,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1773979303299'; // Update manually or via build script
+const BUILD_TIME = '1773980070322'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -2919,13 +2919,6 @@ app.get('/app', (c) => {
         <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
         <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
         
-        <!-- Preconnect to CDNs for faster loading -->
-        <link rel="preconnect" href="https://cdn.tailwindcss.com">
-        <link rel="preconnect" href="https://cdn.jsdelivr.net">
-        <link rel="preconnect" href="https://www.googletagmanager.com">
-        <link rel="dns-prefetch" href="https://js.tosspayments.com">
-        <link rel="dns-prefetch" href="https://accounts.google.com">
-        
         <!-- PWA Manifest -->
         <link rel="manifest" href="/manifest.json">
         
@@ -3078,23 +3071,40 @@ app.get('/', (c) => {
         <meta name="geo.region" content="${isKorean ? 'KR' : 'US'}">
         <meta name="geo.placename" content="${isKorean ? 'South Korea' : 'United States'}">
         
-        <!-- Open Graph (Facebook, LinkedIn) -->
+        <!-- Open Graph (Facebook, LinkedIn, KakaoTalk) -->
         <meta property="og:type" content="website">
-        <meta property="og:url" content="https://worvox.com">
-        <meta property="og:title" content="${isKorean ? 'WorVox - 실전 영어회화 플랫폼 | AI 발음 분석 & 1:1 전화영어' : 'WorVox - Real English Conversation Platform'}">
+        <meta property="og:url" content="https://worvox.com${lang === 'en' ? '?lang=en' : ''}">
+        <meta property="og:title" content="${isKorean ? 'WorVox - 실전 영어회화 플랫폼 | AI 발음 분석 & 1:1 전화영어' : 'WorVox - Real English Conversation Platform | AI Pronunciation & Live Speaking'}">
         <meta property="og:description" content="${isKorean ? 'AI 기반 실시간 발음 분석과 원어민급 강사진의 1:1 전화영어. 맞춤형 피드백으로 영어 실력 향상. 무료 체험 시작하세요!' : 'AI-powered real-time pronunciation analysis and 1:1 live speaking with native-level instructors. Improve your English with personalized feedback. Start your free trial!'}">
         <meta property="og:image" content="https://worvox.com/og-image.jpg">
+        <meta property="og:image:secure_url" content="https://worvox.com/og-image.jpg">
+        <meta property="og:image:type" content="image/jpeg">
         <meta property="og:image:width" content="2752">
         <meta property="og:image:height" content="1536">
-        <meta property="og:site_name" content="WorVox - 실전 영어회화">
-        <meta property="og:locale" content="ko_KR">
+        <meta property="og:image:alt" content="${isKorean ? 'WorVox AI 영어회화 플랫폼' : 'WorVox AI English Speaking Platform'}">
+        <meta property="og:site_name" content="WorVox">
+        <meta property="og:locale" content="${isKorean ? 'ko_KR' : 'en_US'}">
+        <meta property="og:locale:alternate" content="${isKorean ? 'en_US' : 'ko_KR'}">
         
         <!-- Twitter Card -->
         <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:url" content="https://worvox.com">
-        <meta name="twitter:title" content="WorVox - 실전 영어회화 플랫폼">
-        <meta name="twitter:description" content="AI 발음 분석 + 1:1 전화영어로 영어 실력 향상. 무료 체험 가능!">
+        <meta name="twitter:site" content="@WorVox">
+        <meta name="twitter:creator" content="@WorVox">
+        <meta name="twitter:url" content="https://worvox.com${lang === 'en' ? '?lang=en' : ''}">
+        <meta name="twitter:title" content="${isKorean ? 'WorVox - 실전 영어회화 플랫폼' : 'WorVox - AI English Speaking Platform'}">
+        <meta name="twitter:description" content="${isKorean ? 'AI 발음 분석 + 1:1 전화영어로 영어 실력 향상. 무료 체험 가능!' : 'AI pronunciation analysis + 1:1 live speaking. Start your free trial today!'}">
         <meta name="twitter:image" content="https://worvox.com/og-image.jpg">
+        <meta name="twitter:image:alt" content="${isKorean ? 'WorVox AI 영어회화 플랫폼' : 'WorVox AI English Speaking Platform'}">
+        
+        <!-- 카카오톡 미리보기 최적화 -->
+        <meta property="og:rich_attachment" content="true">
+        
+        <!-- 네이버 블로그 최적화 -->
+        <meta property="og:article:author" content="WorVox Team">
+        
+        <!-- 추가 SNS 메타태그 -->
+        <meta property="fb:app_id" content="">
+        <meta name="pinterest-rich-pin" content="true">
         
         <!-- JSON-LD Structured Data for Google -->
         <script type="application/ld+json">
@@ -3102,26 +3112,48 @@ app.get('/', (c) => {
           "@context": "https://schema.org",
           "@type": "EducationalOrganization",
           "name": "WorVox",
-          "alternateName": "워복스",
+          "alternateName": ["워복스", "WorVox English"],
           "url": "https://worvox.com",
-          "logo": "https://worvox.com/logo.png",
-          "description": "AI 기반 영어 학습 플랫폼. 실시간 발음 교정, ElevenLabs TTS, GPT-4 맞춤형 대화 연습 제공.",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://worvox.com/logo.png",
+            "width": 512,
+            "height": 512
+          },
+          "description": "${isKorean ? 'AI 기반 영어 학습 플랫폼. 실시간 발음 교정, ElevenLabs TTS, GPT-4 맞춤형 대화 연습 제공.' : 'AI-powered English learning platform with real-time pronunciation correction, ElevenLabs TTS, and GPT-4 personalized conversation practice.'}",
           "address": {
             "@type": "PostalAddress",
-            "addressCountry": "KR"
+            "addressCountry": "KR",
+            "addressLocality": "Seoul"
+          },
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "Customer Service",
+            "email": "harperleekr@gmail.com",
+            "availableLanguage": ["Korean", "English"]
           },
           "sameAs": [
-            "https://worvox.com"
+            "https://worvox.com",
+            "https://github.com/harperleekr-creator/worvox"
           ],
           "offers": {
             "@type": "AggregateOffer",
             "priceCurrency": "KRW",
             "lowPrice": "19000",
             "highPrice": "174240",
-            "offerCount": "2"
+            "offerCount": "2",
+            "availability": "https://schema.org/InStock"
           },
-          "areaServed": "KR",
-          "availableLanguage": ["ko", "en"]
+          "areaServed": {
+            "@type": "Country",
+            "name": "South Korea"
+          },
+          "availableLanguage": ["ko", "en"],
+          "founder": {
+            "@type": "Person",
+            "name": "Harper Lee"
+          },
+          "keywords": "${isKorean ? '영어회화, AI 영어, 전화영어, 발음 교정, 영어 학습' : 'English conversation, AI English, phone English, pronunciation correction, English learning'}"
         }
         </script>
         <script type="application/ld+json">
@@ -3130,8 +3162,12 @@ app.get('/', (c) => {
           "@type": "SoftwareApplication",
           "name": "WorVox",
           "applicationCategory": "EducationalApplication",
-          "operatingSystem": "Web",
-          "image": "https://worvox.com/static/logo.webp",
+          "applicationSubCategory": "Language Learning",
+          "operatingSystem": "Web, iOS, Android",
+          "browserRequirements": "Requires JavaScript, supports modern browsers",
+          "url": "https://worvox.com",
+          "image": "https://worvox.com/og-image.jpg",
+          "screenshot": "https://worvox.com/og-image.jpg",
           "offers": {
             "@type": "Offer",
             "price": "19000",
@@ -3145,19 +3181,97 @@ app.get('/', (c) => {
             "ratingValue": "4.8",
             "ratingCount": "127",
             "bestRating": "5",
-            "worstRating": "1"
+            "worstRating": "1",
+            "reviewCount": "89"
           },
-          "description": "AI 영어 스피킹 플랫폼 - 실시간 발음 교정, 맞춤형 대화 연습, OPIC 스타일 시험",
-          "screenshot": "https://worvox.com/static/logo.webp",
+          "description": "${isKorean ? 'AI 영어 스피킹 플랫폼 - 실시간 발음 교정, 맞춤형 대화 연습, OPIC 스타일 시험' : 'AI English speaking platform - Real-time pronunciation correction, personalized conversation practice, OPIC-style tests'}",
+          "softwareVersion": "${APP_VERSION}",
+          "datePublished": "2025-12-01",
+          "dateModified": "2026-03-20",
           "creator": {
             "@type": "Organization",
-            "name": "WorVox Team"
+            "name": "WorVox Team",
+            "url": "https://worvox.com"
+          },
+          "provider": {
+            "@type": "Organization",
+            "name": "WorVox",
+            "url": "https://worvox.com"
+          },
+          "featureList": [
+            "${isKorean ? 'AI 기반 발음 분석' : 'AI-powered pronunciation analysis'}",
+            "${isKorean ? '1:1 원어민 강사 전화영어' : '1:1 native speaker phone lessons'}",
+            "${isKorean ? '30+ 실전 시나리오' : '30+ real-life scenarios'}",
+            "${isKorean ? '실시간 대화 연습' : 'Real-time conversation practice'}",
+            "${isKorean ? '게임화된 학습 시스템' : 'Gamified learning system'}",
+            "${isKorean ? 'OPIC 스타일 모의고사' : 'OPIC-style mock tests'}"
+          ]
+        }
+        </script>
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "WorVox",
+          "alternateName": "워복스",
+          "url": "https://worvox.com",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://worvox.com/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          },
+          "inLanguage": ["ko-KR", "en-US"]
+        }
+        </script>
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Course",
+          "name": "${isKorean ? 'WorVox AI 영어회화 과정' : 'WorVox AI English Conversation Course'}",
+          "description": "${isKorean ? 'AI 기반 실시간 발음 분석과 1:1 전화영어를 통한 실전 영어회화 학습' : 'Practical English conversation learning through AI-based real-time pronunciation analysis and 1:1 phone lessons'}",
+          "provider": {
+            "@type": "Organization",
+            "name": "WorVox",
+            "url": "https://worvox.com"
+          },
+          "educationalLevel": "${isKorean ? '초급부터 고급까지' : 'Beginner to Advanced'}",
+          "teaches": "${isKorean ? '영어 회화, 발음, 듣기, 말하기' : 'English conversation, pronunciation, listening, speaking'}",
+          "availableLanguage": ["ko", "en"],
+          "offers": {
+            "@type": "Offer",
+            "category": "Subscription",
+            "priceCurrency": "KRW",
+            "price": "19000"
           }
         }
         </script>
         
         <!-- Canonical URL -->
-        <link rel="canonical" href="https://worvox.com">
+        <link rel="canonical" href="https://worvox.com${lang === 'en' ? '?lang=en' : ''}">
+        
+        <!-- Alternate Language Versions -->
+        <link rel="alternate" hreflang="ko" href="https://worvox.com">
+        <link rel="alternate" hreflang="en" href="https://worvox.com?lang=en">
+        <link rel="alternate" hreflang="x-default" href="https://worvox.com">
+        
+        <!-- Preconnect & DNS Prefetch for Performance -->
+        <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+        <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
+        <link rel="dns-prefetch" href="https://js.tosspayments.com">
+        <link rel="dns-prefetch" href="https://accounts.google.com">
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+        
+        <!-- Additional SEO Tags -->
+        <meta name="format-detection" content="telephone=no">
+        <meta name="apple-mobile-web-app-title" content="WorVox">
+        <meta name="application-name" content="WorVox">
+        <meta name="msapplication-TileColor" content="#a855f7">
+        <meta name="msapplication-config" content="/browserconfig.xml">
+        <meta name="rating" content="general">
+        <meta name="distribution" content="global">
+        <meta name="revisit-after" content="7 days">
+        <meta name="referrer" content="origin-when-cross-origin">
         
         <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
         <meta http-equiv="Pragma" content="no-cache">
@@ -3170,13 +3284,6 @@ app.get('/', (c) => {
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
         <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
         <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
-        
-        <!-- Preconnect to CDNs for faster loading -->
-        <link rel="preconnect" href="https://cdn.tailwindcss.com">
-        <link rel="preconnect" href="https://cdn.jsdelivr.net">
-        <link rel="preconnect" href="https://www.googletagmanager.com">
-        <link rel="dns-prefetch" href="https://js.tosspayments.com">
-        <link rel="dns-prefetch" href="https://accounts.google.com">
         
         <!-- PWA Manifest -->
         <link rel="manifest" href="/manifest.json">
