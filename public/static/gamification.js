@@ -36,6 +36,12 @@ class GamificationManager {
         // Update UI with new stats
         this.updateStatsUI(data);
         
+        // ✅ Update daily goal: XP count
+        if (typeof window.updateDailyGoalProgress === 'function') {
+          await window.updateDailyGoalProgress('xp', xp);
+          console.log('✅ Daily goal updated: +' + xp + ' XP');
+        }
+        
         return data;
       }
     } catch (error) {

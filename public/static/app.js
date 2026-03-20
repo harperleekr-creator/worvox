@@ -471,6 +471,16 @@ class WorVox {
       // Load gamification stats AFTER attendance check to get updated streak
       await this.loadGamificationStats();
       
+      // 🎯 Initialize daily goals (after login)
+      if (typeof window.dailyGoalsManager !== 'undefined' && this.currentUser) {
+        try {
+          await window.dailyGoalsManager.init(this.currentUser.id, this.currentUser.goalLevel || 'balanced');
+          console.log('✅ Daily goals initialized');
+        } catch (error) {
+          console.warn('⚠️ Daily goals initialization failed (non-critical):', error);
+        }
+      }
+      
       this.showTopicSelection();
     } else {
       this.showLogin();
@@ -1710,6 +1720,12 @@ class WorVox {
         // End session
         await axios.post(`/api/sessions/end/${this.timerChallenge.sessionId}`);
         console.log('✅ Timer session ended');
+        
+        // ✅ Update daily goal: timer session count
+        if (this.currentUser && typeof window.updateDailyGoalProgress === 'function') {
+          await window.updateDailyGoalProgress('timer', 1);
+          console.log('✅ Daily goal updated: +1 timer session');
+        }
       } catch (error) {
         console.warn('⚠️ Failed to save timer session:', error);
       }
@@ -3281,6 +3297,12 @@ class WorVox {
               if (wordsResponse.data.success) {
                 console.log('✅ Words added:', wordsResponse.data.wordsAdded, '| Total:', wordsResponse.data.totalWords);
               }
+              
+              // ✅ Update daily goal: word count
+              if (typeof window.updateDailyGoalProgress === 'function') {
+                await window.updateDailyGoalProgress('word', 10);
+                console.log('✅ Daily goal updated: +10 words');
+              }
             } catch (error) {
               console.error('❌ Failed to add words:', error);
             }
@@ -3702,6 +3724,12 @@ class WorVox {
         // End session
         await axios.post(`/api/sessions/end/${sessionId}`);
         console.log('✅ Scenario session ended');
+        
+        // ✅ Update daily goal: timer session count (scenario mode)
+        if (this.currentUser && typeof window.updateDailyGoalProgress === 'function') {
+          await window.updateDailyGoalProgress('timer', 1);
+          console.log('✅ Daily goal updated: +1 timer session (scenario)');
+        }
       } catch (error) {
         console.warn('⚠️ Failed to save scenario session:', error);
       }
@@ -4775,6 +4803,12 @@ class WorVox {
           try {
             await axios.post(`/api/sessions/end/${this.currentExam.sessionId}`);
             console.log('✅ Exam session ended');
+            
+            // ✅ Update daily goal: timer session count (exam mode)
+            if (this.currentUser && typeof window.updateDailyGoalProgress === 'function') {
+              await window.updateDailyGoalProgress('timer', 1);
+              console.log('✅ Daily goal updated: +1 timer session (exam)');
+            }
           } catch (error) {
             console.warn('⚠️ Failed to end session:', error);
           }
@@ -5009,6 +5043,12 @@ class WorVox {
                 });
                 if (wordsResponse.data.success) {
                   console.log('✅ Words added:', wordsResponse.data.wordsAdded, '| Total:', wordsResponse.data.totalWords);
+                }
+                
+                // ✅ Update daily goal: word count
+                if (typeof window.updateDailyGoalProgress === 'function') {
+                  await window.updateDailyGoalProgress('word', totalWords);
+                  console.log('✅ Daily goal updated: +' + totalWords + ' words');
                 }
               } catch (error) {
                 console.error('❌ Failed to add words:', error);
@@ -8085,6 +8125,12 @@ Proceed to payment?
           });
           if (wordsResponse.data.success) {
             console.log('✅ Words added:', wordsResponse.data.wordsAdded, '| Total:', wordsResponse.data.totalWords);
+          }
+          
+          // ✅ Update daily goal: conversation count
+          if (typeof window.updateDailyGoalProgress === 'function') {
+            await window.updateDailyGoalProgress('conversation', 1);
+            console.log('✅ Daily goal updated: +1 conversation');
           }
         } catch (error) {
           console.error('❌ Failed to add words:', error);
