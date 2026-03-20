@@ -1222,7 +1222,11 @@ class WorVox {
         console.error('❌ AI prompt generation failed:', error);
         console.error('Error details:', error.response?.data);
         
-        alert('AI 프롬프트 생성에 실패했습니다.\n기본 문장 풀을 사용합니다.');
+        if (window.toast) {
+          window.toast.error('AI 프롬프트 생성에 실패했습니다. 기본 문장 풀을 사용합니다.', 5000);
+        } else {
+          alert('AI 프롬프트 생성에 실패했습니다.\n기본 문장 풀을 사용합니다.');
+        }
         ({ randomSentence, translation } = this.getDefaultTimerSentence());
       }
     } else {
