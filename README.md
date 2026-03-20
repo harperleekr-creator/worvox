@@ -1,6 +1,177 @@
 # WorVox - AI English Learning Platform
 
-## 🔔 최신 업데이트 (2026-03-20 03:50 UTC) - ✅ Phase 1+2 배포 완료
+## 🔔 최신 업데이트 (2026-03-20 04:05 UTC) - ✅ Mobile UX + Module Loader 배포 완료
+
+### 📱 Mobile UX + Code Splitting 최적화 - Commit `141d20e` ✅
+
+**배포 정보**
+- **Production**: https://worvox.com ✅ 
+- **Preview**: https://1f69c298.worvox.pages.dev ✅
+- **GitHub Commit**: https://github.com/harperleekr-creator/worvox/commit/141d20e
+- **Build Time**: `1773979303299` (2026-03-20T04:01:43.299Z)
+
+#### 🎯 주요 개선 사항
+
+**1️⃣ Mobile UX 최적화** (`public/static/mobile-utils.js` - 10.6KB)
+
+- **터치 제스처 지원**:
+  - ✅ Swipe Right → 대화 페이지에서 뒤로가기
+  - ✅ Swipe Up → 메시지 입력창 포커스
+  - ✅ Swipe Down → 키보드 닫기
+  - ✅ Long Press → 컨텍스트 메뉴 (향후 확장)
+
+- **키보드 최적화**:
+  - ✅ Enter 키로 메시지 전송
+  - ✅ 검색창에서 Enter로 검색 실행
+  - ✅ 입력창 포커스 시 자동 스크롤 (화면 중앙)
+  - ✅ iOS 키보드 닫힐 때 viewport 복구
+
+- **모바일 Viewport 수정**:
+  - ✅ CSS 변수 `--vh` 사용 (모바일 주소창 대응)
+  - ✅ 화면 회전 시 자동 재계산
+  - ✅ `resize`, `orientationchange` 이벤트 핸들링
+
+- **오디오 녹음 최적화**:
+  - ✅ iOS Safari AudioContext 초기화
+  - ✅ 마이크 권한 미리 요청
+  - ✅ 디바이스별 최적 MIME 타입 자동 선택:
+    - `audio/webm;codecs=opus` (최우선)
+    - `audio/webm`, `audio/ogg`, `audio/mp4`, `audio/wav`
+  - ✅ 모노 녹음 (용량 절약)
+  - ✅ 128kbps 비트레이트
+  - ✅ Echo cancellation, Noise suppression, Auto gain control
+
+- **추가 기능**:
+  - ✅ 햅틱 피드백 (진동)
+  - ✅ 네트워크 상태 확인 (4G/3G/2G, 데이터 절약 모드)
+  - ✅ 배터리 상태 확인 (저전력 모드 감지)
+  - ✅ 이미지 lazy loading (IntersectionObserver)
+  - ✅ Pull-to-refresh 비활성화
+  - ✅ 모바일 디버깅 로그 (화면 하단)
+
+**사용 예시**:
+```javascript
+// 녹음 시작
+const { mediaRecorder, stream } = await window.mobileUtils.startRecording();
+
+// 네트워크 상태 확인
+const network = window.mobileUtils.checkNetworkStatus();
+console.log('Network:', network.effectiveType, network.downlink + ' Mbps');
+
+// 배터리 상태 확인
+const battery = await window.mobileUtils.checkBatteryStatus();
+console.log('Battery:', Math.round(battery.level * 100) + '%');
+
+// 햅틱 피드백
+window.mobileUtils.vibrate(50); // 50ms 진동
+```
+
+---
+
+**2️⃣ Module Loader - Lazy Loading 시스템** (`public/static/module-loader.js` - 8.0KB)
+
+- **기능별 모듈 분리 구조**:
+  ```
+  core.js         → 필수 기능 (항상 로드)
+  conversation.js → AI 대화 모드
+  scenario.js     → 시나리오 모드
+  timer.js        → 타이머 모드
+  exam.js         → 실전 모의고사
+  vocabulary.js   → 단어장
+  history.js      → 학습 히스토리
+  stats.js        → 통계
+  rewards.js      → 리워드
+  payment.js      → 결제
+  ```
+
+- **Lazy Loading 전략**:
+  - ✅ 핵심 모듈만 우선 로드 (프리로드)
+  - ✅ 기능 사용 시점에 모듈 로드
+  - ✅ 의존성 자동 해결
+  - ✅ 중복 로드 방지 (캐싱)
+  - ✅ 네트워크 상태 감지 후 추가 프리로드 (4G & 데이터 절약 모드 아닐 때)
+
+- **로딩 최적화**:
+  - ✅ Prefetch: 미리 다운로드 (낮은 우선순위)
+  - ✅ Preload: 높은 우선순위 다운로드
+  - ✅ 로딩 상태 Toast 표시
+  - ✅ 에러 핸들링 및 재시도
+
+**사용 예시**:
+```javascript
+// 모듈 로드
+await window.moduleLoader.loadModule('conversation');
+
+// 여러 모듈 동시 로드
+await window.moduleLoader.loadModules(['scenario', 'timer']);
+
+// 안전한 로드 (Toast + 에러 핸들링)
+await window.moduleLoader.safeLoadModule('exam');
+
+// 모듈 상태 확인
+const status = window.moduleLoader.getStatus();
+console.log('Loaded:', status.loaded);
+console.log('Loading:', status.loading);
+```
+
+---
+
+**3️⃣ CSS 최적화** (`public/static/style.css`)
+
+- ✅ CSS 변수 추가:
+  ```css
+  :root {
+    --vh: 1vh;  /* 모바일 viewport height (JS로 설정) */
+    --touch-target-min: 44px;  /* 터치 영역 최소 크기 */
+    --spacing-xs/sm/md/lg/xl: 0.25/0.5/1/1.5/2rem;
+  }
+  ```
+
+- ✅ 전체 높이 컨테이너:
+  ```css
+  .full-height {
+    height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
+  }
+  ```
+
+- ✅ 모바일 터치 최적화:
+  - 버튼/링크 최소 44x44px
+  - `touch-action: manipulation` (더블탭 줌 방지)
+  - `overscroll-behavior: contain` (오버스크롤 방지)
+
+---
+
+#### 📊 성능 개선 측정
+
+| 항목 | Before | After | 개선 |
+|------|--------|-------|------|
+| **초기 JS 로드** | 795KB (app.js) | 795KB + 18.6KB (utils) | +2.3% |
+| **모듈 로딩** | ❌ 전체 로드 | ✅ 필요시 로드 | 향후 50% 절감 예상 |
+| **모바일 UX** | ⚠️ 기본 | ✅ 최적화 완료 | - |
+| **터치 제스처** | ❌ 없음 | ✅ 4가지 제스처 | - |
+| **오디오 녹음** | ⚠️ 기본 품질 | ✅ 고품질 (opus) | 더 작은 용량 |
+| **Viewport 문제** | ❌ 모바일 주소창 | ✅ 해결 | - |
+
+**참고**: 현재 app.js는 그대로 795KB이지만, Module Loader 인프라가 완성되어 향후 모듈 분리 작업 시 즉시 적용 가능합니다.
+
+---
+
+#### 🔮 다음 단계
+
+**Module 분리 작업** (향후):
+1. app.js (795KB) → core.js (200KB) + 각 기능 모듈 (50-100KB씩)
+2. 초기 로딩 속도 **50% 이상 개선** 예상
+3. 메모리 사용량 **30% 절감** 예상
+
+**Accessibility** (Medium Priority):
+- ARIA labels 추가
+- 키보드 네비게이션 개선
+- WCAG 2.1 AA 준수
+
+---
+
+## 🔔 이전 업데이트 (2026-03-20 03:50 UTC) - ✅ Phase 1+2 배포 완료
 
 ### 🚀 Phase 1+2: UX/UI 개선, PWA, SEO 최적화 - Commit `64af7c4` ✅
 
