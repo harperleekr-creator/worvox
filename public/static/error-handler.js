@@ -79,6 +79,12 @@ class ErrorHandler {
   }
 
   handleAxiosError(error) {
+    // ✅ Skip global error handling if request config has skipGlobalErrorHandler flag
+    if (error.config && error.config.skipGlobalErrorHandler) {
+      console.log('⏭️ Skipping global error handler for this request');
+      return;
+    }
+    
     if (error.response) {
       // 서버 응답 에러 (4xx, 5xx)
       const status = error.response.status;
@@ -86,6 +92,11 @@ class ErrorHandler {
 
       switch (status) {
         case 400:
+          // Skip showing error for vocabulary/progress endpoints (handled locally)
+          if (error.config?.url?.includes('/vocabulary/') || error.config?.url?.includes('/progress/')) {
+            console.log('⏭️ Vocabulary/Progress error handled locally');
+            return;
+          }
           this.handleError(data.error || '잘못된 요청입니다', 'Bad Request');
           break;
         case 401:
@@ -101,6 +112,13 @@ class ErrorHandler {
           this.handleError('접근 권한이 없습니다', 'Forbidden');
           break;
         case 404:
+          // Skip showing error for vocabulary/progress/bookmarks endpoints (handled locally)
+          if (error.config?.url?.includes('/vocabulary/') || 
+              error.config?.url?.includes('/progress/') || 
+              error.config?.url?.includes('/bookmarks/')) {
+            console.log('⏭️ Resource not found error handled locally');
+            return;
+          }
           this.handleError('요청한 데이터를 찾을 수 없습니다', 'Not Found');
           break;
         case 429:
@@ -109,6 +127,14 @@ class ErrorHandler {
         case 500:
         case 502:
         case 503:
+          // ✅ Skip showing "서버 오류" for vocabulary-related endpoints (they handle errors locally)
+          if (error.config?.url?.includes('/vocabulary/') || 
+              error.config?.url?.includes('/progress/') || 
+              error.config?.url?.includes('/bookmarks/') ||
+              error.config?.url?.includes('/daily-goals/')) {
+            console.log('⏭️ Server error for vocabulary/progress/daily-goals handled locally');
+            return;
+          }
           this.handleError('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요', 'Server Error');
           break;
         default:
