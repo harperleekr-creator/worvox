@@ -557,6 +557,15 @@ admin.delete('/users/:id', requireAuth, async (c) => {
       { name: 'user_activity_log', query: 'DELETE FROM user_activity_log WHERE user_id = ?', params: [userId] },
       { name: 'usage_tracking (by string)', query: 'DELETE FROM usage_tracking WHERE user_id = ?', params: [userId.toString()] },
       { name: 'usage_tracking (by int)', query: 'DELETE FROM usage_tracking WHERE CAST(user_id AS INTEGER) = ?', params: [userId] },
+      // ✅ Daily goals & streak system tables (added recently)
+      { name: 'streak_milestones', query: 'DELETE FROM streak_milestones WHERE user_id = ?', params: [userId] },
+      { name: 'daily_goals', query: 'DELETE FROM daily_goals WHERE user_id = ?', params: [userId] },
+      { name: 'user_streaks', query: 'DELETE FROM user_streaks WHERE user_id = ?', params: [userId] },
+      // ✅ Live Speaking (Hiing) related tables
+      { name: 'hiing_notification_logs', query: 'DELETE FROM hiing_notification_logs WHERE session_id IN (SELECT id FROM hiing_sessions WHERE student_id = ? OR teacher_id = ?)', params: [userId, userId] },
+      { name: 'hiing_sessions', query: 'DELETE FROM hiing_sessions WHERE student_id = ? OR teacher_id = ?', params: [userId, userId] },
+      { name: 'hiing_credits', query: 'DELETE FROM hiing_credits WHERE user_id = ?', params: [userId] },
+      { name: 'hiing_teacher_availability', query: 'DELETE FROM hiing_teacher_availability WHERE teacher_id = ?', params: [userId] },
     ]
 
     for (const task of deleteTasks) {
