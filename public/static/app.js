@@ -15388,7 +15388,23 @@ Proceed to payment?
     // Calculate future date
     const futureDate = this.getFutureDate(14);
     const planName = plan === 'core' ? 'Core' : 'Premium';
-    const planPrice = plan === 'core' ? '₩9,900' : '₩19,000';
+    
+    // Get price based on current billing period
+    const billingPeriod = this.currentBillingPeriod || 'monthly';
+    let planPrice, periodText, savingsText;
+    
+    if (billingPeriod === 'yearly') {
+      // Yearly prices (18% discount)
+      planPrice = plan === 'core' ? '₩97,416' : '₩186,960';
+      periodText = '년';
+      const savings = plan === 'core' ? '₩21,384' : '₩41,040';
+      savingsText = `<div class="text-xs text-green-600 mt-1">(연 ${savings} 절약!)</div>`;
+    } else {
+      // Monthly prices
+      planPrice = plan === 'core' ? '₩9,900' : '₩19,000';
+      periodText = '월';
+      savingsText = '';
+    }
 
     // Show confirmation modal
     const modal = document.createElement('div');
@@ -15423,7 +15439,10 @@ Proceed to payment?
             </li>
             <li class="flex items-start">
               <i class="fas fa-credit-card text-purple-500 mr-2 mt-0.5"></i>
-              <span>체험 종료 후 자동 결제: <strong>${planPrice}</strong>/월</span>
+              <div>
+                <span>체험 종료 후 자동 결제: <strong>${planPrice}</strong>/${periodText}</span>
+                ${savingsText}
+              </div>
             </li>
             <li class="flex items-start">
               <i class="fas fa-bell text-yellow-500 mr-2 mt-0.5"></i>
@@ -15503,7 +15522,20 @@ Proceed to payment?
   // Show payment method selection for free trial
   showTrialPaymentMethodModal(plan) {
     const planName = plan === 'core' ? 'Core' : 'Premium';
-    const planPrice = plan === 'core' ? '₩9,900' : '₩19,000';
+    
+    // Get price based on current billing period
+    const billingPeriod = this.currentBillingPeriod || 'monthly';
+    let planPrice, periodText;
+    
+    if (billingPeriod === 'yearly') {
+      // Yearly prices (18% discount)
+      planPrice = plan === 'core' ? '₩97,416' : '₩186,960';
+      periodText = '년';
+    } else {
+      // Monthly prices
+      planPrice = plan === 'core' ? '₩9,900' : '₩19,000';
+      periodText = '월';
+    }
 
     const overlay = document.createElement('div');
     overlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] backdrop-blur-sm';
@@ -15516,7 +15548,7 @@ Proceed to payment?
           ${planName} 플랜 - 2주 무료 체험
         </p>
         <p class="text-xs text-gray-500 dark:text-gray-500 mb-6">
-          체험 종료 후 ${planPrice}/월 자동 결제
+          체험 종료 후 ${planPrice}/${periodText} 자동 결제
         </p>
         
         <!-- Toss Payments (Domestic) -->
@@ -15548,12 +15580,14 @@ Proceed to payment?
     document.querySelector('[class*="fixed inset-0"]')?.remove();
 
     try {
-      console.log(`🎁 Starting Toss free trial for ${plan}`);
+      const billingPeriod = this.currentBillingPeriod || 'monthly';
+      console.log(`🎁 Starting Toss free trial for ${plan} (${billingPeriod})`);
 
       // Step 1: Start trial on backend (get customerKey)
       const startResponse = await axios.post('/api/payments/trial/start', {
         userId: this.currentUser.id,
-        plan
+        plan,
+        billingPeriod
       });
 
       console.log(`📡 Trial start response:`, startResponse.data);
@@ -15575,7 +15609,7 @@ Proceed to payment?
       
       await billing.requestBillingAuth({
         method: 'CARD',
-        successUrl: window.location.origin + `/trial-success?plan=${plan}&userId=${this.currentUser.id}&customerKey=${customerKey}`,
+        successUrl: window.location.origin + `/trial-success?plan=${plan}&userId=${this.currentUser.id}&customerKey=${customerKey}&billingPeriod=${billingPeriod}`,
         failUrl: window.location.origin + '/trial-fail',
         customerEmail: this.currentUser.email,
         customerName: this.currentUser.username

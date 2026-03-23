@@ -217,9 +217,9 @@ payments.get('/history/:userId', async (c) => {
 // Start free trial - generate customer key
 payments.post('/trial/start', async (c) => {
   try {
-    const { userId, plan } = await c.req.json();
+    const { userId, plan, billingPeriod } = await c.req.json();
 
-    console.log(`📥 Received trial request - userId: ${userId} (type: ${typeof userId}), plan: ${plan}`);
+    console.log(`📥 Received trial request - userId: ${userId} (type: ${typeof userId}), plan: ${plan}, billingPeriod: ${billingPeriod || 'monthly'}`);
 
     if (!userId || !plan) {
       return c.json({ error: 'Missing required fields' }, 400);
@@ -229,7 +229,7 @@ payments.post('/trial/start', async (c) => {
       return c.json({ error: 'Invalid plan. Must be "core" or "premium"' }, 400);
     }
 
-    console.log(`🎁 Starting free trial for user ${userId}, plan: ${plan}`);
+    console.log(`🎁 Starting free trial for user ${userId}, plan: ${plan}, billing: ${billingPeriod || 'monthly'}`);
 
     // Check if user already has active trial or subscription
     const user = await c.env.DB.prepare(
@@ -261,10 +261,10 @@ payments.post('/trial/start', async (c) => {
     // Generate unique customer key for Toss Payments
     const customerKey = `customer_${userId}_${Date.now()}`;
 
-    // Store customer key in database
+    // Store customer key and billing period in database
     await c.env.DB.prepare(
-      'UPDATE users SET toss_customer_key = ? WHERE id = ?'
-    ).bind(customerKey, userId).run();
+      'UPDATE users SET toss_customer_key = ?, billing_period = ? WHERE id = ?'
+    ).bind(customerKey, billingPeriod || 'monthly', userId).run();
 
     console.log(`✅ Customer key generated: ${customerKey}`);
 
@@ -272,6 +272,7 @@ payments.post('/trial/start', async (c) => {
       success: true,
       customerKey,
       plan,
+      billingPeriod: billingPeriod || 'monthly',
       message: '무료 체험을 시작합니다'
     });
 
@@ -287,13 +288,14 @@ payments.post('/trial/start', async (c) => {
 // Confirm billing key and activate trial
 payments.post('/trial/confirm', async (c) => {
   try {
-    const { userId, plan, billingKey, customerKey } = await c.req.json();
+    const { userId, plan, billingKey, customerKey, billingPeriod } = await c.req.json();
 
     if (!userId || !plan || !billingKey || !customerKey) {
       return c.json({ error: 'Missing required fields' }, 400);
     }
 
-    console.log(`🎉 Activating trial for user ${userId}, billing key: ${billingKey}`);
+    const period = billingPeriod || 'monthly';
+    console.log(`🎉 Activating trial for user ${userId}, billing key: ${billingKey}, period: ${period}`);
 
     // Calculate trial dates (2 weeks from now)
     const trialStartDate = new Date();
@@ -307,6 +309,7 @@ payments.post('/trial/confirm', async (c) => {
         billing_key = ?,
         toss_customer_key = ?,
         plan = ?,
+        billing_period = ?,
         is_trial = 1,
         trial_start_date = datetime('now'),
         trial_end_date = datetime('now', '+14 days'),
@@ -314,7 +317,7 @@ payments.post('/trial/confirm', async (c) => {
         subscription_start_date = datetime('now'),
         subscription_end_date = datetime('now', '+14 days')
       WHERE id = ?
-    `).bind(billingKey, customerKey, plan, userId).run();
+    `).bind(billingKey, customerKey, plan, period, userId).run();
 
     // Log trial activation
     await c.env.DB.prepare(`
@@ -412,7 +415,7 @@ payments.post('/billing/execute', async (c) => {
     const koreaDate = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Seoul' }));
     const today = koreaDate.toISOString().split('T')[0];
     const { results: usersToCharge } = await c.env.DB.prepare(`
-      SELECT id, username, email, plan, billing_key, trial_end_date
+      SELECT id, username, email, plan, billing_key, billing_period, trial_end_date
       FROM users
       WHERE is_trial = 1
         AND auto_billing_enabled = 1
@@ -426,11 +429,23 @@ payments.post('/billing/execute', async (c) => {
 
     for (const user of (usersToCharge || [])) {
       try {
-        console.log(`💳 Charging user ${user.id} (${user.email})`);
+        const billingPeriod = user.billing_period || 'monthly';
+        console.log(`💳 Charging user ${user.id} (${user.email}) - ${billingPeriod}`);
 
-        // Determine amount based on plan
-        const amount = user.plan === 'core' ? 9900 : 19000;
-        const orderName = `WorVox ${user.plan.toUpperCase()} 월간 구독`;
+        // Determine amount based on plan and billing period
+        let amount, orderName, subscriptionDuration;
+        
+        if (billingPeriod === 'yearly') {
+          // Yearly prices (18% discount)
+          amount = user.plan === 'core' ? 97416 : 186960;
+          orderName = `WorVox ${user.plan.toUpperCase()} 연간 구독`;
+          subscriptionDuration = '+12 months';
+        } else {
+          // Monthly prices
+          amount = user.plan === 'core' ? 9900 : 19000;
+          orderName = `WorVox ${user.plan.toUpperCase()} 월간 구독`;
+          subscriptionDuration = '+1 month';
+        }
 
         // Call Toss Payments Billing API
         const tossResponse = await fetch('https://api.tosspayments.com/v1/billing/' + user.billing_key, {
@@ -460,12 +475,12 @@ payments.post('/billing/execute', async (c) => {
               trial_start_date = NULL,
               trial_end_date = NULL,
               subscription_start_date = datetime('now'),
-              subscription_end_date = datetime('now', '+1 month'),
-              billing_period = 'monthly',
+              subscription_end_date = datetime('now', ?),
+              billing_period = ?,
               last_billing_attempt = datetime('now'),
               billing_failure_count = 0
             WHERE id = ?
-          `).bind(user.id).run();
+          `).bind(subscriptionDuration, billingPeriod, user.id).run();
 
           // Record payment
           await c.env.DB.prepare(`
