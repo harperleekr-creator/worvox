@@ -561,11 +561,21 @@ admin.delete('/users/:id', requireAuth, async (c) => {
       { name: 'streak_milestones', query: 'DELETE FROM streak_milestones WHERE user_id = ?', params: [userId] },
       { name: 'daily_goals', query: 'DELETE FROM daily_goals WHERE user_id = ?', params: [userId] },
       { name: 'user_streaks', query: 'DELETE FROM user_streaks WHERE user_id = ?', params: [userId] },
+      // ✅ Daily missions & XP tracking
+      { name: 'daily_missions', query: 'DELETE FROM daily_missions WHERE user_id = ?', params: [userId] },
+      { name: 'daily_xp_tracking', query: 'DELETE FROM daily_xp_tracking WHERE user_id = ?', params: [userId] },
+      { name: 'daily_xp_history', query: 'DELETE FROM daily_xp_history WHERE user_id = ?', params: [userId] },
+      { name: 'user_attendance', query: 'DELETE FROM user_attendance WHERE user_id = ?', params: [userId] },
+      // ✅ Prize & reward system
+      { name: 'user_prize_wins', query: 'DELETE FROM user_prize_wins WHERE user_id = ?', params: [userId] },
+      { name: 'speed_quiz_scores', query: 'DELETE FROM speed_quiz_scores WHERE user_id = ?', params: [userId] },
       // ✅ Live Speaking (Hiing) related tables
       { name: 'hiing_notification_logs', query: 'DELETE FROM hiing_notification_logs WHERE session_id IN (SELECT id FROM hiing_sessions WHERE student_id = ? OR teacher_id = ?)', params: [userId, userId] },
       { name: 'hiing_sessions', query: 'DELETE FROM hiing_sessions WHERE student_id = ? OR teacher_id = ?', params: [userId, userId] },
       { name: 'hiing_credits', query: 'DELETE FROM hiing_credits WHERE user_id = ?', params: [userId] },
       { name: 'hiing_teacher_availability', query: 'DELETE FROM hiing_teacher_availability WHERE teacher_id = ?', params: [userId] },
+      { name: 'hiing_notification_preferences', query: 'DELETE FROM hiing_notification_preferences WHERE user_id = ?', params: [userId] },
+      { name: 'hiing_teacher_notification_preferences', query: 'DELETE FROM hiing_teacher_notification_preferences WHERE teacher_id = ?', params: [userId] },
     ]
 
     for (const task of deleteTasks) {
