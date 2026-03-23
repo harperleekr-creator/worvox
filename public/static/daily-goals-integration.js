@@ -2,23 +2,43 @@
 
 // Update daily goal progress automatically
 window.updateDailyGoalProgress = async function(activity, amount = 1) {
-  if (!window.worvox?.currentUser || !window.dailyGoalsManager) {
+  if (!window.worvox?.currentUser) {
+    console.warn('⚠️ Daily goals: No user logged in');
+    return;
+  }
+  
+  if (!window.dailyGoalsManager) {
+    console.warn('⚠️ Daily goals: Manager not initialized');
     return;
   }
 
   try {
+    console.log(`🎯 Updating daily goal: ${activity} +${amount}`);
     await window.dailyGoalsManager.updateProgress(
       window.worvox.currentUser.id,
       activity,
       amount
     );
+    console.log(`✅ Daily goal updated: ${activity} +${amount}`);
+    
+    // ✅ Auto-refresh dashboard if modal is open
+    const modal = document.getElementById('daily-goals-modal');
+    if (modal && window.dailyGoalsManager.currentGoal) {
+      console.log('🔄 Refreshing dashboard...');
+      window.dailyGoalsManager.renderDashboard();
+    }
   } catch (error) {
-    console.error('Failed to update daily goal progress:', error);
+    console.error('❌ Failed to update daily goal progress:', error);
   }
 };
 
 // Show daily goals dashboard in a modal
-window.showDailyGoalsDashboard = function() {
+window.showDailyGoalsDashboard = async function() {
+  if (!window.worvox?.currentUser) {
+    alert('로그인이 필요합니다');
+    return;
+  }
+  
   const modal = document.createElement('div');
   modal.id = 'daily-goals-modal';
   modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto';
@@ -49,9 +69,34 @@ window.showDailyGoalsDashboard = function() {
   
   document.body.appendChild(modal);
   
-  // Render dashboard if manager is initialized
-  if (window.dailyGoalsManager && window.dailyGoalsManager.currentGoal) {
-    window.dailyGoalsManager.renderDashboard();
+  // ✅ Load fresh data from server before rendering
+  if (window.dailyGoalsManager) {
+    try {
+      console.log('🔄 Loading fresh daily goals data...');
+      await window.dailyGoalsManager.loadStreak(window.worvox.currentUser.id);
+      console.log('✅ Fresh data loaded, rendering dashboard...');
+      window.dailyGoalsManager.renderDashboard();
+    } catch (error) {
+      console.error('❌ Failed to load daily goals:', error);
+      document.getElementById('daily-goals-dashboard').innerHTML = `
+        <div class="text-center py-12">
+          <div class="text-red-500 text-4xl mb-4">⚠️</div>
+          <p class="text-gray-600">데이터 로드 실패</p>
+          <button onclick="window.showDailyGoalsDashboard()" 
+            class="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+            다시 시도
+          </button>
+        </div>
+      `;
+    }
+  } else {
+    console.error('❌ DailyGoalsManager not initialized');
+    document.getElementById('daily-goals-dashboard').innerHTML = `
+      <div class="text-center py-12">
+        <div class="text-red-500 text-4xl mb-4">⚠️</div>
+        <p class="text-gray-600">일일 목표 시스템 초기화 실패</p>
+      </div>
+    `;
   }
   
   // Close on outside click

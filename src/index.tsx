@@ -32,7 +32,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1774158149386'; // Update manually or via build script
+const BUILD_TIME = '1774233694163'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
