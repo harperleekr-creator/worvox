@@ -1,6 +1,58 @@
 # WorVox - AI English Learning Platform
 
-## 🔔 최신 업데이트 (2026-03-20 04:15 UTC) - ✅ SEO 메타태그 최적화 완료
+## 🔔 최신 업데이트 (2026-03-23 07:38 UTC) - ✅ 토스페이먼츠 라이브 API 전환 완료
+
+### 💳 Toss Payments Live API Migration - Commit `af20bb7` ✅
+
+**배포 정보**
+- **Production**: https://worvox.com ✅ 
+- **Preview**: https://1fb736dc.worvox.pages.dev ✅
+- **GitHub Commit**: https://github.com/harperleekr-creator/worvox/commit/af20bb7
+- **Build Time**: `1774251531011` (2026-03-23T07:38:51.011Z)
+
+#### 🎯 결제 시스템 업그레이드 내역
+
+**1️⃣ 라이브 API 키 전환**
+- ✅ **클라이언트 키**: `live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG` (프론트엔드)
+- ✅ **시크릿 키**: Cloudflare Secret으로 보안 저장
+- ✅ **보안 키**: Cloudflare Secret으로 보안 저장
+
+**2️⃣ 보안 강화**
+```typescript
+// ❌ 기존 (테스트 키 노출)
+const clientKey = 'test_ck_d26DlbXAaV0eR7QxP00rqY50Q9RB';
+
+// ✅ 개선 (라이브 키 + Secrets 분리)
+// Frontend: 클라이언트 키만 노출
+const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
+
+// Backend: 시크릿 키는 Cloudflare Secrets에 암호화 저장
+const tossSecretKey = c.env.TOSS_SECRET_KEY; // ✅ 보안
+const tossSecurityKey = c.env.TOSS_SECURITY_KEY; // ✅ 보안
+```
+
+**3️⃣ 환경별 설정**
+- **Production**: Cloudflare Pages Secrets 사용
+  - `TOSS_SECRET_KEY`: 암호화 저장 ✅
+  - `TOSS_SECURITY_KEY`: 암호화 저장 ✅
+- **Development**: `.dev.vars` 파일 사용 (gitignore)
+- **Type Safety**: TypeScript Bindings 타입 추가
+
+**4️⃣ 실제 결제 활성화**
+- ✅ 일반 결제 (Core/Premium 플랜)
+- ✅ 2주 무료 체험 + 자동 결제
+- ✅ 정기 결제 (월간/연간)
+- ✅ 결제 실패 처리 및 재시도
+
+#### 🔐 보안 정책
+- 민감한 API 키는 절대 코드에 노출하지 않음
+- Cloudflare Secrets로 암호화 관리
+- .dev.vars는 .gitignore 처리
+- 환경 변수는 런타임에만 접근
+
+---
+
+## 🔔 이전 업데이트 (2026-03-20 04:15 UTC) - ✅ SEO 메타태그 최적화 완료
 
 ### 🔍 SEO Meta Tags Enhancement - Commit `c82dd1e` ✅
 
