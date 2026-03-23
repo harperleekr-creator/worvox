@@ -12066,11 +12066,11 @@ Proceed to payment?
                 <div class="flex justify-center mb-8">
                   <div class="bg-white rounded-full p-1.5 shadow-lg inline-flex items-center">
                     <button id="monthlyToggle" onclick="worvox.toggleBillingPeriod('monthly')" 
-                      class="px-6 py-2.5 rounded-full font-semibold transition-all bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+                      class="px-6 py-2.5 rounded-full font-semibold transition-all ${this.currentBillingPeriod === 'yearly' ? 'text-gray-600' : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'}">
                       월별 결제
                     </button>
                     <button id="yearlyToggle" onclick="worvox.toggleBillingPeriod('yearly')" 
-                      class="px-6 py-2.5 rounded-full font-semibold transition-all text-gray-600">
+                      class="px-6 py-2.5 rounded-full font-semibold transition-all ${this.currentBillingPeriod === 'yearly' ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' : 'text-gray-600'}">
                       연별 결제
                       <span class="ml-2 text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">18% 할인</span>
                     </button>
@@ -12129,9 +12129,9 @@ Proceed to payment?
                       <div class="text-4xl mb-3">💙</div>
                       <h3 class="text-2xl font-bold mb-2">Core</h3>
                       <div class="mb-4">
-                        <span id="corePrice" class="text-3xl font-bold">₩9,900</span>
-                        <span id="corePeriod" class="text-blue-100 text-sm">/월</span>
-                        <div id="coreYearlySavings" class="hidden text-xs text-green-300 mt-1">
+                        <span id="corePrice" class="text-3xl font-bold">${this.currentBillingPeriod === 'yearly' ? '₩97,416' : '₩9,900'}</span>
+                        <span id="corePeriod" class="text-blue-100 text-sm">${this.currentBillingPeriod === 'yearly' ? '/년' : '/월'}</span>
+                        <div id="coreYearlySavings" class="${this.currentBillingPeriod === 'yearly' ? '' : 'hidden'} text-xs text-green-300 mt-1">
                           월 ₩9,900 × 12개월 = ₩118,800 → 18% 할인
                         </div>
                       </div>
@@ -12199,9 +12199,9 @@ Proceed to payment?
                       <div class="text-4xl mb-3">✨</div>
                       <h3 class="text-2xl font-bold mb-2">Premium</h3>
                       <div class="mb-4">
-                        <span id="premiumPrice" class="text-3xl font-bold">₩19,000</span>
-                        <span id="premiumPeriod" class="text-purple-100 text-sm">/월</span>
-                        <div id="premiumYearlySavings" class="hidden text-xs text-green-300 mt-1">
+                        <span id="premiumPrice" class="text-3xl font-bold">${this.currentBillingPeriod === 'yearly' ? '₩186,960' : '₩19,000'}</span>
+                        <span id="premiumPeriod" class="text-purple-100 text-sm">${this.currentBillingPeriod === 'yearly' ? '/년' : '/월'}</span>
+                        <div id="premiumYearlySavings" class="${this.currentBillingPeriod === 'yearly' ? '' : 'hidden'} text-xs text-green-300 mt-1">
                           월 ₩19,000 × 12개월 = ₩228,000 → 18% 할인
                         </div>
                       </div>
