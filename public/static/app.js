@@ -5761,7 +5761,7 @@ class WorVox {
       const { orderId, orderName } = prepareResponse.data;
 
       // 2. Initialize Toss Payments
-      const clientKey = 'test_ck_d26DlbXAaV0eR7QxP00rqY50Q9RB';
+      const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
       const tossPayments = TossPayments(clientKey);
       
       // customerKey must include letters/special chars, not just numbers
@@ -15567,7 +15567,7 @@ Proceed to payment?
       console.log(`📝 Customer key: ${customerKey}`);
 
       // Step 2: Initialize Toss Payments Billing
-      const clientKey = 'test_ck_d26DlbXAaV0eR7QxP00rqY50Q9RB';
+      const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
       const tossPayments = TossPayments(clientKey);
 
       // Step 3: Request billing key (카드 등록)
@@ -15668,7 +15668,7 @@ Proceed to payment?
       const { orderId, orderName } = prepareResponse.data;
 
       // 2. Initialize Toss Payments
-      const clientKey = 'test_ck_d26DlbXAaV0eR7QxP00rqY50Q9RB';
+      const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
       const tossPayments = TossPayments(clientKey);
       
       const customerKey = `customer_${this.currentUser.id}`;

@@ -5,6 +5,7 @@ export type Bindings = {
   ELEVENLABS_API_KEY: string;
   TOSS_CLIENT_KEY: string;
   TOSS_SECRET_KEY: string;
+  TOSS_SECURITY_KEY?: string;
   RESEND_API_KEY?: string;
 }
 
