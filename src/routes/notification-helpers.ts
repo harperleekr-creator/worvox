@@ -14,9 +14,11 @@ function formatScheduledDate(scheduledAt: string) {
 }
 
 function formatScheduledTime(scheduledAt: string) {
+  // Convert to Korea timezone (UTC+9)
   const date = new Date(scheduledAt);
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const koreaTime = new Date(date.getTime() + (9 * 60 * 60 * 1000));
+  const hours = String(koreaTime.getUTCHours()).padStart(2, '0');
+  const minutes = String(koreaTime.getUTCMinutes()).padStart(2, '0');
   
   return `${hours}:${minutes}`;
 }

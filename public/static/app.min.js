@@ -5973,11 +5973,14 @@ class WorVox {
       return;
     }
 
+    // Check if it's a free trial (package_type === 'free')
+    const isTrial = creditsResponse.data.recent_purchase?.package_type === 'free';
+
     // Show booking form
-    this.showBookingForm(teacherId, teacherName);
+    this.showBookingForm(teacherId, teacherName, isTrial);
   }
 
-  async showBookingForm(teacherId, teacherName) {
+  async showBookingForm(teacherId, teacherName, isTrial = false) {
     const app = document.getElementById('app');
     
     // Generate next 7 days for date selector
@@ -6041,6 +6044,7 @@ class WorVox {
           <!-- Booking Form -->
           <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-gray-100">
             <h3 class="text-xl font-bold text-gray-800 mb-6">Schedule Your Lesson</h3>
+            ${isTrial ? '<div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6"><p class="text-sm text-green-700"><i class="fas fa-gift mr-2"></i><strong>무료 체험 수업</strong> - 25분으로 진행됩니다</p></div>' : ''}
             
             <div class="space-y-6">
               <!-- Date Selection -->
@@ -6088,11 +6092,13 @@ class WorVox {
                     <div class="text-sm text-gray-600">Standard</div>
                   </button>
                   <button onclick="worvox.selectDurationOption(50)" id="duration-50" 
-                    class="py-3 border-2 border-gray-300 rounded-lg hover:border-emerald-500 hover:bg-emerald-50 transition-all">
+                    class="py-3 border-2 ${isTrial ? 'border-gray-200 cursor-not-allowed opacity-50' : 'border-gray-300 hover:border-emerald-500 hover:bg-emerald-50'} rounded-lg transition-all"
+                    ${isTrial ? 'disabled' : ''}>
                     <div class="font-semibold text-gray-800">50 Minutes</div>
-                    <div class="text-sm text-gray-600">Extended</div>
+                    <div class="text-sm text-gray-600">${isTrial ? 'Not Available' : 'Extended'}</div>
                   </button>
                 </div>
+                ${isTrial ? '<p class="text-xs text-gray-500 mt-2"><i class="fas fa-info-circle mr-1"></i>체험 수업은 25분만 가능합니다</p>' : ''}
               </div>
 
               <!-- Confirm Button -->
@@ -6113,10 +6119,17 @@ class WorVox {
 
     // Store selected teacher info
     this.selectedTeacher = { id: teacherId, name: teacherName };
-    this.selectedDuration = 25; // default
+    this.selectedDuration = 25; // default (and only option for trial)
+    this.isTrial = isTrial;
   }
 
   selectDurationOption(minutes) {
+    // If trial and trying to select 50 minutes, prevent it
+    if (this.isTrial && minutes === 50) {
+      alert('체험 수업은 25분만 가능합니다. 50분 수업은 정식 수업권 구매 후 이용하실 수 있습니다.');
+      return;
+    }
+
     // Remove previous selection
     document.querySelectorAll('[id^="duration-"]').forEach(btn => {
       btn.classList.remove('border-emerald-500', 'bg-emerald-50');
