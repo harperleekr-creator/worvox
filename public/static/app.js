@@ -7276,7 +7276,7 @@ Proceed to payment?
                     </div>
                     <div class="text-center">
                       <div class="text-xl md:text-2xl font-bold text-blue-500" id="dashboard-words">${stats.wordsLearned || 0}</div>
-                      <div class="text-xs text-gray-500">퀴즈 세션</div>
+                      <div class="text-xs text-gray-500">Words</div>
                     </div>
                   </div>
                 </div>
@@ -9012,13 +9012,35 @@ Proceed to payment?
       // ✅ Add vocabulary practice count (1 session = 10 questions)
       if (this.currentUser) {
         try {
+          // Update total words practiced
           const wordsResponse = await axios.post('/api/gamification/words/add', {
             userId: this.currentUser.id,
             words: 1, // 1 quiz session completed
-            activityType: 'vocabulary_quiz'
+            activityType: 'word_search'
           });
           if (wordsResponse.data.success) {
             console.log('✅ Vocabulary quiz session completed | Total sessions:', wordsResponse.data.totalWords);
+          }
+          
+          // Update daily usage for Today's Usage display
+          try {
+            await axios.post('/api/usage/update', {
+              userId: this.currentUser.id,
+              featureType: 'word_search'
+            });
+            
+            // Update local dailyUsage counter
+            if (this.dailyUsage) {
+              this.dailyUsage.wordSearch = (this.dailyUsage.wordSearch || 0) + 1;
+            }
+            
+            // Update UI display
+            const usageElement = document.querySelector('[data-usage-count="word_search"]');
+            if (usageElement) {
+              usageElement.textContent = this.getDailyUsage('word_search');
+            }
+          } catch (usageError) {
+            console.error('Failed to update daily usage:', usageError);
           }
         } catch (error) {
           console.error('Failed to update vocabulary count:', error);
