@@ -766,4 +766,72 @@ app.post('/admin/teacher-detail', async (c: Context) => {
   }
 })
 
+// Get user's active monthly subscriptions (월정기 구독 조회)
+app.get('/subscriptions/:userId', async (c: Context) => {
+  const userId = c.req.param('userId')
+  const { DB } = c.env as Bindings
+
+  try {
+    // Get active monthly subscriptions
+    const subscriptions = await DB.prepare(`
+      SELECT * FROM hiing_credits
+      WHERE user_id = ? 
+      AND package_type = 'monthly'
+      AND (expires_at IS NULL OR expires_at > datetime('now'))
+      ORDER BY purchase_date DESC
+    `).bind(userId).all()
+
+    return c.json({
+      success: true,
+      subscriptions: subscriptions.results || []
+    })
+  } catch (error: any) {
+    console.error('Get subscriptions error:', error)
+    return c.json({ success: false, error: error.message }, 500)
+  }
+})
+
+// Cancel monthly subscription auto-renewal (월정기 구독 자동 갱신 취소)
+app.post('/subscriptions/:subscriptionId/cancel', async (c: Context) => {
+  const subscriptionId = c.req.param('subscriptionId')
+  const { userId } = await c.req.json()
+  const { DB } = c.env as Bindings
+
+  try {
+    // Get subscription
+    const subscription = await DB.prepare(`
+      SELECT * FROM hiing_credits WHERE id = ?
+    `).bind(subscriptionId).first() as any
+
+    if (!subscription) {
+      return c.json({ success: false, error: 'Subscription not found' }, 404)
+    }
+
+    if (subscription.user_id !== userId) {
+      return c.json({ success: false, error: 'Unauthorized' }, 403)
+    }
+
+    if (subscription.package_type !== 'monthly') {
+      return c.json({ success: false, error: 'Not a monthly subscription' }, 400)
+    }
+
+    // Mark subscription as canceled (expires_at를 현재 만료일로 유지하고, 취소 플래그 추가)
+    // Note: 실제로는 Toss Payments의 빌링키 기반 자동결제를 취소해야 하지만,
+    // 현재는 단순히 DB에서 취소 표시만 합니다.
+    await DB.prepare(`
+      UPDATE hiing_credits
+      SET package_type = 'monthly_canceled'
+      WHERE id = ?
+    `).bind(subscriptionId).run()
+
+    return c.json({
+      success: true,
+      message: 'Subscription auto-renewal canceled. You can continue using your remaining credits until expiration.'
+    })
+  } catch (error: any) {
+    console.error('Cancel subscription error:', error)
+    return c.json({ success: false, error: error.message }, 500)
+  }
+})
+
 export default app

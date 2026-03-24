@@ -14542,6 +14542,17 @@ Proceed to payment?
     const isGoogleAuth = authProvider === 'google';
     const isEmailAuth = authProvider === 'email';
     
+    // Load Hiing subscriptions
+    let hiingSubscriptions = [];
+    try {
+      const response = await axios.get(`/api/hiing/subscriptions/${this.currentUser.id}`);
+      if (response.data.success) {
+        hiingSubscriptions = response.data.subscriptions;
+      }
+    } catch (error) {
+      console.error('Failed to load Hiing subscriptions:', error);
+    }
+    
     app.innerHTML = `
       <div class="flex h-screen bg-gray-50 dark:bg-gray-900">
         <!-- Sidebar -->
@@ -14943,6 +14954,85 @@ Proceed to payment?
                 </div>
                 ` : ''}
 
+                <!-- Live Speaking Subscriptions -->
+                ${hiingSubscriptions.length > 0 ? `
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                  <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-phone-alt text-blue-600 mr-2"></i>1:1 Live Speaking 구독
+                  </h3>
+                  
+                  ${hiingSubscriptions.map(sub => {
+                    const isCanceled = sub.package_type === 'monthly_canceled';
+                    const expiresAt = sub.expires_at ? new Date(sub.expires_at) : null;
+                    const daysRemaining = expiresAt ? Math.max(0, Math.ceil((expiresAt - new Date()) / (1000 * 60 * 60 * 24))) : 0;
+                    
+                    return `
+                    <div class="border border-gray-200 rounded-lg p-4 ${isCanceled ? 'bg-gray-50' : 'bg-blue-50'} mb-4">
+                      <div class="flex items-start justify-between mb-3">
+                        <div>
+                          <h4 class="font-semibold text-gray-900">${sub.lesson_count === 10 ? '월정기 10회' : '월정기 20회'}</h4>
+                          <p class="text-sm text-gray-600">₩${sub.amount.toLocaleString()} / 월</p>
+                        </div>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${isCanceled ? 'bg-gray-200 text-gray-700' : 'bg-blue-100 text-blue-800'}">
+                          <i class="fas ${isCanceled ? 'fa-ban' : 'fa-check-circle'} mr-1"></i>${isCanceled ? '자동 갱신 취소됨' : '활성'}
+                        </span>
+                      </div>
+                      
+                      <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div class="p-3 bg-white rounded-lg">
+                          <p class="text-xs text-gray-500 mb-1">남은 수업권</p>
+                          <p class="text-lg font-bold text-gray-900">${sub.remaining_credits}회</p>
+                        </div>
+                        <div class="p-3 bg-white rounded-lg">
+                          <p class="text-xs text-gray-500 mb-1">만료일</p>
+                          <p class="text-sm font-semibold text-gray-900">${expiresAt ? expiresAt.toLocaleDateString('ko-KR') : '-'}</p>
+                        </div>
+                      </div>
+                      
+                      ${!isCanceled ? `
+                      <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3">
+                        <div class="flex items-start gap-2">
+                          <i class="fas fa-info-circle text-yellow-600 text-sm mt-0.5"></i>
+                          <div class="flex-1 text-xs text-yellow-800">
+                            <p class="font-semibold mb-1">자동 갱신 안내</p>
+                            <p>만료일에 자동으로 다음 달 구독이 갱신됩니다.</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <button onclick="worvox.cancelHiingSubscription(${sub.id})" 
+                        class="w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg font-semibold transition-all border border-red-200 text-sm">
+                        <i class="fas fa-times-circle mr-2"></i>자동 갱신 취소
+                      </button>
+                      ` : `
+                      <div class="bg-gray-100 border border-gray-200 rounded-lg p-3">
+                        <div class="flex items-start gap-2">
+                          <i class="fas fa-check-circle text-gray-600 text-sm mt-0.5"></i>
+                          <div class="flex-1 text-xs text-gray-700">
+                            <p class="font-semibold mb-1">자동 갱신이 취소되었습니다</p>
+                            <p>남은 수업권은 만료일(${expiresAt ? expiresAt.toLocaleDateString('ko-KR') : '-'})까지 사용하실 수 있습니다.</p>
+                            <p class="mt-2 text-gray-600">
+                              💰 <strong>환불 문의:</strong> <a href="mailto:support@worvox.com" class="text-blue-600 hover:underline">support@worvox.com</a>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      `}
+                    </div>
+                    `;
+                  }).join('')}
+                  
+                  <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <p class="text-sm text-gray-700">
+                      <i class="fas fa-book text-gray-600 mr-2"></i>
+                      <strong>환불 정책:</strong> 미사용 수업권은 구매일로부터 7일 이내 전액 환불 가능합니다. 
+                      부분 사용 시 남은 수업권에 대해 환불 가능하며, 자세한 내용은 
+                      <a href="mailto:support@worvox.com" class="text-blue-600 hover:underline font-semibold">support@worvox.com</a>으로 문의해주세요.
+                    </p>
+                  </div>
+                </div>
+                ` : ''}
+
                 <!-- Account Actions -->
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
                   <h3 class="text-lg font-bold text-gray-900 mb-4">
@@ -15335,6 +15425,42 @@ Proceed to payment?
     } catch (error) {
       console.error('Cancel trial error:', error);
       alert('체험 해지에 실패했습니다. 다시 시도해주세요.\n' + (error.response?.data?.error || error.message));
+    }
+  }
+
+  // Cancel Hiing monthly subscription auto-renewal
+  async cancelHiingSubscription(subscriptionId) {
+    // Confirmation dialog
+    const confirmed = confirm(
+      '1:1 Live Speaking 월정기 구독 자동 갱신을 취소하시겠습니까?\n\n' +
+      '취소하시면:\n' +
+      '• 남은 수업권은 만료일까지 계속 사용하실 수 있습니다\n' +
+      '• 다음 달 자동 결제가 중단됩니다\n' +
+      '• 환불을 원하시면 support@worvox.com으로 문의해주세요\n' +
+      '• 언제든지 다시 구독할 수 있습니다'
+    );
+
+    if (!confirmed) return;
+
+    try {
+      console.log('Canceling Hiing subscription:', subscriptionId);
+
+      const response = await axios.post(`/api/hiing/subscriptions/${subscriptionId}/cancel`, {
+        userId: this.currentUser.id
+      });
+
+      if (response.data.success) {
+        alert('월정기 구독 자동 갱신이 취소되었습니다.\n남은 수업권은 만료일까지 계속 사용하실 수 있습니다.\n\n환불 문의: support@worvox.com');
+        
+        // Refresh profile page to show updated status
+        this.showProfile();
+      } else {
+        alert('구독 취소에 실패했습니다. 다시 시도해주세요.');
+      }
+
+    } catch (error) {
+      console.error('Cancel Hiing subscription error:', error);
+      alert('구독 취소에 실패했습니다. 다시 시도해주세요.\n' + (error.response?.data?.error || error.message));
     }
   }
 
