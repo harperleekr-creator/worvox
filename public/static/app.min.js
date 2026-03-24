@@ -7276,7 +7276,7 @@ Proceed to payment?
                     </div>
                     <div class="text-center">
                       <div class="text-xl md:text-2xl font-bold text-blue-500" id="dashboard-words">${stats.wordsLearned || 0}</div>
-                      <div class="text-xs text-gray-500">Words</div>
+                      <div class="text-xs text-gray-500">퀴즈 세션</div>
                     </div>
                   </div>
                 </div>
@@ -8986,16 +8986,7 @@ Proceed to payment?
     
     if (question.isCorrect) {
       this.quizData.score++;
-      
-      // Award XP for correct answer
-      if (typeof gamificationManager !== 'undefined' && this.currentUser) {
-        await gamificationManager.addXP(
-          this.currentUser.id,
-          15, // 15 XP per correct answer
-          'quiz_correct',
-          `Correct answer for word: ${question.word.word}`
-        );
-      }
+      // ❌ Removed individual XP per correct answer - will award at quiz completion
     }
     
     // Update only the quiz content area, not the entire page
@@ -9008,14 +8999,30 @@ Proceed to payment?
     if (this.quizData.currentIndex >= this.quizData.questions.length) {
       this.quizData.finished = true;
       
-      // Award bonus XP for completing quiz
+      // ✅ Award XP for completing quiz (10 XP for completing 10 questions)
       if (typeof gamificationManager !== 'undefined' && this.currentUser) {
         await gamificationManager.addXP(
           this.currentUser.id,
-          50, // 50 XP bonus for completing quiz
+          10, // 10 XP for completing quiz (10 questions)
           'quiz_complete',
           `Completed quiz with score: ${this.quizData.score}/${this.quizData.questions.length}`
         );
+      }
+      
+      // ✅ Add vocabulary practice count (1 session = 10 questions)
+      if (this.currentUser) {
+        try {
+          const wordsResponse = await axios.post('/api/gamification/words/add', {
+            userId: this.currentUser.id,
+            words: 1, // 1 quiz session completed
+            activityType: 'vocabulary_quiz'
+          });
+          if (wordsResponse.data.success) {
+            console.log('✅ Vocabulary quiz session completed | Total sessions:', wordsResponse.data.totalWords);
+          }
+        } catch (error) {
+          console.error('Failed to update vocabulary count:', error);
+        }
       }
     }
     
