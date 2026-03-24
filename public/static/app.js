@@ -16657,7 +16657,14 @@ Proceed to payment?
                 <h2 class="text-3xl font-bold text-gray-800 mb-2">
                   🎁 상품 뽑기
                 </h2>
-                <p class="text-gray-600">레벨업할 때마다 뽑기 기회를 얻습니다!</p>
+                <p class="text-gray-600 mb-2">레벨업할 때마다 뽑기 기회를 얻습니다!</p>
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 inline-block">
+                  <p class="text-sm text-blue-800">
+                    <i class="fas fa-gift mr-2"></i>
+                    <strong>랜덤박스 획득 방법:</strong>
+                    <span class="ml-2">① 레벨업 (레벨당 1개) ② 데일리 목표 달성 ③ 출석 연속 기록</span>
+                  </p>
+                </div>
                 <div class="mt-4 inline-flex items-center bg-white px-6 py-3 rounded-full shadow-lg">
                   <span class="text-2xl font-bold text-purple-600">${spinCount}</span>
                   <span class="ml-2 text-gray-600">회 남음</span>

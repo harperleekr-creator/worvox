@@ -154,8 +154,9 @@ gamification.post('/xp/add', async (c: Context<{ Bindings: Bindings }>) => {
       VALUES (?, ?, ?, ?, ?)
     `).bind(userId, activityType || 'unknown', xp, coinsEarned, details || null).run()
 
-    // Award level-up badge if leveled up
+    // Award level-up badge and random box if leveled up
     if (leveledUp) {
+      // Award level-up badge
       await c.env.DB.prepare(`
         INSERT OR IGNORE INTO user_badges (user_id, badge_name, badge_description, badge_icon)
         VALUES (?, ?, ?, ?)
@@ -165,6 +166,15 @@ gamification.post('/xp/add', async (c: Context<{ Bindings: Bindings }>) => {
         `Reached level ${newLevel}!`,
         '🏆'
       ).run()
+
+      // Award 1 random box for leveling up
+      await c.env.DB.prepare(`
+        UPDATE user_streaks 
+        SET total_random_boxes_earned = total_random_boxes_earned + 1
+        WHERE user_id = ?
+      `).bind(userId).run()
+
+      console.log(`🎁 Level up reward: User ${userId} leveled up to ${newLevel}, earned 1 random box`)
     }
 
     return c.json({
