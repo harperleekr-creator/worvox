@@ -266,6 +266,24 @@ rewards.post('/claim', async (c) => {
       return c.json({ success: false, error: 'User ID and Prize ID required' }, 400);
     }
 
+    // Get user info
+    const user = await c.env.DB.prepare(`
+      SELECT id, username, email FROM users WHERE id = ?
+    `).bind(userId).first();
+
+    if (!user) {
+      return c.json({ success: false, error: 'User not found' }, 404);
+    }
+
+    // Get prize info
+    const prize = await c.env.DB.prepare(`
+      SELECT id, name_ko, name_en, description, category FROM prizes WHERE id = ?
+    `).bind(prizeId).first();
+
+    if (!prize) {
+      return c.json({ success: false, error: 'Prize not found' }, 404);
+    }
+
     // Find the win record
     const win = await c.env.DB.prepare(`
       SELECT id FROM user_prize_wins
@@ -296,6 +314,142 @@ rewards.post('/claim', async (c) => {
     ).run();
 
     console.log(`✅ Prize claim submitted for user ${userId}, prize ${prizeId}`);
+
+    // Send notification email to support
+    try {
+      const RESEND_API_KEY = c.env.RESEND_API_KEY;
+      
+      if (!RESEND_API_KEY) {
+        console.warn('⚠️ RESEND_API_KEY not configured, skipping email notification');
+      } else {
+        const emailHTML = `
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>랜덤박스 당첨자 정보</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f3f4f6;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          
+          <!-- Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%); padding: 40px 30px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: bold;">
+                🎁 랜덤박스 당첨자 정보
+              </h1>
+            </td>
+          </tr>
+          
+          <!-- Winner Info -->
+          <tr>
+            <td style="padding: 30px;">
+              <h2 style="margin: 0 0 20px 0; color: #1f2937; font-size: 20px; font-weight: bold;">
+                당첨 상품 정보
+              </h2>
+              <table width="100%" cellpadding="8" cellspacing="0" style="border: 1px solid #e5e7eb; border-radius: 8px;">
+                <tr style="background-color: #f9fafb;">
+                  <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-weight: 600; width: 30%;">상품명</td>
+                  <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #1f2937;">${prize.name_ko}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-weight: 600;">상품 설명</td>
+                  <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #1f2937;">${prize.description}</td>
+                </tr>
+                <tr style="background-color: #f9fafb;">
+                  <td style="padding: 12px; color: #6b7280; font-weight: 600;">카테고리</td>
+                  <td style="padding: 12px; color: #1f2937;">${prize.category === 'physical' ? '실물 상품' : prize.category === 'digital' ? '디지털 상품' : '서비스'}</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Contact Info -->
+          <tr>
+            <td style="padding: 0 30px 30px 30px;">
+              <h2 style="margin: 0 0 20px 0; color: #1f2937; font-size: 20px; font-weight: bold;">
+                당첨자 정보
+              </h2>
+              <table width="100%" cellpadding="8" cellspacing="0" style="border: 1px solid #e5e7eb; border-radius: 8px;">
+                <tr style="background-color: #f9fafb;">
+                  <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-weight: 600; width: 30%;">사용자 ID</td>
+                  <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #1f2937;">${user.id}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-weight: 600;">사용자명</td>
+                  <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #1f2937;">${user.username || 'N/A'}</td>
+                </tr>
+                <tr style="background-color: #f9fafb;">
+                  <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-weight: 600;">이름</td>
+                  <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #1f2937;">${name}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-weight: 600;">이메일</td>
+                  <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #1f2937;">${email}</td>
+                </tr>
+                <tr style="background-color: #f9fafb;">
+                  <td style="padding: 12px; ${address ? 'border-bottom: 1px solid #e5e7eb;' : ''} color: #6b7280; font-weight: 600;">전화번호</td>
+                  <td style="padding: 12px; ${address ? 'border-bottom: 1px solid #e5e7eb;' : ''} color: #1f2937;">${phone}</td>
+                </tr>
+                ${address ? `
+                <tr>
+                  <td style="padding: 12px; color: #6b7280; font-weight: 600; vertical-align: top;">배송지 주소</td>
+                  <td style="padding: 12px; color: #1f2937; white-space: pre-line;">${address}</td>
+                </tr>
+                ` : ''}
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding: 30px; background-color: #f9fafb; text-align: center; border-top: 1px solid #e5e7eb;">
+              <p style="margin: 0; color: #6b7280; font-size: 14px;">
+                이 메일은 WorVox 랜덤박스 당첨자가 정보를 제출했을 때 자동으로 발송됩니다.
+              </p>
+              <p style="margin: 10px 0 0 0; color: #6b7280; font-size: 14px;">
+                © ${new Date().getFullYear()} WorVox. All rights reserved.
+              </p>
+            </td>
+          </tr>
+          
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+        `;
+
+        const response = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${RESEND_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            from: 'WorVox <noreply@worvox.com>',
+            to: ['support@worvox.com'],
+            subject: `🎁 [랜덤박스 당첨] ${prize.name_ko} - ${name}`,
+            html: emailHTML
+          })
+        });
+
+        if (response.ok) {
+          console.log('✅ Prize claim notification email sent to support@worvox.com');
+        } else {
+          const errorData = await response.json();
+          console.error('❌ Failed to send notification email:', errorData);
+        }
+      }
+    } catch (emailError) {
+      console.error('❌ Email notification error (non-critical):', emailError);
+      // Don't fail the claim submission if email fails
+    }
 
     return c.json({
       success: true,
