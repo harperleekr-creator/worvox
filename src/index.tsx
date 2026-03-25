@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1774428123771'; // Update manually or via build script
+const BUILD_TIME = '1774428401485'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -3365,11 +3365,37 @@ app.get('/', (c) => {
         <script>
           window.addEventListener('load', () => {
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('view') === 'teacher-selection') {
+            const view = urlParams.get('view');
+            
+            if (view === 'teacher-selection') {
               // Wait for worvox object to be initialized
               setTimeout(() => {
                 if (window.worvox && window.worvox.showTeacherSelection) {
                   window.worvox.showTeacherSelection();
+                  // Clean up URL
+                  window.history.replaceState({}, '', '/app');
+                }
+              }, 500);
+            } else if (view === 'terms') {
+              setTimeout(() => {
+                if (window.worvox && window.worvox.showTerms) {
+                  window.worvox.showTerms();
+                  // Clean up URL
+                  window.history.replaceState({}, '', '/app');
+                }
+              }, 500);
+            } else if (view === 'privacy') {
+              setTimeout(() => {
+                if (window.worvox && window.worvox.showPrivacy) {
+                  window.worvox.showPrivacy();
+                  // Clean up URL
+                  window.history.replaceState({}, '', '/app');
+                }
+              }, 500);
+            } else if (view === 'refund') {
+              setTimeout(() => {
+                if (window.worvox && window.worvox.showRefund) {
+                  window.worvox.showRefund();
                   // Clean up URL
                   window.history.replaceState({}, '', '/app');
                 }
@@ -3386,6 +3412,19 @@ app.get('/', (c) => {
     'X-Content-Type-Options': 'nosniff',
     'Vary': '*'
   });
+});
+
+// Terms, Privacy, Refund pages - redirect to /app (handled by frontend)
+app.get('/terms', (c) => {
+  return c.redirect('/app?view=terms');
+});
+
+app.get('/privacy', (c) => {
+  return c.redirect('/app?view=privacy');
+});
+
+app.get('/refund', (c) => {
+  return c.redirect('/app?view=refund');
 });
 
 // Teacher portal page
