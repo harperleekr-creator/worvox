@@ -5866,6 +5866,12 @@ class WorVox {
 
   // Teacher selection and booking
   async showTeacherSelection() {
+    // Add to browser history
+    if (history.state && history.state.page !== 'hiing') {
+      history.pushState({ page: 'hiing' }, '', '/app');
+    }
+    this.currentPage = 'hiing';
+    
     if (!this.currentUser) {
       alert('Please login first.');
       return;
@@ -9227,6 +9233,12 @@ Proceed to payment?
 
   // History feature
   async showHistory() {
+    // Add to browser history
+    if (history.state && history.state.page !== 'history') {
+      history.pushState({ page: 'history' }, '', '/app');
+    }
+    this.currentPage = 'history';
+    
     try {
       // Load user from localStorage if not in memory
       if (!this.currentUser) {
@@ -14649,6 +14661,12 @@ Proceed to payment?
 
   // Show user profile/settings page
   async showProfile() {
+    // Add to browser history
+    if (history.state && history.state.page !== 'profile') {
+      history.pushState({ page: 'profile' }, '', '/app');
+    }
+    this.currentPage = 'profile';
+    
     const app = document.getElementById('app');
     
     // Determine auth provider for display
