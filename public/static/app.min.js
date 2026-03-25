@@ -16,6 +16,11 @@ class WorVox {
     this.preloadedPrompts = {};
     this.isPreloading = false;
     
+    // 🎯 Retention Features
+    this.xpBoostActive = false;
+    this.xpBoostEndTime = null;
+    this.weekendEventActive = false;
+    
     // User plan and usage tracking
     this.userPlan = 'free'; // 'free', 'premium', 'business'
     this.currentBillingPeriod = 'monthly'; // 'monthly' or 'yearly'
@@ -474,6 +479,12 @@ class WorVox {
       // Load gamification stats AFTER attendance check to get updated streak
       await this.loadGamificationStats();
       
+      // 🎁 Check for comeback bonus (AFTER attendance check)
+      await this.checkComebackBonus();
+      
+      // 🎉 Check weekend event
+      this.checkWeekendEvent();
+      
       // 🎯 Initialize daily goals (after login)
       if (typeof window.dailyGoalsManager !== 'undefined' && this.currentUser) {
         try {
@@ -655,7 +666,216 @@ class WorVox {
     }
   }
 
+  // 🎁 Check for comeback bonus
+  async checkComebackBonus() {
+    if (!this.currentUser) return;
+    
+    try {
+      console.log('🎁 Checking comeback bonus...');
+      const response = await axios.post('/api/retention/comeback-check', {
+        userId: this.currentUser.id
+      });
+      
+      if (response.data.eligible) {
+        console.log('🎊 User eligible for comeback bonus!', response.data);
+        
+        const daysAway = response.data.daysAway || 3;
+        
+        // Activate XP boost for 10 minutes
+        this.activateXPBoost(10);
+        
+        // Show comeback bonus modal
+        this.showComebackBonusModal(daysAway);
+        
+        // Award Random Boxes will be handled by backend
+      }
+    } catch (error) {
+      console.error('Failed to check comeback bonus:', error);
+    }
+  }
+  
+  // ⚡ Activate XP Boost
+  activateXPBoost(durationMinutes) {
+    this.xpBoostActive = true;
+    this.xpBoostEndTime = Date.now() + (durationMinutes * 60 * 1000);
+    
+    console.log(`⚡ XP Boost activated for ${durationMinutes} minutes`);
+    
+    // Update UI to show boost status
+    this.updateXPBoostUI();
+    
+    // Set timer to deactivate boost
+    setTimeout(() => {
+      this.xpBoostActive = false;
+      this.xpBoostEndTime = null;
+      this.updateXPBoostUI();
+      this.showNotification('⏰ XP 2배 부스트가 종료되었습니다!', 'info');
+    }, durationMinutes * 60 * 1000);
+  }
+  
+  // 🎉 Check weekend event
+  checkWeekendEvent() {
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 = Sunday, 6 = Saturday
+    
+    // Check if today is Saturday (6) or Sunday (0)
+    this.weekendEventActive = (dayOfWeek === 0 || dayOfWeek === 6);
+    
+    if (this.weekendEventActive) {
+      console.log('🎉 Weekend Event Active! XP 2배 자동 적용');
+      this.showWeekendEventBanner();
+    }
+  }
+  
+  // 🎊 Show comeback bonus modal
+  showComebackBonusModal(daysAway) {
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    modal.innerHTML = `
+      <div class="bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl p-8 max-w-md mx-4 text-white shadow-2xl animate-bounce">
+        <div class="text-center">
+          <div class="text-6xl mb-4">🎁</div>
+          <h2 class="text-3xl font-bold mb-4">반가워요!</h2>
+          <p class="text-lg mb-6">${daysAway}일 만에 돌아오셨네요!<br/>특별 복귀 보너스를 드립니다</p>
+          
+          <div class="bg-white bg-opacity-20 rounded-xl p-6 mb-6">
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-lg">⚡ XP 2배 부스트</span>
+                <span class="font-bold">10분간</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-lg">🎁 Random Box</span>
+                <span class="font-bold">2개</span>
+              </div>
+            </div>
+          </div>
+          
+          <button 
+            onclick="this.closest('.fixed').remove()"
+            class="w-full bg-white text-purple-600 font-bold py-4 px-6 rounded-xl hover:bg-gray-100 transition-all transform hover:scale-105">
+            시작하기! 🚀
+          </button>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+  }
+  
+  // 🎉 Show weekend event banner
+  showWeekendEventBanner() {
+    // Check if banner already exists
+    if (document.getElementById('weekend-event-banner')) return;
+    
+    const banner = document.createElement('div');
+    banner.id = 'weekend-event-banner';
+    banner.className = 'fixed top-16 left-0 right-0 bg-gradient-to-r from-orange-500 to-pink-500 text-white py-3 px-4 text-center font-bold z-40 shadow-lg';
+    banner.innerHTML = `
+      <div class="flex items-center justify-center gap-2">
+        <span class="text-xl">🎉</span>
+        <span>주말 특별 이벤트! XP 2배 자동 적용 중</span>
+        <span class="text-xl">🎊</span>
+      </div>
+    `;
+    
+    document.body.appendChild(banner);
+  }
+  
+  // 🎨 Update XP Boost UI
+  updateXPBoostUI() {
+    // Check if boost banner exists, remove if boost is inactive
+    const existingBanner = document.getElementById('xp-boost-banner');
+    
+    if (!this.xpBoostActive && existingBanner) {
+      existingBanner.remove();
+      return;
+    }
+    
+    if (this.xpBoostActive && !existingBanner) {
+      const banner = document.createElement('div');
+      banner.id = 'xp-boost-banner';
+      banner.className = 'fixed top-16 left-0 right-0 bg-gradient-to-r from-yellow-400 to-orange-500 text-white py-3 px-4 text-center font-bold z-40 shadow-lg';
+      
+      const updateTimer = () => {
+        if (!this.xpBoostActive || !this.xpBoostEndTime) {
+          banner.remove();
+          return;
+        }
+        
+        const remaining = Math.max(0, Math.floor((this.xpBoostEndTime - Date.now()) / 1000));
+        const minutes = Math.floor(remaining / 60);
+        const seconds = remaining % 60;
+        
+        banner.innerHTML = `
+          <div class="flex items-center justify-center gap-2">
+            <span class="text-xl">⚡</span>
+            <span>XP 2배 부스트 활성화! 남은 시간: ${minutes}:${seconds.toString().padStart(2, '0')}</span>
+            <span class="text-xl">⚡</span>
+          </div>
+        `;
+        
+        if (remaining > 0) {
+          setTimeout(updateTimer, 1000);
+        }
+      };
+      
+      updateTimer();
+      document.body.appendChild(banner);
+    }
+  }
+  
+  // 📢 Show generic notification
+  showNotification(message, type = 'success') {
+    const colors = {
+      success: 'from-green-400 to-blue-500',
+      info: 'from-blue-400 to-purple-500',
+      warning: 'from-yellow-400 to-orange-500',
+      error: 'from-red-400 to-pink-500'
+    };
+    
+    const icons = {
+      success: '✅',
+      info: 'ℹ️',
+      warning: '⚠️',
+      error: '❌'
+    };
+    
+    const notification = document.createElement('div');
+    notification.className = `fixed top-20 right-4 bg-gradient-to-r ${colors[type]} text-white px-6 py-4 rounded-lg shadow-2xl z-50`;
+    notification.innerHTML = `
+      <div class="flex items-center gap-3">
+        <div class="text-2xl">${icons[type]}</div>
+        <div class="font-medium">${message}</div>
+      </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.style.transition = 'opacity 0.5s, transform 0.5s';
+      notification.style.opacity = '0';
+      notification.style.transform = 'translateY(-20px)';
+      setTimeout(() => notification.remove(), 500);
+    }, 4000);
+  }
+
   showXPNotification(xp, message) {
+    // Calculate actual XP with boosts
+    let actualXP = xp;
+    let boostMessage = '';
+    
+    // Check for XP boost (comeback bonus)
+    if (this.xpBoostActive) {
+      actualXP = xp * 2;
+      boostMessage = ' (⚡ 2배 부스트!)';
+    }
+    // Check for weekend event
+    else if (this.weekendEventActive) {
+      actualXP = xp * 2;
+      boostMessage = ' (🎉 주말 이벤트!)';
+    }
+    
     // Create a floating XP notification
     const notification = document.createElement('div');
     notification.className = 'fixed top-20 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-4 rounded-lg shadow-2xl z-50 animate-bounce';
@@ -663,7 +883,7 @@ class WorVox {
       <div class="flex items-center gap-3">
         <div class="text-3xl">🎉</div>
         <div>
-          <div class="font-bold text-lg">+${xp} XP</div>
+          <div class="font-bold text-lg">+${actualXP} XP${boostMessage}</div>
           <div class="text-sm opacity-90">${message}</div>
         </div>
       </div>
@@ -12097,17 +12317,33 @@ Proceed to payment?
         return;
       }
       
+      // 🎯 Apply XP boost multiplier
+      let actualXP = xp;
+      let boostReason = '';
+      
+      if (this.xpBoostActive) {
+        actualXP = xp * 2;
+        boostReason = '⚡ XP Boost';
+        console.log(`⚡ XP Boost applied: ${xp} → ${actualXP}`);
+      } else if (this.weekendEventActive) {
+        actualXP = xp * 2;
+        boostReason = '🎉 Weekend Event';
+        console.log(`🎉 Weekend Event applied: ${xp} → ${actualXP}`);
+      }
+      
       console.log('=== XP Award Debug ===');
       console.log('Current user:', this.currentUser);
       console.log('User ID:', this.currentUser.id);
-      console.log('XP to award:', xp);
+      console.log('Base XP:', xp);
+      console.log('Actual XP (with boost):', actualXP);
+      console.log('Boost reason:', boostReason || 'None');
       console.log('Activity:', activityType);
       
       const response = await axios.post('/api/gamification/xp/add', {
         userId: this.currentUser.id,
-        xp: xp,
+        xp: actualXP,
         activityType: activityType,
-        details: details
+        details: `${details}${boostReason ? ` (${boostReason})` : ''}`
       });
       
       console.log('XP award response:', response.data);
