@@ -1309,11 +1309,11 @@ class WorVox {
           </div>
 
           <!-- Copyright & Links -->
-          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pt-6 border-t border-gray-800">
+          <div class="flex flex-col gap-3 pt-6 border-t border-gray-800">
             <p class="text-xs text-gray-500 text-center md:text-left">
               © ${new Date().getFullYear()} WorVox. All rights reserved.
             </p>
-            <div class="flex flex-wrap items-center justify-center md:justify-end gap-4 text-xs">
+            <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 text-xs">
               <a href="#" onclick="worvox.showTerms(); return false;" class="text-gray-400 hover:text-purple-400 transition">이용약관</a>
               <span class="text-gray-600">|</span>
               <a href="#" onclick="worvox.showPrivacy(); return false;" class="text-gray-400 hover:text-purple-400 transition">개인정보처리방침</a>
