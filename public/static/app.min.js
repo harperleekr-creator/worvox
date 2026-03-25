@@ -7877,27 +7877,27 @@ Proceed to payment?
                   ${this.currentUser?.plan === 'free' ? `
                   <!-- Free Plan: Simple Grid with Limits -->
                   <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    <button onclick="worvox.showAIConversation()" class="p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-all text-center">
+                    <button onclick="worvox.showAIConversation()" class="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-all text-center">
                       <div class="text-2xl mb-1">💬</div>
-                      <div class="text-xs text-gray-600 mb-1">AI Conversation</div>
-                      <div class="text-lg font-bold text-blue-600">
+                      <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">AI Conversation</div>
+                      <div class="text-lg font-bold text-blue-600 dark:text-blue-400">
                         <span data-usage-count="ai_conversation">${this.getDailyUsage('ai_conversation')}</span>/<span class="text-sm">${this.usageLimits.free.aiConversations}</span>
                       </div>
                     </button>
                     
-                    <button onclick="worvox.showTimerMode()" class="p-3 bg-gray-100 rounded-lg cursor-not-allowed opacity-50 text-center">
+                    <button onclick="worvox.showTimerMode()" class="p-3 bg-gray-100 dark:bg-gray-700/50 rounded-lg cursor-not-allowed opacity-50 text-center">
                       <div class="text-2xl mb-1">⏱️</div>
-                      <div class="text-xs text-gray-600 mb-1">Timer Mode</div>
-                      <div class="text-sm text-gray-500 font-medium">Core+</div>
+                      <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">Timer Mode</div>
+                      <div class="text-sm text-gray-500 dark:text-gray-400 font-medium">Core+</div>
                     </button>
                     
-                    <button onclick="worvox.showScenarioMode()" class="p-3 bg-gray-100 rounded-lg cursor-not-allowed opacity-50 text-center">
+                    <button onclick="worvox.showScenarioMode()" class="p-3 bg-gray-100 dark:bg-gray-700/50 rounded-lg cursor-not-allowed opacity-50 text-center">
                       <div class="text-2xl mb-1">🎬</div>
-                      <div class="text-xs text-gray-600 mb-1">Scenario Mode</div>
-                      <div class="text-sm text-gray-500 font-medium">Core+</div>
+                      <div class="text-xs text-gray-600 dark:text-gray-400 mb-1">Scenario Mode</div>
+                      <div class="text-sm text-gray-500 dark:text-gray-400 font-medium">Core+</div>
                     </button>
                     
-                    <button onclick="worvox.showExamMode()" class="p-3 bg-gray-100 rounded-lg cursor-not-allowed opacity-50 text-center">
+                    <button onclick="worvox.showExamMode()" class="p-3 bg-gray-100 dark:bg-gray-700/50 rounded-lg cursor-not-allowed opacity-50 text-center">
                       <div class="text-2xl mb-1">📝</div>
                       <div class="text-xs text-gray-600 mb-1">Exam Mode</div>
                       <div class="text-sm text-gray-500 font-medium">Core+</div>
@@ -7995,17 +7995,17 @@ Proceed to payment?
                 </div>
 
                 <!-- Latest Report Card -->
-                <div id="latestReportCard" class="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-200 mb-6 md:mb-8">
+                <div id="latestReportCard" class="bg-white dark:bg-gray-800 rounded-2xl p-4 md:p-6 shadow-sm border border-gray-200 dark:border-gray-700 mb-6 md:mb-8">
                   <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-base md:text-lg font-semibold text-gray-900">
-                      <i class="fas fa-chart-line text-purple-600 mr-2"></i>Recent Report
+                    <h3 class="text-base md:text-lg font-semibold text-gray-900 dark:text-white">
+                      <i class="fas fa-chart-line text-purple-600 dark:text-purple-400 mr-2"></i>Recent Report
                     </h3>
-                    <button onclick="worvox.showHistory()" class="text-purple-600 hover:text-purple-700 text-xs md:text-sm font-medium">
+                    <button onclick="worvox.showHistory()" class="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-xs md:text-sm font-medium">
                       View All →
                     </button>
                   </div>
                   <div id="latestReportContent">
-                    <div class="text-center py-8 text-gray-400">
+                    <div class="text-center py-8 text-gray-400 dark:text-gray-500">
                       <i class="fas fa-spinner fa-spin text-4xl mb-3"></i>
                       <p class="text-sm">Loading report...</p>
                     </div>
@@ -8068,9 +8068,9 @@ Proceed to payment?
       if (!this.currentUser || !this.currentUser.id) {
         reportContainer.innerHTML = `
           <div class="text-center py-8 md:py-12">
-            <i class="fas fa-chart-line text-gray-300 text-4xl md:text-5xl mb-3"></i>
-            <p class="text-sm md:text-base text-gray-500 font-medium mb-2">No recent reports</p>
-            <p class="text-xs md:text-sm text-gray-400">Start an AI conversation to get your report</p>
+            <i class="fas fa-chart-line text-gray-300 dark:text-gray-600 text-4xl md:text-5xl mb-3"></i>
+            <p class="text-sm md:text-base text-gray-500 dark:text-gray-400 font-medium mb-2">No recent reports</p>
+            <p class="text-xs md:text-sm text-gray-400 dark:text-gray-500">Start an AI conversation to get your report</p>
           </div>
         `;
         return;
@@ -8099,41 +8099,41 @@ Proceed to payment?
         }
         
         reportContainer.innerHTML = `
-          <div class="border ${borderColor} ${bgColor} rounded-xl p-5 md:p-6">
+          <div class="border ${borderColor} dark:border-gray-600 ${bgColor} dark:bg-opacity-20 rounded-xl p-5 md:p-6">
             <div class="flex items-center justify-between mb-4">
               <div class="flex items-center gap-3">
-                <div class="w-16 h-16 md:w-20 md:h-20 ${bgColor} rounded-full flex items-center justify-center border-2 ${borderColor}">
-                  <span class="text-3xl md:text-4xl ${scoreColor} font-bold">${avgScore}</span>
+                <div class="w-16 h-16 md:w-20 md:h-20 ${bgColor} dark:bg-opacity-20 rounded-full flex items-center justify-center border-2 ${borderColor} dark:border-gray-600">
+                  <span class="text-3xl md:text-4xl ${scoreColor} dark:brightness-125 font-bold">${avgScore}</span>
                 </div>
                 <div>
-                  <div class="text-base md:text-lg font-bold text-gray-900">Average Score</div>
-                  <div class="text-xs md:text-sm text-gray-500">${new Date(report.analyzed_at).toLocaleDateString('en-US')}</div>
+                  <div class="text-base md:text-lg font-bold text-gray-900 dark:text-white">Average Score</div>
+                  <div class="text-xs md:text-sm text-gray-500 dark:text-gray-400">${new Date(report.analyzed_at).toLocaleDateString('en-US')}</div>
                 </div>
               </div>
               <button onclick="worvox.showSessionReportById(${report.session_id})" 
-                class="text-purple-600 hover:text-purple-700 text-sm md:text-base font-semibold whitespace-nowrap">
+                class="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm md:text-base font-semibold whitespace-nowrap">
                 View Details →
               </button>
             </div>
             
             <div class="grid grid-cols-3 gap-3 md:gap-4 mb-4">
-              <div class="text-center p-3 md:p-4 bg-white rounded-lg shadow-sm border border-blue-100">
-                <div class="text-xs md:text-sm text-gray-500 mb-1 font-medium">Grammar</div>
-                <div class="text-xl md:text-2xl font-bold text-blue-600">${report.grammar_score}</div>
+              <div class="text-center p-3 md:p-4 bg-white dark:bg-gray-700/50 rounded-lg shadow-sm border border-blue-100 dark:border-blue-800">
+                <div class="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1 font-medium">Grammar</div>
+                <div class="text-xl md:text-2xl font-bold text-blue-600 dark:text-blue-400">${report.grammar_score}</div>
               </div>
-              <div class="text-center p-3 md:p-4 bg-white rounded-lg shadow-sm border border-purple-100">
-                <div class="text-xs md:text-sm text-gray-500 mb-1 font-medium">Vocabulary</div>
-                <div class="text-xl md:text-2xl font-bold text-purple-600">${report.vocabulary_score}</div>
+              <div class="text-center p-3 md:p-4 bg-white dark:bg-gray-700/50 rounded-lg shadow-sm border border-purple-100 dark:border-purple-800">
+                <div class="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1 font-medium">Vocabulary</div>
+                <div class="text-xl md:text-2xl font-bold text-purple-600 dark:text-purple-400">${report.vocabulary_score}</div>
               </div>
-              <div class="text-center p-3 md:p-4 bg-white rounded-lg shadow-sm border border-green-100">
-                <div class="text-xs md:text-sm text-gray-500 mb-1 font-medium">Fluency</div>
-                <div class="text-xl md:text-2xl font-bold text-green-600">${report.fluency_score}</div>
+              <div class="text-center p-3 md:p-4 bg-white dark:bg-gray-700/50 rounded-lg shadow-sm border border-green-100 dark:border-green-800">
+                <div class="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-1 font-medium">Fluency</div>
+                <div class="text-xl md:text-2xl font-bold text-green-600 dark:text-green-400">${report.fluency_score}</div>
               </div>
             </div>
             
             ${report.total_messages ? `
-              <div class="pt-3 border-t border-gray-200">
-                <div class="flex items-center justify-between text-xs md:text-sm text-gray-600">
+              <div class="pt-3 border-t border-gray-200 dark:border-gray-600">
+                <div class="flex items-center justify-between text-xs md:text-sm text-gray-600 dark:text-gray-400">
                   <span class="flex items-center gap-1"><i class="fas fa-comments"></i>${report.total_messages} conversations</span>
                   <span class="flex items-center gap-1"><i class="fas fa-font"></i>${report.total_words} words</span>
                   <span class="flex items-center gap-1"><i class="fas fa-clock"></i>${Math.ceil(report.total_messages * 0.5)} min</span>
@@ -8146,9 +8146,9 @@ Proceed to payment?
         // No report found
         reportContainer.innerHTML = `
           <div class="text-center py-8 md:py-12">
-            <i class="fas fa-chart-line text-gray-300 text-4xl md:text-5xl mb-3"></i>
-            <p class="text-sm md:text-base text-gray-500 font-medium mb-2">No recent reports</p>
-            <p class="text-xs md:text-sm text-gray-400">Start an AI conversation to get your report</p>
+            <i class="fas fa-chart-line text-gray-300 dark:text-gray-600 text-4xl md:text-5xl mb-3"></i>
+            <p class="text-sm md:text-base text-gray-500 dark:text-gray-400 font-medium mb-2">No recent reports</p>
+            <p class="text-xs md:text-sm text-gray-400 dark:text-gray-500">Start an AI conversation to get your report</p>
           </div>
         `;
       }
@@ -8157,9 +8157,9 @@ Proceed to payment?
       // Show empty state on error
       reportContainer.innerHTML = `
         <div class="text-center py-8 md:py-12">
-          <i class="fas fa-chart-line text-gray-300 text-4xl md:text-5xl mb-3"></i>
-          <p class="text-sm md:text-base text-gray-500 font-medium mb-2">최근 리포트 없음</p>
-          <p class="text-xs md:text-sm text-gray-400">AI 대화를 시작하고 리포트를 받아보세요</p>
+          <i class="fas fa-chart-line text-gray-300 dark:text-gray-600 text-4xl md:text-5xl mb-3"></i>
+          <p class="text-sm md:text-base text-gray-500 dark:text-gray-400 font-medium mb-2">최근 리포트 없음</p>
+          <p class="text-xs md:text-sm text-gray-400 dark:text-gray-500">AI 대화를 시작하고 리포트를 받아보세요</p>
         </div>
       `;
     }
