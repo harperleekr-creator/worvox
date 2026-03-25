@@ -144,7 +144,7 @@ sessions.get('/user/:userId', async (c) => {
   }
 });
 
-// ⏱️ Get today's total session time for a user
+// ⏱️ Get today's and yesterday's total session time for a user
 sessions.get('/today-time/:userId', async (c) => {
   try {
     const userId = parseInt(c.req.param('userId'));
@@ -156,18 +156,33 @@ sessions.get('/today-time/:userId', async (c) => {
     const db = c.env.DB;
     const today = new Date().toISOString().split('T')[0];
     
-    // Get total session time for today from hiing_session_time table
-    const result = await db.prepare(`
+    // Calculate yesterday's date
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+    
+    // Get total session time for today
+    const todayResult = await db.prepare(`
       SELECT COALESCE(SUM(duration_seconds), 0) as totalSeconds
       FROM hiing_session_time
       WHERE user_id = ?
         AND DATE(created_at) = ?
     `).bind(userId, today).first();
     
+    // Get total session time for yesterday
+    const yesterdayResult = await db.prepare(`
+      SELECT COALESCE(SUM(duration_seconds), 0) as totalSeconds
+      FROM hiing_session_time
+      WHERE user_id = ?
+        AND DATE(created_at) = ?
+    `).bind(userId, yesterdayStr).first();
+    
     return c.json({
       success: true,
-      totalSeconds: result?.totalSeconds || 0,
-      date: today
+      totalSeconds: todayResult?.totalSeconds || 0,
+      yesterdaySeconds: yesterdayResult?.totalSeconds || 0,
+      date: today,
+      yesterdayDate: yesterdayStr
     });
     
   } catch (error) {
@@ -175,6 +190,7 @@ sessions.get('/today-time/:userId', async (c) => {
     return c.json({
       success: false,
       totalSeconds: 0,
+      yesterdaySeconds: 0,
       error: error instanceof Error ? error.message : 'Unknown error'
     }, 200); // Return 200 to not block app
   }

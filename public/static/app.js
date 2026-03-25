@@ -25,6 +25,7 @@ class WorVox {
     this.sessionStartTime = null;
     this.sessionTimer = null;
     this.todayTotalSeconds = 0; // Total seconds for today (累积时间)
+    this.yesterdayTotalSeconds = 0; // Total seconds for yesterday
     this.currentSessionSeconds = 0; // Current session seconds
     
     // User plan and usage tracking
@@ -749,16 +750,17 @@ class WorVox {
     if (!this.currentUser) return;
     
     try {
-      const today = new Date().toISOString().split('T')[0];
       const response = await axios.get(`/api/sessions/today-time/${this.currentUser.id}`);
       
       if (response.data.success) {
         this.todayTotalSeconds = response.data.totalSeconds || 0;
-        console.log(`⏱️ Today's total session time: ${this.todayTotalSeconds}s`);
+        this.yesterdayTotalSeconds = response.data.yesterdaySeconds || 0;
+        console.log(`⏱️ Today's total: ${this.todayTotalSeconds}s, Yesterday: ${this.yesterdayTotalSeconds}s`);
       }
     } catch (error) {
       console.error('Failed to load today session time:', error);
       this.todayTotalSeconds = 0;
+      this.yesterdayTotalSeconds = 0;
     }
   }
   
@@ -781,6 +783,21 @@ class WorVox {
     console.log('⏱️ Session timer started');
   }
   
+  // ⏱️ Format session time (seconds to HH:MM or MM:SS)
+  formatSessionTime(totalSeconds) {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    
+    // If less than 1 hour, show MM:SS
+    if (hours === 0) {
+      const seconds = totalSeconds % 60;
+      return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+    
+    // If 1 hour or more, show HH:MM
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+  }
+  
   // ⏱️ Update timer display
   updateTimerDisplay() {
     const totalSeconds = this.todayTotalSeconds + this.currentSessionSeconds;
@@ -800,6 +817,12 @@ class WorVox {
     const mobileTimer = document.getElementById('session-timer-mobile');
     if (mobileTimer) {
       mobileTimer.textContent = timeString;
+    }
+    
+    // Update dashboard today time
+    const dashboardTodayTime = document.getElementById('dashboard-today-time');
+    if (dashboardTodayTime) {
+      dashboardTodayTime.textContent = this.formatSessionTime(totalSeconds);
     }
   }
   
@@ -7694,24 +7717,32 @@ Proceed to payment?
                 <!-- Stats Section -->
                 <div class="mb-5">
                   <h2 class="text-base md:text-lg font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
-                    🔥 Streak | 오늘 XP | 전체 XP | Words
+                    🔥 Streak | 오늘 XP | 전체 XP | Words | 어제/오늘 시간
                   </h2>
-                  <div class="grid grid-cols-4 gap-3" id="dashboard-stats-container">
+                  <div class="grid grid-cols-3 md:grid-cols-6 gap-3" id="dashboard-stats-container">
                     <div class="text-center">
                       <div class="text-xl md:text-2xl font-bold text-orange-500" id="dashboard-streak">${gamificationStats.streak || 0}</div>
-                      <div class="text-xs text-gray-500">Streak</div>
+                      <div class="text-xs text-gray-500 dark:text-gray-400">Streak</div>
                     </div>
                     <div class="text-center">
                       <div class="text-xl md:text-2xl font-bold text-green-500" id="dashboard-daily-xp">${gamificationStats.dailyXp || 0}</div>
-                      <div class="text-xs text-gray-500">오늘 XP</div>
+                      <div class="text-xs text-gray-500 dark:text-gray-400">오늘 XP</div>
                     </div>
                     <div class="text-center">
                       <div class="text-xl md:text-2xl font-bold text-purple-500" id="dashboard-xp">${gamificationStats.totalXp || 0}</div>
-                      <div class="text-xs text-gray-500">전체 XP</div>
+                      <div class="text-xs text-gray-500 dark:text-gray-400">전체 XP</div>
                     </div>
                     <div class="text-center">
                       <div class="text-xl md:text-2xl font-bold text-blue-500" id="dashboard-words">${stats.wordsLearned || 0}</div>
-                      <div class="text-xs text-gray-500">Words</div>
+                      <div class="text-xs text-gray-500 dark:text-gray-400">Words</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-xl md:text-2xl font-bold text-cyan-500" id="dashboard-yesterday-time">${this.formatSessionTime(this.yesterdayTotalSeconds)}</div>
+                      <div class="text-xs text-gray-500 dark:text-gray-400">어제</div>
+                    </div>
+                    <div class="text-center">
+                      <div class="text-xl md:text-2xl font-bold text-emerald-500" id="dashboard-today-time">${this.formatSessionTime(this.todayTotalSeconds)}</div>
+                      <div class="text-xs text-gray-500 dark:text-gray-400">오늘</div>
                     </div>
                   </div>
                 </div>
