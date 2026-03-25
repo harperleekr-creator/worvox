@@ -1159,7 +1159,7 @@ class WorVox {
       <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden md:hidden" onclick="worvox.toggleMobileSidebar()"></div>
       
       <!-- Sidebar (hidden on mobile by default) -->
-      <div id="sidebar" class="fixed md:static inset-y-0 left-0 w-64 bg-gray-900 text-white flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out">
+      <div id="sidebar" class="fixed md:static inset-y-0 left-0 w-64 bg-gray-900 text-white flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out md:border-r md:border-gray-800">
         <!-- Logo -->
         <div class="p-4 border-b border-gray-700 flex items-center justify-between">
           <a href="#" onclick="worvox.showTopicSelection(); worvox.closeMobileSidebar(); return false;" class="text-xl font-bold cursor-pointer hover:opacity-90 transition-opacity">
@@ -1287,8 +1287,8 @@ class WorVox {
   // Footer with company information
   getFooter() {
     return `
-      <footer class="w-screen bg-gray-900 text-gray-400 py-4 md:py-6 -ml-4 md:-ml-8 mt-6 md:mt-12">
-        <div class="px-4 md:px-8 max-w-full">
+      <footer class="w-screen bg-gray-900 text-gray-400 -ml-4 md:-ml-6 mt-6 md:mt-12">
+        <div class="px-4 md:px-6 py-4 md:py-6 max-w-full">
           <div class="flex flex-col gap-2 md:gap-3 text-xs">
             <!-- Company Info -->
             <div class="text-center md:text-left">
@@ -1310,13 +1310,13 @@ class WorVox {
             </div>
             
             <!-- Copyright & Links -->
-            <div class="flex flex-wrap items-center justify-center md:justify-start pt-3 border-t border-gray-800" style="gap: 0.75rem;">
+            <div class="flex flex-wrap items-center justify-center md:justify-start pt-3 border-t border-gray-800 gap-2 md:gap-3">
               <span class="text-gray-500">© ${new Date().getFullYear()} WorVox</span>
-              <span class="text-gray-600">|</span>
+              <span class="text-gray-600 hidden md:inline">|</span>
               <a href="#" onclick="worvox.showTerms(); return false;" class="text-gray-400 hover:text-gray-300 transition-colors whitespace-nowrap">이용약관</a>
-              <span class="text-gray-600">|</span>
+              <span class="text-gray-600 hidden md:inline">|</span>
               <a href="#" onclick="worvox.showPrivacy(); return false;" class="text-gray-400 hover:text-gray-300 transition-colors whitespace-nowrap">개인정보처리방침</a>
-              <span class="text-gray-600">|</span>
+              <span class="text-gray-600 hidden md:inline">|</span>
               <a href="#" onclick="worvox.showRefund(); return false;" class="text-gray-400 hover:text-gray-300 transition-colors whitespace-nowrap">환불정책</a>
             </div>
           </div>
@@ -7658,7 +7658,7 @@ Proceed to payment?
             
             <!-- Content Area with Scrolling -->
             <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
-              <div class="p-4 md:px-8 md:py-6">
+              <div class="p-4 md:px-6 md:py-6">
                 <div class="max-w-4xl mx-auto">
                 <!-- Welcome Message - ChatGPT Style -->
                 <div class="mb-6">
