@@ -5903,11 +5903,6 @@ class WorVox {
               </div>
             </div>
             
-            <!-- Language label with flags -->
-            <div class="text-center mb-2">
-              <span class="text-3xl">${teacher.nationality || '🇰🇷🇺🇸'}</span>
-            </div>
-            
             <!-- Name badge (yellow background like screenshot) -->
             <div class="mx-4 mb-3">
               <div class="bg-yellow-300 rounded-full py-2 px-4 text-center">
@@ -5918,10 +5913,11 @@ class WorVox {
             <div class="px-6 pb-6">
               ${teacher.detail_image_url ? `
                 <!-- Detail image -->
-                <div class="mb-4">
+                <div class="mb-4 flex justify-center">
                   <img src="${teacher.detail_image_url}" alt="${teacher.name} details" 
-                    class="w-full rounded-lg shadow-md"
-                    onerror="this.style.display='none';">
+                    class="max-w-full max-h-64 rounded-lg shadow-md object-contain"
+                    onerror="console.error('Failed to load image:', this.src); this.parentElement.style.display='none';"
+                    onload="console.log('Image loaded successfully:', this.src);">
                 </div>
               ` : `
                 <!-- Title/Subtitle -->
