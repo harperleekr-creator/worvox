@@ -888,14 +888,14 @@ class WorVox {
             </div>
             
             <!-- Copyright & Links -->
-            <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 pt-3 border-t border-gray-800">
+            <div class="flex flex-wrap items-center justify-center md:justify-start pt-3 border-t border-gray-800" style="gap: 0.75rem;">
               <span class="text-gray-500">© ${new Date().getFullYear()} WorVox</span>
-              <span class="text-gray-700">|</span>
-              <a href="#" onclick="worvox.showTerms(); return false;" class="hover:text-gray-300 transition-colors whitespace-nowrap">이용약관</a>
-              <span class="text-gray-700">|</span>
-              <a href="#" onclick="worvox.showPrivacy(); return false;" class="hover:text-gray-300 transition-colors whitespace-nowrap">개인정보처리방침</a>
-              <span class="text-gray-700">|</span>
-              <a href="#" onclick="worvox.showRefund(); return false;" class="hover:text-gray-300 transition-colors whitespace-nowrap">환불정책</a>
+              <span class="text-gray-600">|</span>
+              <a href="#" onclick="worvox.showTerms(); return false;" class="text-gray-400 hover:text-gray-300 transition-colors whitespace-nowrap">이용약관</a>
+              <span class="text-gray-600">|</span>
+              <a href="#" onclick="worvox.showPrivacy(); return false;" class="text-gray-400 hover:text-gray-300 transition-colors whitespace-nowrap">개인정보처리방침</a>
+              <span class="text-gray-600">|</span>
+              <a href="#" onclick="worvox.showRefund(); return false;" class="text-gray-400 hover:text-gray-300 transition-colors whitespace-nowrap">환불정책</a>
             </div>
           </div>
         </div>
