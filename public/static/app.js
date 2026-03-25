@@ -21,6 +21,12 @@ class WorVox {
     this.xpBoostEndTime = null;
     this.weekendEventActive = false;
     
+    // ⏱️ Session Timer
+    this.sessionStartTime = null;
+    this.sessionTimer = null;
+    this.todayTotalSeconds = 0; // Total seconds for today (累积时间)
+    this.currentSessionSeconds = 0; // Current session seconds
+    
     // User plan and usage tracking
     this.userPlan = 'free'; // 'free', 'premium', 'business'
     this.currentBillingPeriod = 'monthly'; // 'monthly' or 'yearly'
@@ -453,6 +459,13 @@ class WorVox {
     // Load usage from localStorage
     this.loadUsageData();
     
+    // ⏱️ Save session time before page unload
+    window.addEventListener('beforeunload', () => {
+      if (this.currentUser && this.sessionTimer) {
+        this.stopSessionTimer();
+      }
+    });
+    
     this.init();
   }
 
@@ -484,6 +497,10 @@ class WorVox {
       
       // 🎉 Check weekend event
       this.checkWeekendEvent();
+      
+      // ⏱️ Load today's session time and start timer
+      await this.loadTodaySessionTime();
+      this.startSessionTimer();
       
       // 🎯 Initialize daily goals (after login)
       if (typeof window.dailyGoalsManager !== 'undefined' && this.currentUser) {
@@ -725,6 +742,99 @@ class WorVox {
       console.log('🎉 Weekend Event Active! XP 2배 자동 적용');
       this.showWeekendEventBanner();
     }
+  }
+  
+  // ⏱️ Load today's total session time
+  async loadTodaySessionTime() {
+    if (!this.currentUser) return;
+    
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const response = await axios.get(`/api/sessions/today-time/${this.currentUser.id}`);
+      
+      if (response.data.success) {
+        this.todayTotalSeconds = response.data.totalSeconds || 0;
+        console.log(`⏱️ Today's total session time: ${this.todayTotalSeconds}s`);
+      }
+    } catch (error) {
+      console.error('Failed to load today session time:', error);
+      this.todayTotalSeconds = 0;
+    }
+  }
+  
+  // ⏱️ Start session timer
+  startSessionTimer() {
+    this.sessionStartTime = Date.now();
+    this.currentSessionSeconds = 0;
+    
+    // Update timer every second
+    this.sessionTimer = setInterval(() => {
+      this.currentSessionSeconds = Math.floor((Date.now() - this.sessionStartTime) / 1000);
+      this.updateTimerDisplay();
+      
+      // Save to DB every 30 seconds
+      if (this.currentSessionSeconds % 30 === 0) {
+        this.saveSessionTime();
+      }
+    }, 1000);
+    
+    console.log('⏱️ Session timer started');
+  }
+  
+  // ⏱️ Update timer display
+  updateTimerDisplay() {
+    const totalSeconds = this.todayTotalSeconds + this.currentSessionSeconds;
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    
+    const timeString = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    
+    // Update desktop timer
+    const desktopTimer = document.getElementById('session-timer-desktop');
+    if (desktopTimer) {
+      desktopTimer.textContent = timeString;
+    }
+    
+    // Update mobile timer
+    const mobileTimer = document.getElementById('session-timer-mobile');
+    if (mobileTimer) {
+      mobileTimer.textContent = timeString;
+    }
+  }
+  
+  // ⏱️ Save session time to DB
+  async saveSessionTime() {
+    if (!this.currentUser || this.currentSessionSeconds === 0) return;
+    
+    try {
+      await axios.post('/api/sessions/save-time', {
+        userId: this.currentUser.id,
+        seconds: this.currentSessionSeconds
+      });
+      
+      // Update today's total
+      this.todayTotalSeconds += this.currentSessionSeconds;
+      this.currentSessionSeconds = 0;
+      this.sessionStartTime = Date.now();
+      
+      console.log(`⏱️ Session time saved. Today total: ${this.todayTotalSeconds}s`);
+    } catch (error) {
+      console.error('Failed to save session time:', error);
+    }
+  }
+  
+  // ⏱️ Stop session timer (called on logout or page unload)
+  stopSessionTimer() {
+    if (this.sessionTimer) {
+      clearInterval(this.sessionTimer);
+      this.sessionTimer = null;
+    }
+    
+    // Save final session time
+    this.saveSessionTime();
+    
+    console.log('⏱️ Session timer stopped');
   }
   
   // 🎊 Show comeback bonus modal
@@ -6565,6 +6675,9 @@ Proceed to payment?
 
   // Logout and clear all authentication data
   logout() {
+    // ⏱️ Stop session timer and save final time
+    this.stopSessionTimer();
+    
     // Clear all user data
     this.currentUser = null;
     this.currentSession = null;
@@ -7479,7 +7592,7 @@ Proceed to payment?
           <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Mobile Header with Dark Mode & Upgrade -->
             <div class="md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
-              <div class="flex items-center justify-between">
+              <div class="flex items-center justify-between mb-2">
                 <button onclick="worvox.toggleMobileSidebar()" class="text-gray-600 dark:text-gray-300">
                   <i class="fas fa-bars text-xl"></i>
                 </button>
@@ -7496,12 +7609,23 @@ Proceed to payment?
                   </button>
                 </div>
               </div>
+              <!-- Session Timer (Mobile) -->
+              <div class="flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-700">
+                <i class="fas fa-clock text-blue-600 dark:text-blue-400 text-sm"></i>
+                <span class="text-sm font-mono font-semibold text-blue-700 dark:text-blue-300" id="session-timer-mobile">00:00:00</span>
+              </div>
             </div>
             
             <!-- Desktop Top Bar -->
             <div class="hidden md:flex bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-3 items-center justify-between">
               <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Choose Your Learning Path</h2>
               <div class="flex items-center gap-3">
+                <!-- Session Timer -->
+                <div class="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-700">
+                  <i class="fas fa-clock text-blue-600 dark:text-blue-400"></i>
+                  <span class="text-sm font-mono font-semibold text-blue-700 dark:text-blue-300" id="session-timer-desktop">00:00:00</span>
+                </div>
+                
                 <!-- Dark Mode Toggle -->
                 <button onclick="worvox.toggleDarkMode()" 
                   class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all" 

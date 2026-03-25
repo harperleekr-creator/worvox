@@ -144,4 +144,83 @@ sessions.get('/user/:userId', async (c) => {
   }
 });
 
+// ⏱️ Get today's total session time for a user
+sessions.get('/today-time/:userId', async (c) => {
+  try {
+    const userId = parseInt(c.req.param('userId'));
+    
+    if (!userId) {
+      return c.json({ error: 'User ID is required' }, 400);
+    }
+    
+    const db = c.env.DB;
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Get total session time for today from hiing_session_time table
+    const result = await db.prepare(`
+      SELECT COALESCE(SUM(duration_seconds), 0) as totalSeconds
+      FROM hiing_session_time
+      WHERE user_id = ?
+        AND DATE(created_at) = ?
+    `).bind(userId, today).first();
+    
+    return c.json({
+      success: true,
+      totalSeconds: result?.totalSeconds || 0,
+      date: today
+    });
+    
+  } catch (error) {
+    console.error('Get today session time error:', error);
+    return c.json({
+      success: false,
+      totalSeconds: 0,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }, 200); // Return 200 to not block app
+  }
+});
+
+// ⏱️ Save session time
+sessions.post('/save-time', async (c) => {
+  try {
+    const { userId, seconds } = await c.req.json();
+    
+    if (!userId || !seconds) {
+      return c.json({ error: 'userId and seconds are required' }, 400);
+    }
+    
+    const db = c.env.DB;
+    
+    // Create table if not exists
+    await db.prepare(`
+      CREATE TABLE IF NOT EXISTS hiing_session_time (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        duration_seconds INTEGER NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `).run();
+    
+    // Insert session time record
+    await db.prepare(`
+      INSERT INTO hiing_session_time (user_id, duration_seconds, created_at)
+      VALUES (?, ?, CURRENT_TIMESTAMP)
+    `).bind(userId, seconds).run();
+    
+    console.log(`⏱️ Saved ${seconds}s for user ${userId}`);
+    
+    return c.json({
+      success: true,
+      secondsSaved: seconds
+    });
+    
+  } catch (error) {
+    console.error('Save session time error:', error);
+    return c.json({
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
 export default sessions;
