@@ -1314,11 +1314,11 @@ class WorVox {
               © ${new Date().getFullYear()} WorVox. All rights reserved.
             </p>
             <div class="flex flex-wrap items-center justify-center md:justify-end gap-4 text-xs">
-              <a href="#" onclick="worvox.showTerms(); return false;" class="hover:text-purple-400 transition">이용약관</a>
-              <span class="text-gray-700">|</span>
-              <a href="#" onclick="worvox.showPrivacy(); return false;" class="hover:text-purple-400 transition">개인정보처리방침</a>
-              <span class="text-gray-700">|</span>
-              <a href="#" onclick="worvox.showRefund(); return false;" class="hover:text-purple-400 transition">환불정책</a>
+              <a href="#" onclick="worvox.showTerms(); return false;" class="text-gray-400 hover:text-purple-400 transition">이용약관</a>
+              <span class="text-gray-600">|</span>
+              <a href="#" onclick="worvox.showPrivacy(); return false;" class="text-gray-400 hover:text-purple-400 transition">개인정보처리방침</a>
+              <span class="text-gray-600">|</span>
+              <a href="#" onclick="worvox.showRefund(); return false;" class="text-gray-400 hover:text-purple-400 transition">환불정책</a>
             </div>
           </div>
         </div>
