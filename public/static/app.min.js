@@ -1161,7 +1161,7 @@ class WorVox {
       <!-- Sidebar (hidden on mobile by default) -->
       <div id="sidebar" class="fixed md:static inset-y-0 left-0 w-64 bg-gray-900 text-white flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out md:border-r md:border-gray-800">
         <!-- Logo -->
-        <div class="p-4 border-b border-gray-700 flex items-center justify-between">
+        <div class="p-4 flex items-center justify-between">
           <a href="#" onclick="worvox.showTopicSelection(); worvox.closeMobileSidebar(); return false;" class="text-xl font-bold cursor-pointer hover:opacity-90 transition-opacity">
             WorVox
           </a>
