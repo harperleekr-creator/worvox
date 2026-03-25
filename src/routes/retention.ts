@@ -14,18 +14,27 @@ app.post('/comeback-check', async (c) => {
 
     const db = c.env.DB;
     
-    // Get user's last activity date
+    // Get user's last activity date from multiple sources
     const lastActivityQuery = `
-      SELECT 
-        MAX(created_at) as last_activity
-      FROM hiing_usage
-      WHERE user_id = ?
+      SELECT MAX(last_activity) as last_activity
+      FROM (
+        SELECT MAX(created_at) as last_activity FROM hiing_usage WHERE user_id = ?
+        UNION ALL
+        SELECT MAX(created_at) as last_activity FROM hiing_sessions WHERE user_id = ?
+        UNION ALL
+        SELECT MAX(created_at) as last_activity FROM hiing_gamification_activity WHERE user_id = ?
+        UNION ALL
+        SELECT last_login as last_activity FROM hiing_users WHERE id = ?
+      )
     `;
     
-    const result = await db.prepare(lastActivityQuery).bind(userId).first();
+    const result = await db.prepare(lastActivityQuery)
+      .bind(userId, userId, userId, userId)
+      .first();
     
     if (!result || !result.last_activity) {
-      // No previous activity, not eligible
+      // No previous activity, not eligible (probably a new user)
+      console.log(`ℹ️ User ${userId} has no previous activity - not eligible for comeback bonus`);
       return c.json({ 
         eligible: false,
         reason: 'No previous activity'
@@ -132,10 +141,14 @@ app.post('/comeback-check', async (c) => {
     
   } catch (error) {
     console.error('Comeback bonus check error:', error);
+    
+    // Return not eligible instead of error for better UX
+    // This prevents blocking the app initialization
     return c.json({ 
-      error: 'Failed to check comeback bonus',
-      details: error instanceof Error ? error.message : String(error)
-    }, 500);
+      eligible: false,
+      reason: 'Error checking comeback bonus',
+      error: error instanceof Error ? error.message : String(error)
+    }, 200); // Return 200 instead of 500 to prevent blocking
   }
 });
 
