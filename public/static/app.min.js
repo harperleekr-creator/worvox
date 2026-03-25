@@ -616,7 +616,7 @@ class WorVox {
         }
       }
     } catch (error) {
-      console.error('❌ User sync failed (non-critical):', error);
+      console.warn('⚠️ User sync failed (non-critical):', error.message || error);
       // Don't block app initialization if sync fails
     }
   }
@@ -649,7 +649,7 @@ class WorVox {
         console.warn('⚠️ No stats returned');
       }
     } catch (error) {
-      console.error('Error loading gamification stats:', error);
+      console.warn('⚠️ Error loading gamification stats (non-critical):', error.message || error);
     }
   }
 
@@ -679,7 +679,7 @@ class WorVox {
         console.log(`🔥 Attendance check completed: ${streakDays} day streak, ${xpAwarded} XP`);
       }
     } catch (error) {
-      console.error('Failed to check attendance:', error);
+      console.warn('⚠️ Failed to check attendance (non-critical):', error.message || error);
       // Non-critical error, don't block app
     }
   }
@@ -708,7 +708,7 @@ class WorVox {
         // Award Random Boxes will be handled by backend
       }
     } catch (error) {
-      console.error('Failed to check comeback bonus:', error);
+      console.warn('⚠️ Failed to check comeback bonus (non-critical):', error.message || error);
     }
   }
   
@@ -758,7 +758,7 @@ class WorVox {
         console.log(`⏱️ Today's total: ${this.todayTotalSeconds}s, Yesterday: ${this.yesterdayTotalSeconds}s`);
       }
     } catch (error) {
-      console.error('Failed to load today session time:', error);
+      console.warn('⚠️ Failed to load today session time (non-critical):', error.message || error);
       this.todayTotalSeconds = 0;
       this.yesterdayTotalSeconds = 0;
     }
