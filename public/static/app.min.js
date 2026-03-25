@@ -5903,6 +5903,11 @@ class WorVox {
               </div>
             </div>
             
+            <!-- Language label -->
+            <div class="text-center mb-1">
+              <span class="text-xs text-gray-600 font-semibold">Korean & English</span>
+            </div>
+            
             <!-- Nationality flags -->
             <div class="flex justify-center gap-2 mb-2">
               <span class="text-2xl">${teacher.nationality || '🇰🇷🇺🇸'}</span>
