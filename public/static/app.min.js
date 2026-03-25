@@ -5916,29 +5916,38 @@ class WorVox {
             </div>
             
             <div class="px-6 pb-6">
-              <!-- Title/Subtitle -->
-              <div class="text-center mb-3">
-                <p class="text-sm text-gray-700 font-semibold" style="white-space: pre-line;">${(teacher.title || teacher.specialty.substring(0, 50)).replace(/\\\\n/g, '\n')}</p>
-              </div>
-              
-              <!-- Main specialty/experience (scrollable if long) -->
-              <div class="mb-4 max-h-24 overflow-y-auto">
-                <p class="text-xs text-gray-600 leading-relaxed" style="white-space: pre-line;">${teacher.specialty.replace(/\\\\n/g, '\n')}</p>
-              </div>
-              
-              <!-- Bio/Message box (black background like screenshot) -->
-              ${teacher.bio ? `
-                <div class="bg-black rounded-lg p-3 mb-4">
-                  <p class="text-xs text-yellow-300 leading-relaxed" style="white-space: pre-line;">${teacher.bio.replace(/\\\\n/g, '\n')}</p>
+              ${teacher.detail_image_url ? `
+                <!-- Detail image -->
+                <div class="mb-4">
+                  <img src="${teacher.detail_image_url}" alt="${teacher.name} details" 
+                    class="w-full rounded-lg shadow-md"
+                    onerror="this.style.display='none';">
                 </div>
-              ` : ''}
-              
-              <!-- Rating -->
-              <div class="flex items-center justify-center gap-1 text-yellow-500 mb-4">
-                ${Array(Math.floor(teacher.rating)).fill('<i class="fas fa-star"></i>').join('')}
-                ${teacher.rating % 1 !== 0 ? '<i class="fas fa-star-half-alt"></i>' : ''}
-                <span class="text-gray-600 text-sm ml-1">${teacher.rating}</span>
-              </div>
+              ` : `
+                <!-- Title/Subtitle -->
+                <div class="text-center mb-3">
+                  <p class="text-sm text-gray-700 font-semibold" style="white-space: pre-line;">${(teacher.title || teacher.specialty.substring(0, 50)).replace(/\\\\n/g, '\n')}</p>
+                </div>
+                
+                <!-- Main specialty/experience (scrollable if long) -->
+                <div class="mb-4 max-h-24 overflow-y-auto">
+                  <p class="text-xs text-gray-600 leading-relaxed" style="white-space: pre-line;">${teacher.specialty.replace(/\\\\n/g, '\n')}</p>
+                </div>
+                
+                <!-- Bio/Message box (black background like screenshot) -->
+                ${teacher.bio ? `
+                  <div class="bg-black rounded-lg p-3 mb-4">
+                    <p class="text-xs text-yellow-300 leading-relaxed" style="white-space: pre-line;">${teacher.bio.replace(/\\\\n/g, '\n')}</p>
+                  </div>
+                ` : ''}
+                
+                <!-- Rating -->
+                <div class="flex items-center justify-center gap-1 text-yellow-500 mb-4">
+                  ${Array(Math.floor(teacher.rating)).fill('<i class="fas fa-star"></i>').join('')}
+                  ${teacher.rating % 1 !== 0 ? '<i class="fas fa-star-half-alt"></i>' : ''}
+                  <span class="text-gray-600 text-sm ml-1">${teacher.rating}</span>
+                </div>
+              `}
               
               <button onclick="worvox.selectTeacher(${teacher.id}, '${teacher.name}')" 
                 class="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all shadow-md">
