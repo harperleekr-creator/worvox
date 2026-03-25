@@ -452,6 +452,9 @@ class WorVox {
   }
 
   async init() {
+    // Setup browser history navigation
+    this.setupHistoryNavigation();
+    
     // Check for existing user in localStorage
     const savedUser = localStorage.getItem('worvox_user');
     if (savedUser) {
@@ -484,6 +487,78 @@ class WorVox {
       this.showTopicSelection();
     } else {
       this.showLogin();
+    }
+  }
+
+  setupHistoryNavigation() {
+    // Track current page
+    this.currentPage = 'login';
+    
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', (event) => {
+      if (event.state && event.state.page) {
+        console.log('🔙 Browser back button:', event.state.page);
+        this.navigateToPage(event.state.page, event.state.data, true);
+      }
+    });
+    
+    // Initial history state
+    history.replaceState({ page: 'login' }, '', '/app');
+  }
+
+  navigateToPage(page, data = {}, skipPushState = false) {
+    console.log('🔀 Navigate to:', page, data);
+    
+    switch(page) {
+      case 'login':
+        this.showLogin();
+        break;
+      case 'dashboard':
+        this.showTopicSelection();
+        break;
+      case 'chat':
+        if (data.topicId) {
+          this.currentTopic = data.topic;
+          this.startConversation(data.topicId);
+        }
+        break;
+      case 'timer':
+        if (data.duration) {
+          this.startTimerChallenge(data.duration);
+        }
+        break;
+      case 'scenario':
+        if (data.scenarioId) {
+          this.startScenarioMode(data.scenarioId);
+        }
+        break;
+      case 'exam':
+        if (data.examType) {
+          this.startExamMode(data.examType);
+        }
+        break;
+      case 'vocabulary':
+        this.showVocabulary();
+        break;
+      case 'wordbook':
+        if (data.wordbookId) {
+          this.openWordbook(data.wordbookId);
+        }
+        break;
+      case 'history':
+        this.showHistory();
+        break;
+      case 'profile':
+        this.showProfile();
+        break;
+      case 'rewards':
+        this.showRewards();
+        break;
+      case 'hiing':
+        this.showTeacherSelection();
+        break;
+      default:
+        console.warn('Unknown page:', page);
     }
   }
 
@@ -6293,6 +6368,11 @@ Proceed to payment?
   }
 
   showLogin() {
+    // Add to browser history
+    if (history.state && history.state.page !== 'login') {
+      history.pushState({ page: 'login' }, '', '/app');
+    }
+    this.currentPage = 'login';
     this.onboardingStep = 1;
     this.showOnboardingStep();
   }
@@ -7087,6 +7167,14 @@ Proceed to payment?
   async showTopicSelection() {
     try {
       console.log('🏠 showTopicSelection called');
+      
+      // Add to browser history
+      if (!window.location.pathname.includes('/app')) {
+        history.pushState({ page: 'dashboard' }, '', '/app');
+      } else if (history.state && history.state.page !== 'dashboard') {
+        history.pushState({ page: 'dashboard' }, '', '/app');
+      }
+      this.currentPage = 'dashboard';
       
       // Ensure user is logged in (load from localStorage if needed)
       if (!this.currentUser) {
