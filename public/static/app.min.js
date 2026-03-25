@@ -5894,17 +5894,8 @@ class WorVox {
 
         grid.innerHTML = teachers.map(teacher => `
           <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all overflow-hidden border border-gray-100">
-            <!-- Smaller circular photo (96px) -->
-            <div class="flex justify-center pt-6 pb-2">
-              <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-gray-100 shadow-lg">
-                <img src="${teacher.photo_url}" alt="${teacher.name}" 
-                  class="w-full h-full object-cover"
-                  onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22><circle fill=%22%2393c5fd%22 cx=%22100%22 cy=%22100%22 r=%22100%22/><text x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-size=%2280%22 font-family=%22Arial%22>${teacher.name.charAt(0)}</text></svg>';">
-              </div>
-            </div>
-            
-            <!-- Name badge (yellow background like screenshot) -->
-            <div class="mx-4 mb-3">
+            <!-- Name badge (yellow background) -->
+            <div class="mx-4 mt-6 mb-4">
               <div class="bg-yellow-300 rounded-full py-2 px-4 text-center">
                 <h3 class="text-lg font-bold text-gray-900">${teacher.name}</h3>
               </div>
@@ -5912,10 +5903,11 @@ class WorVox {
             
             <div class="px-6 pb-6">
               ${teacher.detail_image_url ? `
-                <!-- Detail image -->
-                <div class="mb-4 flex justify-center">
+                <!-- Detail image - Much larger -->
+                <div class="mb-4">
                   <img src="${teacher.detail_image_url}" alt="${teacher.name} details" 
-                    class="max-w-full max-h-64 rounded-lg shadow-md object-contain"
+                    class="w-full rounded-lg shadow-md object-cover"
+                    style="max-height: 500px;"
                     onerror="console.error('Failed to load image:', this.src); this.parentElement.style.display='none';"
                     onload="console.log('Image loaded successfully:', this.src);">
                 </div>
