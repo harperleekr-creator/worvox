@@ -783,19 +783,13 @@ class WorVox {
     console.log('⏱️ Session timer started');
   }
   
-  // ⏱️ Format session time (seconds to HH:MM or MM:SS)
+  // ⏱️ Format session time (seconds to MM:SS - minutes can exceed 60)
   formatSessionTime(totalSeconds) {
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
     
-    // If less than 1 hour, show MM:SS
-    if (hours === 0) {
-      const seconds = totalSeconds % 60;
-      return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    }
-    
-    // If 1 hour or more, show HH:MM
-    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    // Always show MM:SS format (minutes can be 61, 62, 100+, etc.)
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
   }
   
   // ⏱️ Update timer display
