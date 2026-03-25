@@ -8031,10 +8031,10 @@ Proceed to payment?
                     </div>
                   </div>
                 </div>
+                
+                <!-- Footer -->
+                ${this.getFooter()}
               </div>
-              
-              <!-- Footer (inside padded content area) -->
-              ${this.getFooter()}
               </div>
             </div>
           </div>
