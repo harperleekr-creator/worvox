@@ -7658,7 +7658,7 @@ Proceed to payment?
             
             <!-- Content Area with Scrolling -->
             <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
-              <div class="p-4 md:p-8">
+              <div class="p-4 md:px-8 md:py-6">
                 <div class="max-w-4xl mx-auto">
                 <!-- Welcome Message - ChatGPT Style -->
                 <div class="mb-6">
