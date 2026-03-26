@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1774493507306'; // Update manually or via build script
+const BUILD_TIME = '1774494025301'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -630,6 +630,230 @@ app.get('/landing', (c) => {
                 </p>
             </div>
         </section>
+
+        <!-- Value Visualization Section (Charts) -->
+        <section class="py-16 px-4 bg-gradient-to-b from-purple-50 to-white">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                        <span class="text-purple-600">WorVox</span>는 얼마나 효과적일까요?
+                    </h2>
+                    <p class="text-lg text-gray-600">데이터로 증명된 학습 효과와 비용 절감 효과</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Chart 1: 영어 실력 향상 그래프 -->
+                    <div class="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all border border-purple-100">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-600 rounded-xl flex items-center justify-center text-white text-2xl">
+                                📈
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900">영어 실력 향상 속도</h3>
+                                <p class="text-sm text-gray-500">기존 학습법 대비 3배 빠른 성장</p>
+                            </div>
+                        </div>
+                        <canvas id="skillImprovementChart" class="w-full" height="250"></canvas>
+                        <div class="mt-4 grid grid-cols-2 gap-4 text-center">
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <div class="text-2xl font-bold text-gray-400">30일</div>
+                                <div class="text-xs text-gray-500">기존 학습법</div>
+                            </div>
+                            <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-3 border-2 border-purple-300">
+                                <div class="text-2xl font-bold text-purple-600">10일</div>
+                                <div class="text-xs text-purple-600 font-semibold">WorVox 평균</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chart 2: 비용 절감 그래프 -->
+                    <div class="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition-all border border-blue-100">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-xl flex items-center justify-center text-white text-2xl">
+                                💰
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900">월 학습 비용 비교</h3>
+                                <p class="text-sm text-gray-500">영어 학원 대비 87% 절감</p>
+                            </div>
+                        </div>
+                        <canvas id="costComparisonChart" class="w-full" height="250"></canvas>
+                        <div class="mt-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm text-gray-600">연간 절감액</span>
+                                <span class="text-2xl font-bold text-blue-600">₩1,572,000</span>
+                            </div>
+                            <div class="text-xs text-gray-500 text-center">
+                                * 영어 학원(월 15만원) 대비 WorVox Core(월 1.9만원) 기준
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Call to Action -->
+                <div class="mt-12 text-center">
+                    <div class="inline-block bg-gradient-to-r from-purple-100 to-blue-100 rounded-2xl p-8 border-2 border-purple-300">
+                        <p class="text-xl font-bold text-gray-900 mb-2">
+                            💡 지금 시작하면 <span class="text-purple-600">2주 무료 체험</span> 가능!
+                        </p>
+                        <p class="text-gray-600 mb-4">실력 향상과 비용 절감을 직접 경험해보세요</p>
+                        <a href="/app" 
+                           class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:shadow-xl transition transform hover:scale-105">
+                            <i class="fas fa-rocket mr-2"></i>무료로 시작하기
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <script>
+        // Chart.js 초기화 (페이지 로드 후)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Chart 1: 영어 실력 향상 그래프 (Line Chart)
+            const skillCtx = document.getElementById('skillImprovementChart');
+            if (skillCtx) {
+                new Chart(skillCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['1일', '3일', '7일', '10일', '14일', '21일', '30일'],
+                        datasets: [
+                            {
+                                label: 'WorVox',
+                                data: [10, 25, 45, 70, 85, 92, 100],
+                                borderColor: 'rgb(147, 51, 234)',
+                                backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                                borderWidth: 3,
+                                tension: 0.4,
+                                fill: true,
+                                pointRadius: 5,
+                                pointHoverRadius: 7
+                            },
+                            {
+                                label: '기존 학습법',
+                                data: [5, 10, 18, 25, 32, 45, 55],
+                                borderColor: 'rgb(156, 163, 175)',
+                                backgroundColor: 'rgba(156, 163, 175, 0.1)',
+                                borderWidth: 2,
+                                tension: 0.4,
+                                fill: true,
+                                pointRadius: 4,
+                                pointHoverRadius: 6
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    font: { size: 12, weight: 'bold' },
+                                    padding: 15
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': ' + context.parsed.y + '점';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '점';
+                                    }
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        interaction: {
+                            mode: 'nearest',
+                            axis: 'x',
+                            intersect: false
+                        }
+                    }
+                });
+            }
+
+            // Chart 2: 비용 절감 그래프 (Bar Chart)
+            const costCtx = document.getElementById('costComparisonChart');
+            if (costCtx) {
+                new Chart(costCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['영어 학원', '일대일 과외', '온라인 강의', 'WorVox'],
+                        datasets: [{
+                            label: '월 비용 (원)',
+                            data: [150000, 200000, 50000, 19000],
+                            backgroundColor: [
+                                'rgba(239, 68, 68, 0.7)',
+                                'rgba(249, 115, 22, 0.7)',
+                                'rgba(234, 179, 8, 0.7)',
+                                'rgba(147, 51, 234, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgb(239, 68, 68)',
+                                'rgb(249, 115, 22)',
+                                'rgb(234, 179, 8)',
+                                'rgb(147, 51, 234)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return '월 비용: ₩' + context.parsed.y.toLocaleString() + '원';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '₩' + (value / 1000) + 'k';
+                                    }
+                                },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+        </script>
 
         <!-- Quick Target Audience (3초 안에 이해) -->
         <section class="py-12 px-4 bg-white border-b-4 border-purple-200">
