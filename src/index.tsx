@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1774518842078'; // Update manually or via build script
+const BUILD_TIME = '1774519270731'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -3651,7 +3651,7 @@ app.get('/test', (c) => {
         console.log("Window loaded");
     </script>
     
-    <script src="/static/app.min.js?v=${BUILD_TIME}"></script>
+    <script src="/static/app.min.js?v=${BUILD_TIME}" defer></script>
     
     <script>
         console.log("=== After app.min.js ===");
@@ -3778,6 +3778,9 @@ app.get('/app', (c) => {
         <script src="/static/error-handler.js?v=${version}"></script>
         <script src="/static/mobile-utils.js?v=${version}"></script>
         <script src="/static/module-loader.js?v=${version}"></script>
+        
+        <!-- TossPayments SDK - Must load before app.min.js -->
+        <script src="https://js.tosspayments.com/v2/standard"></script>
         
         <!-- App Scripts -->
         <script src="/static/gamification.js?v=${version}"></script>
@@ -4144,6 +4147,8 @@ app.get('/', (c) => {
         <script src="/static/toast.js?v=${version}"></script>
         <script src="/static/error-handler.js?v=${version}"></script>
 
+        <!-- TossPayments SDK - Must load before app.min.js -->
+        <script src="https://js.tosspayments.com/v2/standard"></script>
         
         <!-- App Scripts -->
         <script src="/static/gamification.js?v=${version}"></script>
