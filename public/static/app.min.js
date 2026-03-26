@@ -6746,8 +6746,8 @@ Proceed to payment?
     const progress = Math.round((this.onboardingStep / 3) * 100);
 
     app.innerHTML = `
-      <div class="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-6xl flex flex-col lg:flex-row overflow-hidden">
+      <div class="min-h-screen flex items-center justify-center p-4" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-5xl flex flex-col lg:flex-row overflow-hidden" style="min-height: 650px">
           <!-- Mobile: Introduction at Top -->
           <div class="lg:hidden w-full bg-gradient-to-br from-indigo-600 to-purple-700 p-6 text-white">
             <div class="space-y-4">
@@ -6921,54 +6921,70 @@ Proceed to payment?
   getStep1HTML() {
     return `
       <div class="space-y-6">
-        <div class="text-center">
-          <div class="text-5xl mb-4">👋</div>
-          <h2 class="text-2xl font-bold text-white mb-2">Welcome to WorVox!</h2>
-          <p class="text-indigo-100">로그인하거나 회원가입하여 시작하세요</p>
+        <div class="mb-8">
+          <div class="flex items-center gap-2 mb-8">
+            <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center">
+              <span class="text-white font-bold text-2xl">W</span>
+            </div>
+          </div>
+          <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back!</h2>
+          <p class="text-gray-600">Sign in to your cockpit.</p>
+        </div>
+        
+        <!-- Email Input -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            <i class="fas fa-envelope text-gray-400 mr-2"></i>Email
+          </label>
+          <input type="email" id="loginEmail" 
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            placeholder="Your email">
+        </div>
+        
+        <!-- Password Input -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            <i class="fas fa-lock text-gray-400 mr-2"></i>Password
+          </label>
+          <input type="password" id="loginPassword" 
+            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            placeholder="Password">
+        </div>
+        
+        <!-- Forgot Password Link -->
+        <div class="text-right">
+          <a href="#" class="text-sm text-green-600 hover:text-green-700 font-medium">Forgot Password?</a>
+        </div>
+        
+        <!-- Sign In Button -->
+        <button onclick="worvox.handleEmailLogin()" 
+          class="w-full py-4 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-all shadow-lg">
+          Sign in
+        </button>
+        
+        <!-- Divider -->
+        <div class="relative">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-200"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-4 bg-white text-gray-500">OR</span>
+          </div>
         </div>
         
         <!-- Google Sign-In Button -->
         <div id="googleSignInButton" class="flex justify-center"></div>
         
-        <!-- Divider -->
-        <div class="relative">
-          <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-white/30"></div>
-          </div>
-          <div class="relative flex justify-center text-sm">
-            <span class="px-2 bg-indigo-600 text-indigo-100">또는</span>
-          </div>
+        <!-- Sign Up Link -->
+        <div class="text-center">
+          <p class="text-sm text-gray-600">
+            Don't have an account? 
+            <button onclick="worvox.nextStep()" class="text-indigo-600 hover:text-indigo-700 font-semibold">Sign up</button>
+          </p>
         </div>
         
-        <!-- Email/Password Login Form -->
-        <div id="loginForm">
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-white mb-2">이메일</label>
-              <input type="email" id="loginEmail" 
-                class="w-full px-4 py-3 border border-white/30 bg-white/10 text-white placeholder-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
-                placeholder="example@email.com">
-            </div>
-            
-            <div>
-              <label class="block text-sm font-medium text-white mb-2">비밀번호</label>
-              <input type="password" id="loginPassword" 
-                class="w-full px-4 py-3 border border-white/30 bg-white/10 text-white placeholder-indigo-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent"
-                placeholder="••••••••">
-            </div>
-            
-            <button onclick="worvox.handleEmailLogin()" 
-              class="w-full py-3 bg-white text-indigo-600 rounded-lg font-semibold hover:bg-indigo-50 transition-all">
-              로그인
-            </button>
-            
-            <div class="text-center">
-              <button onclick="worvox.showSignupForm()" class="text-white hover:text-indigo-100 text-sm font-medium">
-                계정이 없으신가요? <span class="underline">회원가입</span>
-              </button>
-            </div>
-          </div>
-        </div>
+        <!-- Hidden signup form toggle -->
+        <div id="loginForm" style="display:none"></div>
         
         <!-- Signup Form (Hidden by default) -->
         <div id="signupForm" class="hidden">
