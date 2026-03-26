@@ -6756,29 +6756,33 @@ Proceed to payment?
           <!-- Stats Dashboard - Right Side -->
           <div class="hidden lg:flex w-full lg:w-7/12 p-8 lg:p-12 flex-col justify-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
             <div class="space-y-6">
+              <!-- Header -->
+              <div class="text-center mb-4">
+                <h2 class="text-2xl font-bold text-white mb-2">🎯 Real WorVox Results</h2>
+                <p class="text-purple-100 text-sm">Average learner progress in the last 30 days</p>
+              </div>
+              
               <!-- Words Learned Card -->
               <div class="bg-white rounded-2xl p-6 shadow-xl">
-                <div class="flex items-center justify-between mb-4">
-                  <div>
-                    <p class="text-xs text-gray-500 mb-1">This Month</p>
-                    <p class="text-4xl font-bold text-gray-900">1,248 <span class="text-base font-normal text-gray-500">words</span></p>
-                  </div>
-                  <div class="flex items-center gap-3">
+                <div class="mb-4">
+                  <div class="flex items-center justify-between mb-2">
+                    <p class="text-sm text-gray-600">📚 Words Learned</p>
                     <span class="text-sm text-green-600 font-semibold flex items-center gap-1">
                       <i class="fas fa-arrow-up"></i>+32%
                     </span>
-                    <button class="px-3 py-1.5 bg-gray-100 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-200 transition">
-                      <i class="fas fa-share-alt mr-1"></i>Share
-                    </button>
                   </div>
+                  <p class="text-4xl font-bold text-gray-900">1,248 <span class="text-base font-normal text-gray-500">words</span></p>
+                </div>
+                <div class="pt-3 border-t border-gray-100">
+                  <p class="text-xs text-gray-500">✨ 최근 WorVox 이용자 평균</p>
                 </div>
               </div>
               
               <!-- Study Time Card -->
               <div class="bg-white rounded-2xl p-6 shadow-xl">
                 <div class="flex items-center justify-between mb-4">
-                  <h3 class="text-sm font-semibold text-gray-700">Study Time</h3>
-                  <p class="text-xs text-gray-500">Last 30 Days</p>
+                  <p class="text-sm text-gray-600">⏱️ Study Time</p>
+                  <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs font-semibold">Last 30 Days</span>
                 </div>
                 <div class="mb-4">
                   <p class="text-4xl font-bold text-gray-900">42.5 <span class="text-base font-normal text-gray-500">hours</span></p>
@@ -6794,8 +6798,10 @@ Proceed to payment?
                   }).join('')}
                 </div>
                 
-                <div class="mt-4 text-xs text-gray-600 text-center">
-                  Average <span class="font-semibold text-green-600">1.4 hours/day</span> - Keep going! 🔥
+                <div class="mt-4 pt-3 border-t border-gray-100">
+                  <p class="text-xs text-gray-600 text-center">
+                    평균 <span class="font-semibold text-green-600">하루 1.4시간</span> 학습 중 🔥
+                  </p>
                 </div>
               </div>
             </div>
