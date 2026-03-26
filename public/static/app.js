@@ -6183,21 +6183,17 @@ class WorVox {
 
       const { orderId, orderName } = prepareResponse.data;
 
-      // 2. Initialize Toss Payments
+      // 2. Initialize Toss Payments (v2 SDK)
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
-      const tossPayments = TossPayments(clientKey);
+      const tossPayments = await loadTossPayments(clientKey);
       
       // customerKey must include letters/special chars, not just numbers
       const customerKey = `customer_${this.currentUser.id}`;
-      const payment = tossPayments.payment({ customerKey });
 
       // 3. Request payment
-      await payment.requestPayment({
+      await tossPayments.requestPayment({
         method: 'CARD',
-        amount: { 
-          value: finalAmount,
-          currency: 'KRW'
-        },
+        amount: finalAmount,
         orderId: orderId,
         orderName: orderName,
         successUrl: window.location.origin + '/payment/success',
@@ -16168,15 +16164,14 @@ Proceed to payment?
       const { customerKey } = startResponse.data;
       console.log(`📝 Customer key: ${customerKey}`);
 
-      // Step 2: Initialize Toss Payments Billing
+      // Step 2: Initialize Toss Payments Billing (v2 SDK)
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
-      const tossPayments = TossPayments(clientKey);
+      const tossPayments = await loadTossPayments(clientKey);
 
       // Step 3: Request billing key (카드 등록)
-      const billing = tossPayments.payment({ customerKey });
-      
-      await billing.requestBillingAuth({
+      await tossPayments.requestBillingAuth({
         method: 'CARD',
+        customerKey: customerKey,
         successUrl: window.location.origin + `/trial-success?plan=${plan}&userId=${this.currentUser.id}&customerKey=${customerKey}&billingPeriod=${billingPeriod}`,
         failUrl: window.location.origin + '/trial-fail',
         customerEmail: this.currentUser.email,
@@ -16269,20 +16264,16 @@ Proceed to payment?
 
       const { orderId, orderName } = prepareResponse.data;
 
-      // 2. Initialize Toss Payments
+      // 2. Initialize Toss Payments (v2 SDK)
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
-      const tossPayments = TossPayments(clientKey);
+      const tossPayments = await loadTossPayments(clientKey);
       
       const customerKey = `customer_${this.currentUser.id}`;
-      const payment = tossPayments.payment({ customerKey });
 
       // 3. Request payment
-      await payment.requestPayment({
+      await tossPayments.requestPayment({
         method: 'CARD',
-        amount: { 
-          value: amount,
-          currency: 'KRW'
-        },
+        amount: amount,
         orderId: orderId,
         orderName: orderName,
         successUrl: window.location.origin + '/payment/success',
