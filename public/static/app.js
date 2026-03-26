@@ -6758,20 +6758,20 @@ Proceed to payment?
             <div class="space-y-6">
               <!-- Header -->
               <div class="text-center mb-4">
-                <h2 class="text-2xl font-bold text-white mb-2">🎯 Real WorVox Results</h2>
-                <p class="text-purple-100 text-sm">Average learner progress in the last 30 days</p>
+                <h2 class="text-2xl font-bold text-white mb-2">🎯 실제 WorVox 학습 효과</h2>
+                <p class="text-purple-100 text-sm">최근 30일 평균 학습자 성과</p>
               </div>
               
               <!-- Words Learned Card -->
               <div class="bg-white rounded-2xl p-6 shadow-xl">
                 <div class="mb-4">
                   <div class="flex items-center justify-between mb-2">
-                    <p class="text-sm text-gray-600">📚 Words Learned</p>
+                    <p class="text-sm text-gray-600">📚 학습한 단어</p>
                     <span class="text-sm text-green-600 font-semibold flex items-center gap-1">
                       <i class="fas fa-arrow-up"></i>+32%
                     </span>
                   </div>
-                  <p class="text-4xl font-bold text-gray-900">1,248 <span class="text-base font-normal text-gray-500">words</span></p>
+                  <p class="text-4xl font-bold text-gray-900">1,248 <span class="text-base font-normal text-gray-500">개</span></p>
                 </div>
                 <div class="pt-3 border-t border-gray-100">
                   <p class="text-xs text-gray-500">✨ 최근 WorVox 이용자 평균</p>
@@ -6781,11 +6781,11 @@ Proceed to payment?
               <!-- Study Time Card -->
               <div class="bg-white rounded-2xl p-6 shadow-xl">
                 <div class="flex items-center justify-between mb-4">
-                  <p class="text-sm text-gray-600">⏱️ Study Time</p>
-                  <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs font-semibold">Last 30 Days</span>
+                  <p class="text-sm text-gray-600">⏱️ 학습 시간</p>
+                  <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs font-semibold">최근 30일</span>
                 </div>
                 <div class="mb-4">
-                  <p class="text-4xl font-bold text-gray-900">42.5 <span class="text-base font-normal text-gray-500">hours</span></p>
+                  <p class="text-4xl font-bold text-gray-900">42.5 <span class="text-base font-normal text-gray-500">시간</span></p>
                 </div>
                 
                 <!-- Bar Chart -->
@@ -6822,39 +6822,39 @@ Proceed to payment?
               <span class="text-white font-bold text-2xl">W</span>
             </div>
           </div>
-          <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back!</h2>
-          <p class="text-gray-600">Sign in to your cockpit.</p>
+          <h2 class="text-3xl font-bold text-gray-900 mb-2">다시 오신 것을 환영합니다!</h2>
+          <p class="text-gray-600">계정에 로그인하세요.</p>
         </div>
         
         <!-- Email Input -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">
-            <i class="fas fa-envelope text-gray-400 mr-2"></i>Email
+            <i class="fas fa-envelope text-gray-400 mr-2"></i>이메일
           </label>
           <input type="email" id="loginEmail" 
             class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-            placeholder="Your email">
+            placeholder="이메일 주소">
         </div>
         
         <!-- Password Input -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">
-            <i class="fas fa-lock text-gray-400 mr-2"></i>Password
+            <i class="fas fa-lock text-gray-400 mr-2"></i>비밀번호
           </label>
           <input type="password" id="loginPassword" 
             class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-            placeholder="Password">
+            placeholder="비밀번호">
         </div>
         
         <!-- Forgot Password Link -->
         <div class="text-right">
-          <a href="#" class="text-sm text-green-600 hover:text-green-700 font-medium">Forgot Password?</a>
+          <a href="#" class="text-sm text-green-600 hover:text-green-700 font-medium">비밀번호를 잊으셨나요?</a>
         </div>
         
         <!-- Sign In Button -->
         <button onclick="worvox.handleEmailLogin()" 
           class="w-full py-4 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-all shadow-lg">
-          Sign in
+          로그인
         </button>
         
         <!-- Divider -->
@@ -6863,7 +6863,7 @@ Proceed to payment?
             <div class="w-full border-t border-gray-200"></div>
           </div>
           <div class="relative flex justify-center text-sm">
-            <span class="px-4 bg-white text-gray-500">OR</span>
+            <span class="px-4 bg-white text-gray-500">또는</span>
           </div>
         </div>
         
@@ -6873,8 +6873,8 @@ Proceed to payment?
         <!-- Sign Up Link -->
         <div class="text-center">
           <p class="text-sm text-gray-600">
-            Don't have an account? 
-            <button onclick="worvox.nextStep()" class="text-indigo-600 hover:text-indigo-700 font-semibold">Sign up</button>
+            계정이 없으신가요? 
+            <button onclick="worvox.nextStep()" class="text-indigo-600 hover:text-indigo-700 font-semibold">회원가입</button>
           </p>
         </div>
         
