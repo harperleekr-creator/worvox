@@ -236,7 +236,7 @@ payments.post('/trial/start', async (c) => {
       'SELECT id, username, email, plan, is_trial, trial_end_date FROM users WHERE id = ?'
     ).bind(userId).first();
 
-    console.log(`🔍 User lookup result:`, user ? `Found: ${user.username} (${user.email})` : 'Not found');
+    console.log(`🔍 User lookup result:`, user ? `Found: ${user.username} (${user.email}), plan: ${user.plan}, is_trial: ${user.is_trial}, trial_end_date: ${user.trial_end_date}` : 'Not found');
 
     if (!user) {
       return c.json({ 
@@ -247,14 +247,23 @@ payments.post('/trial/start', async (c) => {
 
     // Check if user already has active paid plan
     if (user.plan && user.plan !== 'free' && !user.is_trial) {
-      return c.json({ error: '이미 유료 플랜을 사용 중입니다' }, 400);
+      console.log(`❌ User already has paid plan: ${user.plan}`);
+      return c.json({ 
+        error: '이미 유료 플랜을 사용 중입니다',
+        details: `현재 플랜: ${user.plan}`
+      }, 400);
     }
 
     // Check if user already has active trial
     if (user.is_trial && user.trial_end_date) {
       const trialEndDate = new Date(user.trial_end_date);
+      console.log(`🔍 Checking trial status - trial_end_date: ${user.trial_end_date}, current: ${new Date().toISOString()}, is active: ${trialEndDate > new Date()}`);
       if (trialEndDate > new Date()) {
-        return c.json({ error: '이미 무료 체험을 이용 중입니다' }, 400);
+        console.log(`❌ User already has active trial until ${trialEndDate.toISOString()}`);
+        return c.json({ 
+          error: '이미 무료 체험을 이용 중입니다',
+          details: `무료 체험 종료일: ${trialEndDate.toISOString().split('T')[0]}`
+        }, 400);
       }
     }
 
