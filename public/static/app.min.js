@@ -6822,7 +6822,7 @@ Proceed to payment?
               <span class="text-white font-bold text-2xl">W</span>
             </div>
           </div>
-          <h2 class="text-3xl font-bold text-gray-900 mb-2">다시 오신 것을 환영합니다!</h2>
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">다시 오신 것을 환영합니다!</h2>
           <p class="text-gray-600">계정에 로그인하세요.</p>
         </div>
         
