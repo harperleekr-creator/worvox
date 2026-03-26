@@ -16423,10 +16423,10 @@ Proceed to payment?
       // 2. Initialize Toss Payments (v2 SDK)
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
       // Load TossPayments SDK (v2)
-      if (typeof window.TossPayments === 'undefined') {
+      if (typeof loadTossPayments === 'undefined') {
         throw new Error('TossPayments SDK가 로드되지 않았습니다. 페이지를 새로고침해주세요.');
       }
-      const tossPayments = await window.TossPayments(clientKey);
+      const tossPayments = await loadTossPayments(clientKey);
       
       const customerKey = `customer_${this.currentUser.id}`;
 
