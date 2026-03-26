@@ -1022,6 +1022,221 @@ payments.post('/hiing/subscribe/confirm', async (c) => {
       VALUES (?, 'hiing_subscribe_confirm', ?)
     `).bind(userId, `Confirmed Live Speaking ${lessonCount}회 subscription - First payment: ₩${amount.toLocaleString()}`).run();
 
+    // Step 6: Send payment confirmation email
+    if (user && (user as any).email) {
+      try {
+        const resendApiKey = c.env.RESEND_API_KEY;
+        if (resendApiKey) {
+          const packageTypeName = packageType === 'monthly' ? '월정기 구독' : '일반 구매';
+          const formattedNextBillingDate = nextBillingDate.toLocaleDateString('ko-KR', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
+
+          const emailHtml = `
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>결제 완료 - WorVox Live Speaking</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          
+          <!-- 헤더 -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); padding: 40px 30px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: bold;">
+                🎉 결제가 완료되었습니다!
+              </h1>
+              <p style="margin: 10px 0 0 0; color: #ddd6fe; font-size: 18px;">
+                Live Speaking ${lessonCount}회 수업권
+              </p>
+            </td>
+          </tr>
+          
+          <!-- 결제 정보 -->
+          <tr>
+            <td style="padding: 40px 30px 20px 30px;">
+              <p style="margin: 0 0 20px 0; color: #1f2937; font-size: 18px; line-height: 1.6;">
+                안녕하세요, <strong>${(user as any).username}</strong>님! 👋
+              </p>
+              <p style="margin: 0 0 20px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                <strong>Live Speaking ${lessonCount}회 수업권</strong> 구독이 완료되었습니다!
+              </p>
+            </td>
+          </tr>
+          
+          <!-- 결제 상세 정보 박스 -->
+          <tr>
+            <td style="padding: 0 30px 30px 30px;">
+              <div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-radius: 12px; padding: 30px; border: 2px solid #3b82f6;">
+                <h2 style="margin: 0 0 20px 0; color: #1e40af; font-size: 22px; font-weight: bold; text-align: center;">
+                  ✅ 결제 상세 정보
+                </h2>
+                
+                <table width="100%" cellpadding="8" cellspacing="0">
+                  <tr>
+                    <td style="color: #1e40af; font-weight: 600; font-size: 14px;">📦 패키지</td>
+                    <td style="color: #1f2937; font-size: 14px; text-align: right;">Live Speaking ${lessonCount}회</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #1e40af; font-weight: 600; font-size: 14px;">💳 결제 방식</td>
+                    <td style="color: #1f2937; font-size: 14px; text-align: right;">${packageTypeName}</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #1e40af; font-weight: 600; font-size: 14px;">💰 결제 금액</td>
+                    <td style="color: #1f2937; font-size: 16px; font-weight: bold; text-align: right;">₩${amount.toLocaleString()}</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #1e40af; font-weight: 600; font-size: 14px;">📅 다음 결제일</td>
+                    <td style="color: #1f2937; font-size: 14px; text-align: right;">${formattedNextBillingDate}</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #1e40af; font-weight: 600; font-size: 14px;">🔄 자동 결제</td>
+                    <td style="color: #10b981; font-size: 14px; font-weight: bold; text-align: right;">활성화됨</td>
+                  </tr>
+                </table>
+                
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #93c5fd;">
+                  <p style="margin: 0; color: #1e40af; font-size: 13px; line-height: 1.6;">
+                    💡 <strong>알림:</strong> 다음 결제일 3일 전에 이메일로 알려드립니다.
+                  </p>
+                </div>
+              </div>
+            </td>
+          </tr>
+          
+          <!-- 다음 단계 안내 -->
+          <tr>
+            <td style="padding: 0 30px 30px 30px;">
+              <div style="background: #f0fdf4; border-left: 4px solid #10b981; padding: 20px; border-radius: 8px;">
+                <h3 style="margin: 0 0 15px 0; color: #065f46; font-size: 18px; font-weight: bold;">
+                  🚀 다음 단계
+                </h3>
+                <ol style="margin: 0; padding-left: 20px; color: #047857; font-size: 14px; line-height: 1.8;">
+                  <li>WorVox 앱에 로그인하세요</li>
+                  <li>1:1 Live Speaking 메뉴로 이동하세요</li>
+                  <li>원하는 강사와 시간을 선택하세요</li>
+                  <li>수업을 예약하고 영어 실력을 향상시키세요!</li>
+                </ol>
+              </div>
+            </td>
+          </tr>
+          
+          <!-- CTA 버튼 -->
+          <tr>
+            <td style="padding: 0 30px 40px 30px; text-align: center;">
+              <a href="https://worvox.com/app" style="display: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 12px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                WorVox 시작하기 🚀
+              </a>
+            </td>
+          </tr>
+          
+          <!-- 구독 관리 안내 -->
+          <tr>
+            <td style="padding: 0 30px 30px 30px;">
+              <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 20px; border-radius: 8px;">
+                <p style="margin: 0; color: #991b1b; font-size: 14px; line-height: 1.6;">
+                  <strong>구독 관리:</strong> 언제든 내 정보 > 구독 관리에서 구독을 취소하거나 변경할 수 있습니다.
+                </p>
+              </div>
+            </td>
+          </tr>
+          
+          <!-- 푸터 -->
+          <tr>
+            <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+              <p style="margin: 0 0 10px 0; color: #6b7280; font-size: 14px;">
+                궁금한 점이 있으시면 언제든 문의해주세요
+              </p>
+              <p style="margin: 0 0 20px 0;">
+                <a href="mailto:support@worvox.com" style="color: #3b82f6; text-decoration: none; font-weight: 600;">support@worvox.com</a>
+              </p>
+              <p style="margin: 0; color: #9ca3af; font-size: 12px;">
+                © 2026 WorVox. All rights reserved.
+              </p>
+            </td>
+          </tr>
+          
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+          `;
+
+          const emailText = `
+🎉 결제가 완료되었습니다!
+
+안녕하세요, ${(user as any).username}님!
+
+Live Speaking ${lessonCount}회 수업권 구독이 완료되었습니다.
+
+✅ 결제 상세 정보
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+📦 패키지: Live Speaking ${lessonCount}회
+💳 결제 방식: ${packageTypeName}
+💰 결제 금액: ₩${amount.toLocaleString()}
+📅 다음 결제일: ${formattedNextBillingDate}
+🔄 자동 결제: 활성화됨
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 알림: 다음 결제일 3일 전에 이메일로 알려드립니다.
+
+🚀 다음 단계:
+1. WorVox 앱에 로그인하세요
+2. 1:1 Live Speaking 메뉴로 이동하세요
+3. 원하는 강사와 시간을 선택하세요
+4. 수업을 예약하고 영어 실력을 향상시키세요!
+
+WorVox 시작하기: https://worvox.com/app
+
+구독 관리: 언제든 내 정보 > 구독 관리에서 구독을 취소하거나 변경할 수 있습니다.
+
+궁금한 점이 있으시면 언제든 문의해주세요
+support@worvox.com
+
+© 2026 WorVox. All rights reserved.
+          `;
+
+          const emailResponse = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${resendApiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              from: 'WorVox <noreply@worvox.com>',
+              to: [(user as any).email],
+              subject: `🎉 Live Speaking ${lessonCount}회 결제가 완료되었습니다!`,
+              html: emailHtml,
+              text: emailText
+            })
+          });
+
+          if (emailResponse.ok) {
+            const emailData = await emailResponse.json();
+            console.log('✅ Live Speaking payment email sent:', { email: (user as any).email, emailId: emailData.id });
+          } else {
+            const errorData = await emailResponse.json();
+            console.error('❌ Failed to send Live Speaking payment email:', errorData);
+          }
+        } else {
+          console.log('⚠️ RESEND_API_KEY not configured, skipping payment email');
+        }
+      } catch (emailError) {
+        console.error('❌ Error sending Live Speaking payment email:', emailError);
+        // Don't fail the payment if email fails
+      }
+    }
+
     return c.json({
       success: true,
       billingKey: billingKey,
