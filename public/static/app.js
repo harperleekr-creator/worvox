@@ -6756,16 +6756,16 @@ Proceed to payment?
           <!-- Stats Dashboard - Right Side -->
           <div class="hidden lg:flex w-full lg:w-7/12 p-8 lg:p-12 flex-col justify-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
             <div class="space-y-6">
-              <!-- Month Progress Card -->
+              <!-- Words Learned Card -->
               <div class="bg-white rounded-2xl p-6 shadow-xl">
                 <div class="flex items-center justify-between mb-4">
                   <div>
-                    <p class="text-xs text-gray-500 mb-1">September 2025</p>
-                    <p class="text-4xl font-bold text-gray-900">6,429 <span class="text-base font-normal text-gray-500">USD</span></p>
+                    <p class="text-xs text-gray-500 mb-1">This Month</p>
+                    <p class="text-4xl font-bold text-gray-900">1,248 <span class="text-base font-normal text-gray-500">words</span></p>
                   </div>
                   <div class="flex items-center gap-3">
                     <span class="text-sm text-green-600 font-semibold flex items-center gap-1">
-                      <i class="fas fa-arrow-up"></i>+12.4%
+                      <i class="fas fa-arrow-up"></i>+32%
                     </span>
                     <button class="px-3 py-1.5 bg-gray-100 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-200 transition">
                       <i class="fas fa-share-alt mr-1"></i>Share
@@ -6774,14 +6774,14 @@ Proceed to payment?
                 </div>
               </div>
               
-              <!-- Study Time / Revenue Card -->
+              <!-- Study Time Card -->
               <div class="bg-white rounded-2xl p-6 shadow-xl">
                 <div class="flex items-center justify-between mb-4">
-                  <h3 class="text-sm font-semibold text-gray-700">Revenue</h3>
-                  <p class="text-xs text-gray-500">Sep 2025</p>
+                  <h3 class="text-sm font-semibold text-gray-700">Study Time</h3>
+                  <p class="text-xs text-gray-500">Last 30 Days</p>
                 </div>
                 <div class="mb-4">
-                  <p class="text-4xl font-bold text-gray-900">12,892 <span class="text-base font-normal text-gray-500">USD</span></p>
+                  <p class="text-4xl font-bold text-gray-900">42.5 <span class="text-base font-normal text-gray-500">hours</span></p>
                 </div>
                 
                 <!-- Bar Chart -->
@@ -6795,7 +6795,7 @@ Proceed to payment?
                 </div>
                 
                 <div class="mt-4 text-xs text-gray-600 text-center">
-                  Increase <span class="font-semibold text-green-600">13%</span> for this month
+                  Average <span class="font-semibold text-green-600">1.4 hours/day</span> - Keep going! 🔥
                 </div>
               </div>
             </div>
