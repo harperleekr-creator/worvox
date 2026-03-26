@@ -6927,8 +6927,159 @@ Proceed to payment?
 
   // Toggle between login and signup forms
   showSignupForm() {
-    document.getElementById('loginForm').classList.add('hidden');
-    document.getElementById('signupForm').classList.remove('hidden');
+    // Create modal overlay
+    const modal = document.createElement('div');
+    modal.id = 'signupModal';
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
+    modal.onclick = (e) => {
+      if (e.target === modal) this.closeSignupModal();
+    };
+    
+    modal.innerHTML = `
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative animate-fadeIn" onclick="event.stopPropagation()">
+        <!-- Close Button -->
+        <button onclick="worvox.closeSignupModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl">
+          <i class="fas fa-times"></i>
+        </button>
+        
+        <!-- Header -->
+        <div class="text-center mb-6">
+          <h2 class="text-3xl font-bold text-gray-800 mb-2">회원가입</h2>
+          <p class="text-gray-600">WorVox와 함께 영어 실력을 키워보세요!</p>
+        </div>
+        
+        <!-- Signup Form -->
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">이름</label>
+            <input type="text" id="modalSignupName" 
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              placeholder="홍길동">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
+            <input type="email" id="modalSignupEmail" 
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              placeholder="example@email.com">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">비밀번호</label>
+            <input type="password" id="modalSignupPassword" 
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              placeholder="8자 이상">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">비밀번호 확인</label>
+            <input type="password" id="modalSignupPasswordConfirm" 
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              placeholder="비밀번호 재입력">
+          </div>
+          
+          <button onclick="worvox.handleModalSignup()" 
+            class="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition-all transform hover:scale-105">
+            회원가입
+          </button>
+          
+          <div class="text-center">
+            <button onclick="worvox.closeSignupModal()" class="text-gray-600 hover:text-gray-800 text-sm font-medium">
+              이미 계정이 있으신가요? <span class="text-indigo-600 underline">로그인</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Focus first input
+    setTimeout(() => {
+      document.getElementById('modalSignupName').focus();
+    }, 100);
+  }
+  
+  closeSignupModal() {
+    const modal = document.getElementById('signupModal');
+    if (modal) {
+      modal.remove();
+    }
+  }
+  
+  async handleModalSignup() {
+    const name = document.getElementById('modalSignupName').value.trim();
+    const email = document.getElementById('modalSignupEmail').value.trim();
+    const password = document.getElementById('modalSignupPassword').value;
+    const passwordConfirm = document.getElementById('modalSignupPasswordConfirm').value;
+
+    // Validation
+    if (!name || !email || !password || !passwordConfirm) {
+      alert('모든 필드를 입력해주세요.');
+      return;
+    }
+
+    if (password.length < 8) {
+      alert('비밀번호는 8자 이상이어야 합니다.');
+      return;
+    }
+
+    if (password !== passwordConfirm) {
+      alert('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert('올바른 이메일 형식이 아닙니다.');
+      return;
+    }
+
+    try {
+      const response = await axios.post('/api/users/signup', {
+        name,
+        email,
+        password
+      });
+
+      console.log('Signup successful:', response.data);
+
+      // Close modal
+      this.closeSignupModal();
+
+      // Store user data
+      localStorage.setItem('worvox_user', JSON.stringify(response.data.user));
+      this.currentUser = response.data.user;
+      
+      // Update user plan from database
+      this.userPlan = response.data.user.plan || 'free';
+      console.log('User plan updated to:', this.userPlan);
+
+      // Show success message
+      alert(`환영합니다, ${name}님! 이제 영어 레벨을 선택해주세요.`);
+
+      // If new user, show onboarding steps
+      if (response.data.isNew) {
+        console.log('🆕 New user - showing onboarding');
+        this.onboardingStep = 2; // Start from step 2 (level selection)
+        this.showOnboardingStep();
+      } else {
+        console.log('👤 Existing user - loading data...');
+        // Load user data and show home
+        await this.loadUsageFromServer();
+        await this.loadGamificationStats();
+        this.showTopicSelection();
+      }
+
+    } catch (error) {
+      console.error('Signup error:', error);
+      if (error.response?.status === 409) {
+        alert('이미 등록된 이메일입니다. 로그인해주세요.');
+      } else {
+        alert('회원가입에 실패했습니다. 다시 시도해주세요.');
+      }
+    }
   }
 
   showLoginForm() {
