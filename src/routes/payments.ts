@@ -3,6 +3,203 @@ import type { Bindings } from '../types';
 
 const payments = new Hono<{ Bindings: Bindings }>();
 
+// 무료 체험 시작 이메일 템플릿
+const getTrialStartEmailHTML = (userName: string, planName: string, trialEndDate: string, billingAmount: string) => `
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>무료 체험 시작 - WorVox</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          
+          <!-- 헤더 -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 40px 30px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: bold;">
+                🎉 무료 체험 시작!
+              </h1>
+              <p style="margin: 10px 0 0 0; color: #d1fae5; font-size: 18px;">
+                ${planName} 플랜을 2주간 무료로 경험하세요
+              </p>
+            </td>
+          </tr>
+          
+          <!-- 체험 정보 -->
+          <tr>
+            <td style="padding: 40px 30px 20px 30px;">
+              <p style="margin: 0 0 20px 0; color: #1f2937; font-size: 18px; line-height: 1.6;">
+                안녕하세요, <strong>${userName}</strong>님! 👋
+              </p>
+              <p style="margin: 0 0 20px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                <strong>${planName} 플랜</strong> 무료 체험이 성공적으로 시작되었습니다!
+              </p>
+            </td>
+          </tr>
+          
+          <!-- 중요 정보 박스 -->
+          <tr>
+            <td style="padding: 0 30px 30px 30px;">
+              <div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-radius: 12px; padding: 30px; border: 2px solid #3b82f6;">
+                <h2 style="margin: 0 0 20px 0; color: #1e40af; font-size: 22px; font-weight: bold; text-align: center;">
+                  ✅ 카드 등록 완료
+                </h2>
+                
+                <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 15px;">
+                  <tr>
+                    <td style="padding: 12px 0; border-bottom: 1px solid #93c5fd;">
+                      <span style="color: #1e40af; font-size: 15px; font-weight: bold;">무료 체험 종료일:</span>
+                    </td>
+                    <td style="padding: 12px 0; text-align: right; border-bottom: 1px solid #93c5fd;">
+                      <span style="color: #1e3a8a; font-size: 15px; font-weight: bold;">${trialEndDate}</span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 12px 0; border-bottom: 1px solid #93c5fd;">
+                      <span style="color: #1e40af; font-size: 15px; font-weight: bold;">체험 후 자동 결제:</span>
+                    </td>
+                    <td style="padding: 12px 0; text-align: right; border-bottom: 1px solid #93c5fd;">
+                      <span style="color: #1e3a8a; font-size: 15px; font-weight: bold;">${billingAmount}</span>
+                    </td>
+                  </tr>
+                </table>
+                
+                <p style="margin: 15px 0 0 0; color: #1e40af; font-size: 14px; line-height: 1.6;">
+                  💡 <strong>알림:</strong> 무료 체험 종료 3일 전에 이메일로 미리 알려드립니다.<br/>
+                  언제든 내 정보 > 구독 관리에서 해지하실 수 있습니다.
+                </p>
+              </div>
+            </td>
+          </tr>
+          
+          <!-- Premium 혜택 -->
+          <tr>
+            <td style="padding: 0 30px 30px 30px;">
+              <h2 style="margin: 0 0 20px 0; color: #1f2937; font-size: 24px; font-weight: bold;">
+                🌟 ${planName} 플랜 혜택
+              </h2>
+              
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="padding: 10px 0;">
+                    <span style="color: #10b981; font-size: 20px; margin-right: 10px;">✓</span>
+                    <span style="color: #374151; font-size: 15px;">AI 발음 & 억양 상세 피드백</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 10px 0;">
+                    <span style="color: #10b981; font-size: 20px; margin-right: 10px;">✓</span>
+                    <span style="color: #374151; font-size: 15px;">무제한 대화 & 연습 세션</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 10px 0;">
+                    <span style="color: #10b981; font-size: 20px; margin-right: 10px;">✓</span>
+                    <span style="color: #374151; font-size: 15px;">개선된 답변 예시 제공</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 10px 0;">
+                    <span style="color: #10b981; font-size: 20px; margin-right: 10px;">✓</span>
+                    <span style="color: #374151; font-size: 15px;">학습 진도 상세 리포트</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          
+          <!-- 시작하기 버튼 -->
+          <tr>
+            <td style="padding: 0 30px 40px 30px; text-align: center;">
+              <h2 style="margin: 0 0 20px 0; color: #1f2937; font-size: 24px; font-weight: bold;">
+                지금 바로 시작해보세요! 🚀
+              </h2>
+              <a href="https://worvox.com/app" style="display: inline-block; background: linear-gradient(135deg, #a855f7 0%, #3b82f6 100%); color: #ffffff !important; text-decoration: none; padding: 18px 50px; border-radius: 12px; font-size: 20px; font-weight: bold; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                <span style="color: #ffffff; font-weight: bold;">WorVox 시작하기</span>
+              </a>
+            </td>
+          </tr>
+          
+          <!-- 도움말 -->
+          <tr>
+            <td style="padding: 0 30px 40px 30px; background-color: #f9fafb; border-top: 1px solid #e5e7eb;">
+              <h3 style="margin: 30px 0 15px 0; color: #1f2937; font-size: 18px; font-weight: bold;">
+                💡 시작 팁
+              </h3>
+              <ul style="margin: 0; padding-left: 20px; color: #4b5563; font-size: 14px; line-height: 1.8;">
+                <li>먼저 <strong>AI 대화</strong>로 가볍게 시작해보세요</li>
+                <li><strong>타이머 모드</strong>로 빠른 반응 능력을 키워보세요</li>
+                <li><strong>시나리오 모드</strong>로 실전 상황을 대비하세요</li>
+                <li>매일 10분씩 꾸준히 하면 놀라운 변화를 경험하실 거예요!</li>
+              </ul>
+            </td>
+          </tr>
+          
+          <!-- 푸터 -->
+          <tr>
+            <td style="padding: 30px; background-color: #111827; text-align: center;">
+              <p style="margin: 0 0 10px 0; color: #9ca3af; font-size: 14px;">
+                궁금한 점이 있으신가요?
+              </p>
+              <p style="margin: 0 0 20px 0;">
+                <a href="mailto:support@worvox.com" style="color: #60a5fa; text-decoration: none; font-size: 14px;">
+                  support@worvox.com
+                </a>
+              </p>
+              <p style="margin: 0; color: #6b7280; font-size: 12px;">
+                © 2026 WorVox. All rights reserved.<br>
+                대전광역시 서구 대덕대로241번길 20, 5층 548-2호
+              </p>
+            </td>
+          </tr>
+          
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+`;
+
+const getTrialStartEmailText = (userName: string, planName: string, trialEndDate: string, billingAmount: string) => `
+안녕하세요, ${userName}님! 👋
+
+${planName} 플랜 무료 체험이 성공적으로 시작되었습니다!
+
+✅ 카드 등록 완료
+
+무료 체험 종료일: ${trialEndDate}
+체험 후 자동 결제: ${billingAmount}
+
+💡 알림: 무료 체험 종료 3일 전에 이메일로 미리 알려드립니다.
+언제든 내 정보 > 구독 관리에서 해지하실 수 있습니다.
+
+🌟 ${planName} 플랜 혜택:
+
+✓ AI 발음 & 억양 상세 피드백
+✓ 무제한 대화 & 연습 세션
+✓ 개선된 답변 예시 제공
+✓ 학습 진도 상세 리포트
+
+지금 바로 시작하기: https://worvox.com/app
+
+💡 시작 팁:
+- 먼저 AI 대화로 가볍게 시작해보세요
+- 타이머 모드로 빠른 반응 능력을 키워보세요
+- 시나리오 모드로 실전 상황을 대비하세요
+- 매일 10분씩 꾸준히 하면 놀라운 변화를 경험하실 거예요!
+
+궁금한 점이 있으신가요?
+📧 support@worvox.com
+
+© 2026 WorVox. All rights reserved.
+`;
+
 // Toss Payments: 결제 준비 (Order ID 생성)
 payments.post('/prepare', async (c) => {
   try {
@@ -338,6 +535,58 @@ payments.post('/trial/confirm', async (c) => {
     ).run();
 
     console.log(`✅ Trial activated until ${trialEndDate.toISOString()}`);
+
+    // Get user info for email
+    const user = await c.env.DB.prepare(
+      'SELECT username, email FROM users WHERE id = ?'
+    ).bind(userId).first();
+
+    // Send trial start email
+    if (user && user.email) {
+      try {
+        const resendApiKey = c.env.RESEND_API_KEY;
+        if (resendApiKey) {
+          const planDisplayName = plan === 'core' ? 'Core' : 'Premium';
+          const billingAmount = period === 'yearly' 
+            ? (plan === 'core' ? '₩97,416/년' : '₩186,960/년')
+            : (plan === 'core' ? '₩9,900/월' : '₩19,000/월');
+          
+          const formattedTrialEndDate = trialEndDate.toLocaleDateString('ko-KR', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
+
+          const emailResponse = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${resendApiKey}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              from: 'WorVox <noreply@worvox.com>',
+              to: [user.email],
+              subject: `🎉 ${planDisplayName} 무료 체험이 시작되었습니다!`,
+              html: getTrialStartEmailHTML(user.username, planDisplayName, formattedTrialEndDate, billingAmount),
+              text: getTrialStartEmailText(user.username, planDisplayName, formattedTrialEndDate, billingAmount)
+            })
+          });
+
+          if (emailResponse.ok) {
+            const emailData = await emailResponse.json();
+            console.log('✅ Trial start email sent:', { email: user.email, emailId: emailData.id });
+          } else {
+            const errorData = await emailResponse.json();
+            console.error('❌ Failed to send trial start email:', errorData);
+          }
+        } else {
+          console.log('⚠️ RESEND_API_KEY not configured, skipping trial start email');
+        }
+      } catch (emailError) {
+        console.error('❌ Error sending trial start email:', emailError);
+        // Don't fail the trial activation if email fails
+      }
+    }
 
     return c.json({
       success: true,
