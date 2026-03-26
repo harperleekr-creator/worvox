@@ -128,6 +128,44 @@ admin.get('/stats', requireAuth, async (c) => {
       WHERE last_login_at >= datetime('now', '-1 day')
     `).first()
 
+    // Recent payments (last 10)
+    const recentPayments = await c.env.DB.prepare(`
+      SELECT 
+        po.order_id,
+        po.user_id,
+        u.username,
+        u.email,
+        po.plan_name,
+        po.amount,
+        po.status,
+        po.created_at
+      FROM payment_orders po
+      LEFT JOIN users u ON po.user_id = u.id
+      ORDER BY po.created_at DESC
+      LIMIT 10
+    `).all()
+
+    // Active trials (users with is_trial = 1)
+    const activeTrials = await c.env.DB.prepare(`
+      SELECT 
+        u.id,
+        u.username,
+        u.email,
+        u.plan,
+        u.trial_start_date,
+        u.trial_end_date,
+        u.billing_period
+      FROM users u
+      WHERE u.is_trial = 1
+      ORDER BY u.trial_end_date DESC
+      LIMIT 20
+    `).all()
+
+    // Trial count
+    const trialCount = await c.env.DB.prepare(`
+      SELECT COUNT(*) as count FROM users WHERE is_trial = 1
+    `).first()
+
     return c.json({
       success: true,
       data: {
@@ -138,7 +176,10 @@ admin.get('/stats', requireAuth, async (c) => {
         planDistribution: planStats.results || [],
         totalSessions: totalSessions?.count || 0,
         totalMessages: totalMessages?.count || 0,
-        totalRevenue: totalRevenue?.total || 0
+        totalRevenue: totalRevenue?.total || 0,
+        recentPayments: recentPayments.results || [],
+        activeTrials: activeTrials.results || [],
+        trialCount: trialCount?.count || 0
       }
     })
   } catch (error) {
