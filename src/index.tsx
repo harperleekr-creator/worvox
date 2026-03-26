@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1774494200116'; // Update manually or via build script
+const BUILD_TIME = '1774494395858'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -654,7 +654,9 @@ app.get('/landing', (c) => {
                                 <p class="text-sm text-gray-500">기존 학습법 대비 3배 빠른 성장</p>
                             </div>
                         </div>
-                        <canvas id="skillImprovementChart" class="w-full" height="250"></canvas>
+                        <div class="relative h-64" style="height: 250px;">
+                            <canvas id="skillImprovementChart"></canvas>
+                        </div>
                         <div class="mt-4 grid grid-cols-2 gap-4 text-center">
                             <div class="bg-gray-50 rounded-lg p-3">
                                 <div class="text-2xl font-bold text-gray-400">30일</div>
@@ -678,7 +680,9 @@ app.get('/landing', (c) => {
                                 <p class="text-sm text-gray-500">영어 학원 대비 87% 절감</p>
                             </div>
                         </div>
-                        <canvas id="costComparisonChart" class="w-full" height="250"></canvas>
+                        <div class="relative h-64" style="height: 250px;">
+                            <canvas id="costComparisonChart"></canvas>
+                        </div>
                         <div class="mt-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200">
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-sm text-gray-600">연간 절감액</span>
@@ -744,7 +748,8 @@ app.get('/landing', (c) => {
                     },
                     options: {
                         responsive: true,
-                        maintainAspectRatio: false,
+                        maintainAspectRatio: true,
+                        aspectRatio: 2,
                         plugins: {
                             legend: {
                                 display: true,
@@ -819,7 +824,8 @@ app.get('/landing', (c) => {
                     },
                     options: {
                         responsive: true,
-                        maintainAspectRatio: false,
+                        maintainAspectRatio: true,
+                        aspectRatio: 2,
                         plugins: {
                             legend: {
                                 display: false
