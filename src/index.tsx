@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1774505277241'; // Update manually or via build script
+const BUILD_TIME = '1774505617906'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -779,6 +779,7 @@ app.get('/trial-success', (c) => {
   const customerKey = c.req.query('customerKey');
   const plan = c.req.query('plan');
   const userId = c.req.query('userId');
+  const billingPeriod = c.req.query('billingPeriod') || 'monthly';
   
   return c.html(`
     <!DOCTYPE html>
@@ -817,7 +818,8 @@ app.get('/trial-success', (c) => {
                 userId: '${userId}',
                 plan: '${plan}',
                 billingKey: '${authKey}',
-                customerKey: '${customerKey}'
+                customerKey: '${customerKey}',
+                billingPeriod: '${billingPeriod}'
               });
               
               if (response.data.success) {
