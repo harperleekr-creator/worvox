@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1774509431296'; // Update manually or via build script
+const BUILD_TIME = '1774510047257'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -817,7 +817,7 @@ app.get('/trial-success', (c) => {
               const response = await axios.post('/api/payments/trial/confirm', {
                 userId: '${userId}',
                 plan: '${plan}',
-                billingKey: '${authKey}',
+                authKey: '${authKey}',
                 customerKey: '${customerKey}',
                 billingPeriod: '${billingPeriod}'
               });

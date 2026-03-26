@@ -494,11 +494,41 @@ payments.post('/trial/start', async (c) => {
 // Confirm billing key and activate trial
 payments.post('/trial/confirm', async (c) => {
   try {
-    const { userId, plan, billingKey, customerKey, billingPeriod } = await c.req.json();
+    const { userId, plan, authKey, customerKey, billingPeriod } = await c.req.json();
 
-    if (!userId || !plan || !billingKey || !customerKey) {
+    if (!userId || !plan || !authKey || !customerKey) {
       return c.json({ error: 'Missing required fields' }, 400);
     }
+
+    const tossSecretKey = c.env.TOSS_SECRET_KEY;
+    if (!tossSecretKey) {
+      return c.json({ error: 'Toss Payments not configured' }, 500);
+    }
+
+    // Step 1: Get billing key from Toss
+    const billingKeyResponse = await fetch('https://api.tosspayments.com/v1/billing/authorizations/issue', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${btoa(tossSecretKey + ':')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        authKey: authKey,
+        customerKey: customerKey 
+      })
+    });
+
+    const billingKeyResult = await billingKeyResponse.json();
+
+    if (!billingKeyResponse.ok) {
+      console.error('Billing key error:', billingKeyResult);
+      return c.json({ 
+        error: 'Failed to get billing key',
+        details: billingKeyResult
+      }, billingKeyResponse.status);
+    }
+
+    const billingKey = billingKeyResult.billingKey;
 
     const period = billingPeriod || 'monthly';
     console.log(`🎉 Activating trial for user ${userId}, billing key: ${billingKey}, period: ${period}`);
@@ -894,14 +924,17 @@ payments.post('/hiing/subscribe/confirm', async (c) => {
 
     const db = c.env.DB;
 
-    // Step 1: Get billing key from Toss
-    const billingKeyResponse = await fetch(`https://api.tosspayments.com/v1/billing/authorizations/${authKey}`, {
+    // Step 1: Get billing key from Toss (올바른 API)
+    const billingKeyResponse = await fetch('https://api.tosspayments.com/v1/billing/authorizations/issue', {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${btoa(tossSecretKey + ':')}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ customerKey: customerKey })
+      body: JSON.stringify({ 
+        authKey: authKey,
+        customerKey: customerKey 
+      })
     });
 
     const billingKeyResult = await billingKeyResponse.json();
@@ -916,7 +949,14 @@ payments.post('/hiing/subscribe/confirm', async (c) => {
 
     const billingKey = billingKeyResult.billingKey;
 
-    // Step 2: Execute first payment immediately
+    // Step 2: Get user info
+    const user = await db.prepare('SELECT * FROM users WHERE id = ?').bind(userId).first();
+    
+    if (!user) {
+      return c.json({ error: 'User not found' }, 404);
+    }
+
+    // Step 3: Execute first payment immediately
     const orderId = `hiing_order_${Date.now()}_${userId}`;
     const orderName = `WorVox Live Speaking ${lessonCount}회 (${packageType === 'monthly' ? '월정기' : '일반'})`;
 
@@ -946,8 +986,7 @@ payments.post('/hiing/subscribe/confirm', async (c) => {
       }, paymentResponse.status);
     }
 
-    // Step 3: Update user subscription info
-    const user = await db.prepare('SELECT * FROM users WHERE id = ?').bind(userId).first();
+    // Step 4: Update user subscription info
     
     const nextBillingDate = new Date();
     nextBillingDate.setMonth(nextBillingDate.getMonth() + 1);
