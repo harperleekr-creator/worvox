@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1774508233833'; // Update manually or via build script
+const BUILD_TIME = '1774509431296'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -918,6 +918,147 @@ app.get('/trial-fail', (c) => {
                 <p class="text-sm text-gray-400 mb-6">오류 코드: ${code || 'N/A'}</p>
                 <button 
                   onclick="window.location.href='/'"
+                  class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+                >
+                  홈으로 돌아가기
+                </button>
+            </div>
+        </div>
+    </body>
+    </html>
+  `);
+});
+
+// Live Speaking 구독 성공 페이지
+app.get('/hiing-subscribe-success', (c) => {
+  const authKey = c.req.query('authKey');
+  const customerKey = c.req.query('customerKey');
+  const userId = c.req.query('userId');
+  const lessonCount = c.req.query('lessonCount');
+  const amount = c.req.query('amount');
+  const packageType = c.req.query('packageType');
+  
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>구독 완료 - WorVox Live Speaking</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    </head>
+    <body class="bg-gray-50">
+        <div class="min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
+                <div id="loading" class="text-center">
+                    <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p class="text-gray-600">구독 처리 중...</p>
+                </div>
+                
+                <div id="success" class="hidden text-center">
+                    <div class="text-6xl mb-4">🎉</div>
+                    <h1 class="text-2xl font-bold text-gray-900 mb-4">구독이 완료되었습니다!</h1>
+                    <div class="bg-blue-50 rounded-lg p-4 mb-6 text-left">
+                        <p class="text-sm text-gray-600 mb-2">
+                            <span class="font-semibold">패키지:</span> <span id="package-info"></span>
+                        </p>
+                        <p class="text-sm text-gray-600 mb-2">
+                            <span class="font-semibold">결제 금액:</span> ₩<span id="amount-info"></span>
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            <span class="font-semibold">다음 결제일:</span> <span id="next-billing"></span>
+                        </p>
+                    </div>
+                    <button 
+                      onclick="window.location.href='/app'"
+                      class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition"
+                    >
+                      수업 시작하기 🚀
+                    </button>
+                </div>
+                
+                <div id="error" class="hidden text-center">
+                    <div class="text-6xl mb-4">❌</div>
+                    <h1 class="text-2xl font-bold text-gray-900 mb-2">구독 처리 실패</h1>
+                    <p id="error-message" class="text-gray-600 mb-6"></p>
+                    <button 
+                      onclick="window.location.href='/app'"
+                      class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+                    >
+                      홈으로 돌아가기
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+          async function confirmSubscription() {
+            try {
+              const response = await axios.post('/api/payments/hiing/subscribe/confirm', {
+                authKey: '${authKey}',
+                customerKey: '${customerKey}',
+                userId: parseInt('${userId}'),
+                lessonCount: parseInt('${lessonCount}'),
+                amount: parseInt('${amount}'),
+                packageType: '${packageType}'
+              });
+              
+              if (response.data.success) {
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('success').classList.remove('hidden');
+                
+                const packageText = '${packageType}' === 'monthly' ? '월정기 구독' : '일반 구매';
+                document.getElementById('package-info').textContent = \`Live Speaking \${response.data.lessonCount}회 (\${packageText})\`;
+                document.getElementById('amount-info').textContent = response.data.amount.toLocaleString();
+                document.getElementById('next-billing').textContent = response.data.nextBillingDate;
+                
+                // Redirect after 3 seconds
+                setTimeout(() => {
+                  window.location.href = '/app';
+                }, 3000);
+              } else {
+                throw new Error(response.data.error || '구독 확정 실패');
+              }
+            } catch (error) {
+              console.error('Subscription confirmation error:', error);
+              document.getElementById('loading').classList.add('hidden');
+              document.getElementById('error').classList.remove('hidden');
+              document.getElementById('error-message').textContent = error.response?.data?.error || error.message || '알 수 없는 오류';
+            }
+          }
+          
+          // Auto-execute on page load
+          confirmSubscription();
+        </script>
+    </body>
+    </html>
+  `);
+});
+
+// Live Speaking 구독 실패 페이지
+app.get('/hiing-subscribe-fail', (c) => {
+  const code = c.req.query('code');
+  const message = c.req.query('message');
+  
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>구독 실패 - WorVox Live Speaking</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-gray-50">
+        <div class="min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
+                <div class="text-6xl mb-4">❌</div>
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">구독 등록 실패</h1>
+                <p class="text-gray-600 mb-2">${message || '카드 등록이 취소되었습니다.'}</p>
+                <p class="text-sm text-gray-400 mb-6">오류 코드: ${code || 'N/A'}</p>
+                <button 
+                  onclick="window.location.href='/app'"
                   class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
                 >
                   홈으로 돌아가기

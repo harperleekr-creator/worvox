@@ -828,4 +828,177 @@ payments.post('/billing/execute', async (c) => {
   }
 });
 
+// Live Speaking 정기구독 시작 (빌링키 등록 + 첫 결제)
+payments.post('/hiing/subscribe/start', async (c) => {
+  try {
+    const { userId, lessonCount, amount, packageType } = await c.req.json();
+
+    if (!userId || !lessonCount || !amount) {
+      return c.json({ error: 'Missing required fields' }, 400);
+    }
+
+    const db = c.env.DB;
+
+    // Check if user exists
+    const user = await db.prepare('SELECT * FROM users WHERE id = ?').bind(userId).first();
+    if (!user) {
+      return c.json({ error: 'User not found' }, 404);
+    }
+
+    // Generate Toss customer key
+    const customerKey = `hiing_customer_${userId}_${Date.now()}`;
+
+    // Store customer key in database
+    await db.prepare(`
+      UPDATE users 
+      SET toss_customer_key = ?
+      WHERE id = ?
+    `).bind(customerKey, userId).run();
+
+    // Log activity
+    await db.prepare(`
+      INSERT INTO activity_logs (user_id, activity_type, details)
+      VALUES (?, 'hiing_subscribe_start', ?)
+    `).bind(userId, `Started Live Speaking ${lessonCount}회 subscription (${packageType})`).run();
+
+    return c.json({
+      success: true,
+      customerKey: customerKey,
+      lessonCount: lessonCount,
+      amount: amount,
+      packageType: packageType
+    });
+
+  } catch (error) {
+    console.error('Hiing subscribe start error:', error);
+    return c.json({ 
+      error: 'Failed to start subscription',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
+// Live Speaking 정기구독 확정 (빌링키 등록 완료 후 첫 결제)
+payments.post('/hiing/subscribe/confirm', async (c) => {
+  try {
+    const { authKey, customerKey, userId, lessonCount, amount, packageType } = await c.req.json();
+
+    if (!authKey || !customerKey || !userId || !lessonCount || !amount) {
+      return c.json({ error: 'Missing required fields' }, 400);
+    }
+
+    const tossSecretKey = c.env.TOSS_SECRET_KEY;
+    if (!tossSecretKey) {
+      return c.json({ error: 'Toss Payments not configured' }, 500);
+    }
+
+    const db = c.env.DB;
+
+    // Step 1: Get billing key from Toss
+    const billingKeyResponse = await fetch(`https://api.tosspayments.com/v1/billing/authorizations/${authKey}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${btoa(tossSecretKey + ':')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ customerKey: customerKey })
+    });
+
+    const billingKeyResult = await billingKeyResponse.json();
+
+    if (!billingKeyResponse.ok) {
+      console.error('Billing key error:', billingKeyResult);
+      return c.json({ 
+        error: 'Failed to get billing key',
+        details: billingKeyResult
+      }, billingKeyResponse.status);
+    }
+
+    const billingKey = billingKeyResult.billingKey;
+
+    // Step 2: Execute first payment immediately
+    const orderId = `hiing_order_${Date.now()}_${userId}`;
+    const orderName = `WorVox Live Speaking ${lessonCount}회 (${packageType === 'monthly' ? '월정기' : '일반'})`;
+
+    const paymentResponse = await fetch('https://api.tosspayments.com/v1/billing/' + billingKey, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${btoa(tossSecretKey + ':')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        customerKey: customerKey,
+        amount: amount,
+        orderId: orderId,
+        orderName: orderName,
+        customerEmail: (user as any)?.email || '',
+        customerName: (user as any)?.username || ''
+      })
+    });
+
+    const paymentResult = await paymentResponse.json();
+
+    if (!paymentResponse.ok) {
+      console.error('First payment error:', paymentResult);
+      return c.json({ 
+        error: 'Failed to process first payment',
+        details: paymentResult
+      }, paymentResponse.status);
+    }
+
+    // Step 3: Update user subscription info
+    const user = await db.prepare('SELECT * FROM users WHERE id = ?').bind(userId).first();
+    
+    const nextBillingDate = new Date();
+    nextBillingDate.setMonth(nextBillingDate.getMonth() + 1);
+
+    await db.prepare(`
+      UPDATE users 
+      SET 
+        billing_key = ?,
+        hiing_lesson_count = ?,
+        hiing_subscription_active = 1,
+        hiing_subscription_type = ?,
+        hiing_next_billing_date = ?,
+        hiing_billing_amount = ?
+      WHERE id = ?
+    `).bind(
+      billingKey,
+      lessonCount,
+      packageType,
+      nextBillingDate.toISOString().split('T')[0],
+      amount,
+      userId
+    ).run();
+
+    // Step 4: Record payment in payment_orders
+    await db.prepare(`
+      INSERT INTO payment_orders (order_id, user_id, plan_name, amount, status, payment_key, confirmed_at, created_at)
+      VALUES (?, ?, ?, ?, 'completed', ?, datetime('now'), datetime('now'))
+    `).bind(orderId, userId, `Live Speaking ${lessonCount}회`, amount, paymentResult.paymentKey).run();
+
+    // Step 5: Log activity
+    await db.prepare(`
+      INSERT INTO activity_logs (user_id, activity_type, details)
+      VALUES (?, 'hiing_subscribe_confirm', ?)
+    `).bind(userId, `Confirmed Live Speaking ${lessonCount}회 subscription - First payment: ₩${amount.toLocaleString()}`).run();
+
+    return c.json({
+      success: true,
+      billingKey: billingKey,
+      orderId: orderId,
+      amount: amount,
+      lessonCount: lessonCount,
+      nextBillingDate: nextBillingDate.toISOString().split('T')[0]
+    });
+
+  } catch (error) {
+    console.error('Hiing subscribe confirm error:', error);
+    return c.json({ 
+      error: 'Failed to confirm subscription',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
 export default payments;

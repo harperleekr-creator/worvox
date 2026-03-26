@@ -6169,42 +6169,39 @@ class WorVox {
     if (!confirmed) return;
     
     try {
-      // 1. Prepare order
-      const prepareResponse = await axios.post('/api/payments/prepare', {
-        planName: `Live Speaking ${lessonCount}회`,
-        price: finalAmount,
-        period: packageType,
-        userId: this.currentUser.id
+      // Step 1: Start Live Speaking subscription (빌링키 등록 준비)
+      const startResponse = await axios.post('/api/payments/hiing/subscribe/start', {
+        userId: this.currentUser.id,
+        lessonCount: lessonCount,
+        amount: finalAmount,
+        packageType: packageType
       });
 
-      if (!prepareResponse.data.success) {
-        throw new Error('결제 준비 실패');
+      if (!startResponse.data.success) {
+        const errorMsg = startResponse.data.error || '구독 시작 실패';
+        throw new Error(errorMsg);
       }
 
-      const { orderId, orderName } = prepareResponse.data;
+      const { customerKey } = startResponse.data;
+      console.log(`📝 Live Speaking Customer key: ${customerKey}`);
 
-      // 2. Initialize Toss Payments (v2 SDK)
+      // Step 2: Initialize Toss Payments Billing (v2 SDK)
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
       const tossPayments = await loadTossPayments(clientKey);
-      
-      // customerKey must include letters/special chars, not just numbers
-      const customerKey = `customer_${this.currentUser.id}`;
 
-      // 3. Request payment
-      await tossPayments.requestPayment({
+      // Step 3: Request billing key (카드 등록 + 즉시 결제)
+      await tossPayments.requestBillingAuth({
         method: 'CARD',
-        amount: finalAmount,
-        orderId: orderId,
-        orderName: orderName,
-        successUrl: window.location.origin + '/payment/success',
-        failUrl: window.location.origin + '/payment/fail',
+        customerKey: customerKey,
+        successUrl: window.location.origin + `/hiing-subscribe-success?userId=${this.currentUser.id}&customerKey=${customerKey}&lessonCount=${lessonCount}&amount=${finalAmount}&packageType=${packageType}`,
+        failUrl: window.location.origin + '/hiing-subscribe-fail',
         customerEmail: this.currentUser.email,
-        customerName: this.currentUser.username,
+        customerName: this.currentUser.username
       });
       
     } catch (error) {
-      console.error('Lesson purchase error:', error)
-      alert('❌ 결제 시작 중 오류가 발생했습니다.\n' + (error.message || ''));
+      console.error('Live Speaking subscription error:', error)
+      alert('❌ 정기구독 시작 중 오류가 발생했습니다.\n' + (error.response?.data?.error || error.message || ''));
     }
   }
 
