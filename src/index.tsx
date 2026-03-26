@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1774495590076'; // Update manually or via build script
+const BUILD_TIME = '1774496060572'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -48,6 +48,16 @@ app.use('*', async (c, next) => {
 
 // Enable CORS for API routes
 app.use('/api/*', cors());
+
+// Ensure UTF-8 encoding for all API responses
+app.use('/api/*', async (c, next) => {
+  await next();
+  // Set UTF-8 charset for JSON responses
+  const contentType = c.res.headers.get('Content-Type');
+  if (contentType && contentType.includes('application/json') && !contentType.includes('charset')) {
+    c.res.headers.set('Content-Type', 'application/json; charset=utf-8');
+  }
+});
 
 // Serve static files with proper cache headers
 app.use('/static/*', serveStatic({ root: './public' }));

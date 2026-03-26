@@ -57,37 +57,42 @@ users.post('/google-login', async (c) => {
     console.log('🔓 Decoding JWT payload...');
     let payload;
     try {
-      payload = JSON.parse(atob(parts[1]));
-      console.log('✅ JWT decoded successfully');
+      // Decode base64 and parse JSON with proper UTF-8 handling
+      const base64Payload = parts[1];
+      const decodedPayload = atob(base64Payload);
+      
+      // Convert to UTF-8 properly
+      const utf8Payload = decodeURIComponent(
+        Array.from(decodedPayload)
+          .map(char => '%' + ('00' + char.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      
+      payload = JSON.parse(utf8Payload);
+      console.log('✅ JWT decoded successfully with UTF-8');
       console.log('👤 User info:', { 
         email: payload.email, 
         name: payload.name,
         sub: payload.sub 
       });
     } catch (decodeError) {
-      console.error('❌ JWT decode error:', decodeError);
-      return c.json({ error: 'Failed to decode JWT token' }, 400);
+      // Fallback to simple atob if UTF-8 conversion fails
+      try {
+        payload = JSON.parse(atob(parts[1]));
+        console.log('✅ JWT decoded with fallback method');
+      } catch (fallbackError) {
+        console.error('❌ JWT decode error:', decodeError);
+        return c.json({ error: 'Failed to decode JWT token' }, 400);
+      }
     }
     
     const googleId = payload.sub;
     const email = payload.email;
     
-    // Ensure proper UTF-8 handling for name
-    let name = 'User';
-    try {
-      if (payload.name) {
-        // Try to properly decode the name
-        name = payload.name;
-        console.log('👤 Original name:', name);
-        console.log('👤 Name length:', name.length);
-        console.log('👤 Name charCodes:', Array.from(name).map(c => c.charCodeAt(0)));
-      } else if (email) {
-        name = email.split('@')[0];
-      }
-    } catch (nameError) {
-      console.error('❌ Name processing error:', nameError);
-      name = email?.split('@')[0] || 'User';
-    }
+    // Get name from payload (already UTF-8 decoded)
+    const name = payload.name || email?.split('@')[0] || 'User';
+    console.log('👤 Final username:', name);
+    console.log('👤 Username char codes:', Array.from(name).map(c => c.charCodeAt(0)));
     
     const picture = payload.picture || null;
 
