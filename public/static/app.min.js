@@ -6747,166 +6747,55 @@ Proceed to payment?
 
     app.innerHTML = `
       <div class="min-h-screen flex items-center justify-center p-4" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-5xl flex flex-col lg:flex-row overflow-hidden" style="min-height: 650px">
-          <!-- Mobile: Introduction at Top -->
-          <div class="lg:hidden w-full bg-gradient-to-br from-indigo-600 to-purple-700 p-6 text-white">
-            <div class="space-y-4">
-              <div class="text-center">
-                <h2 class="text-xl font-bold mb-2 leading-snug">Speak Confidently, Master English Fluently</h2>
-                <p class="text-indigo-100 text-sm mb-3">Created by global educators for maximum speaking practice</p>
-                <div class="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
-                  <p class="text-white font-semibold text-sm mb-1">One Platform. Complete Mastery.</p>
-                  <p class="text-indigo-100 text-xs">Everything you need to speak English fluently</p>
-                </div>
-              </div>
-              
-              <div class="grid grid-cols-2 gap-3">
-                <div class="flex items-center gap-2">
-                  <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
-                    💬
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-xs">AI Conversations</h3>
-                  </div>
-                </div>
-                
-                <div class="flex items-center gap-2">
-                  <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
-                    🎬
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-xs">30+ Scenarios</h3>
-                  </div>
-                </div>
-                
-                <div class="flex items-center gap-2">
-                  <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
-                    ⚡
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-xs">Instant Feedback</h3>
-                  </div>
-                </div>
-                
-                <div class="flex items-center gap-2">
-                  <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
-                    📈
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-xs">Progress Tracking</h3>
-                  </div>
-                </div>
-                
-                <div class="flex items-center gap-2">
-                  <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
-                    🎯
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-xs">Built for Fluency</h3>
-                  </div>
-                </div>
-                
-                <div class="flex items-center gap-2">
-                  <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-lg">
-                    🌏
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-xs">Global Team</h3>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Login Form -->
-          <div class="w-full lg:w-1/2 p-6 lg:p-8 bg-gradient-to-br from-indigo-600 to-purple-700">
-            <!-- Header -->
-            <div class="text-center mb-4 lg:mb-6">
-              <h1 class="text-2xl lg:text-3xl font-bold text-white mb-2">WorVox</h1>
-              <p class="text-indigo-100 text-sm">Step ${this.onboardingStep} of 3</p>
-            </div>
-
-            <!-- Progress Bar -->
-            <div class="w-full bg-white/20 rounded-full h-2 mb-6 lg:mb-8">
-              <div class="bg-white h-2 rounded-full transition-all duration-300" 
-                   style="width: ${progress}%"></div>
-            </div>
-
-            <!-- Current Step Content -->
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-5xl flex flex-col lg:flex-row overflow-hidden" style="min-height: 680px">
+          <!-- Login Form - Left Side -->
+          <div class="w-full lg:w-5/12 p-8 lg:p-12 flex flex-col justify-center bg-white">
             ${steps[this.onboardingStep - 1]}
           </div>
           
-          <!-- Desktop: Introduction on Right -->
-          <div class="hidden lg:flex w-full lg:w-1/2 bg-gradient-to-br from-indigo-600 to-purple-700 p-12 flex-col justify-center text-white">
-            <div class="space-y-8">
-              <div>
-                <h2 class="text-4xl font-bold mb-4 leading-snug">Speak Confidently,<br/>Master English Fluently</h2>
-                <p class="text-indigo-100 text-lg leading-relaxed mb-4">Created by global educators who understand the power of conversation</p>
-                <p class="text-indigo-200 text-base leading-relaxed">WorVox isn't just another learning app—it's your complete English speaking solution. Master vocabulary and grammar while building real confidence through diverse scenarios and AI-powered feedback.</p>
-                <div class="mt-6 pt-6 border-t border-white/20">
-                  <p class="text-white font-semibold text-xl">One Platform. Complete Mastery.</p>
-                  <p class="text-indigo-100 text-sm mt-2">Everything you need to speak English fluently, all in one place.</p>
-                </div>
-              </div>
-              
-              <div class="space-y-6">
-                <div class="flex items-start gap-4">
-                  <div class="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center text-2xl">
-                    💬
-                  </div>
+          <!-- Stats Dashboard - Right Side -->
+          <div class="hidden lg:flex w-full lg:w-7/12 p-8 lg:p-12 flex-col justify-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
+            <div class="space-y-6">
+              <!-- Month Progress Card -->
+              <div class="bg-white rounded-2xl p-6 shadow-xl">
+                <div class="flex items-center justify-between mb-4">
                   <div>
-                    <h3 class="font-semibold text-lg mb-1">Speak More, Fear Less</h3>
-                    <p class="text-indigo-100 text-sm">Practice real conversations with AI—no judgment, just progress</p>
+                    <p class="text-xs text-gray-500 mb-1">September 2025</p>
+                    <p class="text-4xl font-bold text-gray-900">6,429 <span class="text-base font-normal text-gray-500">USD</span></p>
                   </div>
-                </div>
-                
-                <div class="flex items-start gap-4">
-                  <div class="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center text-2xl">
-                    🎬
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-lg mb-1">30+ Real-Life Scenarios</h3>
-                    <p class="text-indigo-100 text-sm">Airport, restaurant, business—practice every situation you'll face</p>
-                  </div>
-                </div>
-                
-                <div class="flex items-start gap-4">
-                  <div class="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center text-2xl">
-                    ⚡
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-lg mb-1">Instant AI Feedback</h3>
-                    <p class="text-indigo-100 text-sm">Get pronunciation and fluency scores in seconds, not days</p>
-                  </div>
-                </div>
-                
-                <div class="flex items-start gap-4">
-                  <div class="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center text-2xl">
-                    📈
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-lg mb-1">Track Your Growth</h3>
-                    <p class="text-indigo-100 text-sm">Watch your confidence soar with detailed progress analytics</p>
-                  </div>
-                </div>
-                
-                <div class="flex items-start gap-4">
-                  <div class="flex-shrink-0 w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center text-2xl">
-                    🎯
-                  </div>
-                  <div>
-                    <h3 class="font-semibold text-lg mb-1">Built for Fluency</h3>
-                    <p class="text-indigo-100 text-sm">Vocabulary and grammar matter, but speaking builds confidence</p>
+                  <div class="flex items-center gap-3">
+                    <span class="text-sm text-green-600 font-semibold flex items-center gap-1">
+                      <i class="fas fa-arrow-up"></i>+12.4%
+                    </span>
+                    <button class="px-3 py-1.5 bg-gray-100 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-200 transition">
+                      <i class="fas fa-share-alt mr-1"></i>Share
+                    </button>
                   </div>
                 </div>
               </div>
               
-              <div class="pt-6 border-t border-white/20">
-                <div class="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
-                  <p class="text-white font-semibold mb-3">🌏 Created by Global Educators</p>
-                  <p class="text-indigo-100 text-sm leading-relaxed">
-                    Designed by international team members who know exactly what it takes to speak English confidently. We built WorVox to maximize speaking practice—because fluency comes from conversation, not textbooks.
-                  </p>
+              <!-- Study Time / Revenue Card -->
+              <div class="bg-white rounded-2xl p-6 shadow-xl">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="text-sm font-semibold text-gray-700">Revenue</h3>
+                  <p class="text-xs text-gray-500">Sep 2025</p>
+                </div>
+                <div class="mb-4">
+                  <p class="text-4xl font-bold text-gray-900">12,892 <span class="text-base font-normal text-gray-500">USD</span></p>
+                </div>
+                
+                <!-- Bar Chart -->
+                <div class="h-24 flex items-end justify-between gap-1">
+                  ${Array.from({length: 20}, (_, i) => {
+                    const height = 20 + Math.random() * 80;
+                    const colors = ['bg-cyan-400', 'bg-green-400', 'bg-yellow-400', 'bg-gray-300'];
+                    const color = colors[Math.floor(i / 5)];
+                    return `<div class="${color} rounded-t" style="width: 4%; height: ${height}%"></div>`;
+                  }).join('')}
+                </div>
+                
+                <div class="mt-4 text-xs text-gray-600 text-center">
+                  Increase <span class="font-semibold text-green-600">13%</span> for this month
                 </div>
               </div>
             </div>
