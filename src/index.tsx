@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1774430419465'; // Update manually or via build script
+const BUILD_TIME = '1774493507306'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -722,30 +722,22 @@ app.get('/landing', (c) => {
 
                 <div class="grid md:grid-cols-2 gap-8 mb-12">
                     <!-- Global Team Story -->
-                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-                        <div class="text-5xl mb-4 text-center">🌏</div>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/15 transition-all">
+                        <div class="text-6xl mb-6 text-center">🌏</div>
                         <h3 class="text-2xl font-bold text-white mb-4 text-center">Created by Global Educators</h3>
-                        <p class="text-white/90 leading-relaxed text-center mb-4">
-                            해외 출신 운영진들이 직접 설계한 플랫폼
-                        </p>
-                        <p class="text-white/80 leading-relaxed">
-                            우리는 영어를 유창하게 말하는 것이 얼마나 중요한지 알고 있습니다. 
-                            그래서 WorVox를 만들었습니다 - <strong class="text-yellow-300">대화의 힘</strong>을 이해하는 
-                            글로벌 교육자들이 최대한 많이 말할 수 있도록 설계한 플랫폼입니다.
+                        <p class="text-white/90 text-lg leading-relaxed text-center">
+                            해외 출신 운영진들이 직접 설계한<br/>
+                            <strong class="text-yellow-300">대화 중심</strong> 학습 플랫폼
                         </p>
                     </div>
 
                     <!-- Speaking Philosophy -->
-                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-                        <div class="text-5xl mb-4 text-center">💬</div>
+                    <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/15 transition-all">
+                        <div class="text-6xl mb-6 text-center">💬</div>
                         <h3 class="text-2xl font-bold text-white mb-4 text-center">Built for Fluency</h3>
-                        <p class="text-white/90 leading-relaxed text-center mb-4">
-                            말을 많이 하면 자신감이 생깁니다
-                        </p>
-                        <p class="text-white/80 leading-relaxed">
-                            어휘와 문법도 공부하지만, <strong class="text-yellow-300">결국 스피킹을 많이 함으로써</strong> 
-                            영어에 자신감을 가질 수 있습니다. 다양한 시나리오와 즉각적인 피드백으로 
-                            <strong class="text-yellow-300">실전 대화 능력</strong>을 키우세요.
+                        <p class="text-white/90 text-lg leading-relaxed text-center">
+                            많이 말할수록 자신감이 생깁니다<br/>
+                            <strong class="text-yellow-300">실전 대화</strong>로 영어 완성
                         </p>
                     </div>
                 </div>
