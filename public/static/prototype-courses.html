@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorVox - Courses</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .course-card {
+            transition: all 0.3s ease;
+        }
+        .course-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.4);
+        }
+        .glow {
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+    </style>
+</head>
+<body class="min-h-screen p-6">
+    
+    <!-- Header -->
+    <header class="max-w-7xl mx-auto mb-8 flex items-center justify-between">
+        <div class="flex items-center gap-6">
+            <a href="/prototype-courses" class="px-6 py-2 rounded-lg bg-purple-600 text-white font-semibold">Courses</a>
+            <a href="/prototype" class="px-4 py-2 rounded-lg text-gray-400 hover:text-white transition">Dashboard</a>
+            <a href="/prototype-profile" class="px-4 py-2 rounded-lg text-gray-400 hover:text-white transition">My Profile</a>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">🇰🇷</span>
+                <span class="text-2xl">🇺🇸</span>
+            </div>
+            <div class="flex items-center gap-3 bg-gray-800 rounded-full px-4 py-2">
+                <span class="text-white font-medium">김재헌</span>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                    <span class="text-white font-bold">김</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- Page Title -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-white mb-2">코스 선택</h1>
+            <p class="text-gray-400">다양한 학습 방식으로 영어 실력을 향상시키세요</p>
+        </div>
+
+        <!-- Featured: 1:1 Phone English -->
+        <div class="mb-12">
+            <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                <i class="fas fa-star text-yellow-400"></i>
+                추천 코스
+            </h2>
+            
+            <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-3xl p-8 relative overflow-hidden glow">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-32 -mt-32"></div>
+                
+                <div class="relative z-10">
+                    <div class="flex items-start justify-between mb-6">
+                        <div>
+                            <div class="inline-block bg-white/20 text-white px-4 py-1 rounded-full text-sm font-semibold mb-4">
+                                🔥 인기
+                            </div>
+                            <h3 class="text-3xl font-bold text-white mb-2">1:1 전화영어 수업</h3>
+                            <p class="text-white/90 text-lg mb-4">원어민 선생님과 실시간 전화로 영어 회화 연습</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-white/80 text-sm mb-1">월</div>
+                            <div class="text-4xl font-bold text-white">₩99,000</div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-white/10 rounded-xl p-4">
+                            <div class="flex items-center gap-3 mb-2">
+                                <i class="fas fa-phone text-2xl text-white"></i>
+                                <div class="text-white font-semibold">실시간 통화</div>
+                            </div>
+                            <p class="text-white/80 text-sm">원어민과 1:1 전화 수업</p>
+                        </div>
+                        
+                        <div class="bg-white/10 rounded-xl p-4">
+                            <div class="flex items-center gap-3 mb-2">
+                                <i class="fas fa-calendar-alt text-2xl text-white"></i>
+                                <div class="text-white font-semibold">자유로운 예약</div>
+                            </div>
+                            <p class="text-white/80 text-sm">원하는 시간에 수업 예약</p>
+                        </div>
+                        
+                        <div class="bg-white/10 rounded-xl p-4">
+                            <div class="flex items-center gap-3 mb-2">
+                                <i class="fas fa-certificate text-2xl text-white"></i>
+                                <div class="text-white font-semibold">전문 피드백</div>
+                            </div>
+                            <p class="text-white/80 text-sm">매 수업 후 발음·문법 리포트</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-4">
+                        <button class="flex-1 bg-white hover:bg-gray-100 text-orange-600 font-semibold py-4 rounded-xl transition">
+                            지금 시작하기
+                        </button>
+                        <button class="px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-xl transition">
+                            자세히 보기
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Learning Modes -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                <i class="fas fa-robot text-purple-400"></i>
+                AI 학습 모드
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- AI Free Conversation -->
+                <div onclick="window.location.href='/app'" class="course-card bg-gray-800 rounded-2xl p-6 cursor-pointer">
+                    <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-4">
+                        <i class="fas fa-comments text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">AI 자유 대화</h3>
+                    <p class="text-gray-400 text-sm mb-4">원하는 주제로 자유롭게 대화</p>
+                    
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center gap-2 text-sm text-gray-300">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span>자유로운 주제 선택</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-300">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span>실시간 발음 교정</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-300">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span>대화 기록 저장</span>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-gray-700 pt-4 flex items-center justify-between">
+                        <span class="text-purple-400 font-semibold">무료</span>
+                        <button class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition">
+                            시작하기
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Scenario Mode -->
+                <div onclick="window.location.href='/app?mode=scenario'" class="course-card bg-gray-800 rounded-2xl p-6 cursor-pointer">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-4">
+                        <i class="fas fa-theater-masks text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">시나리오 모드</h3>
+                    <p class="text-gray-400 text-sm mb-4">30+ 실생활 상황 시나리오</p>
+                    
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center gap-2 text-sm text-gray-300">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span>일상, 비즈니스, 여행 등</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-300">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span>실전 대화 연습</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-300">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span>상황별 표현 학습</span>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-gray-700 pt-4 flex items-center justify-between">
+                        <span class="text-blue-400 font-semibold">무료</span>
+                        <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
+                            시작하기
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Timer Mode -->
+                <div onclick="window.location.href='/app?mode=timer'" class="course-card bg-gray-800 rounded-2xl p-6 cursor-pointer">
+                    <div class="w-16 h-16 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mb-4">
+                        <i class="fas fa-stopwatch text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">타이머 모드</h3>
+                    <p class="text-gray-400 text-sm mb-4">시간 제한 집중 학습</p>
+                    
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center gap-2 text-sm text-gray-300">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span>5/10/15분 선택</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-300">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span>집중력 향상</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-300">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span>시간당 XP 보너스</span>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-gray-700 pt-4 flex items-center justify-between">
+                        <span class="text-orange-400 font-semibold">무료</span>
+                        <button class="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition">
+                            시작하기
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Exam Mode -->
+                <div onclick="window.location.href='/app?mode=exam'" class="course-card bg-gray-800 rounded-2xl p-6 cursor-pointer">
+                    <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center mb-4">
+                        <i class="fas fa-clipboard-check text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">시험 모드</h3>
+                    <p class="text-gray-400 text-sm mb-4">실전 영어 실력 평가</p>
+                    
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center gap-2 text-sm text-gray-300">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span>레벨별 문제 출제</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-300">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span>종합 평가 리포트</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-300">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span>약점 분석</span>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-gray-700 pt-4 flex items-center justify-between">
+                        <span class="text-red-400 font-semibold">무료</span>
+                        <button class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition">
+                            시작하기
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Vocabulary -->
+                <div onclick="window.location.href='/app?mode=vocabulary'" class="course-card bg-gray-800 rounded-2xl p-6 cursor-pointer">
+                    <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mb-4">
+                        <i class="fas fa-book text-3xl text-white"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">단어 학습</h3>
+                    <p class="text-gray-400 text-sm mb-4">AI 기반 맞춤형 단어 학습</p>
+                    
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center gap-2 text-sm text-gray-300">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span>5,000+ 필수 단어</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-300">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span>복습 알림 시스템</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-300">
+                            <i class="fas fa-check text-green-500"></i>
+                            <span>예문으로 학습</span>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t border-gray-700 pt-4 flex items-center justify-between">
+                        <span class="text-green-400 font-semibold">무료</span>
+                        <button class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition">
+                            시작하기
+                        </button>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- Learning Path -->
+        <div class="bg-gray-800 rounded-2xl p-8 mt-8">
+            <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                <i class="fas fa-route text-purple-400"></i>
+                추천 학습 경로
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+                <div class="bg-gray-700 rounded-xl p-4 text-center">
+                    <div class="text-3xl mb-2">1️⃣</div>
+                    <div class="text-white font-semibold mb-1">기초</div>
+                    <div class="text-gray-400 text-sm">단어 학습</div>
+                </div>
+                
+                <div class="bg-gray-700 rounded-xl p-4 text-center">
+                    <div class="text-3xl mb-2">2️⃣</div>
+                    <div class="text-white font-semibold mb-1">상황별</div>
+                    <div class="text-gray-400 text-sm">시나리오 모드</div>
+                </div>
+                
+                <div class="bg-gray-700 rounded-xl p-4 text-center">
+                    <div class="text-3xl mb-2">3️⃣</div>
+                    <div class="text-white font-semibold mb-1">자유</div>
+                    <div class="text-gray-400 text-sm">AI 대화</div>
+                </div>
+                
+                <div class="bg-gray-700 rounded-xl p-4 text-center">
+                    <div class="text-3xl mb-2">4️⃣</div>
+                    <div class="text-white font-semibold mb-1">집중</div>
+                    <div class="text-gray-400 text-sm">타이머 모드</div>
+                </div>
+                
+                <div class="bg-purple-600 rounded-xl p-4 text-center">
+                    <div class="text-3xl mb-2">🎯</div>
+                    <div class="text-white font-semibold mb-1">평가</div>
+                    <div class="text-white text-sm">시험 모드</div>
+                </div>
+            </div>
+            
+            <div class="mt-6 text-center">
+                <p class="text-gray-400 text-sm mb-2">모든 모드를 마스터한 후에는</p>
+                <div class="inline-block bg-orange-500 rounded-xl px-6 py-3 text-white font-semibold">
+                    🔥 1:1 전화영어로 완성하세요!
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

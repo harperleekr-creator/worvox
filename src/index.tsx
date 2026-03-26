@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1774499841410'; // Update manually or via build script
+const BUILD_TIME = '1774504651464'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -88,6 +88,418 @@ app.use('/favicon-*', serveStatic({ root: './' }));
 app.use('/apple-touch-icon.png', serveStatic({ root: './' }));
 app.use('/android-chrome-*', serveStatic({ root: './' }));
 app.use('/logo.png', serveStatic({ root: './' }));
+
+// Prototype route (development only - not deployed to production)
+app.get('/prototype', async (c) => {
+  return c.html(`
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorVox - Modern Dashboard Prototype</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .glow {
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+        .glow-orange {
+            box-shadow: 0 0 20px rgba(251, 146, 60, 0.3);
+        }
+        .category-btn {
+            transition: all 0.3s ease;
+        }
+        .category-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+        }
+    </style>
+</head>
+<body class="min-h-screen p-6">
+    
+    <!-- Header -->
+    <header class="max-w-7xl mx-auto mb-8 flex items-center justify-between">
+        <div class="flex items-center gap-6">
+            <a href="/prototype-courses" class="px-4 py-2 rounded-lg text-gray-400 hover:text-white transition">Courses</a>
+            <a href="/prototype" class="px-6 py-2 rounded-lg bg-purple-600 text-white font-semibold">Dashboard</a>
+            <a href="/prototype-profile" class="px-4 py-2 rounded-lg text-gray-400 hover:text-white transition">My Profile</a>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">🇰🇷</span>
+                <span class="text-2xl">🇺🇸</span>
+            </div>
+            <div class="flex items-center gap-3 bg-gray-800 rounded-full px-4 py-2">
+                <span class="text-white font-medium">김재헌</span>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                    <span class="text-white font-bold">김</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- Hero Section - AI Teacher Card -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            
+            <!-- Large Hero Card -->
+            <div class="lg:col-span-2 bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl p-8 relative overflow-hidden glow">
+                <div class="absolute top-4 right-4 flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-full text-sm font-semibold">
+                    <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                    ONLINE
+                </div>
+                
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-2xl">
+                        👨‍🏫
+                    </div>
+                    <div>
+                        <div class="text-gray-400 text-sm">Today's AI Teacher</div>
+                        <div class="text-white text-2xl font-bold">Martin</div>
+                    </div>
+                </div>
+                
+                <div class="mb-6">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800" 
+                         alt="Teacher" 
+                         class="w-full h-64 object-cover rounded-2xl">
+                </div>
+                
+                <button class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-2 transition">
+                    <i class="fas fa-comments"></i>
+                    AI 선생님과 대화 시작하기
+                </button>
+            </div>
+            
+            <!-- Stats Card -->
+            <div class="bg-gradient-to-br from-orange-400 to-orange-500 rounded-3xl p-6 text-white glow-orange">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-sm font-semibold bg-white/20 px-3 py-1 rounded-full">PRO</span>
+                    <span class="text-sm">Level 12</span>
+                </div>
+                
+                <div class="space-y-4 mb-6">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-trophy text-white/80"></i>
+                        <span class="text-sm">126 레벨</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-brain text-white/80"></i>
+                        <span class="text-sm">14 퀴즈 완료</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-clock text-white/80"></i>
+                        <span class="text-sm">170 시간</span>
+                    </div>
+                </div>
+                
+                <!-- Weekly Progress -->
+                <div class="bg-white/10 rounded-2xl p-4">
+                    <div class="text-xs text-white/80 mb-2">주간 학습 시간</div>
+                    <div class="flex items-end justify-between gap-1 h-32">
+                        <div class="flex-1 bg-purple-600 rounded-t" style="height: 60%"></div>
+                        <div class="flex-1 bg-purple-500 rounded-t" style="height: 45%"></div>
+                        <div class="flex-1 bg-purple-600 rounded-t" style="height: 75%"></div>
+                        <div class="flex-1 bg-purple-700 rounded-t" style="height: 90%"></div>
+                        <div class="flex-1 bg-purple-600 rounded-t" style="height: 50%"></div>
+                        <div class="flex-1 bg-gray-400 rounded-t" style="height: 20%"></div>
+                        <div class="flex-1 bg-gray-400 rounded-t" style="height: 20%"></div>
+                    </div>
+                    <div class="flex justify-between text-xs text-white/60 mt-2">
+                        <span>Mon</span>
+                        <span>Tue</span>
+                        <span>Wed</span>
+                        <span>Thu</span>
+                        <span>Fri</span>
+                        <span>Sat</span>
+                        <span>Sun</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trainings Section -->
+        <div class="mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-3xl font-bold text-white">Trainings</h2>
+                <p class="text-gray-400">매일 쉽게 언어 실력을 향상시키세요!</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- Words Spoken Card -->
+                <div class="bg-gradient-to-br from-green-400 to-green-500 rounded-2xl p-6 text-white">
+                    <h3 class="text-xl font-bold mb-2">말한 단어</h3>
+                    <p class="text-sm text-white/80 mb-4">1,287 words</p>
+                    <div class="bg-white/20 rounded-full h-2 mb-2">
+                        <div class="bg-white rounded-full h-2" style="width: 65%"></div>
+                    </div>
+                    <p class="text-xs text-white/80">이번 주 목표의 65%</p>
+                </div>
+                
+                <!-- Words Heard Card -->
+                <div class="bg-gray-800 rounded-2xl p-6 text-white">
+                    <h3 class="text-xl font-bold mb-2">들은 단어</h3>
+                    <p class="text-sm text-gray-400 mb-4">3,542 words</p>
+                    <div class="bg-gray-700 rounded-full h-2 mb-2">
+                        <div class="bg-blue-500 rounded-full h-2" style="width: 78%"></div>
+                    </div>
+                    <p class="text-xs text-gray-400">이번 주 목표의 78%</p>
+                </div>
+                
+                <!-- Sessions Card -->
+                <div class="bg-gray-800 rounded-2xl p-6 text-white">
+                    <h3 class="text-xl font-bold mb-2">Sessions</h3>
+                    <p class="text-sm text-gray-400 mb-4">248 대화</p>
+                    <div class="bg-gray-700 rounded-full h-2 mb-2">
+                        <div class="bg-purple-500 rounded-full h-2" style="width: 82%"></div>
+                    </div>
+                    <p class="text-xs text-gray-400">이번 달 목표의 82%</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories & Practice Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Categories (Left) -->
+            <div class="bg-gray-800 rounded-2xl p-6">
+                <h3 class="text-white text-xl font-bold mb-4">카테고리 선택</h3>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <button class="category-btn bg-purple-600 hover:bg-purple-700 text-white rounded-xl p-4 flex items-center gap-2">
+                        <i class="fas fa-utensils"></i>
+                        <span class="text-sm font-semibold">음식</span>
+                    </button>
+                    
+                    <button class="category-btn bg-orange-500 hover:bg-orange-600 text-white rounded-xl p-4 flex items-center gap-2">
+                        <i class="fas fa-plane"></i>
+                        <span class="text-sm font-semibold">여행</span>
+                    </button>
+                    
+                    <button class="category-btn bg-purple-600 hover:bg-purple-700 text-white rounded-xl p-4 flex items-center gap-2">
+                        <i class="fas fa-basketball-ball"></i>
+                        <span class="text-sm font-semibold">스포츠</span>
+                    </button>
+                    
+                    <button class="category-btn bg-purple-600 hover:bg-purple-700 text-white rounded-xl p-4 flex items-center gap-2">
+                        <i class="fas fa-paw"></i>
+                        <span class="text-sm font-semibold">동물</span>
+                    </button>
+                    
+                    <button class="category-btn bg-purple-600 hover:bg-purple-700 text-white rounded-xl p-4 flex items-center gap-2">
+                        <i class="fas fa-heartbeat"></i>
+                        <span class="text-sm font-semibold">건강</span>
+                    </button>
+                    
+                    <button class="category-btn bg-purple-600 hover:bg-purple-700 text-white rounded-xl p-4 flex items-center gap-2">
+                        <i class="fas fa-flask"></i>
+                        <span class="text-sm font-semibold">과학</span>
+                    </button>
+                    
+                    <button class="category-btn bg-orange-500 hover:bg-orange-600 text-white rounded-xl p-4 flex items-center gap-2">
+                        <i class="fas fa-briefcase"></i>
+                        <span class="text-sm font-semibold">비즈니스</span>
+                    </button>
+                    
+                    <button class="category-btn bg-purple-600 hover:bg-purple-700 text-white rounded-xl p-4 flex items-center gap-2">
+                        <i class="fas fa-ellipsis-h"></i>
+                        <span class="text-sm font-semibold">기타</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Practice Speaking (Center) -->
+            <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 text-white">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold">말하기 연습</h3>
+                    <span class="bg-green-500 text-white text-xs px-3 py-1 rounded-full font-semibold">AI</span>
+                </div>
+                
+                <div class="mb-4">
+                    <p class="text-yellow-400 text-lg font-semibold mb-2">How are you today?</p>
+                    <p class="text-gray-300 text-sm">오늘 기분이 어때요?</p>
+                </div>
+                
+                <div class="bg-gray-700 rounded-xl p-4 mb-4">
+                    <div class="flex items-center justify-center gap-2">
+                        <button class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700 transition">
+                            <i class="fas fa-microphone text-white"></i>
+                        </button>
+                        <div class="flex-1 h-16 flex items-center justify-center gap-1">
+                            <div class="w-1 bg-indigo-400 rounded-full" style="height: 20%"></div>
+                            <div class="w-1 bg-indigo-400 rounded-full" style="height: 40%"></div>
+                            <div class="w-1 bg-indigo-400 rounded-full" style="height: 60%"></div>
+                            <div class="w-1 bg-indigo-400 rounded-full" style="height: 80%"></div>
+                            <div class="w-1 bg-indigo-500 rounded-full" style="height: 90%"></div>
+                            <div class="w-1 bg-indigo-500 rounded-full" style="height: 100%"></div>
+                            <div class="w-1 bg-indigo-600 rounded-full" style="height: 95%"></div>
+                            <div class="w-1 bg-indigo-600 rounded-full" style="height: 85%"></div>
+                            <div class="w-1 bg-indigo-500 rounded-full" style="height: 70%"></div>
+                            <div class="w-1 bg-indigo-500 rounded-full" style="height: 50%"></div>
+                            <div class="w-1 bg-indigo-400 rounded-full" style="height: 35%"></div>
+                            <div class="w-1 bg-indigo-400 rounded-full" style="height: 25%"></div>
+                            <div class="w-1 bg-indigo-400 rounded-full" style="height: 45%"></div>
+                            <div class="w-1 bg-indigo-500 rounded-full" style="height: 65%"></div>
+                            <div class="w-1 bg-indigo-500 rounded-full" style="height: 85%"></div>
+                            <div class="w-1 bg-indigo-600 rounded-full" style="height: 100%"></div>
+                            <div class="w-1 bg-indigo-600 rounded-full" style="height: 90%"></div>
+                            <div class="w-1 bg-indigo-500 rounded-full" style="height: 75%"></div>
+                            <div class="w-1 bg-indigo-500 rounded-full" style="height: 55%"></div>
+                            <div class="w-1 bg-indigo-400 rounded-full" style="height: 30%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2">
+                    <i class="fas fa-arrow-right"></i>
+                    계속하기
+                </button>
+            </div>
+            
+            <!-- Fast Repeat (Right) -->
+            <div class="bg-gray-800 rounded-2xl p-6 text-white">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold">빠른 복습</h3>
+                </div>
+                
+                <div class="bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl p-6 mb-4">
+                    <h4 class="text-lg font-semibold mb-2">단어 복습</h4>
+                    <div class="flex items-center gap-2 text-sm">
+                        <i class="fas fa-clock"></i>
+                        <span>10분 연습</span>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-center">
+                        <div class="w-24 h-24 bg-orange-500 rounded-full flex items-center justify-center text-4xl animate-bounce">
+                            🤖
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2">
+                    <i class="fas fa-play"></i>
+                    연습 시작
+                </button>
+            </div>
+        </div>
+        
+        <!-- Daily Goals & Streak -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+            <!-- Daily Goals -->
+            <div class="bg-gray-800 rounded-2xl p-6">
+                <h3 class="text-white text-xl font-bold mb-4 flex items-center gap-2">
+                    <i class="fas fa-bullseye text-orange-500"></i>
+                    오늘의 목표
+                </h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-300 text-sm">대화 세션</span>
+                            <span class="text-white font-semibold">2 / 3</span>
+                        </div>
+                        <div class="bg-gray-700 rounded-full h-2">
+                            <div class="bg-green-500 rounded-full h-2" style="width: 66%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-300 text-sm">학습 시간</span>
+                            <span class="text-white font-semibold">18 / 30 분</span>
+                        </div>
+                        <div class="bg-gray-700 rounded-full h-2">
+                            <div class="bg-orange-500 rounded-full h-2" style="width: 60%"></div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-300 text-sm">새로운 단어</span>
+                            <span class="text-white font-semibold">8 / 10</span>
+                        </div>
+                        <div class="bg-gray-700 rounded-full h-2">
+                            <div class="bg-purple-500 rounded-full h-2" style="width: 80%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Streak -->
+            <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-6 text-white">
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <i class="fas fa-fire"></i>
+                    학습 연속 기록
+                </h3>
+                
+                <div class="text-center mb-4">
+                    <div class="text-6xl font-bold mb-2">12</div>
+                    <div class="text-sm text-white/80">일 연속 학습 중!</div>
+                </div>
+                
+                <div class="bg-white/20 rounded-xl p-4">
+                    <div class="flex justify-between items-center">
+                        <div class="text-center">
+                            <div class="text-2xl mb-1">🔥</div>
+                            <div class="text-xs">Mon</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl mb-1">🔥</div>
+                            <div class="text-xs">Tue</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl mb-1">🔥</div>
+                            <div class="text-xs">Wed</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl mb-1">🔥</div>
+                            <div class="text-xs">Thu</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl mb-1">🔥</div>
+                            <div class="text-xs">Fri</div>
+                        </div>
+                        <div class="text-center opacity-50">
+                            <div class="text-2xl mb-1">⭕</div>
+                            <div class="text-xs">Sat</div>
+                        </div>
+                        <div class="text-center opacity-50">
+                            <div class="text-2xl mb-1">⭕</div>
+                            <div class="text-xs">Sun</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Waveform animation removed - now using static bars
+    </script>
+
+</body>
+</html>
+  `);
+});
+
+// Prototype Courses page
+app.get('/prototype-courses', (c) => {
+  return c.redirect('/static/prototype-courses.html');
+});
+
+// Prototype Profile page  
+app.get('/prototype-profile', (c) => {
+  return c.redirect('/static/prototype-profile.html');
+});
 
 // Naver Webmaster verification file
 app.get('/naver2b8cc0248abdd5b43e205955b8ef7247.html', async (c) => {

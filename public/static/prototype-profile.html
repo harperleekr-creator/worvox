@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorVox - My Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .tab-btn {
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-6">
+    
+    <!-- Header -->
+    <header class="max-w-7xl mx-auto mb-8 flex items-center justify-between">
+        <div class="flex items-center gap-6">
+            <a href="/prototype-courses" class="px-4 py-2 rounded-lg text-gray-400 hover:text-white transition">Courses</a>
+            <a href="/prototype" class="px-4 py-2 rounded-lg text-gray-400 hover:text-white transition">Dashboard</a>
+            <a href="/prototype-profile" class="px-6 py-2 rounded-lg bg-purple-600 text-white font-semibold">My Profile</a>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">🇰🇷</span>
+                <span class="text-2xl">🇺🇸</span>
+            </div>
+            <div class="flex items-center gap-3 bg-gray-800 rounded-full px-4 py-2">
+                <span class="text-white font-medium">김재헌</span>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                    <span class="text-white font-bold">김</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- Profile Header -->
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl p-8 mb-8">
+            <div class="flex items-start gap-6">
+                <div class="w-24 h-24 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-4xl font-bold text-white">
+                    김
+                </div>
+                
+                <div class="flex-1">
+                    <div class="flex items-center gap-4 mb-2">
+                        <h1 class="text-3xl font-bold text-white">김재헌</h1>
+                        <span class="px-4 py-1 bg-orange-500 text-white rounded-full text-sm font-semibold">PRO</span>
+                        <span class="px-4 py-1 bg-purple-600 text-white rounded-full text-sm font-semibold">Level 12</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">jaejeon998795@gmail.com</p>
+                    
+                    <div class="grid grid-cols-4 gap-4">
+                        <div class="bg-gray-700 rounded-xl p-4">
+                            <div class="text-gray-400 text-sm mb-1">총 학습 시간</div>
+                            <div class="text-2xl font-bold text-white">170h</div>
+                        </div>
+                        <div class="bg-gray-700 rounded-xl p-4">
+                            <div class="text-gray-400 text-sm mb-1">대화 세션</div>
+                            <div class="text-2xl font-bold text-white">248</div>
+                        </div>
+                        <div class="bg-gray-700 rounded-xl p-4">
+                            <div class="text-gray-400 text-sm mb-1">학습 연속</div>
+                            <div class="text-2xl font-bold text-orange-500">12일 🔥</div>
+                        </div>
+                        <div class="bg-gray-700 rounded-xl p-4">
+                            <div class="text-gray-400 text-sm mb-1">획득 XP</div>
+                            <div class="text-2xl font-bold text-purple-400">3,240</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl transition">
+                    <i class="fas fa-edit mr-2"></i>
+                    프로필 수정
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex gap-4 mb-8">
+            <button onclick="showTab('info')" id="tab-info" class="tab-btn active px-6 py-3 bg-gray-800 text-gray-400 rounded-xl font-semibold">
+                <i class="fas fa-user mr-2"></i>
+                내 정보
+            </button>
+            <button onclick="showTab('history')" id="tab-history" class="tab-btn px-6 py-3 bg-gray-800 text-gray-400 rounded-xl font-semibold">
+                <i class="fas fa-history mr-2"></i>
+                학습 기록
+            </button>
+            <button onclick="showTab('rewards')" id="tab-rewards" class="tab-btn px-6 py-3 bg-gray-800 text-gray-400 rounded-xl font-semibold">
+                <i class="fas fa-gift mr-2"></i>
+                보상
+            </button>
+            <button onclick="showTab('achievements')" id="tab-achievements" class="tab-btn px-6 py-3 bg-gray-800 text-gray-400 rounded-xl font-semibold">
+                <i class="fas fa-trophy mr-2"></i>
+                업적
+            </button>
+        </div>
+
+        <!-- Tab Content: My Info -->
+        <div id="content-info" class="tab-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <!-- Account Info -->
+                <div class="bg-gray-800 rounded-2xl p-6">
+                    <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        <i class="fas fa-id-card text-purple-400"></i>
+                        계정 정보
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">이름</label>
+                            <input type="text" value="김재헌" class="w-full bg-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" readonly>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">이메일</label>
+                            <input type="email" value="jaejeon998795@gmail.com" class="w-full bg-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500" readonly>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">가입일</label>
+                            <input type="text" value="2024년 1월 15일" class="w-full bg-gray-700 text-white px-4 py-3 rounded-lg" readonly>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">계정 상태</label>
+                            <div class="flex items-center gap-2">
+                                <span class="px-4 py-2 bg-green-500 text-white rounded-lg font-semibold">활성</span>
+                                <span class="px-4 py-2 bg-orange-500 text-white rounded-lg font-semibold">PRO 멤버십</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Learning Settings -->
+                <div class="bg-gray-800 rounded-2xl p-6">
+                    <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        <i class="fas fa-cog text-purple-400"></i>
+                        학습 설정
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">일일 학습 목표</label>
+                            <select class="w-full bg-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                <option>30분</option>
+                                <option selected>1시간</option>
+                                <option>2시간</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">선호 학습 시간</label>
+                            <select class="w-full bg-gray-700 text-white px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                <option>아침 (06:00 - 09:00)</option>
+                                <option selected>저녁 (18:00 - 22:00)</option>
+                                <option>밤 (22:00 - 24:00)</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-400 text-sm mb-2">알림 설정</label>
+                            <div class="space-y-3">
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" checked class="w-5 h-5 rounded bg-gray-700 border-gray-600">
+                                    <span class="text-white">일일 목표 알림</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" checked class="w-5 h-5 rounded bg-gray-700 border-gray-600">
+                                    <span class="text-white">연속 학습 유지 알림</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="checkbox" class="w-5 h-5 rounded bg-gray-700 border-gray-600">
+                                    <span class="text-white">새로운 콘텐츠 알림</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Level Progress -->
+                <div class="bg-gradient-to-br from-purple-600 to-purple-700 rounded-2xl p-6 text-white">
+                    <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+                        <i class="fas fa-chart-line"></i>
+                        레벨 진행도
+                    </h2>
+                    
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm">Level 12</span>
+                            <span class="text-sm">Level 13</span>
+                        </div>
+                        <div class="bg-white/20 rounded-full h-4 mb-2">
+                            <div class="bg-white rounded-full h-4" style="width: 65%"></div>
+                        </div>
+                        <p class="text-sm text-white/80">3,240 / 5,000 XP (65%)</p>
+                    </div>
+                    
+                    <div class="bg-white/10 rounded-xl p-4">
+                        <p class="text-sm mb-2">다음 레벨까지</p>
+                        <p class="text-3xl font-bold">1,760 XP</p>
+                        <p class="text-sm text-white/80 mt-2">약 6일 남음 (일 평균 300 XP 기준)</p>
+                    </div>
+                </div>
+                
+                <!-- Subscription -->
+                <div class="bg-gray-800 rounded-2xl p-6">
+                    <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        <i class="fas fa-crown text-orange-400"></i>
+                        멤버십
+                    </h2>
+                    
+                    <div class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-6 mb-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-white mb-1">PRO 플랜</h3>
+                                <p class="text-white/80 text-sm">월 ₩19,000</p>
+                            </div>
+                            <div class="text-3xl">👑</div>
+                        </div>
+                        <div class="text-white text-sm">
+                            <p class="mb-2">다음 결제일: 2024년 2월 15일</p>
+                            <p>무제한 AI 대화 + 모든 기능 이용</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <button class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition">
+                            플랜 변경
+                        </button>
+                        <button class="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition">
+                            결제 내역
+                        </button>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- Tab Content: History -->
+        <div id="content-history" class="tab-content hidden">
+            
+            <!-- Stats Overview -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-gray-800 rounded-2xl p-6">
+                    <canvas id="weeklyChart" class="w-full" style="height: 200px;"></canvas>
+                </div>
+                <div class="bg-gray-800 rounded-2xl p-6">
+                    <h3 class="text-gray-400 text-sm mb-2">이번 주 학습</h3>
+                    <p class="text-4xl font-bold text-white mb-4">8.5h</p>
+                    <div class="flex items-center gap-2 text-green-500">
+                        <i class="fas fa-arrow-up"></i>
+                        <span class="text-sm">지난주 대비 +12%</span>
+                    </div>
+                </div>
+                <div class="bg-gray-800 rounded-2xl p-6">
+                    <h3 class="text-gray-400 text-sm mb-2">이번 달 학습</h3>
+                    <p class="text-4xl font-bold text-white mb-4">34.2h</p>
+                    <div class="flex items-center gap-2 text-green-500">
+                        <i class="fas fa-arrow-up"></i>
+                        <span class="text-sm">목표 대비 85% 달성</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Sessions -->
+            <div class="bg-gray-800 rounded-2xl p-6">
+                <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                    <i class="fas fa-clock text-purple-400"></i>
+                    최근 학습 기록
+                </h2>
+                
+                <div class="space-y-4">
+                    <!-- Session 1 -->
+                    <div class="bg-gray-700 rounded-xl p-4 flex items-center gap-4">
+                        <div class="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-comments text-white text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-white font-semibold mb-1">AI 자유 대화 - 비즈니스</h3>
+                            <p class="text-gray-400 text-sm">2024년 3월 26일 오전 10:30</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-white font-semibold">25분</div>
+                            <div class="text-green-500 text-sm">+50 XP</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Session 2 -->
+                    <div class="bg-gray-700 rounded-xl p-4 flex items-center gap-4">
+                        <div class="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-book text-white text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-white font-semibold mb-1">단어 학습 - 비즈니스 영어</h3>
+                            <p class="text-gray-400 text-sm">2024년 3월 25일 오후 8:15</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-white font-semibold">15분</div>
+                            <div class="text-green-500 text-sm">+30 XP</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Session 3 -->
+                    <div class="bg-gray-700 rounded-xl p-4 flex items-center gap-4">
+                        <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-microphone text-white text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-white font-semibold mb-1">발음 교정 - 문장 연습</h3>
+                            <p class="text-gray-400 text-sm">2024년 3월 25일 오후 7:45</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-white font-semibold">20분</div>
+                            <div class="text-green-500 text-sm">+40 XP</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Session 4 -->
+                    <div class="bg-gray-700 rounded-xl p-4 flex items-center gap-4">
+                        <div class="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-comments text-white text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-white font-semibold mb-1">AI 자유 대화 - 여행</h3>
+                            <p class="text-gray-400 text-sm">2024년 3월 24일 오후 9:00</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-white font-semibold">30분</div>
+                            <div class="text-green-500 text-sm">+60 XP</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Session 5 -->
+                    <div class="bg-gray-700 rounded-xl p-4 flex items-center gap-4">
+                        <div class="w-12 h-12 bg-yellow-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-headphones text-white text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-white font-semibold mb-1">리스닝 연습 - 뉴스</h3>
+                            <p class="text-gray-400 text-sm">2024년 3월 24일 오전 11:20</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-white font-semibold">18분</div>
+                            <div class="text-green-500 text-sm">+35 XP</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="w-full mt-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition">
+                    더 보기
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab Content: Rewards -->
+        <div id="content-rewards" class="tab-content hidden">
+            
+            <!-- Available Boxes -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                    <i class="fas fa-gift text-purple-400"></i>
+                    사용 가능한 랜덤박스
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Bronze Box -->
+                    <div class="bg-gradient-to-br from-orange-700 to-orange-900 rounded-2xl p-6 text-white relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-5 rounded-full -mr-16 -mt-16"></div>
+                        <div class="relative z-10">
+                            <div class="text-6xl mb-4 text-center">📦</div>
+                            <h3 class="text-xl font-bold text-center mb-2">브론즈 박스</h3>
+                            <p class="text-white/80 text-sm text-center mb-4">보유: 3개</p>
+                            
+                            <div class="bg-white/10 rounded-xl p-3 mb-4">
+                                <div class="text-xs text-white/80 mb-2">획득 가능 보상</div>
+                                <div class="space-y-1 text-sm">
+                                    <div>• 50-100 XP</div>
+                                    <div>• 학습 시간 +10분</div>
+                                    <div>• 스트릭 보호권</div>
+                                </div>
+                            </div>
+                            
+                            <button onclick="openBox('bronze')" class="w-full bg-white hover:bg-gray-100 text-orange-900 font-semibold py-3 rounded-xl transition">
+                                박스 열기
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Silver Box -->
+                    <div class="bg-gradient-to-br from-gray-400 to-gray-600 rounded-2xl p-6 text-white relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
+                        <div class="relative z-10">
+                            <div class="text-6xl mb-4 text-center">🎁</div>
+                            <h3 class="text-xl font-bold text-center mb-2">실버 박스</h3>
+                            <p class="text-white/80 text-sm text-center mb-4">보유: 1개</p>
+                            
+                            <div class="bg-white/10 rounded-xl p-3 mb-4">
+                                <div class="text-xs text-white/80 mb-2">획득 가능 보상</div>
+                                <div class="space-y-1 text-sm">
+                                    <div>• 150-300 XP</div>
+                                    <div>• 학습 시간 +30분</div>
+                                    <div>• XP 부스트 (2배, 1시간)</div>
+                                </div>
+                            </div>
+                            
+                            <button onclick="openBox('silver')" class="w-full bg-white hover:bg-gray-100 text-gray-900 font-semibold py-3 rounded-xl transition">
+                                박스 열기
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Gold Box -->
+                    <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl p-6 text-white relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
+                        <div class="relative z-10">
+                            <div class="text-6xl mb-4 text-center animate-bounce">💎</div>
+                            <h3 class="text-xl font-bold text-center mb-2">골드 박스</h3>
+                            <p class="text-white/80 text-sm text-center mb-4">보유: 0개</p>
+                            
+                            <div class="bg-white/10 rounded-xl p-3 mb-4">
+                                <div class="text-xs text-white/80 mb-2">획득 가능 보상</div>
+                                <div class="space-y-1 text-sm">
+                                    <div>• 500-1000 XP</div>
+                                    <div>• 레벨업 즉시 달성</div>
+                                    <div>• XP 부스트 (3배, 3시간)</div>
+                                </div>
+                            </div>
+                            
+                            <button disabled class="w-full bg-gray-400 text-gray-600 font-semibold py-3 rounded-xl cursor-not-allowed">
+                                박스 없음
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- How to Get Boxes -->
+            <div class="bg-gray-800 rounded-2xl p-6 mb-8">
+                <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-question-circle text-purple-400"></i>
+                    랜덤박스를 얻는 방법
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-gray-700 rounded-xl p-4">
+                        <div class="text-3xl mb-2">🎯</div>
+                        <h4 class="text-white font-semibold mb-2">일일 목표 달성</h4>
+                        <p class="text-gray-400 text-sm">하루 목표를 100% 달성하면 브론즈 박스 획득</p>
+                    </div>
+                    
+                    <div class="bg-gray-700 rounded-xl p-4">
+                        <div class="text-3xl mb-2">🔥</div>
+                        <h4 class="text-white font-semibold mb-2">연속 학습</h4>
+                        <p class="text-gray-400 text-sm">7일 연속 학습 시 실버 박스 획득</p>
+                    </div>
+                    
+                    <div class="bg-gray-700 rounded-xl p-4">
+                        <div class="text-3xl mb-2">🏆</div>
+                        <h4 class="text-white font-semibold mb-2">업적 달성</h4>
+                        <p class="text-gray-400 text-sm">특별 업적 달성 시 골드 박스 획득</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reward History -->
+            <div class="bg-gray-800 rounded-2xl p-6">
+                <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                    <i class="fas fa-history text-purple-400"></i>
+                    최근 보상 내역
+                </h3>
+                
+                <div class="space-y-3">
+                    <div class="bg-gray-700 rounded-xl p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="text-3xl">🎁</div>
+                            <div>
+                                <div class="text-white font-semibold">실버 박스</div>
+                                <div class="text-gray-400 text-sm">2024.03.25</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-green-500 font-semibold">+250 XP</div>
+                            <div class="text-gray-400 text-sm">획득 완료</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-700 rounded-xl p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="text-3xl">📦</div>
+                            <div>
+                                <div class="text-white font-semibold">브론즈 박스</div>
+                                <div class="text-gray-400 text-sm">2024.03.24</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-green-500 font-semibold">+75 XP</div>
+                            <div class="text-gray-400 text-sm">획득 완료</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-700 rounded-xl p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="text-3xl">📦</div>
+                            <div>
+                                <div class="text-white font-semibold">브론즈 박스</div>
+                                <div class="text-gray-400 text-sm">2024.03.23</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-purple-500 font-semibold">스트릭 보호권</div>
+                            <div class="text-gray-400 text-sm">획득 완료</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-700 rounded-xl p-4 flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="text-3xl">💎</div>
+                            <div>
+                                <div class="text-white font-semibold">골드 박스</div>
+                                <div class="text-gray-400 text-sm">2024.03.15</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-yellow-500 font-semibold">+800 XP</div>
+                            <div class="text-gray-400 text-sm">획득 완료</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- Tab Content: Achievements -->
+        <div id="content-achievements" class="tab-content hidden">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Achievement 1 -->
+                <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-2xl p-6 text-white">
+                    <div class="text-5xl mb-4">🏆</div>
+                    <h3 class="text-xl font-bold mb-2">첫 걸음</h3>
+                    <p class="text-white/80 text-sm mb-4">첫 AI 대화 완료</p>
+                    <div class="text-sm">획득일: 2024.01.15</div>
+                </div>
+                
+                <!-- Achievement 2 -->
+                <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl p-6 text-white">
+                    <div class="text-5xl mb-4">🔥</div>
+                    <h3 class="text-xl font-bold mb-2">불타는 열정</h3>
+                    <p class="text-white/80 text-sm mb-4">7일 연속 학습</p>
+                    <div class="text-sm">획득일: 2024.01.22</div>
+                </div>
+                
+                <!-- Achievement 3 -->
+                <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white">
+                    <div class="text-5xl mb-4">📚</div>
+                    <h3 class="text-xl font-bold mb-2">단어 수집가</h3>
+                    <p class="text-white/80 text-sm mb-4">1,000개 단어 학습</p>
+                    <div class="text-sm">획득일: 2024.02.10</div>
+                </div>
+                
+                <!-- Achievement 4 -->
+                <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white">
+                    <div class="text-5xl mb-4">💬</div>
+                    <h3 class="text-xl font-bold mb-2">대화의 달인</h3>
+                    <p class="text-white/80 text-sm mb-4">100번 대화 완료</p>
+                    <div class="text-sm">획득일: 2024.02.28</div>
+                </div>
+                
+                <!-- Achievement 5 -->
+                <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white">
+                    <div class="text-5xl mb-4">🎯</div>
+                    <h3 class="text-xl font-bold mb-2">목표 달성자</h3>
+                    <p class="text-white/80 text-sm mb-4">월간 목표 100% 달성</p>
+                    <div class="text-sm">획득일: 2024.03.01</div>
+                </div>
+                
+                <!-- Achievement 6 (Locked) -->
+                <div class="bg-gray-800 rounded-2xl p-6 text-gray-500 opacity-60">
+                    <div class="text-5xl mb-4">🔒</div>
+                    <h3 class="text-xl font-bold mb-2">마라톤 러너</h3>
+                    <p class="text-gray-400 text-sm mb-4">30일 연속 학습</p>
+                    <div class="text-sm">진행 중: 12/30일</div>
+                </div>
+                
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Tab switching
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+            
+            // Add active class to selected tab
+            document.getElementById('tab-' + tabName).classList.add('active');
+            
+            // Initialize chart if history tab is selected
+            if (tabName === 'history') {
+                initWeeklyChart();
+            }
+        }
+        
+        // Open random box
+        function openBox(type) {
+            const rewards = {
+                bronze: [
+                    { type: 'XP', value: Math.floor(Math.random() * 51) + 50, icon: '✨' },
+                    { type: '학습 시간', value: '+10분', icon: '⏱️' },
+                    { type: '스트릭 보호권', value: '1개', icon: '🛡️' }
+                ],
+                silver: [
+                    { type: 'XP', value: Math.floor(Math.random() * 151) + 150, icon: '✨' },
+                    { type: '학습 시간', value: '+30분', icon: '⏱️' },
+                    { type: 'XP 부스트', value: '2배 (1시간)', icon: '🚀' }
+                ],
+                gold: [
+                    { type: 'XP', value: Math.floor(Math.random() * 501) + 500, icon: '✨' },
+                    { type: '레벨업', value: '즉시 달성', icon: '⬆️' },
+                    { type: 'XP 부스트', value: '3배 (3시간)', icon: '🚀' }
+                ]
+            };
+            
+            const reward = rewards[type][Math.floor(Math.random() * rewards[type].length)];
+            
+            const boxNames = {
+                bronze: '브론즈 박스',
+                silver: '실버 박스',
+                gold: '골드 박스'
+            };
+            
+            alert(`🎉 ${boxNames[type]} 오픈!\n\n${reward.icon} ${reward.type}: ${reward.value}\n\n축하합니다!`);
+        }
+        
+        // Weekly chart
+        function initWeeklyChart() {
+            const canvas = document.getElementById('weeklyChart');
+            if (canvas && !canvas.chart) {
+                const ctx = canvas.getContext('2d');
+                canvas.chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: '학습 시간 (분)',
+                            data: [45, 60, 30, 75, 50, 20, 25],
+                            backgroundColor: '#8b5cf6',
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#374151'
+                                },
+                                ticks: {
+                                    color: '#9ca3af'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    color: '#9ca3af'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+    </script>
+
+</body>
+</html>

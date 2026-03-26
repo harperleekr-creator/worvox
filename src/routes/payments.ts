@@ -321,7 +321,7 @@ payments.post('/trial/confirm', async (c) => {
 
     // Log trial activation
     await c.env.DB.prepare(`
-      INSERT INTO activity_logs (user_id, activity_type, description, created_at)
+      INSERT INTO activity_logs (user_id, activity_type, details, created_at)
       VALUES (?, 'trial_start', ?, datetime('now'))
     `).bind(
       userId,
@@ -374,7 +374,7 @@ payments.post('/trial/cancel', async (c) => {
 
     // Log cancellation
     await c.env.DB.prepare(`
-      INSERT INTO activity_logs (user_id, activity_type, description, created_at)
+      INSERT INTO activity_logs (user_id, activity_type, details, created_at)
       VALUES (?, 'trial_cancel', ?, datetime('now'))
     `).bind(
       userId,
@@ -495,7 +495,7 @@ payments.post('/billing/execute', async (c) => {
 
           // Log success
           await c.env.DB.prepare(`
-            INSERT INTO activity_logs (user_id, activity_type, description, created_at)
+            INSERT INTO activity_logs (user_id, activity_type, details, created_at)
             VALUES (?, 'auto_billing_success', ?, datetime('now'))
           `).bind(
             user.id,
@@ -517,7 +517,7 @@ payments.post('/billing/execute', async (c) => {
 
           // Log failure
           await c.env.DB.prepare(`
-            INSERT INTO activity_logs (user_id, activity_type, description, created_at)
+            INSERT INTO activity_logs (user_id, activity_type, details, created_at)
             VALUES (?, 'auto_billing_failed', ?, datetime('now'))
           `).bind(
             user.id,
