@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1774494395858'; // Update manually or via build script
+const BUILD_TIME = '1774495590076'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -583,22 +583,22 @@ app.get('/landing', (c) => {
         </nav>
 
         <!-- Hero Section -->
-        <section class="pt-24 sm:pt-28 md:pt-32 pb-16 px-4">
+        <section class="pt-8 sm:pt-12 md:pt-16 pb-12 px-4">
             <div class="max-w-4xl mx-auto text-center">
                 <!-- Quick Identity Badge -->
-                <div class="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-semibold mb-6 animate-pulse">
+                <div class="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-semibold mb-4 animate-pulse">
                     <span class="text-lg">🎯</span>
                     <span>${isKorean ? '영어 말하기가 두려운 당신을 위한' : 'For Those Who Fear Speaking English'}</span>
                 </div>
                 
-                <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+                <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 leading-tight">
                     <span class="bg-gradient-to-r from-purple-600 to-blue-600 text-transparent bg-clip-text">
                         ${isKorean ? 'AI 영어 스피킹 플랫폼' : 'AI English Speaking Platform'}
                     </span>
                     <br/>
                     <span class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl">${isKorean ? '실시간 발음 교정 & 맞춤형 회화 연습' : 'Real-time Pronunciation & Personalized Practice'}</span>
                 </h1>
-                <p class="text-base sm:text-lg md:text-xl text-gray-600 mb-8 leading-relaxed px-2">
+                <p class="text-base sm:text-lg md:text-xl text-gray-600 mb-6 leading-relaxed px-2">
                     ${isKorean 
                       ? 'GPT-4 기반 AI로 <strong>영어 회화 실력 3배 향상</strong>!<br class="hidden sm:block"/><span class="block sm:inline">실시간 발음 분석, 30가지 실전 시나리오,</span><span class="block sm:inline">OPIC 준비까지 - 월 1.9만원</span>'
                       : 'Improve your <strong>English conversation skills 3x faster</strong> with GPT-4 AI!<br class="hidden sm:block"/><span class="block sm:inline">Real-time pronunciation analysis, 30 practical scenarios,</span><span class="block sm:inline">OPIC prep - $15/month</span>'
