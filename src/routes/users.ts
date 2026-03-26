@@ -761,13 +761,25 @@ users.post('/sync', async (c) => {
     if (existingUser) {
       console.log('✅ User already exists in DB:', existingUser);
       
-      // Update plan and AI prompts if changed
-      if (existingUser.plan !== plan || existingUser.use_ai_prompts !== use_ai_prompts) {
-        await c.env.DB.prepare(
-          'UPDATE users SET plan = ?, use_ai_prompts = ?, level = ? WHERE email = ?'
-        ).bind(plan || 'free', use_ai_prompts ? 1 : 0, level || 'beginner', email).run();
-        
-        console.log('✅ User plan/settings updated in DB');
+      // IMPORTANT: Don't overwrite paid plans (premium, core, etc.) with 'free'
+      // Only update plan if:
+      // 1. The new plan is NOT 'free' (explicit upgrade)
+      // 2. OR the existing plan is already 'free' (safe to update)
+      const shouldUpdatePlan = plan && plan !== 'free' && existingUser.plan !== plan;
+      const shouldUpdateSettings = existingUser.use_ai_prompts !== use_ai_prompts;
+      
+      if (shouldUpdatePlan || shouldUpdateSettings) {
+        if (shouldUpdatePlan) {
+          await c.env.DB.prepare(
+            'UPDATE users SET plan = ?, use_ai_prompts = ?, level = ? WHERE email = ?'
+          ).bind(plan, use_ai_prompts ? 1 : 0, level || 'beginner', email).run();
+          console.log(`✅ User plan updated: ${existingUser.plan} → ${plan}`);
+        } else {
+          await c.env.DB.prepare(
+            'UPDATE users SET use_ai_prompts = ?, level = ? WHERE email = ?'
+          ).bind(use_ai_prompts ? 1 : 0, level || 'beginner', email).run();
+          console.log('✅ User settings updated (plan unchanged)');
+        }
       }
       
       return c.json({ 
