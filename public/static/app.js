@@ -7216,28 +7216,28 @@ Proceed to payment?
       <div class="space-y-6">
         <div class="text-center">
           <div class="text-5xl mb-4">📚</div>
-          <h2 class="text-2xl font-bold text-white mb-2">English Level</h2>
-          <p class="text-indigo-100">What's your current level?</p>
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">English Level</h2>
+          <p class="text-gray-600">What's your current level?</p>
         </div>
         
         <div class="space-y-3">
           ${levels.map(level => `
             <button onclick="worvox.selectOption('level', '${level.value}')" 
-              class="w-full p-4 border-2 rounded-xl transition-all text-left ${this.onboardingData.level === level.value ? 'border-white bg-white/20' : 'border-white/30 hover:border-white hover:bg-white/10'}">
+              class="w-full p-4 border-2 rounded-xl transition-all text-left ${this.onboardingData.level === level.value ? 'border-indigo-600 bg-indigo-50' : 'border-gray-300 hover:border-indigo-400 hover:bg-indigo-50'}">
               <div class="flex items-center">
                 <span class="text-3xl mr-4">${level.icon}</span>
                 <div class="flex-1">
-                  <div class="font-semibold text-white">${level.label}</div>
-                  <div class="text-sm text-indigo-100">${level.desc}</div>
+                  <div class="font-semibold text-gray-900">${level.label}</div>
+                  <div class="text-sm text-gray-600">${level.desc}</div>
                 </div>
-                ${this.onboardingData.level === level.value ? '<span class="text-white">✓</span>' : ''}
+                ${this.onboardingData.level === level.value ? '<span class="text-indigo-600">✓</span>' : ''}
               </div>
             </button>
           `).join('')}
         </div>
 
         <button onclick="worvox.prevStep()" 
-          class="w-full border-2 border-white/30 text-white py-3 rounded-lg font-semibold hover:bg-white/10 transition-all">
+          class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-all">
           Back
         </button>
       </div>
@@ -7256,28 +7256,28 @@ Proceed to payment?
       <div class="space-y-6">
         <div class="text-center">
           <div class="text-5xl mb-4">💼</div>
-          <h2 class="text-2xl font-bold text-white mb-2">Occupation</h2>
-          <p class="text-indigo-100">What do you do?</p>
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">Occupation</h2>
+          <p class="text-gray-600">What do you do?</p>
         </div>
         
         <div class="space-y-3 max-h-96 overflow-y-auto">
           ${occupations.map(occ => `
             <button onclick="worvox.selectOption('occupation', '${occ.value}')" 
-              class="w-full p-4 border-2 rounded-xl transition-all text-left ${this.onboardingData.occupation === occ.value ? 'border-white bg-white/20' : 'border-white/30 hover:border-white hover:bg-white/10'}">
+              class="w-full p-4 border-2 rounded-xl transition-all text-left ${this.onboardingData.occupation === occ.value ? 'border-indigo-600 bg-indigo-50' : 'border-gray-300 hover:border-indigo-400 hover:bg-indigo-50'}">
               <div class="flex items-center">
                 <span class="text-3xl mr-4">${occ.icon}</span>
                 <div class="flex-1">
-                  <div class="font-semibold text-white">${occ.label}</div>
-                  <div class="text-sm text-indigo-100">${occ.desc}</div>
+                  <div class="font-semibold text-gray-900">${occ.label}</div>
+                  <div class="text-sm text-gray-600">${occ.desc}</div>
                 </div>
-                ${this.onboardingData.occupation === occ.value ? '<span class="text-white">✓</span>' : ''}
+                ${this.onboardingData.occupation === occ.value ? '<span class="text-indigo-600">✓</span>' : ''}
               </div>
             </button>
           `).join('')}
         </div>
 
         <button onclick="worvox.prevStep()" 
-          class="w-full border-2 border-white/30 text-white py-3 rounded-lg font-semibold hover:bg-white/10 transition-all">
+          class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-all">
           Back
         </button>
       </div>
