@@ -6867,7 +6867,7 @@ Proceed to payment?
         <div class="text-center">
           <p class="text-sm text-gray-600">
             계정이 없으신가요? 
-            <button onclick="worvox.nextStep()" class="text-indigo-600 hover:text-indigo-700 font-semibold">회원가입</button>
+            <button onclick="worvox.showSignupForm()" class="text-indigo-600 hover:text-indigo-700 font-semibold">회원가입</button>
           </p>
         </div>
         
