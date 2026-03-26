@@ -16499,7 +16499,7 @@ Proceed to payment?
               </div>
 
               <!-- Charts Row - Compact Size -->
-              <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+              <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
                 <div class="bg-white rounded-lg shadow p-3">
                   <h3 class="text-sm font-semibold mb-2">플랜 분포</h3>
                   <div class="h-32">
@@ -16507,9 +16507,21 @@ Proceed to payment?
                   </div>
                 </div>
                 <div class="bg-white rounded-lg shadow p-3">
-                  <h3 class="text-sm font-semibold mb-2">최근 결제</h3>
+                  <h3 class="text-sm font-semibold mb-2 flex items-center justify-between">
+                    <span>최근 결제</span>
+                    <span id="payment-count" class="text-xs text-gray-500">0건</span>
+                  </h3>
                   <div id="recent-payments" class="space-y-1 h-32 overflow-y-auto text-xs">
                     <!-- Payments will be loaded here -->
+                  </div>
+                </div>
+                <div class="bg-white rounded-lg shadow p-3">
+                  <h3 class="text-sm font-semibold mb-2 flex items-center justify-between">
+                    <span>🎁 무료 체험</span>
+                    <span id="trial-count" class="text-xs text-blue-600 font-bold">0명</span>
+                  </h3>
+                  <div id="active-trials" class="space-y-1 h-32 overflow-y-auto text-xs">
+                    <!-- Trials will be loaded here -->
                   </div>
                 </div>
               </div>
@@ -16579,6 +16591,12 @@ Proceed to payment?
 
         // Draw plan distribution chart
         this.drawPlanChart(stats.planDistribution || []);
+        
+        // Display recent payments
+        this.displayRecentPayments(stats.recentPayments || []);
+        
+        // Display active trials
+        this.displayActiveTrials(stats.activeTrials || [], stats.trialCount || 0);
       }
 
       // Load users
@@ -16658,25 +16676,68 @@ Proceed to payment?
 
   displayRecentPayments(payments) {
     const container = document.getElementById('recent-payments');
+    const countEl = document.getElementById('payment-count');
     if (!container) return;
 
     if (payments.length === 0) {
       container.innerHTML = '<p class="text-gray-400 text-center py-2 text-xs">결제 내역이 없습니다.</p>';
+      if (countEl) countEl.textContent = '0건';
       return;
     }
 
-    container.innerHTML = payments.slice(0, 5).map(payment => `
+    if (countEl) countEl.textContent = `${payments.length}건`;
+
+    container.innerHTML = payments.slice(0, 5).map(payment => {
+      const statusColor = payment.status === 'completed' ? 'text-green-600' : 'text-yellow-600';
+      const statusText = payment.status === 'completed' ? '완료' : '대기';
+      const date = payment.created_at || payment.confirmed_at;
+      
+      return `
       <div class="flex items-center justify-between py-1.5 border-b border-gray-100 last:border-0">
         <div class="flex-1 min-w-0">
           <p class="font-medium text-xs truncate">${payment.username || payment.email}</p>
-          <p class="text-xs text-gray-400">${payment.plan_name}</p>
+          <p class="text-xs text-gray-400">${payment.plan_name} <span class="${statusColor}">(${statusText})</span></p>
         </div>
         <div class="text-right ml-2">
           <p class="font-semibold text-xs">₩${payment.amount.toLocaleString()}</p>
-          <p class="text-xs text-gray-400">${new Date(payment.confirmed_at).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}</p>
+          <p class="text-xs text-gray-400">${date ? new Date(date).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' }) : '-'}</p>
         </div>
       </div>
-    `).join('');
+      `;
+    }).join('');
+  }
+
+  displayActiveTrials(trials, trialCount) {
+    const container = document.getElementById('active-trials');
+    const countEl = document.getElementById('trial-count');
+    if (!container) return;
+
+    if (countEl) countEl.textContent = `${trialCount}명`;
+
+    if (trials.length === 0) {
+      container.innerHTML = '<p class="text-gray-400 text-center py-2 text-xs">무료 체험 사용자가 없습니다.</p>';
+      return;
+    }
+
+    container.innerHTML = trials.slice(0, 5).map(trial => {
+      const endDate = new Date(trial.trial_end_date);
+      const daysLeft = Math.ceil((endDate - new Date()) / (1000 * 60 * 60 * 24));
+      const planName = trial.plan === 'premium' ? 'Premium' : 'Core';
+      const billingPeriod = trial.billing_period === 'yearly' ? '연간' : '월간';
+      
+      return `
+      <div class="flex items-center justify-between py-1.5 border-b border-gray-100 last:border-0">
+        <div class="flex-1 min-w-0">
+          <p class="font-medium text-xs truncate">${trial.username || trial.email}</p>
+          <p class="text-xs text-gray-400">${planName} (${billingPeriod})</p>
+        </div>
+        <div class="text-right ml-2">
+          <p class="font-semibold text-xs ${daysLeft <= 3 ? 'text-red-600' : 'text-blue-600'}">${daysLeft}일 남음</p>
+          <p class="text-xs text-gray-400">${endDate.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}</p>
+        </div>
+      </div>
+      `;
+    }).join('');
   }
 
   displayUsers(users) {
