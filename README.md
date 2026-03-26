@@ -1,6 +1,44 @@
 # WorVox - AI English Learning Platform
 
-## 🔔 최신 업데이트 (2026-03-23 07:38 UTC) - ✅ 토스페이먼츠 라이브 API 전환 완료
+## 🔔 최신 업데이트 (2026-03-26 07:41 UTC) - ✅ CRITICAL FIX: app.min.js 업데이트 완료
+
+### 🚨 Critical Bug Fix - Commit `91f3c1d` ✅
+
+**배포 정보**
+- **Production**: https://worvox.com ✅ 
+- **Preview**: https://8828dcde.worvox.pages.dev ✅
+- **GitHub Commit**: https://github.com/harperleekr-creator/worvox/commit/91f3c1d
+- **Build Time**: `1774510896546` (2026-03-26T07:41:36.546Z)
+
+#### 🐛 Critical Issue Fixed
+**문제**: `src/index.tsx`에서 `app.min.js`를 로드하는데, 실제 코드는 `app.js`에만 업데이트됨
+- ❌ `app.js`에는 최신 코드 (TossPayments v2, 회원가입, 무료 체험)
+- ❌ `app.min.js`에는 구버전 코드 (TossPayments v1, 버그)
+- ❌ 결과: 배포해도 실제로는 구버전 실행
+
+**해결책**: `app.js` → `app.min.js` 복사 후 재배포
+- ✅ `public/static/app.min.js` 최신 코드로 업데이트
+- ✅ TossPayments v2 SDK (`loadTossPayments`) 적용
+- ✅ 회원가입 기능 (`handleEmailSignup`) 포함
+- ✅ 무료 체험 섹션 ("🎁 무료 체험") 포함
+- ✅ 빌링키 결제 방식 (카드 등록 → 즉시 결제 → 자동 반복결제)
+
+#### ✅ 검증 완료
+```bash
+# Production 배포 검증
+curl "https://8828dcde.worvox.pages.dev/static/app.min.js" | grep -c "loadTossPayments"
+# 결과: 3 ✅
+
+curl "https://8828dcde.worvox.pages.dev/static/app.min.js" | grep -c "handleEmailSignup"
+# 결과: 2 ✅
+
+curl "https://8828dcde.worvox.pages.dev/static/app.min.js" | grep -c "🎁 무료 체험"
+# 결과: 1 ✅
+```
+
+---
+
+## 🔔 이전 업데이트 (2026-03-23 07:38 UTC) - ✅ 토스페이먼츠 라이브 API 전환 완료
 
 ### 💳 Toss Payments Live API Migration - Commit `af20bb7` ✅
 
