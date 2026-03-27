@@ -6188,6 +6188,49 @@ class WorVox {
       // Step 2: Initialize Toss Payments Billing (v2 SDK)
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
       
+      // Helper function to dynamically load SDK if not present
+      const ensureSDKLoaded = () => {
+        return new Promise((resolve, reject) => {
+          if (typeof loadTossPayments !== 'undefined') {
+            resolve();
+            return;
+          }
+          
+          // Check if script tag already exists
+          if (document.querySelector('script[src*="tosspayments.com/v2/standard"]')) {
+            reject(new Error('SDK script exists but loadTossPayments not available. Check browser console.'));
+            return;
+          }
+          
+          // Dynamically add script
+          console.log('📦 Dynamically loading TossPayments SDK...');
+          const script = document.createElement('script');
+          script.src = 'https://js.tosspayments.com/v2/standard';
+          script.onload = () => {
+            console.log('✅ SDK script loaded');
+            // Wait a bit for SDK to initialize
+            setTimeout(() => {
+              if (typeof loadTossPayments !== 'undefined') {
+                resolve();
+              } else {
+                reject(new Error('SDK loaded but loadTossPayments still undefined'));
+              }
+            }, 500);
+          };
+          script.onerror = () => {
+            reject(new Error('Failed to load SDK script. Check network connection.'));
+          };
+          document.head.appendChild(script);
+        });
+      };
+      
+      // Try to ensure SDK is loaded
+      try {
+        await ensureSDKLoaded();
+      } catch (ensureError) {
+        console.error('SDK ensure error:', ensureError);
+      }
+      
       // Wait for TossPayments SDK to load (with longer timeout)
       let tossPayments;
       let retries = 0;
@@ -16345,6 +16388,49 @@ Proceed to payment?
 
       // Step 2: Initialize Toss Payments Billing (v2 SDK)
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
+      
+      // Helper function to dynamically load SDK if not present
+      const ensureSDKLoaded = () => {
+        return new Promise((resolve, reject) => {
+          if (typeof loadTossPayments !== 'undefined') {
+            resolve();
+            return;
+          }
+          
+          // Check if script tag already exists
+          if (document.querySelector('script[src*="tosspayments.com/v2/standard"]')) {
+            reject(new Error('SDK script exists but loadTossPayments not available. Check browser console.'));
+            return;
+          }
+          
+          // Dynamically add script
+          console.log('📦 Dynamically loading TossPayments SDK...');
+          const script = document.createElement('script');
+          script.src = 'https://js.tosspayments.com/v2/standard';
+          script.onload = () => {
+            console.log('✅ SDK script loaded');
+            // Wait a bit for SDK to initialize
+            setTimeout(() => {
+              if (typeof loadTossPayments !== 'undefined') {
+                resolve();
+              } else {
+                reject(new Error('SDK loaded but loadTossPayments still undefined'));
+              }
+            }, 500);
+          };
+          script.onerror = () => {
+            reject(new Error('Failed to load SDK script. Check network connection.'));
+          };
+          document.head.appendChild(script);
+        });
+      };
+      
+      // Try to ensure SDK is loaded
+      try {
+        await ensureSDKLoaded();
+      } catch (ensureError) {
+        console.error('SDK ensure error:', ensureError);
+      }
       
       // Wait for TossPayments SDK to load (with longer timeout)
       let tossPayments;
