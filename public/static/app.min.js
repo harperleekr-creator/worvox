@@ -6195,24 +6195,28 @@ class WorVox {
       const { customerKey } = startResponse.data;
       console.log(`📝 Live Speaking Customer key: ${customerKey}`);
 
-      // Step 2: Initialize TossPayments v2 SDK
+      // Step 2: Load and initialize TossPayments v2 SDK
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
       
-      // Wait for TossPayments SDK to load (v2 uses window.TossPayments directly)
-      let tossPayments;
-      if (typeof window.TossPayments !== 'undefined') {
-        tossPayments = window.TossPayments(clientKey);
-        console.log('✅ TossPayments v2 SDK initialized successfully');
-      } else {
-        console.error('❌ TossPayments v2 SDK not loaded');
+      // v2 SDK uses loadTossPayments (async function from SDK)
+      if (typeof loadTossPayments === 'undefined') {
+        console.error('❌ TossPayments v2 SDK (loadTossPayments) not loaded');
         throw new Error('TossPayments SDK가 로드되지 않았습니다. 페이지를 새로고침해주세요.');
       }
 
-      // Step 3: Request billing authorization (카드 등록)
-      console.log('🔑 Requesting billing authorization with customerKey:', customerKey);
-      await tossPayments.requestBillingAuth({
-        method: 'CARD',
+      console.log('🔄 Loading TossPayments v2 SDK...');
+      const tossPayments = await loadTossPayments(clientKey);
+      console.log('✅ TossPayments v2 SDK initialized successfully');
+
+      // Step 3: Get payment object and request billing authorization
+      const payment = tossPayments.payment({
         customerKey: customerKey,
+      });
+      console.log('✅ Payment object created with customerKey:', customerKey);
+
+      console.log('🔑 Requesting billing authorization...');
+      await payment.requestBillingAuth({
+        method: 'CARD',
         successUrl: window.location.origin + `/hiing-subscribe-success?userId=${this.currentUser.id}&customerKey=${customerKey}&lessonCount=${lessonCount}&amount=${finalAmount}&packageType=${packageType}`,
         failUrl: window.location.origin + '/hiing-subscribe-fail',
         customerEmail: this.currentUser.email,
