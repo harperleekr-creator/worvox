@@ -6063,8 +6063,13 @@ class WorVox {
       // Load user's completed sessions
       const sessionsResponse = await axios.get(`/api/hiing/sessions/${this.currentUser.id}`);
       if (sessionsResponse.data.success) {
-        const completed = sessionsResponse.data.sessions.filter(s => s.status === 'completed').length;
-        document.getElementById('completedLessons').textContent = completed;
+        // Count completed sessions: 25min = 1, 50min = 2
+        const completedCount = sessionsResponse.data.sessions
+          .filter(s => s.status === 'completed')
+          .reduce((total, session) => {
+            return total + (session.duration === 50 ? 2 : 1);
+          }, 0);
+        document.getElementById('completedLessons').textContent = completedCount;
       }
     } catch (error) {
       console.error('Load Live Speaking credits error:', error);
@@ -12985,8 +12990,8 @@ Proceed to payment?
                         </span>
                       </button>
                       
-                      <!-- Regular Purchase Button -->
-                      <button onclick="worvox.selectPlan('Core')" 
+                      <!-- Regular Purchase Button (Direct Subscription) -->
+                      <button onclick="worvox.directSubscribe('core')" 
                         class="w-full py-2.5 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-all text-sm hover:border-blue-700">
                         바로 구매하기
                       </button>
@@ -13055,8 +13060,8 @@ Proceed to payment?
                         </span>
                       </button>
                       
-                      <!-- Regular Purchase Button -->
-                      <button onclick="worvox.selectPlan('Premium')" 
+                      <!-- Regular Purchase Button (Direct Subscription) -->
+                      <button onclick="worvox.directSubscribe('premium')" 
                         class="w-full py-2.5 bg-white text-purple-600 border-2 border-purple-600 rounded-lg font-semibold hover:bg-purple-50 transition-all text-sm hover:border-purple-700">
                         바로 구매하기
                       </button>
