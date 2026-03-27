@@ -6195,16 +6195,36 @@ class WorVox {
       const { customerKey } = startResponse.data;
       console.log(`📝 Live Speaking Customer key: ${customerKey}`);
 
-      // Step 2: Load and initialize TossPayments v2 SDK
+      // Step 2: Wait for and load TossPayments v2 SDK
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
       
-      // v2 SDK uses loadTossPayments (async function from SDK)
+      // Wait for loadTossPayments to be available (max 5 seconds)
+      let loadTossPayments = window.loadTossPayments;
       if (typeof loadTossPayments === 'undefined') {
-        console.error('❌ TossPayments v2 SDK (loadTossPayments) not loaded');
-        throw new Error('TossPayments SDK가 로드되지 않았습니다. 페이지를 새로고침해주세요.');
+        console.log('⏳ Waiting for TossPayments v2 SDK to load...');
+        let retries = 0;
+        const maxRetries = 50; // 50 * 100ms = 5 seconds
+        
+        while (retries < maxRetries && typeof window.loadTossPayments === 'undefined') {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          retries++;
+          if (retries % 10 === 0) {
+            console.log(`⏳ Still waiting... (${retries * 100}ms)`);
+          }
+        }
+        
+        loadTossPayments = window.loadTossPayments;
+        
+        if (typeof loadTossPayments === 'undefined') {
+          console.error('❌ TossPayments v2 SDK (loadTossPayments) not loaded after 5 seconds');
+          console.error('Available window properties:', Object.keys(window).filter(k => k.toLowerCase().includes('toss')));
+          throw new Error('TossPayments SDK를 로드할 수 없습니다. 페이지를 새로고침하거나 잠시 후 다시 시도해주세요.');
+        }
+        
+        console.log('✅ TossPayments SDK loaded after', retries * 100, 'ms');
       }
 
-      console.log('🔄 Loading TossPayments v2 SDK...');
+      console.log('🔄 Initializing TossPayments v2 SDK...');
       const tossPayments = await loadTossPayments(clientKey);
       console.log('✅ TossPayments v2 SDK initialized successfully');
 
