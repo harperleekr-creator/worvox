@@ -6159,7 +6159,8 @@ class WorVox {
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 패키지: ${packageName}
 구매 방식: ${packageTypeText}
-정가: ₩${amount.toLocaleString()}${discountText}최종 금액: ₩${finalAmount.toLocaleString()}
+정가: ₩${amount.toLocaleString()}${discountText}
+최종 금액: ₩${finalAmount.toLocaleString()}
 회당 가격: ₩${pricePerLesson.toLocaleString()}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 
