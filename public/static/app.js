@@ -10914,26 +10914,25 @@ Proceed to payment?
       return;
     }
     
+    // Check if user is logged in
+    if (!this.currentUser) {
+      alert('❌ 로그인이 필요합니다.');
+      this.showLogin();
+      return;
+    }
+    
     // Get selected payment method
     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'card';
     
-    try {
-      // Check if user is logged in
-      if (!this.currentUser) {
-        alert('❌ 로그인이 필요합니다.');
-        this.showLogin();
-        return;
-      }
-      
-      // Plan pricing (monthly subscription)
-      const planName = plan === 'premium' ? 'Premium' : plan === 'core' ? 'Core' : 'Business';
-      const amount = this.selectedPlanPrice; // Use selected plan price
-      const lessonCount = 0; // Core/Premium plans don't include lesson count
-      const packageType = 'monthly'; // Monthly subscription
-      
-      // Show confirmation
-      const billingCycleKo = this.selectedBillingCycle === 'monthly' ? '월간' : '연간';
-      const confirmed = confirm(`
+    // Plan pricing (monthly subscription)
+    const planName = plan === 'premium' ? 'Premium' : plan === 'core' ? 'Core' : 'Business';
+    const amount = this.selectedPlanPrice; // Use selected plan price
+    const lessonCount = 0; // Core/Premium plans don't include lesson count
+    const packageType = 'monthly'; // Monthly subscription
+    
+    // Show confirmation
+    const billingCycleKo = this.selectedBillingCycle === 'monthly' ? '월간' : '연간';
+    const confirmed = confirm(`
 🎓 ${planName} 플랜 구독
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 플랜: ${planName}
@@ -10944,10 +10943,11 @@ Proceed to payment?
 
 7일 무료 체험 후 자동 결제됩니다.
 결제를 진행하시겠습니까?
-      `);
-      
-      if (!confirmed) return;
-      
+    `);
+    
+    if (!confirmed) return;
+    
+    try {
       // Step 1: Start subscription (빌링키 등록 준비)
       console.log('🔄 Starting subscription for plan:', plan);
       const startResponse = await axios.post('/api/payments/hiing/subscribe/start', {
@@ -10972,7 +10972,7 @@ Proceed to payment?
       }
 
       const { customerKey } = startResponse.data;
-      console.log(`📝 Customer key for ${planName} plan: ${customerKey}`);
+      console.log(`📝 ${planName} Plan Customer key: ${customerKey}`);
 
       // Step 2: Initialize TossPayments SDK
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
@@ -11020,21 +11020,17 @@ Proceed to payment?
       console.log('✅ Billing authorization request sent');
       
     } catch (error) {
-      console.error('❌ Payment error:', error);
-      console.error('Error details:', {
-        hasResponse: !!error.response,
-        status: error.response?.status,
-        data: error.response?.data,
-        message: error.message
-      });
+      console.error('❌ Plan subscription error:', error);
       
-      // Check if it's an HTTP error response
+      // Check if it's an axios error with response
       if (error.response) {
-        const errorMsg = error.response.data?.error || error.response.data?.message || '결제 처리 중 오류가 발생했습니다.';
-        alert(`❌ ${errorMsg}\n\n다시 시도해주세요.`);
+        console.error('Response status:', error.response.status);
+        console.error('Response data:', error.response.data);
+        const errorMsg = error.response.data?.error || error.response.data?.details || error.message;
+        alert(`❌ 플랜 구독 시작 중 오류가 발생했습니다.\n\n${errorMsg}\n\n잠시 후 다시 시도해주세요.`);
       } else {
-        // Network or SDK error
-        alert(`❌ ${error.message}\n\n다시 시도해주세요.`);
+        // Network error or other error
+        alert(`❌ 플랜 구독 시작 중 오류가 발생했습니다.\n\n${error.message}\n\n인터넷 연결을 확인하고 다시 시도해주세요.`);
       }
     }
   }

@@ -3,7 +3,7 @@
  * PWA 오프라인 기능 및 캐싱 전략
  */
 
-const CACHE_VERSION = 'worvox-v2-fix-customerkey';
+const CACHE_VERSION = 'worvox-v3-fix-sdk-loading';
 const CACHE_NAME = `${CACHE_VERSION}-${Date.now()}`;
 
 // 캐시할 정적 자원
