@@ -862,45 +862,77 @@ payments.post('/billing/execute', async (c) => {
 payments.post('/hiing/subscribe/start', async (c) => {
   try {
     const { userId, lessonCount, amount, packageType } = await c.req.json();
+    console.log('📥 Subscription start request:', { userId, lessonCount, amount, packageType });
 
     if (!userId || !lessonCount || !amount) {
+      console.error('❌ Missing required fields');
       return c.json({ error: 'Missing required fields' }, 400);
     }
 
     const db = c.env.DB;
+    if (!db) {
+      console.error('❌ Database not initialized');
+      return c.json({ error: 'Database not available' }, 500);
+    }
 
     // Check if user exists
+    console.log('🔍 Looking up user:', userId);
     const user = await db.prepare('SELECT * FROM users WHERE id = ?').bind(userId).first();
     if (!user) {
+      console.error('❌ User not found:', userId);
       return c.json({ error: 'User not found' }, 404);
     }
+    console.log('✅ User found:', user.email);
 
     // Generate Toss customer key
     const customerKey = `hiing_customer_${userId}_${Date.now()}`;
+    console.log('🔑 Generated customer key:', customerKey);
 
     // Store customer key in database
-    await db.prepare(`
-      UPDATE users 
-      SET toss_customer_key = ?
-      WHERE id = ?
-    `).bind(customerKey, userId).run();
+    try {
+      const updateResult = await db.prepare(`
+        UPDATE users 
+        SET toss_customer_key = ?
+        WHERE id = ?
+      `).bind(customerKey, userId).run();
+      console.log('✅ Updated user toss_customer_key, rows affected:', updateResult.meta?.changes || 0);
+    } catch (dbError) {
+      console.error('❌ Database UPDATE error:', dbError);
+      // Check if column exists
+      if (dbError instanceof Error && dbError.message.includes('no such column')) {
+        return c.json({ 
+          error: 'Database schema error - toss_customer_key column missing',
+          details: 'Please run database migrations'
+        }, 500);
+      }
+      throw dbError;
+    }
 
     // Log activity
-    await db.prepare(`
-      INSERT INTO activity_logs (user_id, activity_type, details)
-      VALUES (?, 'hiing_subscribe_start', ?)
-    `).bind(userId, `Started Live Speaking ${lessonCount}회 subscription (${packageType})`).run();
+    try {
+      await db.prepare(`
+        INSERT INTO activity_logs (user_id, activity_type, details)
+        VALUES (?, 'hiing_subscribe_start', ?)
+      `).bind(userId, `Started Live Speaking ${lessonCount}회 subscription (${packageType})`).run();
+      console.log('✅ Activity logged');
+    } catch (logError) {
+      console.warn('⚠️ Failed to log activity (non-critical):', logError);
+      // Don't fail the request if activity logging fails
+    }
 
-    return c.json({
+    const response = {
       success: true,
       customerKey: customerKey,
       lessonCount: lessonCount,
       amount: amount,
       packageType: packageType
-    });
+    };
+    console.log('📤 Subscription start response:', response);
+    return c.json(response);
 
   } catch (error) {
-    console.error('Hiing subscribe start error:', error);
+    console.error('❌ Hiing subscribe start error:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     return c.json({ 
       error: 'Failed to start subscription',
       details: error instanceof Error ? error.message : 'Unknown error'
