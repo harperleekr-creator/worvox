@@ -33,9 +33,31 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1774587248507'; // Update manually or via build script
+const BUILD_TIME = '1774587678458'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
+
+// Set security headers (including CSP for TossPayments)
+app.use('*', async (c, next) => {
+  await next();
+  
+  // Set security headers on all responses
+  c.header('X-Frame-Options', 'SAMEORIGIN');
+  c.header('X-Content-Type-Options', 'nosniff');
+  c.header('X-XSS-Protection', '1; mode=block');
+  c.header('Referrer-Policy', 'strict-origin-when-cross-origin');
+  
+  // Allow TossPayments SDK and other CDN resources
+  c.header('Content-Security-Policy', 
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.tosspayments.com https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://accounts.google.com; " +
+    "style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; " +
+    "img-src 'self' data: https:; " +
+    "connect-src 'self' https://api.tosspayments.com; " +
+    "frame-src https://accounts.google.com; " +
+    "font-src 'self' data:"
+  );
+});
 
 // Redirect www to non-www
 app.use('*', async (c, next) => {
