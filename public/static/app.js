@@ -16784,38 +16784,74 @@ Proceed to payment?
         billingPeriod: period
       });
 
+      console.log('📡 Subscription start response:', startResponse.data);
+
       if (!startResponse.data.success) {
-        alert(startResponse.data.error || '구독 시작에 실패했습니다.');
-        return;
+        const errorMsg = startResponse.data.details || startResponse.data.error || '구독 시작 실패';
+        throw new Error(errorMsg);
       }
 
       const { customerKey } = startResponse.data;
-      console.log('✅ Subscription start prepared, customerKey:', customerKey);
+      console.log('📝 Customer key:', customerKey);
 
-      // 2. Wait for TossPayments SDK
-      const clientKey = 'test_ck_d26DlbXAaV0eR7QxP00rqY50Q9RB';
-      const tossPayments = await this.waitForTossPaymentsSDK(clientKey);
+      // 2. Initialize TossPayments SDK
+      const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
       
-      if (!tossPayments) {
-        throw new Error('TossPayments SDK를 로드하지 못했습니다.');
-      }
-
-      console.log('✅ TossPayments SDK loaded, requesting billing auth...');
+      // Wait for TossPayments SDK to load
+      console.log('⏳ Waiting for TossPayments SDK to load...');
+      const tossPayments = await this.waitForTossPaymentsSDK(clientKey);
+      console.log('TossPayments object type:', typeof tossPayments);
+      console.log('TossPayments methods:', Object.keys(tossPayments));
 
       // 3. Request billing authorization
-      const authResult = await tossPayments.requestBillingAuth({
-        method: 'CARD',
-        successUrl: `${window.location.origin}/subscription-success?plan=${planName}&userId=${this.currentUser.id}&period=${period}`,
-        failUrl: `${window.location.origin}/subscription-fail`,
-        customerKey: customerKey,
-        customerEmail: this.currentUser.email,
-        customerName: this.currentUser.username || this.currentUser.email
-      });
-
-      console.log('✅ Billing auth requested:', authResult);
+      console.log('🔑 Requesting billing authorization with customerKey:', customerKey);
+      
+      // Try payment.requestBillingAuth if available
+      if (tossPayments.payment && typeof tossPayments.payment === 'function') {
+        console.log('✅ Using tossPayments.payment() method');
+        const payment = tossPayments.payment({
+          customerKey: customerKey,
+        });
+        console.log('✅ Payment object created');
+        
+        await payment.requestBillingAuth({
+          method: 'CARD',
+          successUrl: `${window.location.origin}/subscription-success?plan=${planName}&userId=${this.currentUser.id}&period=${period}`,
+          failUrl: `${window.location.origin}/subscription-fail`,
+          customerEmail: this.currentUser.email,
+          customerName: this.currentUser.username || this.currentUser.email
+        });
+      } else if (tossPayments.requestBillingAuth && typeof tossPayments.requestBillingAuth === 'function') {
+        console.log('✅ Using tossPayments.requestBillingAuth() directly');
+        await tossPayments.requestBillingAuth({
+          method: 'CARD',
+          customerKey: customerKey,
+          successUrl: `${window.location.origin}/subscription-success?plan=${planName}&userId=${this.currentUser.id}&period=${period}`,
+          failUrl: `${window.location.origin}/subscription-fail`,
+          customerEmail: this.currentUser.email,
+          customerName: this.currentUser.username || this.currentUser.email
+        });
+      } else {
+        console.error('❌ No billing auth method found');
+        console.error('Available methods:', Object.keys(tossPayments));
+        throw new Error('TossPayments SDK에서 결제 메서드를 찾을 수 없습니다.');
+      }
+      
+      console.log('✅ Billing authorization request sent');
+      
     } catch (error) {
       console.error('❌ Subscription start error:', error);
-      alert('구독 시작 중 오류가 발생했습니다: ' + error.message);
+      
+      // Check if it's an axios error with response
+      if (error.response) {
+        console.error('Response status:', error.response.status);
+        console.error('Response data:', error.response.data);
+        const errorMsg = error.response.data?.error || error.response.data?.details || error.message;
+        alert(`❌ 구독 시작 중 오류가 발생했습니다.\n\n${errorMsg}\n\n잠시 후 다시 시도해주세요.`);
+      } else {
+        // Network error or other error
+        alert(`❌ 구독 시작 중 오류가 발생했습니다.\n\n${error.message}\n\n인터넷 연결을 확인하고 다시 시도해주세요.`);
+      }
     }
   }
 
