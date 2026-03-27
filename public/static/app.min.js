@@ -6195,19 +6195,21 @@ class WorVox {
       const { customerKey } = startResponse.data;
       console.log(`📝 Live Speaking Customer key: ${customerKey}`);
 
-      // Step 2: Initialize Toss Payments Billing (v2 SDK)
+      // Step 2: Initialize TossPayments v2 SDK
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
       
-      // TossPayments v1 SDK - Direct initialization
-      if (typeof TossPayments === 'undefined') {
-        console.error('❌ TossPayments v1 SDK not loaded');
+      // Wait for TossPayments SDK to load (v2 uses window.TossPayments directly)
+      let tossPayments;
+      if (typeof window.TossPayments !== 'undefined') {
+        tossPayments = window.TossPayments(clientKey);
+        console.log('✅ TossPayments v2 SDK initialized successfully');
+      } else {
+        console.error('❌ TossPayments v2 SDK not loaded');
         throw new Error('TossPayments SDK가 로드되지 않았습니다. 페이지를 새로고침해주세요.');
       }
-      
-      const tossPayments = TossPayments(clientKey);
-      console.log('✅ TossPayments v1 SDK initialized successfully');
 
-      // Step 3: Request billing key (카드 등록 + 즉시 결제)
+      // Step 3: Request billing authorization (카드 등록)
+      console.log('🔑 Requesting billing authorization with customerKey:', customerKey);
       await tossPayments.requestBillingAuth({
         method: 'CARD',
         customerKey: customerKey,
@@ -6216,6 +6218,7 @@ class WorVox {
         customerEmail: this.currentUser.email,
         customerName: this.currentUser.username
       });
+      console.log('✅ Billing authorization request sent');
       
     } catch (error) {
       console.error('❌ Live Speaking subscription error:', error);
