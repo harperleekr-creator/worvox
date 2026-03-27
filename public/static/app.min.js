@@ -6177,9 +6177,18 @@ class WorVox {
         packageType: packageType
       });
 
-      if (!startResponse.data.success) {
-        const errorMsg = startResponse.data.error || '구독 시작 실패';
+      console.log('📦 Subscription start response:', startResponse.data);
+
+      // Check for errors first
+      if (startResponse.data.error || !startResponse.data.success) {
+        const errorMsg = startResponse.data.error || startResponse.data.details || '구독 시작 실패';
         throw new Error(errorMsg);
+      }
+
+      // Validate customerKey exists
+      if (!startResponse.data.customerKey) {
+        console.error('❌ No customerKey in response:', startResponse.data);
+        throw new Error('서버 응답에 고객 키가 없습니다. 다시 시도해주세요.');
       }
 
       const { customerKey } = startResponse.data;
@@ -6208,8 +6217,18 @@ class WorVox {
       });
       
     } catch (error) {
-      console.error('Live Speaking subscription error:', error)
-      alert('❌ 정기구독 시작 중 오류가 발생했습니다.\n' + (error.response?.data?.error || error.message || ''));
+      console.error('❌ Live Speaking subscription error:', error);
+      
+      // Check if it's an axios error with response
+      if (error.response) {
+        console.error('Response status:', error.response.status);
+        console.error('Response data:', error.response.data);
+        const errorMsg = error.response.data?.error || error.response.data?.details || error.message;
+        alert(`❌ 정기구독 시작 중 오류가 발생했습니다.\n\n${errorMsg}\n\n잠시 후 다시 시도해주세요.`);
+      } else {
+        // Network error or other error
+        alert(`❌ 정기구독 시작 중 오류가 발생했습니다.\n\n${error.message}\n\n인터넷 연결을 확인하고 다시 시도해주세요.`);
+      }
     }
   }
 
@@ -7175,7 +7194,13 @@ Proceed to payment?
         password
       });
 
-      console.log('Signup successful:', response.data);
+      console.log('📦 Signup response:', response.data);
+
+      // Validate response structure
+      if (!response.data || !response.data.user) {
+        console.error('❌ Invalid signup response:', response.data);
+        throw new Error('서버 응답이 올바르지 않습니다. 다시 시도해주세요.');
+      }
 
       // Store user data
       localStorage.setItem('worvox_user', JSON.stringify(response.data.user));
@@ -7200,11 +7225,20 @@ Proceed to payment?
       }
 
     } catch (error) {
-      console.error('Signup error:', error);
-      if (error.response?.status === 409) {
-        alert('이미 등록된 이메일입니다. 로그인해주세요.');
+      console.error('❌ Signup error:', error);
+      
+      if (error.response) {
+        console.error('Response status:', error.response.status);
+        console.error('Response data:', error.response.data);
+        
+        if (error.response.status === 409) {
+          alert('⚠️ 이미 등록된 이메일입니다. 로그인해주세요.');
+        } else {
+          const errorMsg = error.response.data?.error || error.response.data?.message || '알 수 없는 오류';
+          alert(`❌ 회원가입에 실패했습니다.\n\n${errorMsg}\n\n다시 시도해주세요.`);
+        }
       } else {
-        alert('회원가입에 실패했습니다. 다시 시도해주세요.');
+        alert(`❌ 회원가입에 실패했습니다.\n\n${error.message}\n\n인터넷 연결을 확인하고 다시 시도해주세요.`);
       }
     }
   }
