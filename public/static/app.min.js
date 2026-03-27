@@ -6188,80 +6188,14 @@ class WorVox {
       // Step 2: Initialize Toss Payments Billing (v2 SDK)
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
       
-      // Helper function to dynamically load SDK if not present
-      const ensureSDKLoaded = () => {
-        return new Promise((resolve, reject) => {
-          if (typeof loadTossPayments !== 'undefined') {
-            resolve();
-            return;
-          }
-          
-          // Check if script tag already exists
-          if (document.querySelector('script[src*="tosspayments.com/v2/standard"]')) {
-            reject(new Error('SDK script exists but loadTossPayments not available. Check browser console.'));
-            return;
-          }
-          
-          // Dynamically add script
-          console.log('📦 Dynamically loading TossPayments SDK...');
-          const script = document.createElement('script');
-          script.src = 'https://js.tosspayments.com/v2/standard';
-          script.onload = () => {
-            console.log('✅ SDK script loaded');
-            // Wait a bit for SDK to initialize
-            setTimeout(() => {
-              if (typeof loadTossPayments !== 'undefined') {
-                resolve();
-              } else {
-                reject(new Error('SDK loaded but loadTossPayments still undefined'));
-              }
-            }, 500);
-          };
-          script.onerror = () => {
-            reject(new Error('Failed to load SDK script. Check network connection.'));
-          };
-          document.head.appendChild(script);
-        });
-      };
-      
-      // Try to ensure SDK is loaded
-      try {
-        await ensureSDKLoaded();
-      } catch (ensureError) {
-        console.error('SDK ensure error:', ensureError);
+      // TossPayments v1 SDK - Direct initialization
+      if (typeof TossPayments === 'undefined') {
+        console.error('❌ TossPayments v1 SDK not loaded');
+        throw new Error('TossPayments SDK가 로드되지 않았습니다. 페이지를 새로고침해주세요.');
       }
       
-      // Wait for TossPayments SDK to load (with longer timeout)
-      let tossPayments;
-      let retries = 0;
-      const maxRetries = 30; // Increased to 30 retries (3 seconds)
-      
-      while (retries < maxRetries) {
-        if (typeof loadTossPayments !== 'undefined') {
-          try {
-            tossPayments = await loadTossPayments(clientKey);
-            console.log('✅ TossPayments SDK loaded successfully');
-            break;
-          } catch (sdkError) {
-            console.error('TossPayments SDK initialization error:', sdkError);
-            throw new Error('결제 모듈 초기화 실패. 다시 시도해주세요.');
-          }
-        }
-        
-        // Wait 100ms before retry
-        await new Promise(resolve => setTimeout(resolve, 100));
-        retries++;
-        
-        if (retries % 5 === 0) {
-          console.log(`⏳ Waiting for TossPayments SDK... (${retries}/${maxRetries})`);
-        }
-      }
-      
-      if (!tossPayments) {
-        console.error('❌ TossPayments SDK failed to load after 3 seconds');
-        console.error('Available window properties:', Object.keys(window).filter(k => k.toLowerCase().includes('toss') || k.toLowerCase().includes('load')));
-        throw new Error(`TossPayments SDK가 로드되지 않았습니다.\n\n다음을 시도해보세요:\n1. 페이지를 새로고침 (Ctrl+F5 / Cmd+Shift+R)\n2. 브라우저 캐시 삭제\n3. 다른 브라우저 사용\n4. 광고 차단기 비활성화`);
-      }
+      const tossPayments = TossPayments(clientKey);
+      console.log('✅ TossPayments v1 SDK initialized successfully');
 
       // Step 3: Request billing key (카드 등록 + 즉시 결제)
       await tossPayments.requestBillingAuth({
@@ -16389,80 +16323,14 @@ Proceed to payment?
       // Step 2: Initialize Toss Payments Billing (v2 SDK)
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
       
-      // Helper function to dynamically load SDK if not present
-      const ensureSDKLoaded = () => {
-        return new Promise((resolve, reject) => {
-          if (typeof loadTossPayments !== 'undefined') {
-            resolve();
-            return;
-          }
-          
-          // Check if script tag already exists
-          if (document.querySelector('script[src*="tosspayments.com/v2/standard"]')) {
-            reject(new Error('SDK script exists but loadTossPayments not available. Check browser console.'));
-            return;
-          }
-          
-          // Dynamically add script
-          console.log('📦 Dynamically loading TossPayments SDK...');
-          const script = document.createElement('script');
-          script.src = 'https://js.tosspayments.com/v2/standard';
-          script.onload = () => {
-            console.log('✅ SDK script loaded');
-            // Wait a bit for SDK to initialize
-            setTimeout(() => {
-              if (typeof loadTossPayments !== 'undefined') {
-                resolve();
-              } else {
-                reject(new Error('SDK loaded but loadTossPayments still undefined'));
-              }
-            }, 500);
-          };
-          script.onerror = () => {
-            reject(new Error('Failed to load SDK script. Check network connection.'));
-          };
-          document.head.appendChild(script);
-        });
-      };
-      
-      // Try to ensure SDK is loaded
-      try {
-        await ensureSDKLoaded();
-      } catch (ensureError) {
-        console.error('SDK ensure error:', ensureError);
+      // TossPayments v1 SDK - Direct initialization
+      if (typeof TossPayments === 'undefined') {
+        console.error('❌ TossPayments v1 SDK not loaded');
+        throw new Error('TossPayments SDK가 로드되지 않았습니다. 페이지를 새로고침해주세요.');
       }
       
-      // Wait for TossPayments SDK to load (with longer timeout)
-      let tossPayments;
-      let retries = 0;
-      const maxRetries = 30; // Increased to 30 retries (3 seconds)
-      
-      while (retries < maxRetries) {
-        if (typeof loadTossPayments !== 'undefined') {
-          try {
-            tossPayments = await loadTossPayments(clientKey);
-            console.log('✅ TossPayments SDK loaded successfully');
-            break;
-          } catch (sdkError) {
-            console.error('TossPayments SDK initialization error:', sdkError);
-            throw new Error('결제 모듈 초기화 실패. 다시 시도해주세요.');
-          }
-        }
-        
-        // Wait 100ms before retry
-        await new Promise(resolve => setTimeout(resolve, 100));
-        retries++;
-        
-        if (retries % 5 === 0) {
-          console.log(`⏳ Waiting for TossPayments SDK... (${retries}/${maxRetries})`);
-        }
-      }
-      
-      if (!tossPayments) {
-        console.error('❌ TossPayments SDK failed to load after 3 seconds');
-        console.error('Available window properties:', Object.keys(window).filter(k => k.toLowerCase().includes('toss') || k.toLowerCase().includes('load')));
-        throw new Error(`TossPayments SDK가 로드되지 않았습니다.\n\n다음을 시도해보세요:\n1. 페이지를 새로고침 (Ctrl+F5 / Cmd+Shift+R)\n2. 브라우저 캐시 삭제\n3. 다른 브라우저 사용\n4. 광고 차단기 비활성화`);
-      }
+      const tossPayments = TossPayments(clientKey);
+      console.log('✅ TossPayments v1 SDK initialized successfully');
 
       // Step 3: Request billing key (카드 등록)
       await tossPayments.requestBillingAuth({

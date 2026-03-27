@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>TossPayments SDK Test</title>
+    <script src="https://js.tosspayments.com/v2/standard"></script>
+</head>
+<body>
+    <h1>TossPayments SDK Loading Test</h1>
+    <div id="result"></div>
+    
+    <script>
+        setTimeout(() => {
+            const result = document.getElementById('result');
+            
+            if (typeof loadTossPayments !== 'undefined') {
+                result.innerHTML = '<p style="color: green; font-size: 20px;">✅ SUCCESS: loadTossPayments is available!</p>';
+                console.log('✅ loadTossPayments type:', typeof loadTossPayments);
+                
+                // Try to initialize
+                loadTossPayments('test_ck_DUMMY')
+                    .then(tp => {
+                        result.innerHTML += '<p style="color: green;">✅ TossPayments initialized!</p>';
+                        result.innerHTML += '<p>Available methods: ' + Object.keys(tp).join(', ') + '</p>';
+                    })
+                    .catch(err => {
+                        result.innerHTML += '<p style="color: orange;">⚠️ Init error: ' + err.message + '</p>';
+                    });
+            } else {
+                result.innerHTML = '<p style="color: red; font-size: 20px;">❌ FAILED: loadTossPayments is NOT available</p>';
+                result.innerHTML += '<p>Available globals with "load": ' + 
+                    Object.keys(window).filter(k => k.toLowerCase().includes('load')).join(', ') + '</p>';
+                result.innerHTML += '<p>Available globals with "toss": ' + 
+                    Object.keys(window).filter(k => k.toLowerCase().includes('toss')).join(', ') + '</p>';
+                console.error('❌ loadTossPayments not found');
+                console.log('All window properties:', Object.keys(window));
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

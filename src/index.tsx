@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1774588324962'; // Update manually or via build script
+const BUILD_TIME = '1774588732483'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -3795,8 +3795,8 @@ app.get('/app', (c) => {
           })();
         </script>
         
-        <!-- TossPayments SDK - Load first to ensure availability -->
-        <script src="https://js.tosspayments.com/v2/standard"></script>
+        <!-- TossPayments SDK v1 (Stable) - Load first to ensure availability -->
+        <script src="https://js.tosspayments.com/v1"></script>
         
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -4165,8 +4165,8 @@ app.get('/', (c) => {
           })();
         </script>
         
-        <!-- TossPayments SDK - Load first to ensure availability -->
-        <script src="https://js.tosspayments.com/v2/standard"></script>
+        <!-- TossPayments SDK v1 (Stable) - Load first to ensure availability -->
+        <script src="https://js.tosspayments.com/v1"></script>
         
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
