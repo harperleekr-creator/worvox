@@ -6188,10 +6188,10 @@ class WorVox {
       // Step 2: Initialize Toss Payments Billing (v2 SDK)
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
       
-      // Wait for TossPayments SDK to load (with timeout)
+      // Wait for TossPayments SDK to load (with longer timeout)
       let tossPayments;
       let retries = 0;
-      const maxRetries = 10;
+      const maxRetries = 30; // Increased to 30 retries (3 seconds)
       
       while (retries < maxRetries) {
         if (typeof loadTossPayments !== 'undefined') {
@@ -6208,11 +6208,16 @@ class WorVox {
         // Wait 100ms before retry
         await new Promise(resolve => setTimeout(resolve, 100));
         retries++;
-        console.log(`⏳ Waiting for TossPayments SDK... (${retries}/${maxRetries})`);
+        
+        if (retries % 5 === 0) {
+          console.log(`⏳ Waiting for TossPayments SDK... (${retries}/${maxRetries})`);
+        }
       }
       
       if (!tossPayments) {
-        throw new Error('TossPayments SDK가 로드되지 않았습니다. 페이지를 새로고침해주세요.');
+        console.error('❌ TossPayments SDK failed to load after 3 seconds');
+        console.error('Available window properties:', Object.keys(window).filter(k => k.toLowerCase().includes('toss') || k.toLowerCase().includes('load')));
+        throw new Error(`TossPayments SDK가 로드되지 않았습니다.\n\n다음을 시도해보세요:\n1. 페이지를 새로고침 (Ctrl+F5 / Cmd+Shift+R)\n2. 브라우저 캐시 삭제\n3. 다른 브라우저 사용\n4. 광고 차단기 비활성화`);
       }
 
       // Step 3: Request billing key (카드 등록 + 즉시 결제)
@@ -16341,10 +16346,10 @@ Proceed to payment?
       // Step 2: Initialize Toss Payments Billing (v2 SDK)
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
       
-      // Wait for TossPayments SDK to load (with timeout)
+      // Wait for TossPayments SDK to load (with longer timeout)
       let tossPayments;
       let retries = 0;
-      const maxRetries = 10;
+      const maxRetries = 30; // Increased to 30 retries (3 seconds)
       
       while (retries < maxRetries) {
         if (typeof loadTossPayments !== 'undefined') {
@@ -16361,11 +16366,16 @@ Proceed to payment?
         // Wait 100ms before retry
         await new Promise(resolve => setTimeout(resolve, 100));
         retries++;
-        console.log(`⏳ Waiting for TossPayments SDK... (${retries}/${maxRetries})`);
+        
+        if (retries % 5 === 0) {
+          console.log(`⏳ Waiting for TossPayments SDK... (${retries}/${maxRetries})`);
+        }
       }
       
       if (!tossPayments) {
-        throw new Error('TossPayments SDK가 로드되지 않았습니다. 페이지를 새로고침해주세요.');
+        console.error('❌ TossPayments SDK failed to load after 3 seconds');
+        console.error('Available window properties:', Object.keys(window).filter(k => k.toLowerCase().includes('toss') || k.toLowerCase().includes('load')));
+        throw new Error(`TossPayments SDK가 로드되지 않았습니다.\n\n다음을 시도해보세요:\n1. 페이지를 새로고침 (Ctrl+F5 / Cmd+Shift+R)\n2. 브라우저 캐시 삭제\n3. 다른 브라우저 사용\n4. 광고 차단기 비활성화`);
       }
 
       // Step 3: Request billing key (카드 등록)
@@ -16467,10 +16477,10 @@ Proceed to payment?
       // 2. Initialize Toss Payments (v2 SDK)
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
       
-      // Wait for TossPayments SDK to load (with timeout)
+      // Wait for TossPayments SDK to load (with longer timeout)
       let tossPayments;
       let retries = 0;
-      const maxRetries = 10;
+      const maxRetries = 30; // Increased to 30 retries (3 seconds)
       
       while (retries < maxRetries) {
         if (typeof loadTossPayments !== 'undefined') {
@@ -16487,11 +16497,16 @@ Proceed to payment?
         // Wait 100ms before retry
         await new Promise(resolve => setTimeout(resolve, 100));
         retries++;
-        console.log(`⏳ Waiting for TossPayments SDK... (${retries}/${maxRetries})`);
+        
+        if (retries % 5 === 0) {
+          console.log(`⏳ Waiting for TossPayments SDK... (${retries}/${maxRetries})`);
+        }
       }
       
       if (!tossPayments) {
-        throw new Error('TossPayments SDK가 로드되지 않았습니다. 페이지를 새로고침해주세요.');
+        console.error('❌ TossPayments SDK failed to load after 3 seconds');
+        console.error('Available window properties:', Object.keys(window).filter(k => k.toLowerCase().includes('toss') || k.toLowerCase().includes('load')));
+        throw new Error(`TossPayments SDK가 로드되지 않았습니다.\n\n다음을 시도해보세요:\n1. 페이지를 새로고침 (Ctrl+F5 / Cmd+Shift+R)\n2. 브라우저 캐시 삭제\n3. 다른 브라우저 사용\n4. 광고 차단기 비활성화`);
       }
       
       const customerKey = `customer_${this.currentUser.id}`;
