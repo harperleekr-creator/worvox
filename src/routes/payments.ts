@@ -430,16 +430,25 @@ payments.post('/trial/start', async (c) => {
 
     // Check if user already has active trial or subscription
     const user = await c.env.DB.prepare(
-      'SELECT id, username, email, plan, is_trial, trial_end_date FROM users WHERE id = ?'
+      'SELECT id, username, email, plan, is_trial, trial_end_date, has_used_trial FROM users WHERE id = ?'
     ).bind(userId).first();
 
-    console.log(`🔍 User lookup result:`, user ? `Found: ${user.username} (${user.email}), plan: ${user.plan}, is_trial: ${user.is_trial}, trial_end_date: ${user.trial_end_date}` : 'Not found');
+    console.log(`🔍 User lookup result:`, user ? `Found: ${user.username} (${user.email}), plan: ${user.plan}, is_trial: ${user.is_trial}, trial_end_date: ${user.trial_end_date}, has_used_trial: ${user.has_used_trial}` : 'Not found');
 
     if (!user) {
       return c.json({ 
         error: 'User not found', 
         details: `사용자 ID ${userId}를 찾을 수 없습니다.`
       }, 404);
+    }
+
+    // Check if user has already used trial before (CRITICAL: Prevent re-trial after cancellation)
+    if (user.has_used_trial === 1) {
+      console.log(`❌ User has already used trial before (has_used_trial=1)`);
+      return c.json({ 
+        error: '무료 체험은 1회만 이용 가능합니다',
+        details: '이미 무료 체험을 이용하셨습니다. 유료 플랜으로 바로 구독하시거나 고객센터로 문의해주세요.'
+      }, 400);
     }
 
     // Check if user already has active paid plan
@@ -539,6 +548,7 @@ payments.post('/trial/confirm', async (c) => {
     trialEndDate.setDate(trialEndDate.getDate() + 14); // 2 weeks
 
     // Update user with billing key and trial info
+    // CRITICAL: Set has_used_trial=1 to prevent re-trial after cancellation
     await c.env.DB.prepare(`
       UPDATE users 
       SET 
@@ -547,6 +557,7 @@ payments.post('/trial/confirm', async (c) => {
         plan = ?,
         billing_period = ?,
         is_trial = 1,
+        has_used_trial = 1,
         trial_start_date = datetime('now'),
         trial_end_date = datetime('now', '+14 days'),
         auto_billing_enabled = 1,
@@ -680,6 +691,63 @@ payments.post('/trial/cancel', async (c) => {
     console.error('Trial cancel error:', error);
     return c.json({ 
       error: 'Failed to cancel trial',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
+// Cancel paid subscription (user cancels active paid plan)
+payments.post('/subscription/cancel', async (c) => {
+  try {
+    const { userId } = await c.req.json();
+
+    if (!userId) {
+      return c.json({ error: 'Missing userId' }, 400);
+    }
+
+    console.log(`❌ Cancelling subscription for user ${userId}`);
+
+    // Check if user has active subscription
+    const user = await c.env.DB.prepare(
+      'SELECT id, plan, is_trial, subscription_end_date, auto_billing_enabled FROM users WHERE id = ?'
+    ).bind(userId).first();
+
+    if (!user) {
+      return c.json({ error: 'User not found' }, 404);
+    }
+
+    if (user.plan === 'free') {
+      return c.json({ error: '활성화된 구독이 없습니다' }, 400);
+    }
+
+    // Disable auto billing - keep current plan until subscription_end_date
+    await c.env.DB.prepare(`
+      UPDATE users 
+      SET auto_billing_enabled = 0
+      WHERE id = ?
+    `).bind(userId).run();
+
+    // Log cancellation
+    await c.env.DB.prepare(`
+      INSERT INTO activity_logs (user_id, activity_type, details, created_at)
+      VALUES (?, 'subscription_cancel', ?, datetime('now'))
+    `).bind(
+      userId,
+      `Cancelled ${user.plan} subscription - will expire at ${user.subscription_end_date}`
+    ).run();
+
+    console.log(`✅ Subscription cancelled, will expire at ${user.subscription_end_date}`);
+
+    return c.json({
+      success: true,
+      message: `자동 결제가 취소되었습니다. ${user.subscription_end_date}까지는 ${user.plan.toUpperCase()} 플랜을 계속 사용하실 수 있습니다.`,
+      subscription_end_date: user.subscription_end_date
+    });
+
+  } catch (error) {
+    console.error('Subscription cancel error:', error);
+    return c.json({ 
+      error: 'Failed to cancel subscription',
       details: error instanceof Error ? error.message : 'Unknown error'
     }, 500);
   }
