@@ -1,6 +1,118 @@
 # WorVox - AI English Learning Platform
 
-## 🔔 최신 업데이트 (2026-03-26 07:41 UTC) - ✅ CRITICAL FIX: app.min.js 업데이트 완료
+## 🔔 최신 업데이트 (2026-03-27 06:01 UTC) - ✅ 1:1 Live Speaking 수업권 누적 & 월 정기 결제 자동화
+
+### 🎓 Live Speaking Subscription Improvements - Commit `5aa8906` ✅
+
+**배포 정보**
+- **Production**: https://worvox.com ✅ 
+- **Preview**: https://448a4182.worvox.pages.dev ✅
+- **GitHub Commit**: https://github.com/harperleekr-creator/worvox/commit/5aa8906
+- **Build Time**: `1774591306200` (2026-03-27T06:01:46.200Z)
+
+#### 🎉 새로운 기능
+
+**1. 수업권 누적 시스템**
+- ✅ 기존 문제: 결제 시 수업권이 덮어쓰기됨 (10회 → 10회)
+- ✅ 해결: 수업권이 **누적**됨 (10회 → 20회 → 30회)
+- ✅ 코드: `hiing_lesson_count = hiing_lesson_count + ?` (누적 방식)
+
+**2. 월 정기 결제 자동화 API**
+- ✅ 엔드포인트: `POST /api/payments/hiing/monthly-billing`
+- ✅ 기능:
+  - 매월 자동으로 `hiing_next_billing_date`가 오늘 이전인 구독자를 찾음
+  - 저장된 `billing_key`로 자동 결제 실행
+  - 결제 성공 시: 수업권 누적 + 다음 결제일 업데이트
+  - 결제 실패 시: 구독 비활성화 + 실패 로그 기록
+- ✅ 보안: `Authorization: Bearer <CRON_SECRET_TOKEN>` 필수
+
+**3. 데이터베이스 스키마**
+- ✅ 새 컬럼: `hiing_lesson_package_size` (월 갱신 시 추가할 수업권 수)
+- ✅ 마이그레이션: `0047_add_hiing_lesson_package_size.sql`
+
+#### 🔧 월 정기 결제 설정 방법
+
+**Option 1: Cloudflare Workers Cron (추천)**
+```javascript
+// cron-worker.js
+export default {
+  async scheduled(event, env, ctx) {
+    const response = await fetch('https://worvox.com/api/payments/hiing/monthly-billing', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${env.CRON_SECRET_TOKEN}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    const result = await response.json();
+    console.log('Monthly billing result:', result);
+  }
+}
+
+// wrangler.toml
+[triggers]
+crons = ["0 0 * * *"] # 매일 자정 (UTC) 실행
+```
+
+**Option 2: GitHub Actions**
+```yaml
+# .github/workflows/monthly-billing.yml
+name: Monthly Billing
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 매일 자정 (UTC)
+  workflow_dispatch:  # 수동 실행 가능
+
+jobs:
+  billing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Monthly Billing
+        run: |
+          curl -X POST https://worvox.com/api/payments/hiing/monthly-billing \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET_TOKEN }}" \
+            -H "Content-Type: application/json"
+```
+
+**Option 3: 수동 실행 (테스트용)**
+```bash
+curl -X POST https://worvox.com/api/payments/hiing/monthly-billing \
+  -H "Authorization: Bearer YOUR_CRON_SECRET_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+#### 📊 API 응답 예시
+
+```json
+{
+  "success": true,
+  "processed": 5,
+  "successful": 4,
+  "failed": 1,
+  "results": [
+    {
+      "userId": 26,
+      "email": "support@worvox.com",
+      "status": "success",
+      "amount": 100000,
+      "lessonCount": 10,
+      "newTotalLessons": 20,
+      "nextBillingDate": "2026-04-27"
+    },
+    {
+      "userId": 27,
+      "email": "user@example.com",
+      "status": "failed",
+      "error": "카드 한도 초과"
+    }
+  ]
+}
+```
+
+---
+
+## 🔔 이전 업데이트 (2026-03-26 07:41 UTC) - ✅ CRITICAL FIX: app.min.js 업데이트 완료
 
 ### 🚨 Critical Bug Fix - Commit `91f3c1d` ✅
 
