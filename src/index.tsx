@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1774585989128'; // Update manually or via build script
+const BUILD_TIME = '1774586456574'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -3730,8 +3730,6 @@ app.get('/app', (c) => {
         <!-- PWA Manifest -->
         <link rel="manifest" href="/manifest.json">
         
-        <!-- Toss Payments SDK -->
-        <script src="https://js.tosspayments.com/v2/standard"></script>
         <!-- Google Sign-In -->
         <script src="https://accounts.google.com/gsi/client" async defer></script>
         <meta name="google-signin-client_id" content="506018364729-ichplnfnqlk2hmh1bhblepm0un44ltdr.apps.googleusercontent.com">
@@ -3770,6 +3768,9 @@ app.get('/app', (c) => {
           })();
         </script>
         
+        <!-- TossPayments SDK - Load first to ensure availability -->
+        <script src="https://js.tosspayments.com/v2/standard"></script>
+        
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
         
@@ -3778,9 +3779,6 @@ app.get('/app', (c) => {
         <script src="/static/error-handler.js?v=${version}"></script>
         <script src="/static/mobile-utils.js?v=${version}"></script>
         <script src="/static/module-loader.js?v=${version}"></script>
-        
-        <!-- TossPayments SDK - Must load before app.min.js -->
-        <script src="https://js.tosspayments.com/v2/standard"></script>
         
         <!-- App Scripts -->
         <script src="/static/gamification.js?v=${version}"></script>
@@ -4140,15 +4138,15 @@ app.get('/', (c) => {
           })();
         </script>
         
+        <!-- TossPayments SDK - Load first to ensure availability -->
+        <script src="https://js.tosspayments.com/v2/standard"></script>
+        
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
         
         <!-- Core Utilities -->
         <script src="/static/toast.js?v=${version}"></script>
         <script src="/static/error-handler.js?v=${version}"></script>
-
-        <!-- TossPayments SDK - Must load before app.min.js -->
-        <script src="https://js.tosspayments.com/v2/standard"></script>
         
         <!-- App Scripts -->
         <script src="/static/gamification.js?v=${version}"></script>
