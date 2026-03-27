@@ -361,24 +361,88 @@ CRON_SECRET             # Cron Job 인증용 Secret
 
 ---
 
-## 📝 TODO (추가 개선 사항)
+## ✅ 추가 구현 완료
 
-### 1. 자동 결제 Cron을 Cloudflare Cron으로 통합
-현재는 `/billing/execute`를 별도 호출해야 함.
-→ `scheduled.ts`에 Task 4로 추가하면 자동화 가능.
+### 1. GitHub Actions Cron 스케줄러 ✅
+**위치**: `.github/workflows/cron-billing.yml`
 
-**수정 방법**:
+**실행 주기**: 6시간마다 (UTC 00:00, 06:00, 12:00, 18:00)
+
+**작동 방식**:
+```yaml
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:  # 수동 실행 가능
+
+jobs:
+  execute-billing:
+    steps:
+      - Call: POST https://worvox.com/api/payments/billing/execute
+      - Header: Authorization: Bearer {CRON_SECRET}
+```
+
+**설정 필요**:
+1. GitHub Secret: `CRON_SECRET`
+2. Cloudflare 환경변수: `CRON_SECRET` (동일한 값)
+
+**상세 가이드**: `SETUP_CRON_AND_SECRETS.md`
+
+---
+
+### 2. 구독 취소 후 무료체험 재신청 방지 ✅
+**위치**: `src/routes/payments.ts` (Line 445-451)
+
+**DB 스키마 추가**:
+```sql
+-- migrations/0048_add_trial_history_tracking.sql
+ALTER TABLE users ADD COLUMN has_used_trial INTEGER DEFAULT 0;
+UPDATE users SET has_used_trial = 1 WHERE is_trial = 1 OR trial_start_date IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_users_has_used_trial ON users(has_used_trial);
+```
+
+**로직**:
 ```typescript
-// src/scheduled.ts
-export default {
-  async scheduled(event: ScheduledEvent, env: Bindings, ctx: ExecutionContext) {
-    // Task 4: Auto billing for trial users
-    await executeAutoBilling(env);
-  }
+// 무료체험 시작 시
+if (user.has_used_trial === 1) {
+  return c.json({ 
+    error: '무료 체험은 1회만 이용 가능합니다',
+    details: '이미 무료 체험을 이용하셨습니다.'
+  }, 400);
 }
 
-async function executeAutoBilling(env: Bindings) {
-  // payments.ts의 /billing/execute 로직 복사
+// 무료체험 확정 시
+UPDATE users SET has_used_trial = 1 WHERE id = ?
+```
+
+**보호 시나리오**:
+- ✅ 무료체험 → 유료 전환 → 취소 → 재신청 방지
+- ✅ 무료체험 중 취소 → 재신청 방지
+- ✅ 평생 1회만 무료체험 가능
+
+---
+
+### 3. 구독 취소 API 추가 ✅
+**위치**: `src/routes/payments.ts` (추가됨)
+
+**엔드포인트**: `POST /api/payments/subscription/cancel`
+
+**로직**:
+```typescript
+// 자동 결제만 중지, 구독 종료일까지 플랜 유지
+UPDATE users SET auto_billing_enabled = 0 WHERE id = ?
+
+// 활동 로그 기록
+INSERT INTO activity_logs (user_id, activity_type, details)
+VALUES (?, 'subscription_cancel', 'Cancelled premium subscription')
+```
+
+**응답**:
+```json
+{
+  "success": true,
+  "message": "자동 결제가 취소되었습니다. 2026-04-27까지는 PREMIUM 플랜을 계속 사용하실 수 있습니다.",
+  "subscription_end_date": "2026-04-27"
 }
 ```
 
@@ -401,15 +465,35 @@ async function executeAutoBilling(env: Bindings) {
 
 ## ✅ 최종 확인 체크리스트
 
+### 코드 구현
 - [x] 무료체험 중복 방지 코드 구현
 - [x] 무료체험 3일 전 알림 코드 구현
 - [x] 자동 결제 코드 구현
-- [x] Cron 설정 추가 (wrangler.jsonc)
-- [x] DB 스키마 확인 (trial_reminder_sent 필드)
-- [ ] CRON_SECRET 환경 변수 설정
-- [ ] Cron Job 실행 테스트
-- [ ] 실제 카드로 무료체험 테스트
-- [ ] 자동 결제 시뮬레이션 테스트
+- [x] GitHub Actions Cron 워크플로우 추가
+- [x] 구독 취소 후 재체험 방지 (`has_used_trial`)
+- [x] 구독 취소 API 추가 (`/subscription/cancel`)
+- [x] DB 마이그레이션 파일 생성 (`0048_add_trial_history_tracking.sql`)
+
+### DB 설정
+- [x] 로컬 DB 마이그레이션 적용
+- [ ] 프로덕션 DB 마이그레이션 적용 (`npx wrangler d1 migrations apply worvox-production --remote`)
+
+### 환경 변수 설정
+- [ ] GitHub Secret `CRON_SECRET` 설정
+- [ ] Cloudflare 환경 변수 `CRON_SECRET` 설정 (GitHub Secret과 동일한 값)
+- [x] Cloudflare 환경 변수 `TOSS_SECRET_KEY` 확인
+- [x] Cloudflare 환경 변수 `RESEND_API_KEY` 확인
+
+### 테스트
+- [ ] GitHub Actions 수동 실행 테스트
+- [ ] Cron 엔드포인트 직접 호출 테스트
+- [ ] 무료체험 재신청 방지 테스트
+- [ ] 구독 취소 후 재신청 방지 테스트
+- [ ] Activity logs 모니터링
+
+### 문서
+- [x] 시스템 상세 문서 작성 (`TRIAL_AND_BILLING_STATUS.md`)
+- [x] Cron 설정 가이드 작성 (`SETUP_CRON_AND_SECRETS.md`)
 
 ---
 
