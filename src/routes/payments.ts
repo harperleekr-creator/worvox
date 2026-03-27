@@ -1023,6 +1023,13 @@ payments.post('/hiing/subscribe/confirm', async (c) => {
     const nextBillingDate = new Date();
     nextBillingDate.setMonth(nextBillingDate.getMonth() + 1);
 
+    // Get current lesson count to accumulate
+    const currentUser = await db.prepare('SELECT hiing_lesson_count FROM users WHERE id = ?').bind(userId).first();
+    const currentLessonCount = (currentUser as any)?.hiing_lesson_count || 0;
+    const newTotalLessonCount = currentLessonCount + lessonCount;
+
+    console.log(`📊 Lesson count update: ${currentLessonCount} + ${lessonCount} = ${newTotalLessonCount}`);
+
     await db.prepare(`
       UPDATE users 
       SET 
@@ -1031,14 +1038,16 @@ payments.post('/hiing/subscribe/confirm', async (c) => {
         hiing_subscription_active = 1,
         hiing_subscription_type = ?,
         hiing_next_billing_date = ?,
-        hiing_billing_amount = ?
+        hiing_billing_amount = ?,
+        hiing_lesson_package_size = ?
       WHERE id = ?
     `).bind(
       billingKey,
-      lessonCount,
+      newTotalLessonCount,  // Accumulate lesson count
       packageType,
       nextBillingDate.toISOString().split('T')[0],
       amount,
+      lessonCount,  // Store package size for monthly renewal
       userId
     ).run();
 
@@ -1282,6 +1291,178 @@ support@worvox.com
     console.error('Hiing subscribe confirm error:', error);
     return c.json({ 
       error: 'Failed to confirm subscription',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
+// 월 정기 결제 자동 실행 (Cloudflare Cron 또는 외부 스케줄러에서 호출)
+payments.post('/hiing/monthly-billing', async (c) => {
+  try {
+    // Security: Check for authorization token
+    const authHeader = c.req.header('Authorization');
+    const expectedToken = c.env.CRON_SECRET_TOKEN || 'default-cron-secret';
+    
+    if (authHeader !== `Bearer ${expectedToken}`) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    const db = c.env.DB;
+    const tossSecretKey = c.env.TOSS_SECRET_KEY;
+
+    if (!tossSecretKey) {
+      return c.json({ error: 'Toss Payments not configured' }, 500);
+    }
+
+    // Get all active subscriptions where next_billing_date is today or earlier
+    const today = new Date().toISOString().split('T')[0];
+    
+    console.log(`🔄 Running monthly billing for date: ${today}`);
+
+    const subscriptions = await db.prepare(`
+      SELECT id, username, email, billing_key, hiing_lesson_package_size, hiing_billing_amount, toss_customer_key
+      FROM users
+      WHERE hiing_subscription_active = 1
+        AND hiing_next_billing_date <= ?
+        AND billing_key IS NOT NULL
+    `).bind(today).all();
+
+    console.log(`📊 Found ${subscriptions.results.length} subscriptions to bill`);
+
+    const results = [];
+
+    for (const user of subscriptions.results) {
+      try {
+        const userId = (user as any).id;
+        const billingKey = (user as any).billing_key;
+        const lessonCount = (user as any).hiing_lesson_package_size || 10;
+        const amount = (user as any).hiing_billing_amount || 100000;
+        const customerKey = (user as any).toss_customer_key;
+
+        console.log(`💳 Processing billing for user ${userId} (${(user as any).email})`);
+
+        // Execute monthly payment
+        const orderId = `hiing_monthly_${Date.now()}_${userId}`;
+        const orderName = `WorVox Live Speaking ${lessonCount}회 (월정기)`;
+
+        const paymentResponse = await fetch('https://api.tosspayments.com/v1/billing/' + billingKey, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Basic ${btoa(tossSecretKey + ':')}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            customerKey: customerKey,
+            amount: amount,
+            orderId: orderId,
+            orderName: orderName,
+            customerEmail: (user as any).email || '',
+            customerName: (user as any).username || ''
+          })
+        });
+
+        const paymentResult = await paymentResponse.json();
+
+        if (!paymentResponse.ok) {
+          console.error(`❌ Payment failed for user ${userId}:`, paymentResult);
+          
+          // If payment fails, deactivate subscription
+          await db.prepare(`
+            UPDATE users 
+            SET hiing_subscription_active = 0
+            WHERE id = ?
+          `).bind(userId).run();
+
+          // Log failure
+          await db.prepare(`
+            INSERT INTO activity_logs (user_id, activity_type, details)
+            VALUES (?, 'hiing_monthly_billing_failed', ?)
+          `).bind(userId, `Monthly billing failed: ${paymentResult.message || 'Unknown error'}`).run();
+
+          results.push({
+            userId: userId,
+            email: (user as any).email,
+            status: 'failed',
+            error: paymentResult.message || 'Payment failed'
+          });
+
+          continue;
+        }
+
+        console.log(`✅ Payment successful for user ${userId}`);
+
+        // Update user: add lessons + set next billing date
+        const nextBillingDate = new Date();
+        nextBillingDate.setMonth(nextBillingDate.getMonth() + 1);
+
+        // Get current lesson count and add new lessons
+        const currentUser = await db.prepare('SELECT hiing_lesson_count FROM users WHERE id = ?').bind(userId).first();
+        const currentLessonCount = (currentUser as any)?.hiing_lesson_count || 0;
+        const newTotalLessonCount = currentLessonCount + lessonCount;
+
+        console.log(`📊 User ${userId}: ${currentLessonCount} + ${lessonCount} = ${newTotalLessonCount} lessons`);
+
+        await db.prepare(`
+          UPDATE users 
+          SET 
+            hiing_lesson_count = ?,
+            hiing_next_billing_date = ?
+          WHERE id = ?
+        `).bind(
+          newTotalLessonCount,
+          nextBillingDate.toISOString().split('T')[0],
+          userId
+        ).run();
+
+        // Record payment
+        await db.prepare(`
+          INSERT INTO payment_orders (order_id, user_id, plan_name, amount, status, payment_key, confirmed_at, created_at)
+          VALUES (?, ?, ?, ?, 'completed', ?, datetime('now'), datetime('now'))
+        `).bind(orderId, userId, `Live Speaking ${lessonCount}회 (월정기)`, amount, paymentResult.paymentKey).run();
+
+        // Log success
+        await db.prepare(`
+          INSERT INTO activity_logs (user_id, activity_type, details)
+          VALUES (?, 'hiing_monthly_billing_success', ?)
+        `).bind(userId, `Monthly billing successful: ₩${amount.toLocaleString()} - Added ${lessonCount} lessons`).run();
+
+        results.push({
+          userId: userId,
+          email: (user as any).email,
+          status: 'success',
+          amount: amount,
+          lessonCount: lessonCount,
+          newTotalLessons: newTotalLessonCount,
+          nextBillingDate: nextBillingDate.toISOString().split('T')[0]
+        });
+
+        console.log(`✅ User ${userId} billing complete`);
+
+      } catch (userError) {
+        console.error(`❌ Error processing user ${(user as any).id}:`, userError);
+        results.push({
+          userId: (user as any).id,
+          email: (user as any).email,
+          status: 'error',
+          error: userError instanceof Error ? userError.message : 'Unknown error'
+        });
+      }
+    }
+
+    console.log(`🎉 Monthly billing complete: ${results.filter(r => r.status === 'success').length}/${results.length} successful`);
+
+    return c.json({
+      success: true,
+      processed: results.length,
+      successful: results.filter(r => r.status === 'success').length,
+      failed: results.filter(r => r.status === 'failed').length,
+      results: results
+    });
+
+  } catch (error) {
+    console.error('❌ Monthly billing error:', error);
+    return c.json({ 
+      error: 'Monthly billing failed',
       details: error instanceof Error ? error.message : 'Unknown error'
     }, 500);
   }
