@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1774603769641'; // Update manually or via build script
+const BUILD_TIME = '1774604115449'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -800,6 +800,31 @@ app.get('/payment/fail', (c) => {
   `);
 });
 
+// Get user by ID
+app.get('/api/users/:userId', async (c) => {
+  const userId = c.req.param('userId');
+  const { DB } = c.env as Bindings;
+  
+  try {
+    const user = await DB.prepare(`
+      SELECT id, username, email, plan, is_trial, trial_start_date, trial_end_date, 
+             billing_period, auto_billing_enabled, subscription_start_date, subscription_end_date,
+             created_at, profile_picture, bio
+      FROM users 
+      WHERE id = ?
+    `).bind(userId).first();
+    
+    if (!user) {
+      return c.json({ success: false, error: 'User not found' }, 404);
+    }
+    
+    return c.json({ success: true, user });
+  } catch (error: any) {
+    console.error('Get user error:', error);
+    return c.json({ success: false, error: error.message }, 500);
+  }
+});
+
 // Trial Success - Billing key registered
 app.get('/trial-success', (c) => {
   const authKey = c.req.query('authKey');
@@ -850,6 +875,27 @@ app.get('/trial-success', (c) => {
               });
               
               if (response.data.success) {
+                // Fetch latest user data from server to ensure sync
+                try {
+                  const userResponse = await axios.get('/api/users/${userId}');
+                  if (userResponse.data.success) {
+                    const updatedUser = userResponse.data.user;
+                    localStorage.setItem('worvox_user', JSON.stringify(updatedUser));
+                    console.log('✅ Updated user data from server:', updatedUser);
+                  }
+                } catch (err) {
+                  console.error('Failed to fetch updated user:', err);
+                  // Fallback: update localStorage manually
+                  const storedUser = localStorage.getItem('worvox_user');
+                  if (storedUser) {
+                    const userData = JSON.parse(storedUser);
+                    userData.plan = '${plan}';
+                    userData.is_trial = 1;
+                    userData.trial_end_date = response.data.trialEndDate;
+                    localStorage.setItem('worvox_user', JSON.stringify(userData));
+                  }
+                }
+                
                 document.getElementById('content').innerHTML = \`
                   <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
                     <div class="text-6xl mb-4">🎉</div>
@@ -875,13 +921,18 @@ app.get('/trial-success', (c) => {
                     </p>
                     
                     <button 
-                      onclick="window.location.href='/'"
+                      onclick="window.location.href='/app'"
                       class="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-3 rounded-lg font-semibold hover:from-green-600 hover:to-emerald-600 transition shadow-lg"
                     >
                       시작하기
                     </button>
                   </div>
                 \`;
+                
+                // Redirect to /app after 2 seconds
+                setTimeout(() => {
+                  window.location.href = '/app';
+                }, 2000);
               } else {
                 throw new Error('체험 활성화 실패');
               }
