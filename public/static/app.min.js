@@ -16546,27 +16546,48 @@ Proceed to payment?
       const { customerKey } = startResponse.data;
       console.log(`📝 Customer key: ${customerKey}`);
 
-      // Step 2: Initialize Toss Payments Billing (v2 SDK)
+      // Step 2: Initialize TossPayments SDK
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
       
-      // TossPayments v1 SDK - Direct initialization
-      if (typeof TossPayments === 'undefined') {
-        console.error('❌ TossPayments v1 SDK not loaded');
-        throw new Error('TossPayments SDK가 로드되지 않았습니다. 페이지를 새로고침해주세요.');
-      }
-      
-      const tossPayments = TossPayments(clientKey);
-      console.log('✅ TossPayments v1 SDK initialized successfully');
+      // Wait for TossPayments SDK to load
+      console.log('⏳ Waiting for TossPayments SDK to load...');
+      const tossPayments = await this.waitForTossPaymentsSDK(clientKey);
+      console.log('TossPayments object type:', typeof tossPayments);
+      console.log('TossPayments methods:', Object.keys(tossPayments));
 
-      // Step 3: Request billing key (카드 등록)
-      await tossPayments.requestBillingAuth({
-        method: 'CARD',
-        customerKey: customerKey,
-        successUrl: window.location.origin + `/trial-success?plan=${plan}&userId=${this.currentUser.id}&customerKey=${customerKey}&billingPeriod=${billingPeriod}`,
-        failUrl: window.location.origin + '/trial-fail',
-        customerEmail: this.currentUser.email,
-        customerName: this.currentUser.username
-      });
+      // Step 3: Request billing authorization
+      console.log('🔑 Requesting billing authorization with customerKey:', customerKey);
+      
+      // Try payment.requestBillingAuth if available
+      if (tossPayments.payment && typeof tossPayments.payment === 'function') {
+        console.log('✅ Using tossPayments.payment() method');
+        const payment = tossPayments.payment({
+          customerKey: customerKey,
+        });
+        console.log('✅ Payment object created');
+        
+        await payment.requestBillingAuth({
+          method: 'CARD',
+          successUrl: window.location.origin + `/trial-success?plan=${plan}&userId=${this.currentUser.id}&customerKey=${customerKey}&billingPeriod=${billingPeriod}`,
+          failUrl: window.location.origin + '/trial-fail',
+          customerEmail: this.currentUser.email,
+          customerName: this.currentUser.username
+        });
+      } else if (tossPayments.requestBillingAuth && typeof tossPayments.requestBillingAuth === 'function') {
+        console.log('✅ Using tossPayments.requestBillingAuth() directly');
+        await tossPayments.requestBillingAuth({
+          method: 'CARD',
+          customerKey: customerKey,
+          successUrl: window.location.origin + `/trial-success?plan=${plan}&userId=${this.currentUser.id}&customerKey=${customerKey}&billingPeriod=${billingPeriod}`,
+          failUrl: window.location.origin + '/trial-fail',
+          customerEmail: this.currentUser.email,
+          customerName: this.currentUser.username
+        });
+      } else {
+        console.error('❌ No billing auth method found');
+        console.error('Available methods:', Object.keys(tossPayments));
+        throw new Error('TossPayments SDK에서 결제 메서드를 찾을 수 없습니다.');
+      }
 
     } catch (error) {
       console.error('Toss free trial error:', error);
