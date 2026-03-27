@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1774587678458'; // Update manually or via build script
+const BUILD_TIME = '1774588324962'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -47,15 +47,20 @@ app.use('*', async (c, next) => {
   c.header('X-XSS-Protection', '1; mode=block');
   c.header('Referrer-Policy', 'strict-origin-when-cross-origin');
   
-  // Allow TossPayments SDK and other CDN resources
+  // Relaxed CSP - Allow TossPayments SDK and all necessary CDN resources
   c.header('Content-Security-Policy', 
-    "default-src 'self'; " +
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.tosspayments.com https://cdn.tailwindcss.com https://cdn.jsdelivr.net https://accounts.google.com; " +
-    "style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; " +
-    "img-src 'self' data: https:; " +
-    "connect-src 'self' https://api.tosspayments.com; " +
-    "frame-src https://accounts.google.com; " +
-    "font-src 'self' data:"
+    "default-src 'self' https:; " +  // Allow all HTTPS sources for default
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; " +  // Allow all HTTPS scripts
+    "style-src 'self' 'unsafe-inline' https:; " +  // Allow all HTTPS styles
+    "img-src 'self' data: blob: https:; " +  // Allow images from anywhere including emojis
+    "connect-src 'self' https: wss:; " +  // Allow all HTTPS and WebSocket connections
+    "frame-src 'self' https:; " +  // Allow all HTTPS frames
+    "font-src 'self' data: https:; " +  // Allow fonts from anywhere
+    "media-src 'self' https:; " +  // Allow media
+    "object-src 'none'; " +  // Disable plugins
+    "base-uri 'self'; " +  // Restrict base tag
+    "form-action 'self' https:; " +  // Allow form submissions
+    "frame-ancestors 'self'"  // Prevent clickjacking
   );
 });
 
