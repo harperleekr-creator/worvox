@@ -17189,7 +17189,7 @@ Proceed to payment?
     }
 
     tbody.innerHTML = users.map(user => {
-      const planBadge = this.getPlanBadge(user.plan || 'free');
+      const planBadge = this.getPlanBadge(user.plan || 'free', user.is_trial, user.trial_end_date);
       const studyHours = Math.floor((user.total_study_minutes || 0) / 60);
       const studyMinutes = (user.total_study_minutes || 0) % 60;
       
@@ -17227,14 +17227,24 @@ Proceed to payment?
     }).join('');
   }
 
-  getPlanBadge(plan) {
+  getPlanBadge(plan, isTrial, trialEndDate) {
     const badges = {
       free: '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">FREE</span>',
       core: '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">CORE</span>',
       premium: '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">PREMIUM</span>',
       business: '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">BUSINESS</span>'
     };
-    return badges[plan] || badges.free;
+    
+    const planBadge = badges[plan] || badges.free;
+    
+    // Add trial badge if user is on trial
+    if (isTrial && plan !== 'free') {
+      const daysLeft = trialEndDate ? Math.ceil((new Date(trialEndDate) - new Date()) / (1000 * 60 * 60 * 24)) : 0;
+      const trialBadge = `<br/><span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-700">🎁 무료체험 (D-${daysLeft})</span>`;
+      return planBadge + trialBadge;
+    }
+    
+    return planBadge;
   }
 
   filterUsers(searchTerm) {

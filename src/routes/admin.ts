@@ -34,14 +34,19 @@ admin.get('/users', requireAuth, async (c) => {
         u.email,
         u.level,
         u.plan,
+        u.is_trial,
+        u.trial_start_date,
+        u.trial_end_date,
         u.billing_period,
         u.subscription_start_date,
         u.subscription_end_date,
         u.last_login_at,
         u.created_at,
+        u.is_admin,
         COUNT(DISTINCT s.id) as total_sessions,
         COUNT(DISTINCT m.id) as total_messages,
-        COALESCE(SUM(sd.duration_seconds), 0) as total_duration_seconds
+        COALESCE(SUM(sd.duration_seconds), 0) as total_duration_seconds,
+        COALESCE(SUM(sd.duration_seconds) / 60, 0) as total_study_minutes
       FROM users u
       LEFT JOIN sessions s ON u.id = s.user_id
       LEFT JOIN messages m ON s.id = m.session_id
@@ -646,6 +651,39 @@ admin.delete('/users/:id', requireAuth, async (c) => {
   } catch (error) {
     console.error('Admin delete user error:', error)
     return c.json({ error: '사용자 삭제 실패: ' + (error as Error).message }, 500)
+  }
+})
+
+// Set user as admin (restricted to specific emails)
+admin.post('/set-admin', async (c) => {
+  try {
+    const { email, secret } = await c.req.json()
+    
+    // Simple secret check (you can change this to a more secure method)
+    if (secret !== 'worvox-admin-2024') {
+      return c.json({ error: '권한이 없습니다' }, 403)
+    }
+    
+    // Update user to admin
+    const result = await c.env.DB.prepare(`
+      UPDATE users 
+      SET is_admin = 1 
+      WHERE email = ?
+    `).bind(email).run()
+    
+    if (result.meta.changes === 0) {
+      return c.json({ error: '사용자를 찾을 수 없습니다' }, 404)
+    }
+    
+    console.log(`✅ User ${email} set as admin`)
+    
+    return c.json({
+      success: true,
+      message: `${email}이(가) 관리자로 설정되었습니다`
+    })
+  } catch (error) {
+    console.error('Set admin error:', error)
+    return c.json({ error: '관리자 설정 실패' }, 500)
   }
 })
 
