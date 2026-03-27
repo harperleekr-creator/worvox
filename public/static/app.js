@@ -15768,6 +15768,105 @@ Proceed to payment?
                 </div>
                 ` : ''}
 
+                <!-- Core/Premium Subscription Status -->
+                ${this.currentUser.plan && this.currentUser.plan !== 'free' ? `
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                  <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-crown text-purple-600 mr-2"></i>${this.currentUser.plan === 'core' ? 'Core' : 'Premium'} 플랜 구독
+                  </h3>
+                  
+                  <div class="border border-purple-200 rounded-lg p-4 bg-gradient-to-br from-purple-50 to-pink-50 mb-4">
+                    <div class="flex items-start justify-between mb-3">
+                      <div>
+                        <h4 class="font-semibold text-gray-900 text-lg">
+                          <i class="fas fa-crown text-purple-600 mr-2"></i>${this.currentUser.plan === 'core' ? 'Core' : 'Premium'} 플랜
+                        </h4>
+                        ${this.currentUser.is_trial ? `
+                          <p class="text-sm text-purple-600 font-semibold mt-1">
+                            <i class="fas fa-gift mr-1"></i>2주 무료 체험 중
+                          </p>
+                        ` : `
+                          <p class="text-sm text-gray-600 mt-1">
+                            ${this.currentUser.billing_period === 'yearly' ? '연간 구독' : '월간 구독'}
+                          </p>
+                        `}
+                      </div>
+                      ${this.currentUser.auto_billing_enabled ? `
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                          <i class="fas fa-check-circle mr-1"></i>활성
+                        </span>
+                      ` : `
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-200 text-gray-700">
+                          <i class="fas fa-ban mr-1"></i>갱신 취소됨
+                        </span>
+                      `}
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                      ${this.currentUser.is_trial ? `
+                        <div class="p-3 bg-white rounded-lg">
+                          <p class="text-xs text-gray-500 mb-1">체험 시작일</p>
+                          <p class="text-sm font-semibold text-gray-900">${this.currentUser.trial_start_date ? new Date(this.currentUser.trial_start_date).toLocaleDateString('ko-KR') : '-'}</p>
+                        </div>
+                        <div class="p-3 bg-white rounded-lg">
+                          <p class="text-xs text-gray-500 mb-1">체험 종료일</p>
+                          <p class="text-sm font-semibold text-gray-900">${this.currentUser.trial_end_date ? new Date(this.currentUser.trial_end_date).toLocaleDateString('ko-KR') : '-'}</p>
+                        </div>
+                      ` : `
+                        <div class="p-3 bg-white rounded-lg">
+                          <p class="text-xs text-gray-500 mb-1">구독 시작일</p>
+                          <p class="text-sm font-semibold text-gray-900">${this.currentUser.subscription_start_date ? new Date(this.currentUser.subscription_start_date).toLocaleDateString('ko-KR') : '-'}</p>
+                        </div>
+                        <div class="p-3 bg-white rounded-lg">
+                          <p class="text-xs text-gray-500 mb-1">다음 결제일</p>
+                          <p class="text-sm font-semibold text-gray-900">${this.currentUser.subscription_end_date ? new Date(this.currentUser.subscription_end_date).toLocaleDateString('ko-KR') : '-'}</p>
+                        </div>
+                      `}
+                    </div>
+                    
+                    <div class="p-3 bg-white rounded-lg mb-3">
+                      <p class="text-xs text-gray-500 mb-1">결제 금액</p>
+                      <p class="text-lg font-bold text-gray-900">
+                        ${this.currentUser.plan === 'core' 
+                          ? (this.currentUser.billing_period === 'yearly' ? '₩97,416/년' : '₩9,900/월')
+                          : (this.currentUser.billing_period === 'yearly' ? '₩186,960/년' : '₩19,000/월')
+                        }
+                      </p>
+                    </div>
+                    
+                    ${this.currentUser.auto_billing_enabled ? `
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3">
+                      <div class="flex items-start gap-2">
+                        <i class="fas fa-info-circle text-yellow-600 text-sm mt-0.5"></i>
+                        <div class="flex-1 text-xs text-yellow-800">
+                          <p class="font-semibold mb-1">자동 갱신 안내</p>
+                          ${this.currentUser.is_trial 
+                            ? `<p>무료 체험 종료 후 자동으로 유료 구독으로 전환됩니다.</p>`
+                            : `<p>다음 결제일에 자동으로 구독이 갱신됩니다.</p>`
+                          }
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <button onclick="worvox.cancelCoreSubscription()" 
+                      class="w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg font-semibold transition-all border border-red-200 text-sm">
+                      <i class="fas fa-times-circle mr-2"></i>구독 취소
+                    </button>
+                    ` : `
+                    <div class="bg-gray-100 border border-gray-200 rounded-lg p-3">
+                      <div class="flex items-start gap-2">
+                        <i class="fas fa-check-circle text-gray-600 text-sm mt-0.5"></i>
+                        <div class="flex-1 text-xs text-gray-700">
+                          <p class="font-semibold mb-1">구독이 취소되었습니다</p>
+                          <p>현재 구독 기간(${this.currentUser.subscription_end_date ? new Date(this.currentUser.subscription_end_date).toLocaleDateString('ko-KR') : '-'})까지 계속 이용하실 수 있습니다.</p>
+                        </div>
+                      </div>
+                    </div>
+                    `}
+                  </div>
+                </div>
+                ` : ''}
+
                 <!-- Live Speaking Subscriptions -->
                 ${hiingSubscriptions.length > 0 ? `
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
@@ -16243,6 +16342,53 @@ Proceed to payment?
   }
 
   // Cancel Hiing monthly subscription auto-renewal
+  async cancelCoreSubscription() {
+    const planName = this.currentUser.plan === 'core' ? 'Core' : 'Premium';
+    const isTrial = this.currentUser.is_trial;
+    
+    // Confirmation dialog
+    const confirmed = confirm(
+      `${planName} 플랜 구독을 취소하시겠습니까?\n\n` +
+      `취소하시면:\n` +
+      `• ${isTrial ? '무료 체험 종료일' : '현재 구독 기간'}까지 계속 사용하실 수 있습니다\n` +
+      `• ${isTrial ? '체험 종료 후' : '다음 결제일부터'} 자동 결제가 중단됩니다\n` +
+      `• ${isTrial ? '' : '환불을 원하시면 support@worvox.com으로 문의해주세요\n'}` +
+      `• 언제든지 다시 구독할 수 있습니다`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      console.log('Canceling Core/Premium subscription for user:', this.currentUser.id);
+
+      const endpoint = isTrial ? '/api/payments/trial/cancel' : '/api/payments/subscription/cancel';
+      const response = await axios.post(endpoint, {
+        userId: this.currentUser.id
+      });
+
+      if (response.data.success) {
+        alert(
+          isTrial 
+            ? '무료 체험 자동 갱신이 취소되었습니다.\n체험 종료일까지 계속 사용하실 수 있습니다.'
+            : `${planName} 플랜 구독이 취소되었습니다.\n현재 구독 기간까지 계속 사용하실 수 있습니다.\n\n환불 문의: support@worvox.com`
+        );
+        
+        // Update local user data
+        this.currentUser.auto_billing_enabled = 0;
+        localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
+        
+        // Refresh profile page
+        this.showProfile();
+      } else {
+        alert('구독 취소에 실패했습니다. 다시 시도해주세요.');
+      }
+
+    } catch (error) {
+      console.error('Cancel subscription error:', error);
+      alert('구독 취소에 실패했습니다. 다시 시도해주세요.\n' + (error.response?.data?.error || error.message));
+    }
+  }
+
   async cancelHiingSubscription(subscriptionId) {
     // Confirmation dialog
     const confirmed = confirm(
@@ -16604,7 +16750,7 @@ Proceed to payment?
 
   async selectPlan(planName) {
     if (!this.currentUser) {
-      
+      alert('로그인이 필요합니다.');
       return;
     }
 
@@ -16622,8 +16768,55 @@ Proceed to payment?
       return;
     }
 
-    // Show payment method selection modal
-    this.showPaymentMethodModal(planName, amount, priceText, period);
+    // Start subscription flow immediately (like free trial flow)
+    await this.startSubscription(planName, period);
+  }
+
+  // Start subscription (immediate billing)
+  async startSubscription(planName, period) {
+    try {
+      console.log('🚀 Starting subscription:', planName, period);
+
+      // 1. Call subscription start API
+      const startResponse = await axios.post('/api/payments/subscription/start', {
+        userId: this.currentUser.id,
+        plan: planName,
+        billingPeriod: period
+      });
+
+      if (!startResponse.data.success) {
+        alert(startResponse.data.error || '구독 시작에 실패했습니다.');
+        return;
+      }
+
+      const { customerKey } = startResponse.data;
+      console.log('✅ Subscription start prepared, customerKey:', customerKey);
+
+      // 2. Wait for TossPayments SDK
+      const clientKey = 'test_ck_d26DlbXAaV0eR7QxP00rqY50Q9RB';
+      const tossPayments = await this.waitForTossPaymentsSDK(clientKey);
+      
+      if (!tossPayments) {
+        throw new Error('TossPayments SDK를 로드하지 못했습니다.');
+      }
+
+      console.log('✅ TossPayments SDK loaded, requesting billing auth...');
+
+      // 3. Request billing authorization
+      const authResult = await tossPayments.requestBillingAuth({
+        method: 'CARD',
+        successUrl: `${window.location.origin}/subscription-success?plan=${planName}&userId=${this.currentUser.id}&period=${period}`,
+        failUrl: `${window.location.origin}/subscription-fail`,
+        customerKey: customerKey,
+        customerEmail: this.currentUser.email,
+        customerName: this.currentUser.username || this.currentUser.email
+      });
+
+      console.log('✅ Billing auth requested:', authResult);
+    } catch (error) {
+      console.error('❌ Subscription start error:', error);
+      alert('구독 시작 중 오류가 발생했습니다: ' + error.message);
+    }
   }
 
   // Show payment method selection modal

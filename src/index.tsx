@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1774606647997'; // Update manually or via build script
+const BUILD_TIME = '1774607684080'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -962,6 +962,159 @@ app.get('/trial-success', (c) => {
 });
 
 // Trial Fail - Billing key registration failed
+// Subscription success page (instant billing)
+app.get('/subscription-success', (c) => {
+  const authKey = c.req.query('authKey');
+  const customerKey = c.req.query('customerKey');
+  const plan = c.req.query('plan');
+  const userId = c.req.query('userId');
+  const period = c.req.query('period') || 'monthly';
+  
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>구독 시작 - WorVox</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-gradient-to-br from-purple-50 to-pink-50">
+        <div id="content" class="min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                <p class="text-gray-600">구독을 활성화하는 중...</p>
+            </div>
+        </div>
+        
+        <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+        <script>
+          async function activateSubscription() {
+            try {
+              const response = await axios.post('/api/payments/subscription/confirm', {
+                userId: '${userId}',
+                plan: '${plan}',
+                authKey: '${authKey}',
+                customerKey: '${customerKey}',
+                billingPeriod: '${period}'
+              });
+              
+              if (response.data.success) {
+                // Fetch latest user data
+                try {
+                  const userResponse = await axios.get('/api/users/${userId}');
+                  if (userResponse.data.success) {
+                    const updatedUser = userResponse.data.user;
+                    localStorage.setItem('worvox_user', JSON.stringify(updatedUser));
+                    console.log('✅ Updated user data:', updatedUser);
+                  }
+                } catch (err) {
+                  console.error('Failed to fetch updated user:', err);
+                }
+                
+                const planName = '${plan}' === 'core' || '${plan}' === 'Core' ? 'Core' : 'Premium';
+                const amount = '${plan}' === 'core' || '${plan}' === 'Core' ? 
+                  ('${period}' === 'monthly' ? '₩9,900' : '₩97,416') :
+                  ('${period}' === 'monthly' ? '₩19,000' : '₩186,960');
+                const periodText = '${period}' === 'monthly' ? '월' : '년';
+                
+                document.getElementById('content').innerHTML = \`
+                  <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+                    <div class="text-6xl mb-4">🎉</div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-3">구독 시작 완료!</h1>
+                    <p class="text-gray-600 mb-4">
+                      <strong class="text-purple-600">\${planName}</strong> 플랜 구독이 시작되었습니다!
+                    </p>
+                    
+                    <div class="bg-purple-50 rounded-lg p-4 mb-6 text-left">
+                      <p class="text-sm text-gray-700 mb-2">
+                        <i class="fas fa-crown text-purple-600 mr-2"></i>
+                        플랜: <strong>\${planName}</strong>
+                      </p>
+                      <p class="text-sm text-gray-700 mb-2">
+                        <i class="fas fa-credit-card text-purple-600 mr-2"></i>
+                        결제 금액: <strong>\${amount}/\${periodText}</strong>
+                      </p>
+                      <p class="text-sm text-gray-700">
+                        <i class="fas fa-calendar-check text-purple-600 mr-2"></i>
+                        다음 결제일: <strong>\${new Date(response.data.nextBillingDate).toLocaleDateString('ko-KR')}</strong>
+                      </p>
+                    </div>
+                    
+                    <p class="text-xs text-gray-500 mb-6">
+                      💡 내 정보 > 구독 관리에서 언제든 해지하실 수 있습니다.
+                    </p>
+                    
+                    <button 
+                      onclick="window.location.href='/app'"
+                      class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-lg font-semibold hover:from-purple-600 hover:to-pink-600 transition shadow-lg"
+                    >
+                      시작하기
+                    </button>
+                  </div>
+                \`;
+                
+                setTimeout(() => {
+                  window.location.href = '/app';
+                }, 2000);
+                
+              } else {
+                throw new Error(response.data.error || '구독 활성화 실패');
+              }
+            } catch (error) {
+              console.error('Subscription activation error:', error);
+              document.getElementById('content').innerHTML = \`
+                <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+                  <div class="text-6xl mb-4">😢</div>
+                  <h1 class="text-3xl font-bold text-gray-900 mb-3">구독 실패</h1>
+                  <p class="text-gray-600 mb-6">\${error.message || '구독 처리 중 문제가 발생했습니다.'}</p>
+                  <button 
+                    onclick="window.location.href='/app'"
+                    class="w-full bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition"
+                  >
+                    홈으로 돌아가기
+                  </button>
+                </div>
+              \`;
+            }
+          }
+          
+          activateSubscription();
+        </script>
+    </body>
+    </html>
+  `);
+});
+
+app.get('/subscription-fail', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>구독 실패 - WorVox</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-gradient-to-br from-red-50 to-pink-50">
+        <div class="min-h-screen flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+                <div class="text-6xl mb-4">😢</div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-3">구독 실패</h1>
+                <p class="text-gray-600 mb-6">결제 정보 등록에 실패했습니다. 다시 시도해주세요.</p>
+                <button 
+                  onclick="window.location.href='/app'"
+                  class="w-full bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition"
+                >
+                  홈으로 돌아가기
+                </button>
+            </div>
+        </div>
+    </body>
+    </html>
+  `);
+});
+
 app.get('/trial-fail', (c) => {
   const code = c.req.query('code');
   const message = c.req.query('message');

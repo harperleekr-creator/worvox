@@ -500,6 +500,178 @@ payments.post('/trial/start', async (c) => {
   }
 });
 
+// Confirm billing key and activate subscription (immediate billing)
+payments.post('/subscription/confirm', async (c) => {
+  try {
+    const { userId, plan, authKey, customerKey, billingPeriod } = await c.req.json();
+
+    if (!userId || !plan || !authKey || !customerKey) {
+      return c.json({ error: 'Missing required fields' }, 400);
+    }
+
+    const tossSecretKey = c.env.TOSS_SECRET_KEY;
+    if (!tossSecretKey) {
+      return c.json({ error: 'Toss Payments not configured' }, 500);
+    }
+
+    // Step 1: Get billing key from Toss
+    const billingKeyResponse = await fetch('https://api.tosspayments.com/v1/billing/authorizations/issue', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${btoa(tossSecretKey + ':')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        authKey: authKey,
+        customerKey: customerKey 
+      })
+    });
+
+    const billingKeyResult = await billingKeyResponse.json();
+
+    if (!billingKeyResponse.ok) {
+      console.error('Billing key error:', billingKeyResult);
+      return c.json({ 
+        error: 'Failed to get billing key',
+        details: billingKeyResult
+      }, billingKeyResponse.status);
+    }
+
+    const billingKey = billingKeyResult.billingKey;
+    const period = billingPeriod || 'monthly';
+    const normalizedPlan = plan.toLowerCase();
+
+    console.log(`💳 Processing subscription for user ${userId}, plan: ${normalizedPlan}, billing key: ${billingKey}, period: ${period}`);
+
+    // Determine billing amount and duration
+    let amount;
+    let durationDays;
+    let displayAmount;
+    
+    if (normalizedPlan === 'core') {
+      if (period === 'yearly') {
+        amount = 97416;
+        durationDays = 365;
+        displayAmount = '₩97,416/년';
+      } else {
+        amount = 9900;
+        durationDays = 30;
+        displayAmount = '₩9,900/월';
+      }
+    } else if (normalizedPlan === 'premium') {
+      if (period === 'yearly') {
+        amount = 186960;
+        durationDays = 365;
+        displayAmount = '₩186,960/년';
+      } else {
+        amount = 19000;
+        durationDays = 30;
+        displayAmount = '₩19,000/월';
+      }
+    } else {
+      return c.json({ error: 'Invalid plan' }, 400);
+    }
+
+    // Step 2: Charge immediately
+    const orderId = `sub_${userId}_${Date.now()}`;
+    const orderName = `${normalizedPlan === 'core' ? 'Core' : 'Premium'} 플랜 (${period === 'yearly' ? '연간' : '월간'})`;
+
+    const user = await c.env.DB.prepare('SELECT username, email FROM users WHERE id = ?')
+      .bind(userId).first();
+
+    if (!user) {
+      return c.json({ error: 'User not found' }, 404);
+    }
+
+    const paymentResponse = await fetch('https://api.tosspayments.com/v1/billing', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${btoa(tossSecretKey + ':')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        billingKey: billingKey,
+        amount: amount,
+        orderId: orderId,
+        orderName: orderName,
+        customerEmail: user.email,
+        customerName: user.username || user.email
+      })
+    });
+
+    const paymentResult = await paymentResponse.json();
+
+    if (!paymentResponse.ok) {
+      console.error('Payment error:', paymentResult);
+      return c.json({ 
+        error: 'Payment failed',
+        details: paymentResult
+      }, paymentResponse.status);
+    }
+
+    console.log(`✅ Payment successful: ${paymentResult.orderId}, amount: ${amount}`);
+
+    // Calculate subscription dates
+    const subscriptionStartDate = new Date();
+    const subscriptionEndDate = new Date();
+    subscriptionEndDate.setDate(subscriptionEndDate.getDate() + durationDays);
+
+    // Step 3: Update user with subscription
+    await c.env.DB.prepare(`
+      UPDATE users 
+      SET 
+        billing_key = ?,
+        toss_customer_key = ?,
+        plan = ?,
+        billing_period = ?,
+        is_trial = 0,
+        trial_start_date = NULL,
+        trial_end_date = NULL,
+        auto_billing_enabled = 1,
+        subscription_start_date = datetime('now'),
+        subscription_end_date = datetime('now', '+${durationDays} days'),
+        billing_failure_count = 0
+      WHERE id = ?
+    `).bind(billingKey, customerKey, normalizedPlan, period, userId).run();
+
+    // Record payment
+    await c.env.DB.prepare(`
+      INSERT INTO payment_orders (
+        user_id, order_id, order_name, amount, status, 
+        billing_key, payment_method, created_at
+      )
+      VALUES (?, ?, ?, ?, 'success', ?, 'card', datetime('now'))
+    `).bind(userId, orderId, orderName, amount, billingKey).run();
+
+    // Log subscription activation
+    await c.env.DB.prepare(`
+      INSERT INTO activity_logs (user_id, activity_type, details, created_at)
+      VALUES (?, 'subscription_start', ?, datetime('now'))
+    `).bind(
+      userId,
+      `Started ${normalizedPlan} subscription - ${displayAmount}`
+    ).run();
+
+    console.log(`✅ Subscription activated until ${subscriptionEndDate.toISOString()}`);
+
+    return c.json({
+      success: true,
+      plan: normalizedPlan,
+      billingPeriod: period,
+      amount: displayAmount,
+      nextBillingDate: subscriptionEndDate.toISOString(),
+      orderId: orderId
+    });
+
+  } catch (error) {
+    console.error('Subscription confirm error:', error);
+    return c.json({ 
+      error: 'Failed to confirm subscription',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
 // Confirm billing key and activate trial
 payments.post('/trial/confirm', async (c) => {
   try {
@@ -647,6 +819,64 @@ payments.post('/trial/confirm', async (c) => {
 });
 
 // Cancel trial (user cancels before trial ends)
+// Start subscription (immediate billing, no trial)
+payments.post('/subscription/start', async (c) => {
+  try {
+    const { userId, plan, billingPeriod } = await c.req.json();
+
+    console.log(`📥 Subscription start - userId: ${userId}, plan: ${plan}, billingPeriod: ${billingPeriod || 'monthly'}`);
+
+    if (!userId || !plan) {
+      return c.json({ error: 'Missing required fields' }, 400);
+    }
+
+    if (!['core', 'premium', 'Core', 'Premium'].includes(plan)) {
+      return c.json({ error: 'Invalid plan. Must be "core" or "premium"' }, 400);
+    }
+
+    // Normalize plan name to lowercase
+    const normalizedPlan = plan.toLowerCase();
+
+    // Check if user exists
+    const user = await c.env.DB.prepare(
+      'SELECT id, username, email, plan FROM users WHERE id = ?'
+    ).bind(userId).first();
+
+    if (!user) {
+      return c.json({ error: 'User not found' }, 404);
+    }
+
+    // Generate unique customer key for TossPayments
+    const customerKey = `sub_${userId}_${Date.now()}`;
+
+    // Update user with billing info
+    await c.env.DB.prepare(`
+      UPDATE users
+      SET toss_customer_key = ?,
+          billing_period = ?
+      WHERE id = ?
+    `).bind(
+      customerKey,
+      billingPeriod || 'monthly',
+      userId
+    ).run();
+
+    console.log(`✅ Subscription prepared, customerKey: ${customerKey}`);
+
+    return c.json({
+      success: true,
+      customerKey: customerKey
+    });
+
+  } catch (error) {
+    console.error('Subscription start error:', error);
+    return c.json({ 
+      error: 'Failed to start subscription',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
 payments.post('/trial/cancel', async (c) => {
   try {
     const { userId } = await c.req.json();
