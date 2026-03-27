@@ -6073,10 +6073,32 @@ class WorVox {
     }
   }
 
-  // Helper function to wait for TossPayments SDK to load
+  // Helper function to load and wait for TossPayments SDK
   async waitForTossPaymentsSDK(clientKey, maxWaitTime = 30000) {
     const startTime = Date.now();
     const checkInterval = 100; // Check every 100ms
+    
+    // First, ensure the SDK script is loaded
+    if (typeof window.TossPayments === 'undefined') {
+      console.log('🔄 TossPayments SDK not found, loading script dynamically...');
+      
+      // Check if script already exists
+      let existingScript = document.querySelector('script[src*="tosspayments.com"]');
+      
+      if (!existingScript) {
+        // Create and load SDK script
+        const script = document.createElement('script');
+        script.src = 'https://js.tosspayments.com/v2/standard';
+        script.async = false; // Load synchronously
+        script.defer = false;
+        
+        // Add to head
+        document.head.appendChild(script);
+        console.log('✅ TossPayments SDK script added to DOM');
+      } else {
+        console.log('ℹ️ TossPayments SDK script already exists in DOM');
+      }
+    }
     
     return new Promise((resolve, reject) => {
       const checkSDK = () => {
@@ -6093,7 +6115,8 @@ class WorVox {
           }
         } else if (elapsed >= maxWaitTime) {
           console.error(`❌ TossPayments SDK timeout after ${elapsed}ms`);
-          reject(new Error(`TossPayments SDK를 ${maxWaitTime/1000}초 동안 기다렸지만 로드되지 않았습니다.\n\n페이지를 새로고침하거나 다시 시도해주세요.`));
+          console.error('Available window properties:', Object.keys(window).filter(k => k.toLowerCase().includes('toss')));
+          reject(new Error(`TossPayments SDK를 ${maxWaitTime/1000}초 동안 기다렸지만 로드되지 않았습니다.\n\n가능한 원인:\n1. 네트워크 연결 문제\n2. 광고 차단 프로그램\n3. 방화벽 차단\n\n페이지를 새로고침하거나 광고 차단 프로그램을 비활성화해주세요.`));
         } else {
           // Continue waiting
           if (elapsed % 5000 === 0) {
