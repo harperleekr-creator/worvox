@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WorVox - Mobile Prototype</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overscroll-behavior: none;
+        }
+        
+        /* Prevent overscroll */
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .main-content {
+            height: calc(100vh - 72px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .glow {
+            box-shadow: 0 8px 32px rgba(139, 92, 246, 0.25);
+        }
+        
+        .glow-orange {
+            box-shadow: 0 8px 32px rgba(251, 146, 60, 0.25);
+        }
+        
+        .glow-green {
+            box-shadow: 0 8px 32px rgba(34, 197, 94, 0.25);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:active {
+            transform: scale(0.98);
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(31, 41, 55, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 50;
+        }
+        
+        .nav-item {
+            transition: all 0.2s ease;
+        }
+        
+        .nav-item.active {
+            color: #a855f7;
+        }
+        
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 80px;
+            right: 16px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            box-shadow: 0 8px 24px rgba(168, 85, 247, 0.4);
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .fab:active {
+            transform: scale(0.9);
+        }
+        
+        /* Progress Ring */
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        /* Streak Flame Animation */
+        @keyframes flame {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(5deg); }
+        }
+        
+        .flame-icon {
+            animation: flame 1.5s ease-in-out infinite;
+        }
+        
+        /* Hide scrollbar */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Top Header Bar -->
+    <header class="bg-gray-800/50 backdrop-blur-md border-b border-gray-700/50 px-4 py-3 sticky top-0 z-10">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                    <span class="text-white font-bold text-sm">김</span>
+                </div>
+                <div>
+                    <div class="text-white font-semibold text-sm">김재헌</div>
+                    <div class="text-gray-400 text-xs">Level 12 • PRO</div>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <button class="text-gray-400 hover:text-white transition">
+                    <i class="fas fa-bell text-lg"></i>
+                    <span class="absolute top-2 right-20 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+                <button class="text-gray-400 hover:text-white transition">
+                    <i class="fas fa-cog text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content px-4 py-4 pb-24">
+        
+        <!-- Today's Progress Card -->
+        <div class="bg-gradient-to-br from-purple-600 to-purple-800 rounded-2xl p-6 mb-4 glow">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <div class="text-purple-200 text-sm mb-1">오늘의 학습</div>
+                    <div class="text-white text-2xl font-bold">23분</div>
+                </div>
+                <div class="relative">
+                    <svg class="w-20 h-20 progress-ring">
+                        <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="6"/>
+                        <circle cx="40" cy="40" r="36" fill="none" stroke="#fff" stroke-width="6" 
+                                stroke-dasharray="226" stroke-dashoffset="90" stroke-linecap="round"/>
+                    </svg>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">60%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4 text-sm">
+                <div class="flex items-center gap-2">
+                    <div class="flame-icon">🔥</div>
+                    <span class="text-white font-semibold">7일 연속</span>
+                </div>
+                <div class="h-4 w-px bg-white/30"></div>
+                <div class="text-purple-200">목표: 30분</div>
+            </div>
+        </div>
+
+        <!-- Quick Stats Grid -->
+        <div class="grid grid-cols-3 gap-3 mb-6">
+            <div class="bg-gray-800/80 backdrop-blur-md rounded-xl p-4 text-center border border-gray-700/50">
+                <div class="text-2xl mb-2">📚</div>
+                <div class="text-white font-bold text-lg">126</div>
+                <div class="text-gray-400 text-xs">단어</div>
+            </div>
+            
+            <div class="bg-gray-800/80 backdrop-blur-md rounded-xl p-4 text-center border border-gray-700/50">
+                <div class="text-2xl mb-2">⭐</div>
+                <div class="text-white font-bold text-lg">1,247</div>
+                <div class="text-gray-400 text-xs">XP</div>
+            </div>
+            
+            <div class="bg-gray-800/80 backdrop-blur-md rounded-xl p-4 text-center border border-gray-700/50">
+                <div class="text-2xl mb-2">🏆</div>
+                <div class="text-white font-bold text-lg">42</div>
+                <div class="text-gray-400 text-xs">뱃지</div>
+            </div>
+        </div>
+
+        <!-- AI Teacher Card -->
+        <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl overflow-hidden mb-4 glow card-hover">
+            <div class="relative">
+                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800" 
+                     alt="AI Teacher" 
+                     class="w-full h-48 object-cover">
+                <div class="absolute top-3 right-3 flex items-center gap-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                    <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+                    ONLINE
+                </div>
+            </div>
+            
+            <div class="p-4">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-xl">
+                        👨‍🏫
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-gray-400 text-xs">Today's AI Teacher</div>
+                        <div class="text-white text-lg font-bold">Martin</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-yellow-500 text-sm">⭐ 4.9</div>
+                        <div class="text-gray-400 text-xs">2.1K reviews</div>
+                    </div>
+                </div>
+                
+                <button class="w-full bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition">
+                    <i class="fas fa-comments"></i>
+                    대화 시작하기
+                </button>
+            </div>
+        </div>
+
+        <!-- Learning Categories -->
+        <div class="mb-4">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-white font-bold text-lg">학습 카테고리</h2>
+                <button class="text-purple-400 text-sm">전체보기 <i class="fas fa-chevron-right text-xs"></i></button>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-4 card-hover">
+                    <div class="text-3xl mb-2">💬</div>
+                    <div class="text-white font-semibold text-sm mb-1">일상 대화</div>
+                    <div class="text-blue-200 text-xs">24개 레슨</div>
+                </div>
+                
+                <div class="bg-gradient-to-br from-green-600 to-green-700 rounded-xl p-4 card-hover">
+                    <div class="text-3xl mb-2">💼</div>
+                    <div class="text-white font-semibold text-sm mb-1">비즈니스</div>
+                    <div class="text-green-200 text-xs">18개 레슨</div>
+                </div>
+                
+                <div class="bg-gradient-to-br from-orange-600 to-orange-700 rounded-xl p-4 card-hover">
+                    <div class="text-3xl mb-2">✈️</div>
+                    <div class="text-white font-semibold text-sm mb-1">여행</div>
+                    <div class="text-orange-200 text-xs">32개 레슨</div>
+                </div>
+                
+                <div class="bg-gradient-to-br from-pink-600 to-pink-700 rounded-xl p-4 card-hover">
+                    <div class="text-3xl mb-2">🎓</div>
+                    <div class="text-white font-semibold text-sm mb-1">시험 준비</div>
+                    <div class="text-pink-200 text-xs">15개 레슨</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="mb-4">
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-white font-bold text-lg">최근 활동</h2>
+                <button class="text-purple-400 text-sm">더보기 <i class="fas fa-chevron-right text-xs"></i></button>
+            </div>
+            
+            <div class="space-y-3">
+                <div class="bg-gray-800/80 backdrop-blur-md rounded-xl p-4 border border-gray-700/50">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
+                                <i class="fas fa-book text-white"></i>
+                            </div>
+                            <div>
+                                <div class="text-white font-semibold text-sm">일상 대화 - Lesson 5</div>
+                                <div class="text-gray-400 text-xs">2시간 전</div>
+                            </div>
+                        </div>
+                        <div class="text-green-400 font-semibold text-sm">+50 XP</div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-800/80 backdrop-blur-md rounded-xl p-4 border border-gray-700/50">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-purple-600 flex items-center justify-center">
+                                <i class="fas fa-trophy text-white"></i>
+                            </div>
+                            <div>
+                                <div class="text-white font-semibold text-sm">뱃지 획득!</div>
+                                <div class="text-gray-400 text-xs">7일 연속 학습</div>
+                            </div>
+                        </div>
+                        <div class="text-2xl">🔥</div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-800/80 backdrop-blur-md rounded-xl p-4 border border-gray-700/50">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-lg bg-orange-600 flex items-center justify-center">
+                                <i class="fas fa-microphone text-white"></i>
+                            </div>
+                            <div>
+                                <div class="text-white font-semibold text-sm">발음 연습</div>
+                                <div class="text-gray-400 text-xs">어제</div>
+                            </div>
+                        </div>
+                        <div class="text-green-400 font-semibold text-sm">+30 XP</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Extra spacing for bottom nav -->
+        <div class="h-8"></div>
+    </main>
+
+    <!-- Floating Action Button -->
+    <button class="fab" onclick="alert('AI 대화 시작!')">
+        <i class="fas fa-comments text-white text-xl"></i>
+    </button>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="flex items-center justify-around py-3">
+            <button class="nav-item active flex flex-col items-center gap-1 px-4 py-1">
+                <i class="fas fa-home text-xl"></i>
+                <span class="text-xs">홈</span>
+            </button>
+            
+            <button class="nav-item flex flex-col items-center gap-1 px-4 py-1 text-gray-400">
+                <i class="fas fa-book text-xl"></i>
+                <span class="text-xs">학습</span>
+            </button>
+            
+            <button class="nav-item flex flex-col items-center gap-1 px-4 py-1 text-gray-400">
+                <i class="fas fa-chart-line text-xl"></i>
+                <span class="text-xs">진도</span>
+            </button>
+            
+            <button class="nav-item flex flex-col items-center gap-1 px-4 py-1 text-gray-400">
+                <i class="fas fa-trophy text-xl"></i>
+                <span class="text-xs">랭킹</span>
+            </button>
+            
+            <button class="nav-item flex flex-col items-center gap-1 px-4 py-1 text-gray-400">
+                <i class="fas fa-user text-xl"></i>
+                <span class="text-xs">프로필</span>
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        // Bottom navigation interaction
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Prevent pull-to-refresh on mobile
+        let touchStartY = 0;
+        document.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        });
+        
+        document.addEventListener('touchmove', (e) => {
+            const touchY = e.touches[0].clientY;
+            const touchDelta = touchY - touchStartY;
+            
+            if (touchDelta > 0 && window.scrollY === 0) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Smooth scroll behavior
+        document.querySelector('.main-content').style.scrollBehavior = 'smooth';
+    </script>
+</body>
+</html>
