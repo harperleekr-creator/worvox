@@ -6073,6 +6073,40 @@ class WorVox {
     }
   }
 
+  // Helper function to wait for TossPayments SDK to load
+  async waitForTossPaymentsSDK(clientKey, maxWaitTime = 30000) {
+    const startTime = Date.now();
+    const checkInterval = 100; // Check every 100ms
+    
+    return new Promise((resolve, reject) => {
+      const checkSDK = () => {
+        const elapsed = Date.now() - startTime;
+        
+        if (typeof window.TossPayments !== 'undefined') {
+          console.log(`✅ TossPayments SDK loaded after ${elapsed}ms`);
+          try {
+            const tossPayments = window.TossPayments(clientKey);
+            resolve(tossPayments);
+          } catch (error) {
+            console.error('❌ Failed to initialize TossPayments:', error);
+            reject(new Error('TossPayments SDK 초기화 실패: ' + error.message));
+          }
+        } else if (elapsed >= maxWaitTime) {
+          console.error(`❌ TossPayments SDK timeout after ${elapsed}ms`);
+          reject(new Error(`TossPayments SDK를 ${maxWaitTime/1000}초 동안 기다렸지만 로드되지 않았습니다.\n\n페이지를 새로고침하거나 다시 시도해주세요.`));
+        } else {
+          // Continue waiting
+          if (elapsed % 5000 === 0) {
+            console.log(`⏳ Still waiting for TossPayments SDK... (${elapsed/1000}s)`);
+          }
+          setTimeout(checkSDK, checkInterval);
+        }
+      };
+      
+      checkSDK();
+    });
+  }
+
   // Purchase lesson packages (일반결제)
   async purchaseLessons(lessonCount, amount, packageType = 'one-time') {
     if (!this.currentUser) {
@@ -6198,16 +6232,9 @@ class WorVox {
       // Step 2: Initialize TossPayments SDK
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
       
-      // Check for TossPayments availability
-      if (typeof window.TossPayments === 'undefined') {
-        console.error('❌ TossPayments SDK not available');
-        console.error('Available window properties:', Object.keys(window).filter(k => k.toLowerCase().includes('toss')));
-        throw new Error('TossPayments SDK를 로드할 수 없습니다. 페이지를 새로고침해주세요.');
-      }
-
-      console.log('🔄 Initializing TossPayments SDK with window.TossPayments()...');
-      const tossPayments = window.TossPayments(clientKey);
-      console.log('✅ TossPayments SDK initialized successfully');
+      // Wait for TossPayments SDK to load
+      console.log('⏳ Waiting for TossPayments SDK to load...');
+      const tossPayments = await this.waitForTossPaymentsSDK(clientKey);
       console.log('TossPayments object type:', typeof tossPayments);
       console.log('TossPayments methods:', Object.keys(tossPayments));
 
@@ -10950,16 +10977,9 @@ Proceed to payment?
       // Step 2: Initialize TossPayments SDK
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
       
-      // Check for TossPayments availability
-      if (typeof window.TossPayments === 'undefined') {
-        console.error('❌ TossPayments SDK not available');
-        console.error('Available window properties:', Object.keys(window).filter(k => k.toLowerCase().includes('toss')));
-        throw new Error('TossPayments SDK를 로드할 수 없습니다. 페이지를 새로고침해주세요.');
-      }
-
-      console.log('🔄 Initializing TossPayments SDK with window.TossPayments()...');
-      const tossPayments = window.TossPayments(clientKey);
-      console.log('✅ TossPayments SDK initialized successfully');
+      // Wait for TossPayments SDK to load
+      console.log('⏳ Waiting for TossPayments SDK to load...');
+      const tossPayments = await this.waitForTossPaymentsSDK(clientKey);
       console.log('TossPayments object type:', typeof tossPayments);
       console.log('TossPayments methods:', Object.keys(tossPayments));
 
