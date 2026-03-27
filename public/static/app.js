@@ -6092,11 +6092,24 @@ class WorVox {
         script.async = false; // Load synchronously
         script.defer = false;
         
+        // Add load event listeners for debugging
+        script.onload = () => {
+          console.log('✅ TossPayments SDK script loaded successfully');
+          console.log('window.TossPayments:', typeof window.TossPayments);
+        };
+        script.onerror = (error) => {
+          console.error('❌ TossPayments SDK script failed to load:', error);
+          console.error('Script src:', script.src);
+          console.error('Possible causes: network error, CORS, ad blocker, firewall');
+        };
+        
         // Add to head
         document.head.appendChild(script);
         console.log('✅ TossPayments SDK script added to DOM');
+        console.log('Script element:', script);
       } else {
         console.log('ℹ️ TossPayments SDK script already exists in DOM');
+        console.log('Existing script:', existingScript);
       }
     }
     
