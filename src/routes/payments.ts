@@ -943,9 +943,9 @@ payments.post('/hiing/subscribe/start', async (c) => {
 // Live Speaking 정기구독 확정 (빌링키 등록 완료 후 첫 결제)
 payments.post('/hiing/subscribe/confirm', async (c) => {
   try {
-    const { authKey, customerKey, userId, lessonCount, amount, packageType } = await c.req.json();
+    const { authKey, customerKey, userId, lessonCount, amount, packageType, plan } = await c.req.json();
 
-    if (!authKey || !customerKey || !userId || !lessonCount || !amount) {
+    if (!authKey || !customerKey || !userId || amount === undefined) {
       return c.json({ error: 'Missing required fields' }, 400);
     }
 
@@ -990,7 +990,9 @@ payments.post('/hiing/subscribe/confirm', async (c) => {
 
     // Step 3: Execute first payment immediately
     const orderId = `hiing_order_${Date.now()}_${userId}`;
-    const orderName = `WorVox Live Speaking ${lessonCount}회 (${packageType === 'monthly' ? '월정기' : '일반'})`;
+    const orderName = lessonCount > 0 
+      ? `WorVox Live Speaking ${lessonCount}회 (${packageType === 'monthly' ? '월정기' : '일반'})`
+      : `WorVox ${plan || 'Premium'} Plan (월정기)`;
 
     const paymentResponse = await fetch('https://api.tosspayments.com/v1/billing/' + billingKey, {
       method: 'POST',
@@ -1026,42 +1028,73 @@ payments.post('/hiing/subscribe/confirm', async (c) => {
     // Get current lesson count to accumulate
     const currentUser = await db.prepare('SELECT hiing_lesson_count FROM users WHERE id = ?').bind(userId).first();
     const currentLessonCount = (currentUser as any)?.hiing_lesson_count || 0;
-    const newTotalLessonCount = currentLessonCount + lessonCount;
+    const newTotalLessonCount = currentLessonCount + (lessonCount || 0);
 
-    console.log(`📊 Lesson count update: ${currentLessonCount} + ${lessonCount} = ${newTotalLessonCount}`);
+    console.log(`📊 Lesson count update: ${currentLessonCount} + ${lessonCount || 0} = ${newTotalLessonCount}`);
 
-    await db.prepare(`
-      UPDATE users 
-      SET 
-        billing_key = ?,
-        hiing_lesson_count = ?,
-        hiing_subscription_active = 1,
-        hiing_subscription_type = ?,
-        hiing_next_billing_date = ?,
-        hiing_billing_amount = ?,
-        hiing_lesson_package_size = ?
-      WHERE id = ?
-    `).bind(
-      billingKey,
-      newTotalLessonCount,  // Accumulate lesson count
-      packageType,
-      nextBillingDate.toISOString().split('T')[0],
-      amount,
-      lessonCount,  // Store package size for monthly renewal
-      userId
-    ).run();
+    // Determine if this is Core/Premium plan subscription (lessonCount = 0) or Live Speaking (lessonCount > 0)
+    if (lessonCount > 0) {
+      // Live Speaking subscription
+      await db.prepare(`
+        UPDATE users 
+        SET 
+          billing_key = ?,
+          hiing_lesson_count = ?,
+          hiing_subscription_active = 1,
+          hiing_subscription_type = ?,
+          hiing_next_billing_date = ?,
+          hiing_billing_amount = ?,
+          hiing_lesson_package_size = ?
+        WHERE id = ?
+      `).bind(
+        billingKey,
+        newTotalLessonCount,
+        packageType,
+        nextBillingDate.toISOString().split('T')[0],
+        amount,
+        lessonCount,
+        userId
+      ).run();
+    } else {
+      // Core/Premium plan subscription
+      const subscriptionPlan = plan === 'core' ? 'core' : 'premium';
+      const trialEndsAt = new Date();
+      trialEndsAt.setDate(trialEndsAt.getDate() + 7); // 7-day trial
+      
+      await db.prepare(`
+        UPDATE users 
+        SET 
+          billing_key = ?,
+          subscription_plan = ?,
+          subscription_status = 'trial',
+          trial_ends_at = ?,
+          billing_cycle = 'monthly',
+          next_billing_date = ?
+        WHERE id = ?
+      `).bind(
+        billingKey,
+        subscriptionPlan,
+        trialEndsAt.toISOString(),
+        nextBillingDate.toISOString().split('T')[0],
+        userId
+      ).run();
+    }
 
     // Step 4: Record payment in payment_orders
+    const planName = lessonCount > 0 ? `Live Speaking ${lessonCount}회` : `${plan || 'Premium'} Plan`;
     await db.prepare(`
       INSERT INTO payment_orders (order_id, user_id, plan_name, amount, status, payment_key, confirmed_at, created_at)
       VALUES (?, ?, ?, ?, 'completed', ?, datetime('now'), datetime('now'))
-    `).bind(orderId, userId, `Live Speaking ${lessonCount}회`, amount, paymentResult.paymentKey).run();
+    `).bind(orderId, userId, planName, amount, paymentResult.paymentKey).run();
 
     // Step 5: Log activity
+    const activityDetails = lessonCount > 0
+      ? `Confirmed Live Speaking ${lessonCount}회 subscription - First payment: ₩${amount.toLocaleString()}`
+      : `Confirmed ${plan || 'Premium'} Plan subscription - First payment: ₩${amount.toLocaleString()}`;
     await db.prepare(`
       INSERT INTO activity_logs (user_id, activity_type, details)
       VALUES (?, 'hiing_subscribe_confirm', ?)
-    `).bind(userId, `Confirmed Live Speaking ${lessonCount}회 subscription - First payment: ₩${amount.toLocaleString()}`).run();
+    `).bind(userId, activityDetails).run();
 
     // Step 6: Send payment confirmation email
     if (user && (user as any).email) {

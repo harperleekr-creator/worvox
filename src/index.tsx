@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1774591306200'; // Update manually or via build script
+const BUILD_TIME = '1774592900619'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -964,6 +964,7 @@ app.get('/hiing-subscribe-success', (c) => {
   const lessonCount = c.req.query('lessonCount');
   const amount = c.req.query('amount');
   const packageType = c.req.query('packageType');
+  const plan = c.req.query('plan'); // Core/Premium plan (optional)
   
   return c.html(`
     <!DOCTYPE html>
@@ -971,7 +972,7 @@ app.get('/hiing-subscribe-success', (c) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>구독 완료 - WorVox Live Speaking</title>
+        <title>구독 완료 - WorVox</title>
         <script src="https://cdn.tailwindcss.com"></script>
         <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
     </head>
@@ -1022,21 +1023,36 @@ app.get('/hiing-subscribe-success', (c) => {
         <script>
           async function confirmSubscription() {
             try {
+              const lessonCount = parseInt('${lessonCount}') || 0;
+              const plan = '${plan}' || '';
+              
               const response = await axios.post('/api/payments/hiing/subscribe/confirm', {
                 authKey: '${authKey}',
                 customerKey: '${customerKey}',
                 userId: parseInt('${userId}'),
-                lessonCount: parseInt('${lessonCount}'),
+                lessonCount: lessonCount,
                 amount: parseInt('${amount}'),
-                packageType: '${packageType}'
+                packageType: '${packageType}',
+                plan: plan
               });
               
               if (response.data.success) {
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('success').classList.remove('hidden');
                 
-                const packageText = '${packageType}' === 'monthly' ? '월정기 구독' : '일반 구매';
-                document.getElementById('package-info').textContent = \`Live Speaking \${response.data.lessonCount}회 (\${packageText})\`;
+                // Determine package info based on plan or lessonCount
+                let packageInfo;
+                if (lessonCount > 0) {
+                  const packageText = '${packageType}' === 'monthly' ? '월정기 구독' : '일반 구매';
+                  packageInfo = \`Live Speaking \${lessonCount}회 (\${packageText})\`;
+                } else if (plan) {
+                  const planName = plan === 'core' ? 'Core' : plan === 'premium' ? 'Premium' : 'Business';
+                  packageInfo = \`\${planName} 플랜 (월간 구독)\`;
+                } else {
+                  packageInfo = '월간 구독';
+                }
+                
+                document.getElementById('package-info').textContent = packageInfo;
                 document.getElementById('amount-info').textContent = response.data.amount.toLocaleString();
                 document.getElementById('next-billing').textContent = response.data.nextBillingDate;
                 

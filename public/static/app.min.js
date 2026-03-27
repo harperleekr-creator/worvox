@@ -10891,22 +10891,131 @@ Proceed to payment?
     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'card';
     
     try {
-      // TODO: Implement actual NHN KCP payment integration
-      // For now, show preparation message
+      // Check if user is logged in
+      if (!this.currentUser) {
+        alert('❌ 로그인이 필요합니다.');
+        this.showLogin();
+        return;
+      }
       
-      const planName = plan === 'premium' ? 'Premium' : 'Business';
+      // Plan pricing (monthly subscription)
+      const planName = plan === 'premium' ? 'Premium' : plan === 'core' ? 'Core' : 'Business';
+      const amount = this.selectedPlanPrice; // Use selected plan price
+      const lessonCount = 0; // Core/Premium plans don't include lesson count
+      const packageType = 'monthly'; // Monthly subscription
+      
+      // Show confirmation
       const billingCycleKo = this.selectedBillingCycle === 'monthly' ? '월간' : '연간';
+      const confirmed = confirm(`
+🎓 ${planName} 플랜 구독
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+플랜: ${planName}
+결제 주기: ${billingCycleKo}
+결제 금액: ₩${amount.toLocaleString()}/월
+결제 수단: ${this.getPaymentMethodName(paymentMethod)}
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+7일 무료 체험 후 자동 결제됩니다.
+결제를 진행하시겠습니까?
+      `);
       
-      alert(`💳 결제 준비 중...\n\n${planName} 플랜 (${billingCycleKo})\n결제 금액: ₩${this.selectedPlanPrice.toLocaleString()}\n결제 수단: ${this.getPaymentMethodName(paymentMethod)}\n\nNHN KCP 결제 시스템 연동 준비 중입니다.\n곧 만나요! 🚀`);
+      if (!confirmed) return;
       
-      // Simulate payment success
-      // setTimeout(() => {
-      //   this.handlePaymentSuccess(plan, this.selectedBillingCycle);
-      // }, 2000);
+      // Step 1: Start subscription (빌링키 등록 준비)
+      console.log('🔄 Starting subscription for plan:', plan);
+      const startResponse = await axios.post('/api/payments/hiing/subscribe/start', {
+        userId: this.currentUser.id,
+        lessonCount: lessonCount,
+        amount: amount,
+        packageType: packageType
+      });
+
+      console.log('📦 Subscription start response:', startResponse.data);
+
+      // Check for errors first
+      if (startResponse.data.error || !startResponse.data.success) {
+        const errorMsg = startResponse.data.error || startResponse.data.details || '구독 시작 실패';
+        throw new Error(errorMsg);
+      }
+
+      // Validate customerKey exists
+      if (!startResponse.data.customerKey) {
+        console.error('❌ No customerKey in response:', startResponse.data);
+        throw new Error('서버 응답에 고객 키가 없습니다. 다시 시도해주세요.');
+      }
+
+      const { customerKey } = startResponse.data;
+      console.log(`📝 Customer key for ${planName} plan: ${customerKey}`);
+
+      // Step 2: Initialize TossPayments SDK
+      const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
+      
+      // Check for TossPayments availability
+      if (typeof window.TossPayments === 'undefined') {
+        console.error('❌ TossPayments SDK not available');
+        console.error('Available window properties:', Object.keys(window).filter(k => k.toLowerCase().includes('toss')));
+        throw new Error('TossPayments SDK를 로드할 수 없습니다. 페이지를 새로고침해주세요.');
+      }
+
+      console.log('🔄 Initializing TossPayments SDK with window.TossPayments()...');
+      const tossPayments = window.TossPayments(clientKey);
+      console.log('✅ TossPayments SDK initialized successfully');
+      console.log('TossPayments object type:', typeof tossPayments);
+      console.log('TossPayments methods:', Object.keys(tossPayments));
+
+      // Step 3: Request billing authorization
+      console.log('🔑 Requesting billing authorization with customerKey:', customerKey);
+      
+      // Try payment.requestBillingAuth if available
+      if (tossPayments.payment && typeof tossPayments.payment === 'function') {
+        console.log('✅ Using tossPayments.payment() method');
+        const payment = tossPayments.payment({
+          customerKey: customerKey,
+        });
+        console.log('✅ Payment object created');
+        
+        await payment.requestBillingAuth({
+          method: 'CARD',
+          successUrl: window.location.origin + `/hiing-subscribe-success?userId=${this.currentUser.id}&customerKey=${customerKey}&lessonCount=${lessonCount}&amount=${amount}&packageType=${packageType}&plan=${plan}`,
+          failUrl: window.location.origin + '/hiing-subscribe-fail',
+          customerEmail: this.currentUser.email,
+          customerName: this.currentUser.username
+        });
+      } else if (tossPayments.requestBillingAuth && typeof tossPayments.requestBillingAuth === 'function') {
+        console.log('✅ Using tossPayments.requestBillingAuth() directly');
+        await tossPayments.requestBillingAuth({
+          method: 'CARD',
+          customerKey: customerKey,
+          successUrl: window.location.origin + `/hiing-subscribe-success?userId=${this.currentUser.id}&customerKey=${customerKey}&lessonCount=${lessonCount}&amount=${amount}&packageType=${packageType}&plan=${plan}`,
+          failUrl: window.location.origin + '/hiing-subscribe-fail',
+          customerEmail: this.currentUser.email,
+          customerName: this.currentUser.username
+        });
+      } else {
+        console.error('❌ No billing auth method found');
+        console.error('Available methods:', Object.keys(tossPayments));
+        throw new Error('TossPayments SDK에서 결제 메서드를 찾을 수 없습니다.');
+      }
+      
+      console.log('✅ Billing authorization request sent');
       
     } catch (error) {
-      console.error('Payment error:', error);
-      alert('❌ 결제 처리 중 오류가 발생했습니다.\n다시 시도해주세요.');
+      console.error('❌ Payment error:', error);
+      console.error('Error details:', {
+        hasResponse: !!error.response,
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
+      
+      // Check if it's an HTTP error response
+      if (error.response) {
+        const errorMsg = error.response.data?.error || error.response.data?.message || '결제 처리 중 오류가 발생했습니다.';
+        alert(`❌ ${errorMsg}\n\n다시 시도해주세요.`);
+      } else {
+        // Network or SDK error
+        alert(`❌ ${error.message}\n\n다시 시도해주세요.`);
+      }
     }
   }
 
