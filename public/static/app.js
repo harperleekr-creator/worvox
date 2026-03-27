@@ -6635,7 +6635,7 @@ class WorVox {
                     class="py-3 border-2 ${isTrial ? 'border-gray-200 cursor-not-allowed opacity-50' : 'border-gray-300 hover:border-emerald-500 hover:bg-emerald-50'} rounded-lg transition-all"
                     ${isTrial ? 'disabled' : ''}>
                     <div class="font-semibold text-gray-800">50 Minutes</div>
-                    <div class="text-sm text-gray-600">${isTrial ? 'Not Available' : 'Extended'}</div>
+                    <div class="text-sm text-gray-600">${isTrial ? 'Not Available' : 'Extended (수업 2회 차감)'}</div>
                   </button>
                 </div>
                 ${isTrial ? '<p class="text-xs text-gray-500 mt-2"><i class="fas fa-info-circle mr-1"></i>체험 수업은 25분만 가능합니다</p>' : ''}
@@ -6703,6 +6703,7 @@ class WorVox {
     // Combine date and time into ISO string
     const scheduledAt = new Date(`${date}T${time}:00`).toISOString();
 
+    const creditsRequired = duration === 50 ? 2 : 1;
     const confirmed = confirm(`
 📚 Confirm Your Lesson Booking
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -6710,6 +6711,7 @@ Teacher: ${teacherName}
 Date: ${new Date(scheduledAt).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
 Time: ${time}
 Duration: ${duration} minutes
+Credits to be used: ${creditsRequired}회
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Your teacher will call you at the scheduled time.

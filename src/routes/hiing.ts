@@ -76,16 +76,19 @@ app.post('/schedule', async (c: Context) => {
   const { DB } = c.env as Bindings
 
   try {
-    // Check if user has credits
-    const credits = await DB.prepare(`
-      SELECT SUM(remaining_credits) as total
-      FROM hiing_credits
-      WHERE user_id = ? 
-      AND (expires_at IS NULL OR expires_at > datetime('now'))
+    // Determine required credits based on duration
+    const requiredCredits = duration === 50 ? 2 : 1
+
+    // Check if user has enough lesson count
+    const user = await DB.prepare(`
+      SELECT hiing_lesson_count FROM users WHERE id = ?
     `).bind(userId).first() as any
 
-    if (!credits || credits.total <= 0) {
-      return c.json({ success: false, error: 'No credits available' }, 400)
+    if (!user || user.hiing_lesson_count < requiredCredits) {
+      return c.json({ 
+        success: false, 
+        error: `수업을 예약하려면 최소 ${requiredCredits}회의 수업권이 필요합니다. 현재 잔여: ${user?.hiing_lesson_count || 0}회` 
+      }, 400)
     }
 
     // Get teacher info
@@ -117,14 +120,14 @@ app.post('/schedule', async (c: Context) => {
       SELECT * FROM hiing_sessions WHERE id = ?
     `).bind(insertResult.meta.last_row_id).first()
 
-    // Get user info for notifications
-    const user = await DB.prepare(`
+    // Get full user info for notifications
+    const fullUser = await DB.prepare(`
       SELECT * FROM users WHERE id = ?
     `).bind(userId).first()
 
     // Send booking confirmation notifications (email + SMS)
     try {
-      await sendBookingConfirmation(c.env, session, user, teacher);
+      await sendBookingConfirmation(c.env, session, fullUser, teacher);
     } catch (error) {
       console.error('Failed to send booking notifications:', error);
       // Continue even if notifications fail
@@ -199,6 +202,9 @@ app.post('/teacher/complete', async (c: Context) => {
       return c.json({ success: false, error: 'Session already completed and credit deducted' }, 400)
     }
 
+    // Determine credits to deduct based on duration
+    const creditsToDeduct = session.duration === 50 ? 2 : 1
+
     // Update session
     await DB.prepare(`
       UPDATE hiing_sessions
@@ -209,39 +215,28 @@ app.post('/teacher/complete', async (c: Context) => {
       WHERE id = ?
     `).bind(sessionId).run()
 
-    // Deduct credit (가장 오래된 것부터 차감)
-    const oldestCredit = await DB.prepare(`
-      SELECT * FROM hiing_credits
-      WHERE user_id = ? AND remaining_credits > 0
-      AND (expires_at IS NULL OR expires_at > datetime('now'))
-      ORDER BY purchase_date ASC
-      LIMIT 1
-    `).bind(session.user_id).first() as any
+    // Deduct from users.hiing_lesson_count
+    await DB.prepare(`
+      UPDATE users
+      SET hiing_lesson_count = hiing_lesson_count - ?
+      WHERE id = ? AND hiing_lesson_count >= ?
+    `).bind(creditsToDeduct, session.user_id, creditsToDeduct).run()
 
-    if (oldestCredit) {
-      await DB.prepare(`
-        UPDATE hiing_credits
-        SET remaining_credits = remaining_credits - 1
-        WHERE id = ?
-      `).bind(oldestCredit.id).run()
-    }
-
-    // Get updated total credits
-    const totalCredits = await DB.prepare(`
-      SELECT SUM(remaining_credits) as total
-      FROM hiing_credits
-      WHERE user_id = ?
-      AND (expires_at IS NULL OR expires_at > datetime('now'))
-    `).bind(session.user_id).first() as any
-
-    // Get user info for completion notification
+    // Get updated lesson count
     const user = await DB.prepare(`
+      SELECT hiing_lesson_count FROM users WHERE id = ?
+    `).bind(session.user_id).first() as any
+
+    const totalCredits = { total: user?.hiing_lesson_count || 0 }
+
+    // Get full user info for completion notification
+    const fullUser = await DB.prepare(`
       SELECT * FROM users WHERE id = ?
     `).bind(session.user_id).first()
 
     // Send lesson completion notification
     try {
-      await sendLessonCompletion(c.env, session, user, teacher, totalCredits?.total || 0);
+      await sendLessonCompletion(c.env, session, fullUser, teacher, totalCredits?.total || 0);
     } catch (error) {
       console.error('Failed to send completion notification:', error);
       // Continue even if notification fails
