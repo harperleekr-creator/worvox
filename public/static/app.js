@@ -6187,11 +6187,33 @@ class WorVox {
 
       // Step 2: Initialize Toss Payments Billing (v2 SDK)
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
-      // Load TossPayments SDK (v2)
-      if (typeof loadTossPayments === 'undefined') {
+      
+      // Wait for TossPayments SDK to load (with timeout)
+      let tossPayments;
+      let retries = 0;
+      const maxRetries = 10;
+      
+      while (retries < maxRetries) {
+        if (typeof loadTossPayments !== 'undefined') {
+          try {
+            tossPayments = await loadTossPayments(clientKey);
+            console.log('✅ TossPayments SDK loaded successfully');
+            break;
+          } catch (sdkError) {
+            console.error('TossPayments SDK initialization error:', sdkError);
+            throw new Error('결제 모듈 초기화 실패. 다시 시도해주세요.');
+          }
+        }
+        
+        // Wait 100ms before retry
+        await new Promise(resolve => setTimeout(resolve, 100));
+        retries++;
+        console.log(`⏳ Waiting for TossPayments SDK... (${retries}/${maxRetries})`);
+      }
+      
+      if (!tossPayments) {
         throw new Error('TossPayments SDK가 로드되지 않았습니다. 페이지를 새로고침해주세요.');
       }
-      const tossPayments = await loadTossPayments(clientKey);
 
       // Step 3: Request billing key (카드 등록 + 즉시 결제)
       await tossPayments.requestBillingAuth({
@@ -16318,11 +16340,33 @@ Proceed to payment?
 
       // Step 2: Initialize Toss Payments Billing (v2 SDK)
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
-      // Load TossPayments SDK (v2)
-      if (typeof loadTossPayments === 'undefined') {
+      
+      // Wait for TossPayments SDK to load (with timeout)
+      let tossPayments;
+      let retries = 0;
+      const maxRetries = 10;
+      
+      while (retries < maxRetries) {
+        if (typeof loadTossPayments !== 'undefined') {
+          try {
+            tossPayments = await loadTossPayments(clientKey);
+            console.log('✅ TossPayments SDK loaded successfully');
+            break;
+          } catch (sdkError) {
+            console.error('TossPayments SDK initialization error:', sdkError);
+            throw new Error('결제 모듈 초기화 실패. 다시 시도해주세요.');
+          }
+        }
+        
+        // Wait 100ms before retry
+        await new Promise(resolve => setTimeout(resolve, 100));
+        retries++;
+        console.log(`⏳ Waiting for TossPayments SDK... (${retries}/${maxRetries})`);
+      }
+      
+      if (!tossPayments) {
         throw new Error('TossPayments SDK가 로드되지 않았습니다. 페이지를 새로고침해주세요.');
       }
-      const tossPayments = await loadTossPayments(clientKey);
 
       // Step 3: Request billing key (카드 등록)
       await tossPayments.requestBillingAuth({
@@ -16422,11 +16466,33 @@ Proceed to payment?
 
       // 2. Initialize Toss Payments (v2 SDK)
       const clientKey = 'live_ck_ORzdMaqN3w2Y5dDmvYoN85AkYXQG';
-      // Load TossPayments SDK (v2)
-      if (typeof loadTossPayments === 'undefined') {
+      
+      // Wait for TossPayments SDK to load (with timeout)
+      let tossPayments;
+      let retries = 0;
+      const maxRetries = 10;
+      
+      while (retries < maxRetries) {
+        if (typeof loadTossPayments !== 'undefined') {
+          try {
+            tossPayments = await loadTossPayments(clientKey);
+            console.log('✅ TossPayments SDK loaded successfully');
+            break;
+          } catch (sdkError) {
+            console.error('TossPayments SDK initialization error:', sdkError);
+            throw new Error('결제 모듈 초기화 실패. 다시 시도해주세요.');
+          }
+        }
+        
+        // Wait 100ms before retry
+        await new Promise(resolve => setTimeout(resolve, 100));
+        retries++;
+        console.log(`⏳ Waiting for TossPayments SDK... (${retries}/${maxRetries})`);
+      }
+      
+      if (!tossPayments) {
         throw new Error('TossPayments SDK가 로드되지 않았습니다. 페이지를 새로고침해주세요.');
       }
-      const tossPayments = await loadTossPayments(clientKey);
       
       const customerKey = `customer_${this.currentUser.id}`;
 
