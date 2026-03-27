@@ -1501,48 +1501,4 @@ payments.post('/hiing/monthly-billing', async (c) => {
   }
 });
 
-// Get user's Live Speaking credits (remaining lessons)
-payments.get('/hiing/credits/:userId', async (c) => {
-  try {
-    const userId = c.req.param('userId');
-    
-    if (!userId) {
-      return c.json({ error: 'Missing userId' }, 400);
-    }
-
-    const db = c.env.DB;
-
-    // Get user's remaining lesson count
-    const user = await db.prepare(`
-      SELECT hiing_lesson_count, hiing_subscription_active, hiing_subscription_type, hiing_next_billing_date
-      FROM users 
-      WHERE id = ?
-    `).bind(userId).first();
-
-    if (!user) {
-      return c.json({ error: 'User not found' }, 404);
-    }
-
-    const remaining_credits = (user as any)?.hiing_lesson_count || 0;
-    const subscription_active = (user as any)?.hiing_subscription_active === 1;
-    const subscription_type = (user as any)?.hiing_subscription_type;
-    const next_billing_date = (user as any)?.hiing_next_billing_date;
-
-    return c.json({
-      success: true,
-      remaining_credits: remaining_credits,
-      subscription_active: subscription_active,
-      subscription_type: subscription_type,
-      next_billing_date: next_billing_date
-    });
-
-  } catch (error) {
-    console.error('❌ Get credits error:', error);
-    return c.json({ 
-      error: 'Failed to get credits',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }, 500);
-  }
-});
-
 export default payments;

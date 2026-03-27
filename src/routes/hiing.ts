@@ -17,26 +17,30 @@ app.get('/credits/:userId', async (c: Context) => {
   const { DB } = c.env as Bindings
 
   try {
-    // Get all active credits and sum remaining
-    const result = await DB.prepare(`
-      SELECT SUM(remaining_credits) as total_remaining
-      FROM hiing_credits
-      WHERE user_id = ? 
-      AND (expires_at IS NULL OR expires_at > datetime('now'))
+    // Get user's remaining lesson count from users table
+    const user = await DB.prepare(`
+      SELECT hiing_lesson_count, hiing_subscription_active, hiing_subscription_type, hiing_next_billing_date, hiing_billing_amount
+      FROM users
+      WHERE id = ?
     `).bind(userId).first() as any
 
-    // Get recent purchase info
-    const recentPurchase = await DB.prepare(`
-      SELECT * FROM hiing_credits
-      WHERE user_id = ?
-      ORDER BY purchase_date DESC
-      LIMIT 1
-    `).bind(userId).first()
+    if (!user) {
+      return c.json({ success: false, error: 'User not found' }, 404)
+    }
+
+    const remaining_credits = user.hiing_lesson_count || 0
+    const subscription_active = user.hiing_subscription_active === 1
+    const subscription_type = user.hiing_subscription_type
+    const next_billing_date = user.hiing_next_billing_date
+    const billing_amount = user.hiing_billing_amount
 
     return c.json({
       success: true,
-      remaining_credits: result?.total_remaining || 0,
-      recent_purchase: recentPurchase || null
+      remaining_credits: remaining_credits,
+      subscription_active: subscription_active,
+      subscription_type: subscription_type,
+      next_billing_date: next_billing_date,
+      billing_amount: billing_amount
     })
   } catch (error: any) {
     console.error('Get credits error:', error)
