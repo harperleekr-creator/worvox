@@ -745,6 +745,12 @@ class WorVox {
     }
   }
   
+  // 🎊 Check if today is weekend
+  isWeekend() {
+    const dayOfWeek = new Date().getDay();
+    return dayOfWeek === 0 || dayOfWeek === 6; // Sunday or Saturday
+  }
+  
   // ⏱️ Load today's total session time
   async loadTodaySessionTime() {
     if (!this.currentUser) return;
