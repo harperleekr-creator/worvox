@@ -12991,7 +12991,7 @@ Proceed to payment?
                       </button>
                       
                       <!-- Regular Purchase Button (Direct Subscription) -->
-                      <button onclick="worvox.directSubscribe('core')" 
+                      <button onclick="worvox.selectPlan('Core')" 
                         class="w-full py-2.5 bg-white text-blue-600 border-2 border-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-all text-sm hover:border-blue-700">
                         바로 구매하기
                       </button>
@@ -13061,7 +13061,7 @@ Proceed to payment?
                       </button>
                       
                       <!-- Regular Purchase Button (Direct Subscription) -->
-                      <button onclick="worvox.directSubscribe('premium')" 
+                      <button onclick="worvox.selectPlan('Premium')" 
                         class="w-full py-2.5 bg-white text-purple-600 border-2 border-purple-600 rounded-lg font-semibold hover:bg-purple-50 transition-all text-sm hover:border-purple-700">
                         바로 구매하기
                       </button>
@@ -16937,7 +16937,19 @@ Proceed to payment?
 
     } catch (error) {
       console.error('Toss free trial error:', error);
-      alert('Toss 무료 체험 시작 중 오류가 발생했습니다: ' + (error.response?.data?.error || error.message));
+      console.error('Error response:', error.response);
+      console.error('Error data:', error.response?.data);
+      
+      let errorMsg = '알 수 없는 오류가 발생했습니다.';
+      if (error.response?.data?.error) {
+        errorMsg = error.response.data.error;
+      } else if (error.response?.data?.details) {
+        errorMsg = error.response.data.details;
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+      
+      alert('Toss 무료 체험 시작 중 오류가 발생했습니다:\n\n' + errorMsg);
     }
   }
 
