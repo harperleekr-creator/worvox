@@ -643,10 +643,10 @@ payments.post('/subscription/confirm', async (c) => {
     // Record payment
     await c.env.DB.prepare(`
       INSERT INTO payment_orders (
-        user_id, order_id, order_name, amount, status, 
-        billing_key, payment_method, created_at
+        user_id, order_id, plan_name, amount, status, 
+        payment_key, created_at
       )
-      VALUES (?, ?, ?, ?, 'success', ?, 'card', datetime('now'))
+      VALUES (?, ?, ?, ?, 'success', ?, datetime('now'))
     `).bind(userId, orderId, orderName, amount, billingKey).run();
 
     // Log subscription activation
