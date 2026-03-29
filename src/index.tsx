@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1774773818613'; // Update manually or via build script
+const BUILD_TIME = '1774774074104'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -991,6 +991,14 @@ app.get('/subscription-success', (c) => {
         <script>
           async function activateSubscription() {
             try {
+              console.log('🔍 URL Parameters:', {
+                userId: '${userId}',
+                plan: '${plan}',
+                authKey: '${authKey}',
+                customerKey: '${customerKey}',
+                billingPeriod: '${period}'
+              });
+              
               const response = await axios.post('/api/payments/subscription/confirm', {
                 userId: '${userId}',
                 plan: '${plan}',
@@ -1063,11 +1071,23 @@ app.get('/subscription-success', (c) => {
               }
             } catch (error) {
               console.error('Subscription activation error:', error);
+              console.error('Error response:', error.response?.data);
+              
+              let errorMessage = '구독 처리 중 문제가 발생했습니다.';
+              if (error.response?.data?.details) {
+                errorMessage = JSON.stringify(error.response.data.details, null, 2);
+              } else if (error.response?.data?.error) {
+                errorMessage = error.response.data.error;
+              } else if (error.message) {
+                errorMessage = error.message;
+              }
+              
               document.getElementById('content').innerHTML = \`
                 <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
                   <div class="text-6xl mb-4">😢</div>
                   <h1 class="text-3xl font-bold text-gray-900 mb-3">구독 실패</h1>
-                  <p class="text-gray-600 mb-6">\${error.message || '구독 처리 중 문제가 발생했습니다.'}</p>
+                  <p class="text-gray-600 mb-4 text-sm">\${errorMessage}</p>
+                  <p class="text-xs text-gray-500 mb-6">고객센터로 문의해주세요.</p>
                   <button 
                     onclick="window.location.href='/app'"
                     class="w-full bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition"
