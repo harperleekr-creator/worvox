@@ -17307,6 +17307,10 @@ Proceed to payment?
                 </h1>
                 <p class="text-gray-600 mt-1">시스템 관리 및 사용자 통계</p>
               </div>
+              <div class="text-right">
+                <p id="last-updated" class="text-xs text-gray-500">자동 업데이트 중...</p>
+                <p class="text-xs text-gray-400 mt-1">30초마다 갱신</p>
+              </div>
             </div>
 
             <!-- Loading State -->
@@ -17434,6 +17438,15 @@ Proceed to payment?
     // Load admin data
     this.loadAdminData();
 
+    // Setup auto-refresh (every 30 seconds)
+    if (this.adminRefreshInterval) {
+      clearInterval(this.adminRefreshInterval);
+    }
+    this.adminRefreshInterval = setInterval(() => {
+      console.log('🔄 Auto-refreshing admin stats...');
+      this.loadAdminData(true);
+    }, 30000); // 30 seconds
+
     // Setup search
     const searchInput = document.getElementById('user-search');
     if (searchInput) {
@@ -17443,7 +17456,7 @@ Proceed to payment?
     }
   }
 
-  async loadAdminData() {
+  async loadAdminData(isAutoRefresh = false) {
     try {
       // Load statistics
       const statsResponse = await axios.get('/api/admin/stats', {
@@ -17467,16 +17480,27 @@ Proceed to payment?
         
         // Display active trials
         this.displayActiveTrials(stats.activeTrials || [], stats.trialCount || 0);
+        
+        // Show last updated time
+        if (isAutoRefresh) {
+          const lastUpdatedEl = document.getElementById('last-updated');
+          if (lastUpdatedEl) {
+            const now = new Date();
+            lastUpdatedEl.textContent = `마지막 업데이트: ${now.toLocaleTimeString('ko-KR')}`;
+          }
+        }
       }
 
-      // Load users
-      const usersResponse = await axios.get('/api/admin/users', {
-        headers: { 'X-User-Id': this.currentUser.id }
-      });
+      // Load users (only on initial load, not on auto-refresh)
+      if (!isAutoRefresh) {
+        const usersResponse = await axios.get('/api/admin/users', {
+          headers: { 'X-User-Id': this.currentUser.id }
+        });
 
-      if (usersResponse.data.success) {
-        this.allUsers = usersResponse.data.data.users || [];
-        this.displayUsers(this.allUsers);
+        if (usersResponse.data.success) {
+          this.allUsers = usersResponse.data.data.users || [];
+          this.displayUsers(this.allUsers);
+        }
       }
 
       // Hide loading, show content
@@ -17485,14 +17509,15 @@ Proceed to payment?
 
     } catch (error) {
       console.error('Load admin data error:', error);
-      document.getElementById('admin-loading').innerHTML = `
-        <div class="text-center">
-          <i class="fas fa-exclamation-circle text-red-500 text-4xl mb-4"></i>
-          <p class="text-red-600 font-semibold">데이터 로딩 실패</p>
-          <p class="text-gray-600 mt-2">${error.response?.data?.error || error.message}</p>
-          <button onclick="worvox.loadAdminData()" class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-            다시 시도
-          </button>
+      if (!isAutoRefresh) {
+        document.getElementById('admin-loading').innerHTML = `
+          <div class="text-center">
+            <i class="fas fa-exclamation-circle text-red-500 text-4xl mb-4"></i>
+            <p class="text-red-600 font-semibold">데이터 로딩 실패</p>
+            <p class="text-gray-600 mt-2">${error.response?.data?.error || error.message}</p>
+            <button onclick="worvox.loadAdminData()" class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              다시 시도
+            </button>
         </div>
       `;
     }
@@ -17558,14 +17583,14 @@ Proceed to payment?
     if (countEl) countEl.textContent = `${payments.length}건`;
 
     container.innerHTML = payments.slice(0, 5).map(payment => {
-      const statusColor = payment.status === 'completed' ? 'text-green-600' : 'text-yellow-600';
-      const statusText = payment.status === 'completed' ? '완료' : '대기';
+      const statusColor = payment.status === 'completed' || payment.status === 'success' ? 'text-green-600' : 'text-yellow-600';
+      const statusText = payment.status === 'completed' || payment.status === 'success' ? '완료' : '대기';
       const date = payment.created_at || payment.confirmed_at;
       
       return `
       <div class="flex items-center justify-between py-1.5 border-b border-gray-100 last:border-0">
         <div class="flex-1 min-w-0">
-          <p class="font-medium text-xs truncate">${payment.username || payment.email}</p>
+          <p class="font-medium text-xs truncate">${payment.username || payment.email} <span class="text-gray-400">(ID: ${payment.user_id})</span></p>
           <p class="text-xs text-gray-400">${payment.plan_name} <span class="${statusColor}">(${statusText})</span></p>
         </div>
         <div class="text-right ml-2">

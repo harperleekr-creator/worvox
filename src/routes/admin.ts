@@ -114,11 +114,11 @@ admin.get('/stats', requireAuth, async (c) => {
     // Total messages
     const totalMessages = await c.env.DB.prepare('SELECT COUNT(*) as count FROM messages').first()
 
-    // Total revenue (from payment_orders)
+    // Total revenue (from payment_orders) - Include both 'success' and 'completed' status
     const totalRevenue = await c.env.DB.prepare(`
       SELECT COALESCE(SUM(amount), 0) as total 
       FROM payment_orders 
-      WHERE status = 'completed'
+      WHERE status IN ('success', 'completed')
     `).first()
 
     // Recent signups (last 7 days)
@@ -133,7 +133,7 @@ admin.get('/stats', requireAuth, async (c) => {
       WHERE last_login_at >= datetime('now', '-1 day')
     `).first()
 
-    // Recent payments (last 10)
+    // Recent payments (last 10) - Include user ID in display
     const recentPayments = await c.env.DB.prepare(`
       SELECT 
         po.order_id,
@@ -146,6 +146,7 @@ admin.get('/stats', requireAuth, async (c) => {
         po.created_at
       FROM payment_orders po
       LEFT JOIN users u ON po.user_id = u.id
+      WHERE po.status IN ('success', 'completed')
       ORDER BY po.created_at DESC
       LIMIT 10
     `).all()
