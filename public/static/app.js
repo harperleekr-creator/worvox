@@ -17021,7 +17021,7 @@ Proceed to payment?
         
         await payment.requestBillingAuth({
           method: 'CARD',
-          successUrl: `${window.location.origin}/subscription-success?plan=${planName}&userId=${this.currentUser.id}&period=${period}`,
+          successUrl: `${window.location.origin}/subscription-success?plan=${planName}&userId=${this.currentUser.id}&period=${period}&customerKey=${customerKey}`,
           failUrl: `${window.location.origin}/subscription-fail`,
           customerEmail: this.currentUser.email,
           customerName: this.currentUser.username || this.currentUser.email
@@ -17031,7 +17031,7 @@ Proceed to payment?
         await tossPayments.requestBillingAuth({
           method: 'CARD',
           customerKey: customerKey,
-          successUrl: `${window.location.origin}/subscription-success?plan=${planName}&userId=${this.currentUser.id}&period=${period}`,
+          successUrl: `${window.location.origin}/subscription-success?plan=${planName}&userId=${this.currentUser.id}&period=${period}&customerKey=${customerKey}`,
           failUrl: `${window.location.origin}/subscription-fail`,
           customerEmail: this.currentUser.email,
           customerName: this.currentUser.username || this.currentUser.email
