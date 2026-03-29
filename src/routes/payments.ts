@@ -1386,18 +1386,16 @@ payments.post('/hiing/subscribe/confirm', async (c) => {
       await db.prepare(`
         INSERT INTO hiing_credits (
           user_id, 
-          credits, 
-          remaining_credits, 
           lesson_count, 
+          remaining_credits, 
           amount, 
           package_type, 
           purchase_date, 
           expires_at
         )
-        VALUES (?, ?, ?, ?, ?, 'monthly', datetime('now'), ?)
+        VALUES (?, ?, ?, ?, 'monthly', datetime('now'), ?)
       `).bind(
         userId,
-        lessonCount,
         lessonCount,
         lessonCount,
         amount,
