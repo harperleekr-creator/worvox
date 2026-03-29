@@ -17813,7 +17813,29 @@ Proceed to payment?
       });
 
       if (response.data.success) {
-        const { user, sessions, payments, lastPayment, loginSessions, usageSummary } = response.data;
+        const { user, sessions, loginSessions, usageSummary } = response.data;
+        
+        // Fetch payment data from dedicated endpoint
+        let payments = [];
+        let paymentStatistics = {
+          totalPayments: 0,
+          totalAmount: 0,
+          lastPaymentDate: null
+        };
+        
+        try {
+          const paymentsResponse = await axios.get(`/api/admin/users/${userId}/payments`, {
+            headers: { 'X-User-Id': this.currentUser.id }
+          });
+          
+          if (paymentsResponse.data.success) {
+            payments = paymentsResponse.data.payments || [];
+            paymentStatistics = paymentsResponse.data.statistics;
+            console.log('✅ Payment data loaded:', paymentStatistics);
+          }
+        } catch (err) {
+          console.error('Failed to load payment data:', err);
+        }
         
         // Fetch Live Speaking credits
         let liveSpeakingCredits = { remaining: 0, total: 0, used: 0, purchases: [] };
@@ -17843,8 +17865,8 @@ Proceed to payment?
         }
         
         // Format last payment date
-        const lastPaymentDate = lastPayment 
-          ? new Date(lastPayment.confirmed_at).toLocaleDateString('ko-KR') 
+        const lastPaymentDate = paymentStatistics.lastPaymentDate
+          ? new Date(paymentStatistics.lastPaymentDate).toLocaleDateString('ko-KR') 
           : '결제 없음';
         
         // Usage features with Korean names
@@ -17883,8 +17905,8 @@ Proceed to payment?
                   <p><strong>현재 플랜:</strong> ${this.getPlanBadge(user.plan || 'free')}</p>
                   <p><strong>결제 주기:</strong> ${user.billing_period === 'monthly' ? '월간' : user.billing_period === 'yearly' ? '연간' : '-'}</p>
                   <p><strong>마지막 결제:</strong> ${lastPaymentDate}</p>
-                  <p><strong>총 결제 횟수:</strong> ${payments.filter(p => p.status === 'completed').length}회</p>
-                  <p><strong>총 결제 금액:</strong> ₩${payments.filter(p => p.status === 'completed').reduce((sum, p) => sum + p.amount, 0).toLocaleString()}</p>
+                  <p><strong>총 결제 횟수:</strong> ${paymentStatistics.totalPayments}회</p>
+                  <p><strong>총 결제 금액:</strong> ₩${paymentStatistics.totalAmount.toLocaleString()}</p>
                 </div>
               </div>
               <div>

@@ -475,6 +475,60 @@ admin.get('/users/:id', requireAuth, async (c) => {
   }
 })
 
+// Get payment history for a specific user
+admin.get('/users/:id/payments', requireAuth, async (c) => {
+  try {
+    const userId = c.req.param('id')
+    
+    console.log(`💳 Fetching payment history for user ID: ${userId}`)
+    
+    // Get all payments for this user
+    const payments = await c.env.DB.prepare(`
+      SELECT * FROM payment_orders 
+      WHERE user_id = ? 
+      ORDER BY created_at DESC
+    `).bind(userId).all()
+
+    // Get successful payments only (status = 'success' or 'completed')
+    const successfulPayments = await c.env.DB.prepare(`
+      SELECT * FROM payment_orders 
+      WHERE user_id = ? AND (status = 'success' OR status = 'completed')
+      ORDER BY created_at DESC
+    `).bind(userId).all()
+
+    // Calculate payment statistics
+    const totalPayments = successfulPayments.results?.length || 0
+    const totalAmount = successfulPayments.results?.reduce((sum: number, payment: any) => {
+      return sum + (payment.amount || 0)
+    }, 0) || 0
+
+    // Get last successful payment
+    const lastPayment = successfulPayments.results?.[0] || null
+    const lastPaymentDate = lastPayment ? lastPayment.created_at : null
+
+    console.log(`✅ Payment history loaded for user ${userId}`)
+    console.log(`  - Total payments: ${totalPayments}`)
+    console.log(`  - Total amount: ₩${totalAmount.toLocaleString()}`)
+    console.log(`  - Last payment: ${lastPaymentDate}`)
+
+    return c.json({
+      success: true,
+      payments: payments.results || [],
+      statistics: {
+        totalPayments,
+        totalAmount,
+        lastPaymentDate
+      }
+    })
+  } catch (error) {
+    console.error('Admin get user payments error:', error)
+    return c.json({ 
+      error: '결제 내역 조회 실패',
+      details: (error as Error).message 
+    }, 500)
+  }
+})
+
 // Update user plan (admin action)
 admin.post('/users/:id/plan', requireAuth, async (c) => {
   try {
