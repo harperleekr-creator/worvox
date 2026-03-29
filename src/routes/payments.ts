@@ -1378,14 +1378,43 @@ payments.post('/hiing/subscribe/confirm', async (c) => {
       ).run();
     }
 
-    // Step 4: Record payment in payment_orders
+    // Step 4: Create hiing_credits record for monthly subscriptions
+    if (lessonCount > 0 && packageType === 'monthly') {
+      const expiresAt = new Date();
+      expiresAt.setMonth(expiresAt.getMonth() + 1); // Expires in 1 month
+      
+      await db.prepare(`
+        INSERT INTO hiing_credits (
+          user_id, 
+          credits, 
+          remaining_credits, 
+          lesson_count, 
+          amount, 
+          package_type, 
+          purchase_date, 
+          expires_at
+        )
+        VALUES (?, ?, ?, ?, ?, 'monthly', datetime('now'), ?)
+      `).bind(
+        userId,
+        lessonCount,
+        lessonCount,
+        lessonCount,
+        amount,
+        expiresAt.toISOString()
+      ).run();
+      
+      console.log(`✅ Created hiing_credits record: ${lessonCount} lessons, expires ${expiresAt.toISOString()}`);
+    }
+
+    // Step 5: Record payment in payment_orders
     const planName = lessonCount > 0 ? `Live Speaking ${lessonCount}회` : `${plan || 'Premium'} Plan`;
     await db.prepare(`
       INSERT INTO payment_orders (order_id, user_id, plan_name, amount, status, payment_key, confirmed_at, created_at)
       VALUES (?, ?, ?, ?, 'completed', ?, datetime('now'), datetime('now'))
     `).bind(orderId, userId, planName, amount, paymentResult.paymentKey).run();
 
-    // Step 5: Log activity
+    // Step 7: Log activity
     const activityDetails = lessonCount > 0
       ? `Confirmed Live Speaking ${lessonCount}회 subscription - First payment: ₩${amount.toLocaleString()}`
       : `Confirmed ${plan || 'Premium'} Plan subscription - First payment: ₩${amount.toLocaleString()}`;
@@ -1394,7 +1423,7 @@ payments.post('/hiing/subscribe/confirm', async (c) => {
       VALUES (?, 'hiing_subscribe_confirm', ?)
     `).bind(userId, activityDetails).run();
 
-    // Step 6: Send payment confirmation email
+    // Step 8: Send payment confirmation email
     if (user && (user as any).email) {
       try {
         const resendApiKey = c.env.RESEND_API_KEY;
