@@ -589,14 +589,14 @@ payments.post('/subscription/confirm', async (c) => {
       return c.json({ error: 'User not found' }, 404);
     }
 
-    const paymentResponse = await fetch('https://api.tosspayments.com/v1/billing', {
+    const paymentResponse = await fetch('https://api.tosspayments.com/v1/billing/' + billingKey, {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${btoa(tossSecretKey + ':')}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        billingKey: billingKey,
+        customerKey: customerKey,
         amount: amount,
         orderId: orderId,
         orderName: orderName,
