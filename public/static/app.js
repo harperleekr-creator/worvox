@@ -14221,53 +14221,296 @@ Proceed to payment?
   }
 
   async practiceSentence(feedbackId, sentence, sessionId) {
-    // 확인 대화상자
-    const confirmed = confirm(`🎯 문장 연습하기\n\n다음 문장을 따라 말해보세요:\n\n"${sentence}"\n\n준비되셨나요?`);
+    // 마이크로 드릴 상태 초기화
+    this.microDrill = {
+      feedbackId,
+      targetSentence: sentence,
+      sessionId,
+      attempts: [],
+      maxAttempts: 3,
+      currentAttempt: 0,
+      isRecording: false,
+      mediaRecorder: null,
+      audioChunks: []
+    };
     
-    if (!confirmed) return;
+    // 마이크로 드릴 UI 렌더링
+    this.renderMicroDrillUI();
+  }
+
+  renderMicroDrillUI() {
+    const { targetSentence, attempts, maxAttempts, currentAttempt, isRecording } = this.microDrill;
     
-    // 피드백 완료 표시
-    try {
-      await axios.post(`/api/analysis/feedback/${feedbackId}/practice`);
-    } catch (e) {
-      console.error('Failed to mark as practiced:', e);
-    }
-    
-    // 간단한 연습 UI 표시
     const app = document.getElementById('app');
     app.innerHTML = `
-      <div class="flex items-center justify-center h-screen bg-gradient-to-br from-purple-50 to-pink-50">
-        <div class="max-w-2xl w-full p-8">
-          <div class="bg-white rounded-3xl shadow-2xl p-8">
-            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">🎯 문장 연습</h2>
+      <div class="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-900 dark:to-gray-800 p-4">
+        <div class="max-w-3xl w-full">
+          <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-6 md:p-8">
             
-            <div class="bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-6 mb-6">
-              <p class="text-lg text-gray-800 font-semibold text-center leading-relaxed">
-                ${sentence}
-              </p>
-            </div>
-            
+            <!-- 헤더 -->
             <div class="text-center mb-6">
-              <p class="text-gray-600 mb-4">이 문장을 3번 따라 말해보세요!</p>
-              <div class="text-4xl mb-4">🎤</div>
-              <p class="text-sm text-gray-500">연습을 완료했다면 아래 버튼을 눌러주세요</p>
+              <h2 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-white mb-2">🎯 마이크로 드릴</h2>
+              <p class="text-gray-600 dark:text-gray-400">발음 집중 훈련</p>
             </div>
             
-            <button 
-              onclick="worvox.showSessionReportById(${sessionId})"
-              class="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold transition-all mb-3">
-              ✅ 연습 완료! 리포트로 돌아가기
-            </button>
+            <!-- 목표 문장 -->
+            <div class="bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900 dark:to-pink-900 rounded-2xl p-6 mb-6">
+              <p class="text-sm text-gray-600 dark:text-gray-300 mb-2 text-center">🎯 목표 문장</p>
+              <p class="text-lg md:text-xl text-gray-800 dark:text-white font-semibold text-center leading-relaxed">
+                ${targetSentence}
+              </p>
+              <button 
+                onclick="worvox.playTTS('${targetSentence.replace(/'/g, "\\'")}')"
+                class="mt-3 w-full py-2 bg-white dark:bg-gray-700 text-purple-600 dark:text-purple-400 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all flex items-center justify-center gap-2">
+                <i class="fas fa-volume-up"></i>
+                발음 듣기
+              </button>
+            </div>
             
-            <button 
-              onclick="worvox.showTopicSelection()"
-              class="w-full py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl font-semibold transition-all">
-              🏠 홈으로 돌아가기
-            </button>
+            <!-- 진행 상황 -->
+            <div class="mb-6">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-sm text-gray-600 dark:text-gray-400">연습 진행</span>
+                <span class="text-sm font-semibold text-purple-600 dark:text-purple-400">${currentAttempt} / ${maxAttempts}</span>
+              </div>
+              <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-300" 
+                     style="width: ${(currentAttempt / maxAttempts) * 100}%"></div>
+              </div>
+            </div>
+            
+            <!-- 녹음 버튼 -->
+            <div class="text-center mb-6">
+              <button 
+                id="micro-drill-record-btn"
+                onclick="worvox.${isRecording ? 'stopMicroDrillRecording' : 'startMicroDrillRecording'}()"
+                class="w-full md:w-auto px-8 py-4 ${isRecording ? 'bg-red-600 hover:bg-red-700 animate-pulse' : 'bg-purple-600 hover:bg-purple-700'} text-white rounded-2xl font-semibold transition-all text-lg shadow-lg">
+                <i class="fas fa-microphone mr-2"></i>
+                ${isRecording ? '🛑 녹음 중지' : currentAttempt < maxAttempts ? `🎤 ${currentAttempt + 1}번째 시도` : '✅ 완료'}
+              </button>
+              ${isRecording ? `
+                <p class="mt-3 text-sm text-red-600 dark:text-red-400 animate-pulse">
+                  🔴 녹음 중... 문장을 또박또박 말해주세요
+                </p>
+              ` : ''}
+            </div>
+            
+            <!-- 시도 결과 -->
+            ${attempts.length > 0 ? `
+              <div class="space-y-3 mb-6">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-3">📊 연습 기록</h3>
+                ${attempts.map((attempt, i) => `
+                  <div class="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 border-l-4 ${
+                    attempt.similarity >= 90 ? 'border-green-500' : 
+                    attempt.similarity >= 70 ? 'border-yellow-500' : 'border-red-500'
+                  }">
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-sm font-semibold text-gray-700 dark:text-gray-300">시도 #${i + 1}</span>
+                      <span class="px-3 py-1 rounded-full text-sm font-bold ${
+                        attempt.similarity >= 90 ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 
+                        attempt.similarity >= 70 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' : 
+                        'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
+                      }">
+                        ${attempt.similarity}% 유사도
+                      </span>
+                    </div>
+                    <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                      🗣️ <strong>인식된 문장:</strong> ${attempt.transcription || '(인식 실패)'}
+                    </div>
+                    ${attempt.feedback ? `
+                      <div class="text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-600 rounded p-2 mt-2">
+                        💡 ${attempt.feedback}
+                      </div>
+                    ` : ''}
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+            
+            <!-- 하단 버튼 -->
+            <div class="flex gap-3">
+              ${currentAttempt >= maxAttempts || attempts.some(a => a.similarity >= 95) ? `
+                <button 
+                  onclick="worvox.completeMicroDrill()"
+                  class="flex-1 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition-all">
+                  ✅ 연습 완료! 리포트로 돌아가기
+                </button>
+              ` : `
+                <button 
+                  onclick="worvox.showSessionReportById(${this.microDrill.sessionId})"
+                  class="flex-1 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 rounded-xl font-semibold transition-all">
+                  ← 리포트로 돌아가기
+                </button>
+              `}
+              <button 
+                onclick="worvox.showTopicSelection()"
+                class="flex-1 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-600 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-200 rounded-xl font-semibold transition-all">
+                🏠 홈으로
+              </button>
+            </div>
+            
           </div>
         </div>
       </div>
     `;
+  }
+
+  async startMicroDrillRecording() {
+    if (this.microDrill.currentAttempt >= this.microDrill.maxAttempts) {
+      alert('최대 시도 횟수에 도달했습니다!');
+      return;
+    }
+    
+    try {
+      // 마이크 권한 요청
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      this.microDrill.audioChunks = [];
+      this.microDrill.mediaRecorder = new MediaRecorder(stream);
+      
+      this.microDrill.mediaRecorder.ondataavailable = (event) => {
+        this.microDrill.audioChunks.push(event.data);
+      };
+      
+      this.microDrill.mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(this.microDrill.audioChunks, { type: 'audio/webm' });
+        await this.analyzeMicroDrillRecording(audioBlob);
+        
+        // 스트림 정리
+        stream.getTracks().forEach(track => track.stop());
+      };
+      
+      this.microDrill.mediaRecorder.start();
+      this.microDrill.isRecording = true;
+      this.renderMicroDrillUI();
+      
+    } catch (error) {
+      console.error('Microphone access error:', error);
+      alert('마이크 접근 권한이 필요합니다.');
+    }
+  }
+
+  stopMicroDrillRecording() {
+    if (this.microDrill.mediaRecorder && this.microDrill.isRecording) {
+      this.microDrill.mediaRecorder.stop();
+      this.microDrill.isRecording = false;
+      this.renderMicroDrillUI();
+    }
+  }
+
+  async analyzeMicroDrillRecording(audioBlob) {
+    try {
+      // 로딩 표시
+      const recordBtn = document.getElementById('micro-drill-record-btn');
+      if (recordBtn) {
+        recordBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>분석 중...';
+        recordBtn.disabled = true;
+      }
+      
+      // 1. 음성 → 텍스트 변환 (STT)
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'recording.webm');
+      
+      const sttResponse = await axios.post('/api/stt/transcribe', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      const transcription = sttResponse.data.transcription || '';
+      
+      // 2. 유사도 계산 (간단한 문자열 비교)
+      const similarity = this.calculateSimilarity(
+        this.microDrill.targetSentence.toLowerCase(),
+        transcription.toLowerCase()
+      );
+      
+      // 3. AI 피드백 생성 (발음 개선 팁)
+      let feedback = '';
+      if (similarity >= 95) {
+        feedback = '완벽합니다! 🎉 발음이 매우 정확해요!';
+      } else if (similarity >= 85) {
+        feedback = '훌륭해요! 거의 완벽합니다. 조금만 더 연습하면 완벽해질 거예요!';
+      } else if (similarity >= 70) {
+        feedback = '좋아요! 문장의 대부분을 정확히 발음했어요. 틀린 부분을 다시 확인해보세요.';
+      } else {
+        feedback = '다시 한번 천천히 따라 읽어보세요. 목표 문장을 먼저 들어보고 연습하면 도움이 됩니다.';
+      }
+      
+      // 4. 결과 저장
+      this.microDrill.attempts.push({
+        transcription,
+        similarity: Math.round(similarity),
+        feedback,
+        timestamp: new Date()
+      });
+      
+      this.microDrill.currentAttempt++;
+      
+      // 5. UI 업데이트
+      this.renderMicroDrillUI();
+      
+      // 6. 연습 완료 표시 (백엔드)
+      if (similarity >= 95 || this.microDrill.currentAttempt >= this.microDrill.maxAttempts) {
+        try {
+          await axios.post(`/api/analysis/feedback/${this.microDrill.feedbackId}/practice`, {
+            attempts: this.microDrill.attempts.length,
+            bestScore: Math.max(...this.microDrill.attempts.map(a => a.similarity))
+          });
+        } catch (e) {
+          console.error('Failed to mark as practiced:', e);
+        }
+      }
+      
+    } catch (error) {
+      console.error('Analysis error:', error);
+      alert('분석 중 오류가 발생했습니다: ' + (error.response?.data?.error || error.message));
+      this.renderMicroDrillUI();
+    }
+  }
+
+  calculateSimilarity(str1, str2) {
+    // Levenshtein Distance 기반 유사도 계산
+    const len1 = str1.length;
+    const len2 = str2.length;
+    const matrix = Array(len2 + 1).fill(null).map(() => Array(len1 + 1).fill(null));
+    
+    for (let i = 0; i <= len1; i++) matrix[0][i] = i;
+    for (let j = 0; j <= len2; j++) matrix[j][0] = j;
+    
+    for (let j = 1; j <= len2; j++) {
+      for (let i = 1; i <= len1; i++) {
+        const indicator = str1[i - 1] === str2[j - 1] ? 0 : 1;
+        matrix[j][i] = Math.min(
+          matrix[j][i - 1] + 1,
+          matrix[j - 1][i] + 1,
+          matrix[j - 1][i - 1] + indicator
+        );
+      }
+    }
+    
+    const distance = matrix[len2][len1];
+    const maxLen = Math.max(len1, len2);
+    return maxLen === 0 ? 100 : ((maxLen - distance) / maxLen) * 100;
+  }
+
+  async completeMicroDrill() {
+    const { attempts } = this.microDrill;
+    const bestScore = Math.max(...attempts.map(a => a.similarity));
+    const avgScore = Math.round(attempts.reduce((sum, a) => sum + a.similarity, 0) / attempts.length);
+    
+    // 축하 메시지
+    let message = '';
+    if (bestScore >= 95) {
+      message = `🎉 완벽합니다!\n\n최고 점수: ${bestScore}%\n평균 점수: ${avgScore}%\n\n발음이 매우 정확해요!`;
+    } else if (bestScore >= 85) {
+      message = `👏 훌륭해요!\n\n최고 점수: ${bestScore}%\n평균 점수: ${avgScore}%\n\n계속 연습하면 더 나아질 거예요!`;
+    } else {
+      message = `💪 좋은 연습이었어요!\n\n최고 점수: ${bestScore}%\n평균 점수: ${avgScore}%\n\n꾸준히 연습하면 실력이 늘어요!`;
+    }
+    
+    alert(message);
+    
+    // 리포트로 돌아가기
+    await this.showSessionReportById(this.microDrill.sessionId);
   }
 
   async showSessionReportById(sessionId) {
