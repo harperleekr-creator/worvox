@@ -15351,6 +15351,19 @@ Proceed to payment?
     
     const app = document.getElementById('app');
     
+    // Refresh user data from server to get latest subscription info
+    try {
+      const userResponse = await axios.get(`/api/users/${this.currentUser.id}`);
+      if (userResponse.data.success) {
+        // Update currentUser with latest data from server
+        this.currentUser = { ...this.currentUser, ...userResponse.data.user };
+        localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
+        console.log('✅ Refreshed user data:', this.currentUser);
+      }
+    } catch (error) {
+      console.error('Failed to refresh user data:', error);
+    }
+    
     // Determine auth provider for display
     const authProvider = this.currentUser.auth_provider || 'email';
     const isGoogleAuth = authProvider === 'google';
