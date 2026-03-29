@@ -543,6 +543,12 @@ payments.post('/subscription/confirm', async (c) => {
 
     console.log(`💳 Processing subscription for user ${userId}, plan: ${normalizedPlan}, billing key: ${billingKey}, period: ${period}`);
 
+    // IMPORTANT: Wait 2 seconds for TossPayments to sync billing key
+    // Without this delay, immediate payment may fail with 404
+    console.log('⏳ Waiting 2 seconds for billing key synchronization...');
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    console.log('✅ Billing key ready for use');
+
     // Determine billing amount and duration
     let amount;
     let durationDays;
