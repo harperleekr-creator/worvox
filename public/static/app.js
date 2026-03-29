@@ -17520,6 +17520,7 @@ Proceed to payment?
             </button>
         </div>
       `;
+      }
     }
   }
 
