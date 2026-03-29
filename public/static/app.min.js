@@ -15380,6 +15380,21 @@ Proceed to payment?
       console.error('Failed to load Hiing subscriptions:', error);
     }
     
+    // Load Hiing sessions (usage history)
+    let hiingSessions = [];
+    let completedSessions = [];
+    let scheduledSessions = [];
+    try {
+      const sessionsResponse = await axios.get(`/api/hiing/sessions/${this.currentUser.id}`);
+      if (sessionsResponse.data.success) {
+        hiingSessions = sessionsResponse.data.sessions || [];
+        completedSessions = hiingSessions.filter(s => s.status === 'completed');
+        scheduledSessions = hiingSessions.filter(s => s.status === 'scheduled');
+      }
+    } catch (error) {
+      console.error('Failed to load Hiing sessions:', error);
+    }
+    
     app.innerHTML = `
       <div class="flex h-screen bg-gray-50 dark:bg-gray-900">
         <!-- Sidebar -->
@@ -15948,6 +15963,79 @@ Proceed to payment?
                     `;
                   }).join('')}
                   
+                  <!-- Usage History Section -->
+                  <div class="mt-4 border-t border-gray-200 pt-4">
+                    <h4 class="text-md font-bold text-gray-900 mb-3">
+                      <i class="fas fa-history text-blue-600 mr-2"></i>수업 사용 기록
+                    </h4>
+                    
+                    <!-- Statistics -->
+                    <div class="grid grid-cols-3 gap-3 mb-4">
+                      <div class="p-3 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200">
+                        <p class="text-xs text-blue-700 mb-1">총 수업 횟수</p>
+                        <p class="text-xl font-bold text-blue-900">${completedSessions.length + scheduledSessions.length}회</p>
+                      </div>
+                      <div class="p-3 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200">
+                        <p class="text-xs text-green-700 mb-1">완료된 수업</p>
+                        <p class="text-xl font-bold text-green-900">${completedSessions.length}회</p>
+                      </div>
+                      <div class="p-3 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg border border-purple-200">
+                        <p class="text-xs text-purple-700 mb-1">예정된 수업</p>
+                        <p class="text-xl font-bold text-purple-900">${scheduledSessions.length}회</p>
+                      </div>
+                    </div>
+                    
+                    ${hiingSessions.length > 0 ? `
+                    <!-- Session List -->
+                    <div class="space-y-2 max-h-96 overflow-y-auto">
+                      <p class="text-sm font-semibold text-gray-700 mb-2">최근 수업 내역</p>
+                      ${hiingSessions.slice(0, 20).map(session => {
+                        const sessionDate = new Date(session.scheduled_at);
+                        const isCompleted = session.status === 'completed';
+                        const duration = session.duration || 25;
+                        const creditUsed = duration === 50 ? 2 : 1;
+                        
+                        return `
+                        <div class="p-3 rounded-lg border ${isCompleted ? 'bg-green-50 border-green-200' : 'bg-purple-50 border-purple-200'}">
+                          <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                              <div class="flex items-center gap-2 mb-1">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${isCompleted ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
+                                  <i class="fas ${isCompleted ? 'fa-check-circle' : 'fa-clock'} mr-1"></i>
+                                  ${isCompleted ? '완료' : '예정'}
+                                </span>
+                                <span class="text-xs text-gray-600">${duration}분</span>
+                                <span class="text-xs font-semibold ${creditUsed === 2 ? 'text-orange-600' : 'text-gray-600'}">
+                                  (${creditUsed}회 ${isCompleted ? '사용' : '차감 예정'})
+                                </span>
+                              </div>
+                              <p class="text-sm font-semibold text-gray-900">${session.teacher_name || '강사'}</p>
+                              <p class="text-xs text-gray-600">
+                                <i class="far fa-calendar mr-1"></i>${sessionDate.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                <i class="far fa-clock ml-2 mr-1"></i>${sessionDate.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        `;
+                      }).join('')}
+                      
+                      ${hiingSessions.length > 20 ? `
+                      <p class="text-xs text-gray-500 text-center pt-2">
+                        최근 20개의 수업만 표시됩니다 (전체 ${hiingSessions.length}개)
+                      </p>
+                      ` : ''}
+                    </div>
+                    ` : `
+                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200 text-center">
+                      <p class="text-sm text-gray-600">아직 수업 기록이 없습니다.</p>
+                      <button onclick="worvox.showTeacherSelection()" class="mt-2 text-blue-600 hover:text-blue-700 font-semibold text-sm">
+                        첫 수업 예약하기 →
+                      </button>
+                    </div>
+                    `}
+                  </div>
+                  
                   <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                     <p class="text-sm text-gray-700">
                       <i class="fas fa-book text-gray-600 mr-2"></i>
@@ -15955,6 +16043,78 @@ Proceed to payment?
                       부분 사용 시 남은 수업권에 대해 환불 가능하며, 자세한 내용은 
                       <a href="mailto:support@worvox.com" class="text-blue-600 hover:underline font-semibold">support@worvox.com</a>으로 문의해주세요.
                     </p>
+                  </div>
+                </div>
+                ` : hiingSessions.length > 0 ? `
+                <!-- Live Speaking Usage History (No Active Subscription) -->
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                  <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-phone-alt text-blue-600 mr-2"></i>1:1 Live Speaking 수업 기록
+                  </h3>
+                  
+                  <div class="p-4 bg-blue-50 rounded-lg border border-blue-200 mb-4">
+                    <p class="text-sm text-gray-700 mb-2">
+                      <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                      현재 활성화된 구독이 없습니다.
+                    </p>
+                    <button onclick="worvox.showRealConversation()" class="text-blue-600 hover:text-blue-700 font-semibold text-sm">
+                      1:1 Live Speaking 구독하기 →
+                    </button>
+                  </div>
+                  
+                  <!-- Statistics -->
+                  <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div class="p-3 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200">
+                      <p class="text-xs text-green-700 mb-1">완료된 수업</p>
+                      <p class="text-xl font-bold text-green-900">${completedSessions.length}회</p>
+                    </div>
+                    <div class="p-3 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border border-gray-200">
+                      <p class="text-xs text-gray-700 mb-1">총 수업 기록</p>
+                      <p class="text-xl font-bold text-gray-900">${hiingSessions.length}회</p>
+                    </div>
+                  </div>
+                  
+                  <!-- Session List -->
+                  <div class="space-y-2 max-h-96 overflow-y-auto">
+                    <p class="text-sm font-semibold text-gray-700 mb-2">수업 내역</p>
+                    ${hiingSessions.slice(0, 20).map(session => {
+                      const sessionDate = new Date(session.scheduled_at);
+                      const isCompleted = session.status === 'completed';
+                      const duration = session.duration || 25;
+                      const creditUsed = duration === 50 ? 2 : 1;
+                      
+                      return `
+                      <div class="p-3 rounded-lg border ${isCompleted ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}">
+                        <div class="flex items-start justify-between">
+                          <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                              <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${isCompleted ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                                <i class="fas ${isCompleted ? 'fa-check-circle' : 'fa-clock'} mr-1"></i>
+                                ${isCompleted ? '완료' : session.status === 'scheduled' ? '예정' : session.status}
+                              </span>
+                              <span class="text-xs text-gray-600">${duration}분</span>
+                              ${isCompleted ? `
+                              <span class="text-xs font-semibold ${creditUsed === 2 ? 'text-orange-600' : 'text-gray-600'}">
+                                (${creditUsed}회 사용)
+                              </span>
+                              ` : ''}
+                            </div>
+                            <p class="text-sm font-semibold text-gray-900">${session.teacher_name || '강사'}</p>
+                            <p class="text-xs text-gray-600">
+                              <i class="far fa-calendar mr-1"></i>${sessionDate.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                              <i class="far fa-clock ml-2 mr-1"></i>${sessionDate.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      `;
+                    }).join('')}
+                    
+                    ${hiingSessions.length > 20 ? `
+                    <p class="text-xs text-gray-500 text-center pt-2">
+                      최근 20개의 수업만 표시됩니다 (전체 ${hiingSessions.length}개)
+                    </p>
+                    ` : ''}
                   </div>
                 </div>
                 ` : ''}
