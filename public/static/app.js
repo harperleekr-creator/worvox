@@ -15384,12 +15384,27 @@ Proceed to payment?
     let hiingSessions = [];
     let completedSessions = [];
     let scheduledSessions = [];
+    let completedCreditsUsed = 0;
+    let scheduledCreditsToUse = 0;
+    let totalCreditsUsed = 0;
+    
     try {
       const sessionsResponse = await axios.get(`/api/hiing/sessions/${this.currentUser.id}`);
       if (sessionsResponse.data.success) {
         hiingSessions = sessionsResponse.data.sessions || [];
         completedSessions = hiingSessions.filter(s => s.status === 'completed');
         scheduledSessions = hiingSessions.filter(s => s.status === 'scheduled');
+        
+        // Calculate credits used (25min = 1, 50min = 2)
+        completedCreditsUsed = completedSessions.reduce((total, session) => {
+          return total + (session.duration === 50 ? 2 : 1);
+        }, 0);
+        
+        scheduledCreditsToUse = scheduledSessions.reduce((total, session) => {
+          return total + (session.duration === 50 ? 2 : 1);
+        }, 0);
+        
+        totalCreditsUsed = completedCreditsUsed + scheduledCreditsToUse;
       }
     } catch (error) {
       console.error('Failed to load Hiing sessions:', error);
@@ -15972,16 +15987,19 @@ Proceed to payment?
                     <!-- Statistics -->
                     <div class="grid grid-cols-3 gap-3 mb-4">
                       <div class="p-3 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200">
-                        <p class="text-xs text-blue-700 mb-1">총 수업 횟수</p>
-                        <p class="text-xl font-bold text-blue-900">${completedSessions.length + scheduledSessions.length}회</p>
+                        <p class="text-xs text-blue-700 mb-1">총 사용 회수</p>
+                        <p class="text-xl font-bold text-blue-900">${totalCreditsUsed}회</p>
+                        <p class="text-xs text-blue-600 mt-1">${completedSessions.length + scheduledSessions.length}개 수업</p>
                       </div>
                       <div class="p-3 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200">
                         <p class="text-xs text-green-700 mb-1">완료된 수업</p>
-                        <p class="text-xl font-bold text-green-900">${completedSessions.length}회</p>
+                        <p class="text-xl font-bold text-green-900">${completedCreditsUsed}회</p>
+                        <p class="text-xs text-green-600 mt-1">${completedSessions.length}개 수업</p>
                       </div>
                       <div class="p-3 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg border border-purple-200">
                         <p class="text-xs text-purple-700 mb-1">예정된 수업</p>
-                        <p class="text-xl font-bold text-purple-900">${scheduledSessions.length}회</p>
+                        <p class="text-xl font-bold text-purple-900">${scheduledCreditsToUse}회</p>
+                        <p class="text-xs text-purple-600 mt-1">${scheduledSessions.length}개 수업</p>
                       </div>
                     </div>
                     
@@ -16066,11 +16084,13 @@ Proceed to payment?
                   <div class="grid grid-cols-2 gap-3 mb-4">
                     <div class="p-3 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200">
                       <p class="text-xs text-green-700 mb-1">완료된 수업</p>
-                      <p class="text-xl font-bold text-green-900">${completedSessions.length}회</p>
+                      <p class="text-xl font-bold text-green-900">${completedCreditsUsed}회</p>
+                      <p class="text-xs text-green-600 mt-1">${completedSessions.length}개 수업</p>
                     </div>
                     <div class="p-3 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border border-gray-200">
-                      <p class="text-xs text-gray-700 mb-1">총 수업 기록</p>
-                      <p class="text-xl font-bold text-gray-900">${hiingSessions.length}회</p>
+                      <p class="text-xs text-gray-700 mb-1">총 사용 기록</p>
+                      <p class="text-xl font-bold text-gray-900">${totalCreditsUsed}회</p>
+                      <p class="text-xs text-gray-600 mt-1">${hiingSessions.length}개 수업</p>
                     </div>
                   </div>
                   
