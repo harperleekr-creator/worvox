@@ -890,23 +890,10 @@ class WorVox {
     document.body.appendChild(modal);
   }
   
-  // 🎉 Show weekend event banner
+  // 🎉 Show weekend event banner (DEPRECATED - now shown inline)
   showWeekendEventBanner() {
-    // Check if banner already exists
-    if (document.getElementById('weekend-event-banner')) return;
-    
-    const banner = document.createElement('div');
-    banner.id = 'weekend-event-banner';
-    banner.className = 'fixed top-16 left-0 right-0 bg-gradient-to-r from-orange-500 to-pink-500 text-white py-3 px-4 text-center font-bold z-40 shadow-lg';
-    banner.innerHTML = `
-      <div class="flex items-center justify-center gap-2">
-        <span class="text-xl">🎉</span>
-        <span>주말 특별 이벤트! XP 2배 자동 적용 중</span>
-        <span class="text-xl">🎊</span>
-      </div>
-    `;
-    
-    document.body.appendChild(banner);
+    // No longer showing separate banner
+    // Weekend XP 2x is now displayed next to "Choose Your Learning Path"
   }
   
   // 🎨 Update XP Boost UI
@@ -7834,7 +7821,10 @@ Proceed to payment?
             
             <!-- Desktop Top Bar -->
             <div class="hidden md:flex bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-3 items-center justify-between">
-              <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Choose Your Learning Path</h2>
+              <div class="flex items-center gap-3">
+                <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Choose Your Learning Path</h2>
+                ${this.isWeekend() ? '<span class="px-3 py-1 bg-gradient-to-r from-orange-500 to-pink-500 text-white text-sm font-bold rounded-full animate-pulse">🎉 주말 XP 2배 적용중!</span>' : ''}
+              </div>
               <div class="flex items-center gap-3">
                 <!-- Session Timer -->
                 <div class="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-700">
