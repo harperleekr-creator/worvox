@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import type { Bindings } from '../types';
+import { sendAdminPaymentNotification } from '../utils/email-helpers';
 
 const payments = new Hono<{ Bindings: Bindings }>();
 
@@ -329,6 +330,31 @@ payments.post('/confirm', async (c) => {
         `).bind(planType, billingPeriod, months, order.user_id).run();
 
         console.log('User subscription updated successfully (AI prompts auto-enabled)');
+
+        // Send admin notification for payment completion (async, non-blocking)
+        try {
+          const user = await db.prepare(
+            'SELECT email, username FROM users WHERE id = ?'
+          ).bind(order.user_id).first();
+
+          if (user) {
+            await sendAdminPaymentNotification(c.env, {
+              order_id: orderId,
+              user_id: order.user_id,
+              user_email: user.email || '',
+              user_name: user.username || '',
+              plan_name: order.plan_name,
+              amount: order.amount,
+              billing_period: billingPeriod,
+              payment_method: result.method || 'card',
+              status: 'completed',
+              created_at: new Date().toISOString()
+            });
+            console.log('📧 Admin payment notification sent for order:', orderId);
+          }
+        } catch (emailError) {
+          console.warn('⚠️ Failed to send admin payment notification (non-critical):', emailError);
+        }
       }
     } catch (dbError) {
       console.log('DB update failed:', dbError);
@@ -659,6 +685,25 @@ payments.post('/subscription/confirm', async (c) => {
     ).run();
 
     console.log(`✅ Subscription activated until ${subscriptionEndDate.toISOString()}`);
+
+    // Send admin notification for subscription payment (async, non-blocking)
+    try {
+      await sendAdminPaymentNotification(c.env, {
+        order_id: orderId,
+        user_id: userId,
+        user_email: user.email || '',
+        user_name: user.username || '',
+        plan_name: orderName,
+        amount: amount,
+        billing_period: period,
+        payment_method: paymentResult.method || 'card',
+        status: 'success',
+        created_at: new Date().toISOString()
+      });
+      console.log('📧 Admin payment notification sent for subscription:', orderId);
+    } catch (emailError) {
+      console.warn('⚠️ Failed to send admin payment notification (non-critical):', emailError);
+    }
 
     return c.json({
       success: true,
@@ -1640,6 +1685,25 @@ support@worvox.com
         console.error('❌ Error sending Live Speaking payment email:', emailError);
         // Don't fail the payment if email fails
       }
+    }
+
+    // Send admin notification for Live Speaking payment (async, non-blocking)
+    try {
+      await sendAdminPaymentNotification(c.env, {
+        order_id: orderId,
+        user_id: userId,
+        user_email: (user as any)?.email || '',
+        user_name: (user as any)?.username || '',
+        plan_name: orderName,
+        amount: amount,
+        billing_period: packageType,
+        payment_method: paymentResult.method || 'card',
+        status: 'completed',
+        created_at: new Date().toISOString()
+      });
+      console.log('📧 Admin payment notification sent for Live Speaking:', orderId);
+    } catch (emailError) {
+      console.warn('⚠️ Failed to send admin payment notification (non-critical):', emailError);
     }
 
     return c.json({

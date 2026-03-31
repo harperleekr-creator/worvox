@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import type { Bindings } from '../types';
+import { sendAdminSignupNotification } from '../utils/email-helpers';
 
 const users = new Hono<{ Bindings: Bindings }>();
 
@@ -188,6 +189,21 @@ users.post('/google-login', async (c) => {
       console.log('📧 Welcome email sent to:', email);
     } catch (emailError) {
       console.warn('⚠️ Failed to send welcome email (non-critical):', emailError);
+    }
+
+    // Send admin notification for new Google signup (async, non-blocking)
+    try {
+      await sendAdminSignupNotification(c.env, {
+        id: Number(userId),
+        email: email,
+        username: username,
+        plan: 'free',
+        is_trial: 0,
+        created_at: new Date().toISOString()
+      });
+      console.log('📧 Admin signup notification sent for:', email);
+    } catch (adminEmailError) {
+      console.warn('⚠️ Failed to send admin notification (non-critical):', adminEmailError);
     }
 
     console.log('🎉 Google login successful!');
@@ -423,6 +439,22 @@ users.post('/signup', async (c) => {
     } catch (emailError) {
       console.warn('⚠️ Failed to send welcome email (non-critical):', emailError);
       // Don't fail signup if email fails
+    }
+
+    // Send admin notification (async, non-blocking)
+    try {
+      await sendAdminSignupNotification(c.env, {
+        id: Number(userId),
+        email: email,
+        username: name,
+        plan: 'free',
+        is_trial: 0,
+        created_at: new Date().toISOString()
+      });
+      console.log('📧 Admin signup notification sent for:', email);
+    } catch (adminEmailError) {
+      console.warn('⚠️ Failed to send admin notification (non-critical):', adminEmailError);
+      // Don't fail signup if admin email fails
     }
 
     return c.json({
