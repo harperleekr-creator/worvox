@@ -3,81 +3,117 @@
  * PWA 오프라인 기능 및 캐싱 전략
  */
 
-const CACHE_VERSION = 'worvox-v3-fix-sdk-loading';
-const CACHE_NAME = `${CACHE_VERSION}-${Date.now()}`;
+const CACHE_VERSION = 'worvox-v4-optimized';
+const STATIC_CACHE = `${CACHE_VERSION}-static`;
+const API_CACHE = `${CACHE_VERSION}-api`;
+const IMAGE_CACHE = `${CACHE_VERSION}-images`;
 
-// 캐시할 정적 자원
-const STATIC_ASSETS = [
+// 즉시 캐시할 핵심 자원 (Critical Path)
+const CRITICAL_ASSETS = [
   '/',
   '/app',
-  '/static/app.js',
   '/static/app.min.js',
   '/static/style.css',
   '/static/skeleton.css',
   '/static/toast.js',
+  '/manifest.json'
+];
+
+// 지연 캐시 가능한 자원 (Non-Critical)
+const SECONDARY_ASSETS = [
   '/static/error-handler.js',
   '/static/gamification.js',
-  '/manifest.json',
   '/android-chrome-192x192.png',
   '/android-chrome-512x512.png',
   '/apple-touch-icon.png',
   '/favicon.ico'
 ];
 
-// API 캐시 전략
-const API_CACHE_DURATION = 5 * 60 * 1000; // 5분
-const API_PATTERNS = [
-  /\/api\/topics/,
-  /\/api\/users\/\d+\/stats/,
-  /\/api\/gamification\/stats/
-];
+// API 캐시 전략 - 시간 기반
+const API_CACHE_DURATIONS = {
+  short: 1 * 60 * 1000,      // 1분 - 실시간 데이터
+  medium: 5 * 60 * 1000,     // 5분 - 일반 데이터
+  long: 30 * 60 * 1000       // 30분 - 정적 데이터
+};
 
-// 캐시하지 않을 패턴
+const API_PATTERNS = {
+  long: [/\/api\/topics/, /\/api\/scenarios/],
+  medium: [/\/api\/users\/\d+\/stats/, /\/api\/gamification\/stats/],
+  short: [/\/api\/sessions/, /\/api\/daily-goals/]
+};
+
+// 절대 캐시하지 않을 패턴 (실시간 필수)
 const NO_CACHE_PATTERNS = [
   /\/api\/chat/,
+  /\/api\/stt/,
+  /\/api\/tts/,
   /\/api\/pronunciation/,
   /\/api\/audio/,
-  /\/api\/payment/
+  /\/api\/payment/,
+  /\/api\/signup/,
+  /\/api\/login/
 ];
 
 /**
- * Service Worker 설치
+ * Service Worker 설치 - 개선된 캐싱 전략
  */
 self.addEventListener('install', (event) => {
-  console.log('🔧 Service Worker installing...');
+  console.log('🔧 Service Worker installing (v4-optimized)...');
   
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('📦 Caching static assets');
-        return cache.addAll(STATIC_ASSETS.map(url => new Request(url, { cache: 'reload' })));
+    Promise.all([
+      // 핵심 자원 즉시 캐시 (Critical Path)
+      caches.open(STATIC_CACHE).then((cache) => {
+        console.log('📦 Caching critical assets');
+        return cache.addAll(CRITICAL_ASSETS.map(url => new Request(url, { cache: 'reload' })));
+      }),
+      
+      // 보조 자원 지연 캐시 (Non-Critical)
+      caches.open(STATIC_CACHE).then((cache) => {
+        console.log('📦 Caching secondary assets');
+        return Promise.all(
+          SECONDARY_ASSETS.map(url => 
+            cache.add(new Request(url, { cache: 'reload' })).catch(() => {
+              console.warn('⚠️ Failed to cache:', url);
+            })
+          )
+        );
       })
-      .catch((error) => {
-        console.error('❌ Cache installation failed:', error);
-      })
-      .then(() => self.skipWaiting())
+    ])
+    .catch((error) => {
+      console.error('❌ Cache installation failed:', error);
+    })
+    .then(() => {
+      console.log('✅ Service Worker installed');
+      self.skipWaiting();
+    })
   );
 });
 
 /**
- * Service Worker 활성화
+ * Service Worker 활성화 - 개선된 캐시 정리
  */
 self.addEventListener('activate', (event) => {
-  console.log('✅ Service Worker activating...');
+  console.log('✅ Service Worker activating (v4-optimized)...');
   
   event.waitUntil(
     caches.keys()
       .then((cacheNames) => {
+        const currentCaches = [STATIC_CACHE, API_CACHE, IMAGE_CACHE];
         return Promise.all(
           cacheNames.map((cacheName) => {
-            if (cacheName.startsWith(CACHE_VERSION) && cacheName !== CACHE_NAME) {
+            // 현재 버전이 아닌 모든 캐시 삭제
+            if (!currentCaches.includes(cacheName)) {
               console.log('🗑️ Deleting old cache:', cacheName);
               return caches.delete(cacheName);
             }
           })
         );
       })
-      .then(() => self.clients.claim())
+      .then(() => {
+        console.log('✅ Service Worker activated and ready');
+        return self.clients.claim();
+      })
   );
 });
 
@@ -117,30 +153,80 @@ self.addEventListener('fetch', (event) => {
 });
 
 /**
- * Cache First 전략 (정적 자원용)
+ * Cache First 전략 (정적 자원용) - 개선됨
  */
 async function cacheFirstStrategy(request) {
   try {
+    const url = new URL(request.url);
+    const isImage = /\.(png|jpg|jpeg|webp|svg|gif)$/i.test(url.pathname);
+    const cacheName = isImage ? IMAGE_CACHE : STATIC_CACHE;
+    
     const cachedResponse = await caches.match(request);
     if (cachedResponse) {
-      console.log('📦 Serving from cache:', request.url);
+      // 백그라운드에서 새로운 버전 확인 (Stale-While-Revalidate)
+      if (!url.pathname.includes('.min.')) {
+        fetch(request).then(networkResponse => {
+          if (networkResponse && networkResponse.status === 200) {
+            caches.open(cacheName).then(cache => {
+              cache.put(request, networkResponse.clone());
+            });
+          }
+        }).catch(() => {}); // 실패해도 무시
+      }
       return cachedResponse;
     }
 
     const networkResponse = await fetch(request);
     if (networkResponse && networkResponse.status === 200) {
-      const cache = await caches.open(CACHE_NAME);
-      cache.put(request, networkResponse.clone());
-      console.log('💾 Cached new resource:', request.url);
+      const cache = await caches.open(cacheName);
+      
+      // 이미지는 1주일 캐시
+      if (isImage) {
+        const headers = new Headers(networkResponse.headers);
+        headers.set('sw-cache-time', Date.now().toString());
+        const modifiedResponse = new Response(networkResponse.body, {
+          status: networkResponse.status,
+          statusText: networkResponse.statusText,
+          headers: headers
+        });
+        cache.put(request, modifiedResponse);
+      } else {
+        cache.put(request, networkResponse.clone());
+      }
     }
     return networkResponse;
   } catch (error) {
     console.error('❌ Fetch failed:', error);
     
-    // 오프라인 폴백 페이지
+    // 오프라인 폴백
     if (request.destination === 'document') {
-      const cache = await caches.open(CACHE_NAME);
-      return cache.match('/app') || new Response('Offline', { status: 503 });
+      const cache = await caches.open(STATIC_CACHE);
+      const fallback = await cache.match('/app');
+      if (fallback) return fallback;
+      
+      return new Response(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>오프라인 - WorVox</title>
+          <style>
+            body { font-family: sans-serif; text-align: center; padding: 50px; background: #f5f5f5; }
+            h1 { color: #333; }
+            p { color: #666; }
+          </style>
+        </head>
+        <body>
+          <h1>🔌 오프라인 상태</h1>
+          <p>인터넷 연결을 확인해주세요.</p>
+          <button onclick="location.reload()">다시 시도</button>
+        </body>
+        </html>
+      `, { 
+        status: 503, 
+        headers: { 'Content-Type': 'text/html; charset=utf-8' } 
+      });
     }
     
     throw error;
@@ -148,20 +234,35 @@ async function cacheFirstStrategy(request) {
 }
 
 /**
- * Network First 전략 (API용)
+ * Network First 전략 (API용) - 개선됨
  */
 async function networkFirstStrategy(request) {
+  const url = new URL(request.url);
+  
+  // API 캐시 만료 시간 결정
+  let cacheDuration = API_CACHE_DURATIONS.medium;
+  for (const [duration, patterns] of Object.entries(API_PATTERNS)) {
+    if (patterns.some(pattern => pattern.test(url.pathname))) {
+      cacheDuration = API_CACHE_DURATIONS[duration];
+      break;
+    }
+  }
+  
   try {
-    const networkResponse = await fetch(request.clone());
+    const networkResponse = await fetch(request.clone(), {
+      // 네트워크 타임아웃 설정 (5초)
+      signal: AbortSignal.timeout(5000)
+    });
     
     // 성공적인 응답이면 캐시에 저장
     if (networkResponse && networkResponse.status === 200) {
-      const cache = await caches.open(CACHE_NAME);
+      const cache = await caches.open(API_CACHE);
       
-      // 캐시 만료 시간 설정
+      // 캐시 만료 시간과 타입 설정
       const responseToCache = networkResponse.clone();
       const headers = new Headers(responseToCache.headers);
       headers.set('sw-cache-time', Date.now().toString());
+      headers.set('sw-cache-duration', cacheDuration.toString());
       
       const modifiedResponse = new Response(responseToCache.body, {
         status: responseToCache.status,
@@ -182,11 +283,24 @@ async function networkFirstStrategy(request) {
     if (cachedResponse) {
       // 캐시 만료 시간 확인
       const cacheTime = cachedResponse.headers.get('sw-cache-time');
+      const savedDuration = cachedResponse.headers.get('sw-cache-duration');
+      
       if (cacheTime) {
         const age = Date.now() - parseInt(cacheTime);
-        if (age < API_CACHE_DURATION) {
-          console.log('📦 Serving API from cache:', request.url);
-          return cachedResponse;
+        const maxAge = savedDuration ? parseInt(savedDuration) : cacheDuration;
+        
+        if (age < maxAge) {
+          console.log('📦 Serving stale API from cache:', request.url);
+          // Stale 데이터임을 표시
+          const headers = new Headers(cachedResponse.headers);
+          headers.set('X-From-Cache', 'true');
+          headers.set('X-Cache-Age', Math.floor(age / 1000).toString() + 's');
+          
+          return new Response(cachedResponse.body, {
+            status: cachedResponse.status,
+            statusText: cachedResponse.statusText,
+            headers: headers
+          });
         } else {
           console.log('⏰ Cache expired for:', request.url);
         }
