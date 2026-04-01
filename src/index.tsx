@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1775017928883'; // Update manually or via build script
+const BUILD_TIME = '1775018171649'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -1445,11 +1445,11 @@ app.get('/landing', (c) => {
                     </div>
                     <div class="flex items-center gap-2">
                         <i class="fas fa-users text-purple-600"></i>
-                        <span>3,000+ 학습자</span>
+                        <span>${isKorean ? '3,000+ 학습자' : '3,000+ Learners'}</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <i class="fas fa-clock text-blue-600"></i>
-                        <span>평균 30일 만에 효과</span>
+                        <span>${isKorean ? '평균 30일 만에 효과' : 'Results in 30 days'}</span>
                     </div>
                 </div>
 
@@ -1469,9 +1469,9 @@ app.get('/landing', (c) => {
             <div class="max-w-6xl mx-auto">
                 <div class="text-center mb-12">
                     <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                        <span class="text-purple-600">WorVox</span>는 얼마나 효과적일까요?
+                        ${isKorean ? '얼마나 효과적일까요?' : 'How Effective is'} <span class="text-purple-600">WorVox</span>${isKorean ? '' : '?'}
                     </h2>
-                    <p class="text-lg text-gray-600">데이터로 증명된 학습 효과와 비용 절감 효과</p>
+                    <p class="text-lg text-gray-600">${isKorean ? '데이터로 증명된 학습 효과와 비용 절감 효과' : 'Proven learning effectiveness and cost savings'}</p>
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-8">
@@ -1482,8 +1482,8 @@ app.get('/landing', (c) => {
                                 📈
                             </div>
                             <div>
-                                <h3 class="text-xl font-bold text-gray-900">영어 실력 향상 속도</h3>
-                                <p class="text-sm text-gray-500">기존 학습법 대비 3배 빠른 성장</p>
+                                <h3 class="text-xl font-bold text-gray-900">${isKorean ? '영어 실력 향상 속도' : 'Skill Improvement Speed'}</h3>
+                                <p class="text-sm text-gray-500">${isKorean ? '기존 학습법 대비 3배 빠른 성장' : '3x faster than traditional methods'}</p>
                             </div>
                         </div>
                         <div class="relative h-64" style="height: 250px;">
@@ -1491,12 +1491,12 @@ app.get('/landing', (c) => {
                         </div>
                         <div class="mt-4 grid grid-cols-2 gap-4 text-center">
                             <div class="bg-gray-50 rounded-lg p-3">
-                                <div class="text-2xl font-bold text-gray-400">30일</div>
-                                <div class="text-xs text-gray-500">기존 학습법</div>
+                                <div class="text-2xl font-bold text-gray-400">${isKorean ? '30일' : '30 days'}</div>
+                                <div class="text-xs text-gray-500">${isKorean ? '기존 학습법' : 'Traditional'}</div>
                             </div>
                             <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-3 border-2 border-purple-300">
-                                <div class="text-2xl font-bold text-purple-600">10일</div>
-                                <div class="text-xs text-purple-600 font-semibold">WorVox 평균</div>
+                                <div class="text-2xl font-bold text-purple-600">${isKorean ? '10일' : '10 days'}</div>
+                                <div class="text-xs text-purple-600 font-semibold">${isKorean ? 'WorVox 평균' : 'WorVox Average'}</div>
                             </div>
                         </div>
                     </div>
@@ -1508,8 +1508,8 @@ app.get('/landing', (c) => {
                                 💰
                             </div>
                             <div>
-                                <h3 class="text-xl font-bold text-gray-900">월 학습 비용 비교</h3>
-                                <p class="text-sm text-gray-500">영어 학원 대비 87% 절감</p>
+                                <h3 class="text-xl font-bold text-gray-900">${isKorean ? '월 학습 비용 비교' : 'Monthly Cost Comparison'}</h3>
+                                <p class="text-sm text-gray-500">${isKorean ? '영어 학원 대비 87% 절감' : '87% savings vs. language schools'}</p>
                             </div>
                         </div>
                         <div class="relative h-64" style="height: 250px;">
@@ -1517,11 +1517,11 @@ app.get('/landing', (c) => {
                         </div>
                         <div class="mt-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-sm text-gray-600">연간 절감액</span>
-                                <span class="text-2xl font-bold text-blue-600">₩1,572,000</span>
+                                <span class="text-sm text-gray-600">${isKorean ? '연간 절감액' : 'Annual Savings'}</span>
+                                <span class="text-2xl font-bold text-blue-600">${isKorean ? '₩1,572,000' : '$1,300'}</span>
                             </div>
                             <div class="text-xs text-gray-500 text-center">
-                                * 영어 학원(월 15만원) 대비 WorVox Core(월 1.9만원) 기준
+${isKorean ? '* 영어 학원(월 15만원) 대비 WorVox Core(월 1.9만원) 기준' : '* Based on language school ($125/mo) vs WorVox Core ($15/mo)'}
                             </div>
                         </div>
                     </div>
@@ -1531,12 +1531,12 @@ app.get('/landing', (c) => {
                 <div class="mt-12 text-center">
                     <div class="inline-block bg-gradient-to-r from-purple-100 to-blue-100 rounded-2xl p-8 border-2 border-purple-300">
                         <p class="text-xl font-bold text-gray-900 mb-2">
-                            💡 지금 시작하면 <span class="text-purple-600">2주 무료 체험</span> 가능!
+${isKorean ? '💡 지금 시작하면 <span class="text-purple-600">2주 무료 체험</span> 가능!' : '💡 Start now and get a <span class="text-purple-600">2-week free trial</span>!'}
                         </p>
-                        <p class="text-gray-600 mb-4">실력 향상과 비용 절감을 직접 경험해보세요</p>
+                        <p class="text-gray-600 mb-4">${isKorean ? '실력 향상과 비용 절감을 직접 경험해보세요' : 'Experience skill improvement and cost savings yourself'}</p>
                         <a href="/app" 
                            class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:shadow-xl transition transform hover:scale-105">
-                            <i class="fas fa-rocket mr-2"></i>무료로 시작하기
+                            <i class="fas fa-rocket mr-2"></i>${isKorean ? '무료로 시작하기' : 'Start Free Trial'}
                         </a>
                     </div>
                 </div>
@@ -1545,6 +1545,7 @@ app.get('/landing', (c) => {
 
         <script>
         // Chart.js 초기화 (페이지 로드 후)
+        const isKorean = ${isKorean};
         document.addEventListener('DOMContentLoaded', function() {
             // Chart 1: 영어 실력 향상 그래프 (Line Chart)
             const skillCtx = document.getElementById('skillImprovementChart');
@@ -1552,7 +1553,7 @@ app.get('/landing', (c) => {
                 new Chart(skillCtx, {
                     type: 'line',
                     data: {
-                        labels: ['1일', '3일', '7일', '10일', '14일', '21일', '30일'],
+                        labels: isKorean ? ['1일', '3일', '7일', '10일', '14일', '21일', '30일'] : ['Day 1', 'Day 3', 'Day 7', 'Day 10', 'Day 14', 'Day 21', 'Day 30'],
                         datasets: [
                             {
                                 label: 'WorVox',
@@ -1566,7 +1567,7 @@ app.get('/landing', (c) => {
                                 pointHoverRadius: 7
                             },
                             {
-                                label: '기존 학습법',
+                                label: isKorean ? '기존 학습법' : 'Traditional',
                                 data: [5, 10, 18, 25, 32, 45, 55],
                                 borderColor: 'rgb(156, 163, 175)',
                                 backgroundColor: 'rgba(156, 163, 175, 0.1)',
@@ -1596,7 +1597,7 @@ app.get('/landing', (c) => {
                                 intersect: false,
                                 callbacks: {
                                     label: function(context) {
-                                        return context.dataset.label + ': ' + context.parsed.y + '점';
+                                        return context.dataset.label + ': ' + context.parsed.y + (isKorean ? '점' : ' pts');
                                     }
                                 }
                             }
@@ -1607,7 +1608,7 @@ app.get('/landing', (c) => {
                                 max: 100,
                                 ticks: {
                                     callback: function(value) {
-                                        return value + '점';
+                                        return value + (isKorean ? '점' : '');
                                     }
                                 },
                                 grid: {
@@ -1635,10 +1636,10 @@ app.get('/landing', (c) => {
                 new Chart(costCtx, {
                     type: 'bar',
                     data: {
-                        labels: ['영어 학원', '일대일 과외', '온라인 강의', 'WorVox'],
+                        labels: isKorean ? ['영어 학원', '일대일 과외', '온라인 강의', 'WorVox'] : ['School', 'Tutor', 'Online', 'WorVox'],
                         datasets: [{
-                            label: '월 비용 (원)',
-                            data: [150000, 200000, 50000, 19000],
+                            label: isKorean ? '월 비용 (원)' : 'Monthly Cost ($)',
+                            data: isKorean ? [150000, 200000, 50000, 19000] : [125, 165, 42, 15],
                             backgroundColor: [
                                 'rgba(239, 68, 68, 0.7)',
                                 'rgba(249, 115, 22, 0.7)',
@@ -1665,7 +1666,11 @@ app.get('/landing', (c) => {
                             tooltip: {
                                 callbacks: {
                                     label: function(context) {
-                                        return '월 비용: ₩' + context.parsed.y.toLocaleString() + '원';
+                                        if (isKorean) {
+                                            return '월 비용: ₩' + context.parsed.y.toLocaleString() + '원';
+                                        } else {
+                                            return 'Monthly: $' + context.parsed.y;
+                                        }
                                     }
                                 }
                             }
@@ -1675,7 +1680,11 @@ app.get('/landing', (c) => {
                                 beginAtZero: true,
                                 ticks: {
                                     callback: function(value) {
-                                        return '₩' + (value / 1000) + 'k';
+                                        if (isKorean) {
+                                            return '₩' + (value / 1000) + 'k';
+                                        } else {
+                                            return '$' + value;
+                                        }
                                     }
                                 },
                                 grid: {
