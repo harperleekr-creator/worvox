@@ -1,5 +1,12 @@
 import { Hono } from 'hono';
 import type { Bindings } from '../types';
+import { 
+  createErrorResponse, 
+  createSuccessResponse, 
+  CommonErrors, 
+  ErrorCodes,
+  getHTTPStatus 
+} from '../utils/error-handler';
 
 const topics = new Hono<{ Bindings: Bindings }>();
 
@@ -19,17 +26,14 @@ topics.get('/', async (c) => {
          END`
     ).all();
 
-    return c.json({
-      topics: result.results || [],
-      success: true,
-    });
+    return c.json(createSuccessResponse({
+      topics: result.results || []
+    }));
 
   } catch (error) {
     console.error('Get topics error:', error);
-    return c.json({ 
-      error: 'Failed to fetch topics',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }, 500);
+    const errorResponse = CommonErrors.databaseError('fetch topics');
+    return c.json(errorResponse, getHTTPStatus(errorResponse.error.code));
   }
 });
 
@@ -39,24 +43,26 @@ topics.get('/level/:level', async (c) => {
     const level = c.req.param('level');
 
     if (!['beginner', 'intermediate', 'advanced'].includes(level)) {
-      return c.json({ error: 'Invalid level' }, 400);
+      const errorResponse = createErrorResponse(
+        ErrorCodes.VALIDATION_INVALID_FORMAT,
+        '유효하지 않은 레벨입니다.',
+        { level, validLevels: ['beginner', 'intermediate', 'advanced'] }
+      );
+      return c.json(errorResponse, getHTTPStatus(errorResponse.error.code));
     }
 
     const result = await c.env.DB.prepare(
       'SELECT * FROM topics WHERE level = ? ORDER BY name'
     ).bind(level).all();
 
-    return c.json({
-      topics: result.results || [],
-      success: true,
-    });
+    return c.json(createSuccessResponse({
+      topics: result.results || []
+    }));
 
   } catch (error) {
     console.error('Get topics by level error:', error);
-    return c.json({ 
-      error: 'Failed to fetch topics',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }, 500);
+    const errorResponse = CommonErrors.databaseError('fetch topics by level');
+    return c.json(errorResponse, getHTTPStatus(errorResponse.error.code));
   }
 });
 
@@ -70,20 +76,20 @@ topics.get('/:topicId', async (c) => {
     ).bind(topicId).first();
 
     if (!topic) {
-      return c.json({ error: 'Topic not found' }, 404);
+      const errorResponse = createErrorResponse(
+        ErrorCodes.RESOURCE_NOT_FOUND,
+        '토픽을 찾을 수 없습니다.',
+        { topicId }
+      );
+      return c.json(errorResponse, getHTTPStatus(errorResponse.error.code));
     }
 
-    return c.json({
-      topic,
-      success: true,
-    });
+    return c.json(createSuccessResponse({ topic }));
 
   } catch (error) {
     console.error('Get topic error:', error);
-    return c.json({ 
-      error: 'Failed to fetch topic',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }, 500);
+    const errorResponse = CommonErrors.databaseError('fetch topic');
+    return c.json(errorResponse, getHTTPStatus(errorResponse.error.code));
   }
 });
 
