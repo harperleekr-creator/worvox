@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1775023862192'; // Update manually or via build script
+const BUILD_TIME = '1775024172564'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -2335,7 +2335,7 @@ ${isKorean ? '💡 지금 시작하면 <span class="text-purple-600">2주 무료
                              onclick="gtag('event', 'demo_image_click', { 'event_category': 'engagement', 'event_label': 'timer_challenge_demo', 'value': 1 })">
                             <picture>
                                 <source srcset="/static/demo-timer-challenge.webp" type="image/webp">
-                                <img src="/static/demo-timer-challenge.png" 
+                                <img src="/static/demo-timer-challenge.webp" 
                                      alt="타이머 챌린지 모드 - 실시간 발음 분석 데모" 
                                      class="w-full h-full object-cover"
                                      loading="lazy">
@@ -2386,7 +2386,7 @@ ${isKorean ? '💡 지금 시작하면 <span class="text-purple-600">2주 무료
                              onclick="gtag('event', 'demo_image_click', { 'event_category': 'engagement', 'event_label': 'scenario_mode_demo', 'value': 1 })">
                             <picture>
                                 <source srcset="/static/demo-scenario-mode.webp" type="image/webp">
-                                <img src="/static/demo-scenario-mode.png" 
+                                <img src="/static/demo-scenario-mode.webp" 
                                      alt="시나리오 모드 - 실전 회화 연습 데모" 
                                      class="w-full h-full object-cover"
                                      loading="lazy">
@@ -2437,7 +2437,7 @@ ${isKorean ? '💡 지금 시작하면 <span class="text-purple-600">2주 무료
                              onclick="gtag('event', 'demo_image_click', { 'event_category': 'engagement', 'event_label': 'exam_mode_demo', 'value': 1 })">
                             <picture>
                                 <source srcset="/static/demo-ai-analysis.webp" type="image/webp">
-                                <img src="/static/demo-ai-analysis.png" 
+                                <img src="/static/demo-ai-analysis.webp" 
                                      alt="시험 모드 - OPIC 준비 및 분석 데모" 
                                      class="w-full h-full object-cover"
                                      loading="lazy">

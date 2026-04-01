@@ -1119,7 +1119,7 @@ class WorVox {
       }
     } catch (error) {
       console.error('Google Sign-In error:', error);
-      alert('Failed to sign in with Google. Please try again.');
+      toast.error('Failed to sign in with Google. Please try again.');
     }
   }
 
@@ -1359,7 +1359,7 @@ class WorVox {
         iconMobile.className = 'fas fa-sun text-yellow-400';
       }
       console.log('🌙 Dark mode enabled');
-      alert('🌙 다크모드가 활성화되었습니다!\n\n페이지 배경과 카드가 어두운 테마로 변경됩니다.');
+      toast.error('🌙 다크모드가 활성화되었습니다!\n\n페이지 배경과 카드가 어두운 테마로 변경됩니다.');
     } else {
       document.documentElement.classList.remove('dark');
       // Update desktop icon
@@ -1373,7 +1373,7 @@ class WorVox {
         iconMobile.className = 'fas fa-moon text-gray-600 dark:text-gray-300';
       }
       console.log('☀️ Light mode enabled');
-      alert('☀️ 라이트모드가 활성화되었습니다!');
+      toast.error('☀️ 라이트모드가 활성화되었습니다!');
     }
   }
 
@@ -1429,7 +1429,7 @@ class WorVox {
       }
     } catch (error) {
       console.error('Error starting conversation:', error);
-      alert('세션 시작 중 오류가 발생했습니다. 다시 시도해주세요.');
+      toast.error('세션 시작 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
   }
 
@@ -1445,7 +1445,7 @@ class WorVox {
   showTimerMode() {
     // Check if core or premium user
     if (!this.isCoreOrPremiumUser()) {
-      alert('⏱️ 타이머 모드는 Core/Premium 전용 기능입니다!\n\n지금 업그레이드하고 압박 훈련을 시작하세요.');
+      toast.info('⏱️ 타이머 모드는 Core/Premium 전용 기능입니다!\n\n지금 업그레이드하고 압박 훈련을 시작하세요.');
       this.showPlan();
       return;
     }
@@ -1651,7 +1651,7 @@ class WorVox {
         if (window.toast) {
           window.toast.error('AI 프롬프트 생성에 실패했습니다. 기본 문장 풀을 사용합니다.', 5000);
         } else {
-          alert('AI 프롬프트 생성에 실패했습니다.\n기본 문장 풀을 사용합니다.');
+          toast.error('AI 프롬프트 생성에 실패했습니다.\n기본 문장 풀을 사용합니다.');
         }
         ({ randomSentence, translation } = this.getDefaultTimerSentence());
       }
@@ -1668,7 +1668,7 @@ class WorVox {
   retryTimerChallenge() {
     if (!this.currentTimerChallenge) {
       console.error('No current timer challenge to retry');
-      alert('다시 시도할 문장이 없습니다. 새 문장을 시작하세요.');
+      toast.error('다시 시도할 문장이 없습니다. 새 문장을 시작하세요.');
       return;
     }
     
@@ -1947,7 +1947,7 @@ class WorVox {
       console.log('✅ Recording started successfully');
     } catch (error) {
       console.error('❌ Failed to start recording:', error);
-      alert('마이크 권한이 필요합니다. 브라우저 설정에서 마이크 권한을 허용해주세요.');
+      toast.error('마이크 권한이 필요합니다. 브라우저 설정에서 마이크 권한을 허용해주세요.');
       this.timerChallenge.started = false;
       this.showTimerMode();
       return;
@@ -2024,9 +2024,9 @@ class WorVox {
     } catch (error) {
       console.error('Timer Mode: Recording error:', error);
       if (error.name === 'NotAllowedError') {
-        alert('마이크 접근 권한이 필요합니다. 브라우저 설정에서 마이크 권한을 허용해주세요.');
+        toast.error('마이크 접근 권한이 필요합니다. 브라우저 설정에서 마이크 권한을 허용해주세요.');
       } else {
-        alert('마이크에 접근할 수 없습니다: ' + error.message);
+        toast.error('마이크에 접근할 수 없습니다: ' + error.message);
       }
     }
   }
@@ -2850,7 +2850,7 @@ class WorVox {
   showScenarioMode() {
     // Check if core or premium user
     if (!this.isCoreOrPremiumUser()) {
-      alert('🎬 시나리오 모드는 Core/Premium 전용 기능입니다!\n\n실제 상황 기반 30가지 대화를 연습하고 실력을 향상하세요.');
+      toast.info('🎬 시나리오 모드는 Core/Premium 전용 기능입니다!\n\n실제 상황 기반 30가지 대화를 연습하고 실력을 향상하세요.');
       this.showPlan();
       return;
     }
@@ -3127,7 +3127,7 @@ class WorVox {
         }
       } catch (error) {
         console.error('❌ AI scenario generation failed:', error.response?.data || error.message);
-        alert('AI 시나리오 생성에 실패했습니다. 기본 시나리오를 사용합니다.');
+        toast.error('AI 시나리오 생성에 실패했습니다. 기본 시나리오를 사용합니다.');
       }
     }
     
@@ -3403,7 +3403,7 @@ class WorVox {
         playBtn.disabled = false;
         playBtn.innerHTML = '<i class="fas fa-volume-up mr-2"></i>듣기';
         URL.revokeObjectURL(audioUrl);
-        alert('오디오 재생 중 오류가 발생했습니다.\n\n에러: ' + (audio.error ? audio.error.message : 'Unknown'));
+        toast.error('오디오 재생 중 오류가 발생했습니다.\n\n에러: ' + (audio.error ? audio.error.message : 'Unknown'));
       };
       
       console.log('▶️ Starting audio playback...');
@@ -3423,7 +3423,7 @@ class WorVox {
       if (error.response?.status === 500) {
         errorMsg += '\nTTS API 설정을 확인해주세요.';
       }
-      alert(errorMsg);
+      toast.error(errorMsg);
     }
   }
   
@@ -3460,7 +3460,7 @@ class WorVox {
       audio.onerror = (e) => {
         console.error('Audio playback error:', e);
         URL.revokeObjectURL(audioUrl);
-        alert('오디오 재생 중 오류가 발생했습니다.');
+        toast.error('오디오 재생 중 오류가 발생했습니다.');
       };
       
       await audio.play();
@@ -3468,7 +3468,7 @@ class WorVox {
       
     } catch (error) {
       console.error('TTS error:', error);
-      alert('오디오 재생 중 오류가 발생했습니다.');
+      toast.error('오디오 재생 중 오류가 발생했습니다.');
     }
   }
   
@@ -3481,7 +3481,7 @@ class WorVox {
       
       audio.onerror = (e) => {
         console.error('Audio playback error:', e);
-        alert('녹음 재생 중 오류가 발생했습니다.');
+        toast.error('녹음 재생 중 오류가 발생했습니다.');
       };
       
       await audio.play();
@@ -3489,7 +3489,7 @@ class WorVox {
       
     } catch (error) {
       console.error('Recording playback error:', error);
-      alert('녹음 재생 중 오류가 발생했습니다.');
+      toast.error('녹음 재생 중 오류가 발생했습니다.');
     }
   }
   
@@ -3550,7 +3550,7 @@ class WorVox {
       
     } catch (error) {
       console.error('Recording error:', error);
-      alert('마이크 접근 권한이 필요합니다.');
+      toast.error('마이크 접근 권한이 필요합니다.');
     }
   }
   
@@ -3735,7 +3735,7 @@ class WorVox {
       
     } catch (error) {
       console.error('Analysis error:', error);
-      alert('분석 중 오류가 발생했습니다. 다시 시도해주세요.');
+      toast.error('분석 중 오류가 발생했습니다. 다시 시도해주세요.');
       this.showScenarioPractice();
     }
   }
@@ -4389,7 +4389,7 @@ class WorVox {
   showExamMode() {
     // Check if core or premium user
     if (!this.isCoreOrPremiumUser()) {
-      alert('📝 시험 모드는 Core/Premium 전용 기능입니다!\n\n지금 업그레이드하고 실전 스피킹 테스트를 경험하세요.');
+      toast.info('📝 시험 모드는 Core/Premium 전용 기능입니다!\n\n지금 업그레이드하고 실전 스피킹 테스트를 경험하세요.');
       this.showPlan();
       return;
     }
@@ -4598,7 +4598,7 @@ class WorVox {
         }
       } catch (error) {
         console.error('❌ AI exam generation failed:', error.response?.data || error.message);
-        alert('AI 시험 문제 생성에 실패했습니다. 기본 문제를 사용합니다.');
+        toast.error('AI 시험 문제 생성에 실패했습니다. 기본 문제를 사용합니다.');
       }
     }
     
@@ -4981,7 +4981,7 @@ class WorVox {
       console.log('✅ Exam recording started');
     } catch (error) {
       console.error('Failed to start exam recording:', error);
-      alert('마이크 접근 권한이 필요합니다.');
+      toast.error('마이크 접근 권한이 필요합니다.');
     }
   }
 
@@ -5233,7 +5233,7 @@ class WorVox {
       }
     } catch (error) {
       console.error('Failed to process exam answer:', error);
-      alert('답변 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
+      toast.error('답변 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
       this.showExamMode();
     }
   }
@@ -5273,7 +5273,7 @@ class WorVox {
           button.innerHTML = originalHTML;
         }
         console.error('Failed to play audio');
-        alert('오디오 재생에 실패했습니다.');
+        toast.error('오디오 재생에 실패했습니다.');
         this.currentAudio = null;
       };
 
@@ -5285,7 +5285,7 @@ class WorVox {
         button.disabled = false;
         button.innerHTML = originalHTML;
       }
-      alert('오디오 재생에 실패했습니다.');
+      toast.error('오디오 재생에 실패했습니다.');
     }
   }
 
@@ -6144,7 +6144,7 @@ class WorVox {
   // Purchase lesson packages (일반결제)
   async purchaseLessons(lessonCount, amount, packageType = 'one-time') {
     if (!this.currentUser) {
-      alert('Please login to purchase lesson credits.');
+      toast.error('Please login to purchase lesson credits.');
       return;
     }
 
@@ -6160,16 +6160,16 @@ class WorVox {
         });
 
         if (response.data.success) {
-          alert(`🎁 Free trial registered!\n\nYou received ${lessonCount} lesson credit.\n\nPlease select a teacher and schedule your lesson! 🚀`);
+          toast.error(`🎁 Free trial registered!\n\nYou received ${lessonCount} lesson credit.\n\nPlease select a teacher and schedule your lesson! 🚀`);
           // Show teacher selection page
           this.showTeacherSelection();
         } else {
           // Handle error from response (duplicate free trial)
           const errorMsg = response.data.error || 'Failed to register free trial';
           if (errorMsg.includes('already used')) {
-            alert('❌ 무료 체험은 1회만 가능합니다.\n\n이미 무료 체험을 사용하셨습니다.\n수업권을 구매해주세요! 💰');
+            toast.error('❌ 무료 체험은 1회만 가능합니다.\n\n이미 무료 체험을 사용하셨습니다.\n수업권을 구매해주세요! 💰');
           } else {
-            alert('❌ ' + errorMsg);
+            toast.error('❌ ' + errorMsg);
           }
         }
       } catch (error) {
@@ -6186,14 +6186,14 @@ class WorVox {
           const errorMsg = error.response.data?.error || '';
           console.log('Error message from API:', errorMsg);
           if (errorMsg.includes('already used')) {
-            alert('❌ 무료 체험은 1회만 가능합니다.\n\n이미 무료 체험을 사용하셨습니다.\n수업권을 구매해주세요! 💰');
+            toast.error('❌ 무료 체험은 1회만 가능합니다.\n\n이미 무료 체험을 사용하셨습니다.\n수업권을 구매해주세요! 💰');
           } else {
-            alert('❌ ' + errorMsg);
+            toast.error('❌ ' + errorMsg);
           }
         } else {
           // Show generic error with details in console
           console.error('Non-400 error or missing response');
-          alert('❌ Failed to register free trial. Please try again.\n\nCheck browser console for details.');
+          toast.error('❌ Failed to register free trial. Please try again.\n\nCheck browser console for details.');
         }
       }
       return;
@@ -6316,10 +6316,10 @@ class WorVox {
         console.error('Response status:', error.response.status);
         console.error('Response data:', error.response.data);
         const errorMsg = error.response.data?.error || error.response.data?.details || error.message;
-        alert(`❌ 정기구독 시작 중 오류가 발생했습니다.\n\n${errorMsg}\n\n잠시 후 다시 시도해주세요.`);
+        toast.error(`❌ 정기구독 시작 중 오류가 발생했습니다.\n\n${errorMsg}\n\n잠시 후 다시 시도해주세요.`);
       } else {
         // Network error or other error
-        alert(`❌ 정기구독 시작 중 오류가 발생했습니다.\n\n${error.message}\n\n인터넷 연결을 확인하고 다시 시도해주세요.`);
+        toast.error(`❌ 정기구독 시작 중 오류가 발생했습니다.\n\n${error.message}\n\n인터넷 연결을 확인하고 다시 시도해주세요.`);
       }
     }
   }
@@ -6333,7 +6333,7 @@ class WorVox {
     this.currentPage = 'hiing';
     
     if (!this.currentUser) {
-      alert('Please login first.');
+      toast.error('Please login first.');
       return;
     }
 
@@ -6499,14 +6499,14 @@ class WorVox {
 
   async selectTeacher(teacherId, teacherName) {
     if (!this.currentUser) {
-      alert('Please login first.');
+      toast.error('Please login first.');
       return;
     }
 
     // Check if user has credits
     const creditsResponse = await axios.get(`/api/hiing/credits/${this.currentUser.id}`);
     if (!creditsResponse.data.success || creditsResponse.data.remaining_credits <= 0) {
-      alert('You need to purchase lesson credits first!');
+      toast.error('You need to purchase lesson credits first!');
       this.showLiveSpeaking();
       return;
     }
@@ -6664,7 +6664,7 @@ class WorVox {
   selectDurationOption(minutes) {
     // If trial and trying to select 50 minutes, prevent it
     if (this.isTrial && minutes === 50) {
-      alert('체험 수업은 25분만 가능합니다. 50분 수업은 정식 수업권 구매 후 이용하실 수 있습니다.');
+      toast.error('체험 수업은 25분만 가능합니다. 50분 수업은 정식 수업권 구매 후 이용하실 수 있습니다.');
       return;
     }
 
@@ -6689,12 +6689,12 @@ class WorVox {
     const duration = this.selectedDuration || 25;
 
     if (!date || !time) {
-      alert('날짜와 시간을 선택해주세요');
+      toast.error('날짜와 시간을 선택해주세요');
       return;
     }
 
     if (!studentPhone || studentPhone.trim() === '') {
-      alert('전화번호를 입력해주세요');
+      toast.error('전화번호를 입력해주세요');
       return;
     }
 
@@ -6729,7 +6729,7 @@ Proceed with booking?
       });
 
       if (response.data.success) {
-        alert(`✅ 예약 완료!
+        toast.error(`✅ 예약 완료!
 
 강사: ${teacherName}
 날짜: ${new Date(scheduledAt).toLocaleDateString('ko-KR')}
@@ -6747,7 +6747,7 @@ Proceed with booking?
       }
     } catch (error) {
       console.error('Schedule error:', error);
-      alert('❌ Failed to book lesson. Please try again.\n' + (error.response?.data?.error || error.message));
+      toast.error('❌ Failed to book lesson. Please try again.\n' + (error.response?.data?.error || error.message));
     }
   }
 
@@ -6773,7 +6773,7 @@ Proceed with booking?
     const data = this.bookingData;
     
     if (!data || !data.sessionsPerWeek || !data.sessionDuration) {
-      alert('Please select both sessions per week and session duration.');
+      toast.error('Please select both sessions per week and session duration.');
       return;
     }
     
@@ -6792,7 +6792,7 @@ Proceed to payment?
     
     if (confirmed) {
       // TODO: Implement actual payment integration
-      alert('Payment feature coming soon! Your booking details have been saved.');
+      toast.error('Payment feature coming soon! Your booking details have been saved.');
       
       // For now, just log the booking
       console.log('Booking Data:', data);
@@ -7136,24 +7136,24 @@ Proceed to payment?
 
     // Validation
     if (!name || !email || !password || !passwordConfirm) {
-      alert('모든 필드를 입력해주세요.');
+      toast.error('모든 필드를 입력해주세요.');
       return;
     }
 
     if (password.length < 8) {
-      alert('비밀번호는 8자 이상이어야 합니다.');
+      toast.error('비밀번호는 8자 이상이어야 합니다.');
       return;
     }
 
     if (password !== passwordConfirm) {
-      alert('비밀번호가 일치하지 않습니다.');
+      toast.error('비밀번호가 일치하지 않습니다.');
       return;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      alert('올바른 이메일 형식이 아닙니다.');
+      toast.error('올바른 이메일 형식이 아닙니다.');
       return;
     }
 
@@ -7178,7 +7178,7 @@ Proceed to payment?
       console.log('User plan updated to:', this.userPlan);
 
       // Show success message
-      alert(`환영합니다, ${name}님! 이제 영어 레벨을 선택해주세요.`);
+      toast.error(`환영합니다, ${name}님! 이제 영어 레벨을 선택해주세요.`);
 
       // If new user, show onboarding steps
       if (response.data.isNew) {
@@ -7196,9 +7196,9 @@ Proceed to payment?
     } catch (error) {
       console.error('Signup error:', error);
       if (error.response?.status === 409) {
-        alert('이미 등록된 이메일입니다. 로그인해주세요.');
+        toast.error('이미 등록된 이메일입니다. 로그인해주세요.');
       } else {
-        alert('회원가입에 실패했습니다. 다시 시도해주세요.');
+        toast.error('회원가입에 실패했습니다. 다시 시도해주세요.');
       }
     }
   }
@@ -7214,7 +7214,7 @@ Proceed to payment?
     const password = document.getElementById('loginPassword').value;
 
     if (!email || !password) {
-      alert('이메일과 비밀번호를 입력해주세요.');
+      toast.error('이메일과 비밀번호를 입력해주세요.');
       return;
     }
 
@@ -7244,9 +7244,9 @@ Proceed to payment?
     } catch (error) {
       console.error('Login error:', error);
       if (error.response?.status === 401) {
-        alert('이메일 또는 비밀번호가 올바르지 않습니다.');
+        toast.error('이메일 또는 비밀번호가 올바르지 않습니다.');
       } else {
-        alert('로그인에 실패했습니다. 다시 시도해주세요.');
+        toast.error('로그인에 실패했습니다. 다시 시도해주세요.');
       }
     }
   }
@@ -7260,24 +7260,24 @@ Proceed to payment?
 
     // Validation
     if (!name || !email || !password || !passwordConfirm) {
-      alert('모든 필드를 입력해주세요.');
+      toast.error('모든 필드를 입력해주세요.');
       return;
     }
 
     if (password.length < 8) {
-      alert('비밀번호는 8자 이상이어야 합니다.');
+      toast.error('비밀번호는 8자 이상이어야 합니다.');
       return;
     }
 
     if (password !== passwordConfirm) {
-      alert('비밀번호가 일치하지 않습니다.');
+      toast.error('비밀번호가 일치하지 않습니다.');
       return;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      alert('올바른 이메일 형식이 아닙니다.');
+      toast.error('올바른 이메일 형식이 아닙니다.');
       return;
     }
 
@@ -7307,7 +7307,7 @@ Proceed to payment?
       // If new user, show onboarding steps
       if (response.data.isNew) {
         console.log('🆕 New user - showing onboarding');
-        alert(`환영합니다, ${name}님! 이제 영어 레벨을 선택해주세요.`);
+        toast.error(`환영합니다, ${name}님! 이제 영어 레벨을 선택해주세요.`);
         this.onboardingStep = 2; // Start from step 2 (level selection)
         this.showOnboardingStep();
       } else {
@@ -7326,13 +7326,13 @@ Proceed to payment?
         console.error('Response data:', error.response.data);
         
         if (error.response.status === 409) {
-          alert('⚠️ 이미 등록된 이메일입니다. 로그인해주세요.');
+          toast.warning('⚠️ 이미 등록된 이메일입니다. 로그인해주세요.');
         } else {
           const errorMsg = error.response.data?.error || error.response.data?.message || '알 수 없는 오류';
-          alert(`❌ 회원가입에 실패했습니다.\n\n${errorMsg}\n\n다시 시도해주세요.`);
+          toast.error(`❌ 회원가입에 실패했습니다.\n\n${errorMsg}\n\n다시 시도해주세요.`);
         }
       } else {
-        alert(`❌ 회원가입에 실패했습니다.\n\n${error.message}\n\n인터넷 연결을 확인하고 다시 시도해주세요.`);
+        toast.error(`❌ 회원가입에 실패했습니다.\n\n${error.message}\n\n인터넷 연결을 확인하고 다시 시도해주세요.`);
       }
     }
   }
@@ -7576,7 +7576,7 @@ Proceed to payment?
     if (this.onboardingStep === 1) {
       const username = document.getElementById('username').value.trim();
       if (!username) {
-        alert('Please enter your name');
+        toast.error('Please enter your name');
         return;
       }
       
@@ -7585,7 +7585,7 @@ Proceed to payment?
         const checkResponse = await axios.post('/api/users/check-username', { username });
         
         if (checkResponse.data.exists) {
-          alert('❌ Username already exists!\n\nThis name is already taken. Please choose a different name.');
+          toast.error('❌ Username already exists!\n\nThis name is already taken. Please choose a different name.');
           return;
         }
         
@@ -7593,7 +7593,7 @@ Proceed to payment?
       } catch (error) {
         console.error('Username check error:', error);
         if (error.response && error.response.status === 409) {
-          alert('❌ Username already exists!\n\nThis name is already taken. Please choose a different name.');
+          toast.error('❌ Username already exists!\n\nThis name is already taken. Please choose a different name.');
           return;
         }
         // If check fails for other reasons, proceed anyway
@@ -7703,7 +7703,7 @@ Proceed to payment?
       }
     } catch (error) {
       console.error('Onboarding error:', error);
-      alert('Failed to complete registration. Please try again.');
+      toast.error('Failed to complete registration. Please try again.');
     }
   }
 
@@ -8250,7 +8250,7 @@ Proceed to payment?
       await this.loadLatestReport();
     } catch (error) {
       console.error('Error loading topics:', error);
-      alert('Failed to load topics. Please refresh the page.');
+      toast.error('Failed to load topics. Please refresh the page.');
     }
   }
 
@@ -8399,7 +8399,7 @@ Proceed to payment?
       }
     } catch (error) {
       console.error('Error starting session:', error);
-      alert('Failed to start session. Please try again.');
+      toast.error('Failed to start session. Please try again.');
     }
   }
 
@@ -8423,7 +8423,7 @@ Proceed to payment?
       }
     } catch (error) {
       console.error('Error resuming session:', error);
-      alert('Failed to resume session. Please try again.');
+      toast.error('Failed to resume session. Please try again.');
     }
   }
 
@@ -8716,9 +8716,9 @@ Proceed to payment?
     } catch (error) {
       console.error('Error starting recording:', error);
       if (error.name === 'NotAllowedError') {
-        alert('Microphone access denied. Please allow microphone access in your browser settings.');
+        toast.error('Microphone access denied. Please allow microphone access in your browser settings.');
       } else {
-        alert('Unable to access microphone: ' + error.message);
+        toast.error('Unable to access microphone: ' + error.message);
       }
     }
   }
@@ -8847,7 +8847,7 @@ Proceed to payment?
         errorMessage = error.message;
       }
       
-      alert(errorMessage + ' Please try again.');
+      toast.error(errorMessage + ' Please try again.');
       
       // Reset UI
       const recordBtn = document.getElementById('recordBtn');
@@ -8908,7 +8908,7 @@ Proceed to payment?
     const replayBtn = document.getElementById(`replay-btn-${messageIndex}`);
     
     if (!message || !message.audioUrl) {
-      alert('Audio not available');
+      toast.error('Audio not available');
       return;
     }
     
@@ -9014,14 +9014,14 @@ Proceed to payment?
             console.error('Error details:', error.response?.data);
             const errorMsg = error.response?.data?.error || error.message || '알 수 없는 오류';
             const errorDetails = error.response?.data?.details || '';
-            alert('분석 중 오류가 발생했습니다:\n\n' + errorMsg + (errorDetails ? '\n\n상세: ' + errorDetails : '') + '\n\n콘솔(F12)에서 자세한 내용을 확인하세요.');
+            toast.error('분석 중 오류가 발생했습니다:\n\n' + errorMsg + (errorDetails ? '\n\n상세: ' + errorDetails : '') + '\n\n콘솔(F12)에서 자세한 내용을 확인하세요.');
             // 분석 실패 시 대시보드로
             this.showTopicSelection();
           }
         } else {
           // 메시지가 너무 적으면 분석 없이 종료
           console.log('⚠️ Not enough messages for analysis (need 3+, got ' + userMessages.length + ')');
-          alert('분석을 위해서는 최소 3번 이상 대화해야 합니다.\n현재 메시지: ' + userMessages.length + '개');
+          toast.error('분석을 위해서는 최소 3번 이상 대화해야 합니다.\n현재 메시지: ' + userMessages.length + '개');
           this.currentSession = null;
           this.currentTopic = null;
           this.messages = [];
@@ -9996,7 +9996,7 @@ Proceed to payment?
       `;
     } catch (error) {
       console.error('Error loading history:', error);
-      alert('Failed to load history. Please try again.');
+      toast.error('Failed to load history. Please try again.');
     }
   }
   
@@ -10209,7 +10209,7 @@ Proceed to payment?
       `;
     } catch (error) {
       console.error('Error loading conversation:', error);
-      alert('Failed to load conversation. Please try again.');
+      toast.error('Failed to load conversation. Please try again.');
     }
   }
 
@@ -10949,13 +10949,13 @@ Proceed to payment?
     // Check terms agreement
     const agreeTerms = document.getElementById('agreeTerms');
     if (!agreeTerms || !agreeTerms.checked) {
-      alert('⚠️ 약관에 동의해주세요.');
+      toast.warning('⚠️ 약관에 동의해주세요.');
       return;
     }
     
     // Check if user is logged in
     if (!this.currentUser) {
-      alert('❌ 로그인이 필요합니다.');
+      toast.error('❌ 로그인이 필요합니다.');
       this.showLogin();
       return;
     }
@@ -11066,10 +11066,10 @@ Proceed to payment?
         console.error('Response status:', error.response.status);
         console.error('Response data:', error.response.data);
         const errorMsg = error.response.data?.error || error.response.data?.details || error.message;
-        alert(`❌ 플랜 구독 시작 중 오류가 발생했습니다.\n\n${errorMsg}\n\n잠시 후 다시 시도해주세요.`);
+        toast.error(`❌ 플랜 구독 시작 중 오류가 발생했습니다.\n\n${errorMsg}\n\n잠시 후 다시 시도해주세요.`);
       } else {
         // Network error or other error
-        alert(`❌ 플랜 구독 시작 중 오류가 발생했습니다.\n\n${error.message}\n\n인터넷 연결을 확인하고 다시 시도해주세요.`);
+        toast.error(`❌ 플랜 구독 시작 중 오류가 발생했습니다.\n\n${error.message}\n\n인터넷 연결을 확인하고 다시 시도해주세요.`);
       }
     }
   }
@@ -11092,13 +11092,13 @@ Proceed to payment?
     localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
     
     // Show success message and redirect
-    alert('🎉 구독이 완료되었습니다!\n\n7일 무료 체험이 시작되었습니다.\n이제 모든 프리미엄 기능을 사용하실 수 있습니다!');
+    toast.success('🎉 구독이 완료되었습니다!\n\n7일 무료 체험이 시작되었습니다.\n이제 모든 프리미엄 기능을 사용하실 수 있습니다!');
     this.showTopicSelection();
   }
 
   // Contact Sales for Business Plan
   contactSales() {
-    alert('🏢 Business 플랜 문의\n\n영업팀 연락처:\n📧 business@worvox.com\n📞 02-1234-5678\n\n담당자가 곧 연락드리겠습니다!');
+    toast.error('🏢 Business 플랜 문의\n\n영업팀 연락처:\n📧 business@worvox.com\n📞 02-1234-5678\n\n담당자가 곧 연락드리겠습니다!');
   }
 
   // Load usage data from localStorage
@@ -11541,7 +11541,7 @@ Proceed to payment?
       audio.play();
     } catch (error) {
       console.error('TTS error:', error);
-      alert('Failed to play pronunciation. Please try again.');
+      toast.error('Failed to play pronunciation. Please try again.');
     }
   }
   
@@ -11566,7 +11566,7 @@ Proceed to payment?
       audio.play();
     } catch (error) {
       console.error('TTS error:', error);
-      alert('Failed to play sentence. Please try again.');
+      toast.error('Failed to play sentence. Please try again.');
     }
   }
 
@@ -11669,7 +11669,7 @@ Proceed to payment?
       }, 100);
     } catch (error) {
       console.error('Error loading statistics:', error);
-      alert('Failed to load statistics. Please try again.');
+      toast.error('Failed to load statistics. Please try again.');
     }
   }
 
@@ -12257,7 +12257,7 @@ Proceed to payment?
   
   openRandomBox() {
     if (!this.availableSpins || this.availableSpins <= 0) {
-      alert('보유한 랜덤박스 횟수가 없습니다!\n\n레벨업 보상을 통해 랜덤박스를 획득하세요.');
+      toast.error('보유한 랜덤박스 횟수가 없습니다!\n\n레벨업 보상을 통해 랜덤박스를 획득하세요.');
       return;
     }
     
@@ -12288,7 +12288,7 @@ Proceed to payment?
     
     // Check available count
     if (!this.availableSpins || this.availableSpins <= 0) {
-      alert('보유한 랜덤박스 횟수가 없습니다!');
+      toast.error('보유한 랜덤박스 횟수가 없습니다!');
       return;
     }
     
@@ -12392,7 +12392,7 @@ Proceed to payment?
       console.error('❌ Failed to spin:', error);
       boxOpening.classList.add('hidden');
       mysteryBox.classList.remove('hidden');
-      alert('랜덤박스 열기에 실패했습니다. 다시 시도해주세요.');
+      toast.error('랜덤박스 열기에 실패했습니다. 다시 시도해주세요.');
     }
   }
   
@@ -12506,12 +12506,12 @@ Proceed to payment?
     const address = addressElem ? addressElem.value.trim() : '';
     
     if (!name || !email || !phone) {
-      alert('모든 필수 항목을 입력해주세요.');
+      toast.error('모든 필수 항목을 입력해주세요.');
       return;
     }
     
     if (prize.category === 'physical' && !address) {
-      alert('배송지 주소를 입력해주세요.');
+      toast.error('배송지 주소를 입력해주세요.');
       return;
     }
     
@@ -12556,7 +12556,7 @@ Proceed to payment?
       }
     } catch (error) {
       console.error('❌ Failed to submit claim:', error);
-      alert('제출에 실패했습니다. 다시 시도해주세요.');
+      toast.error('제출에 실패했습니다. 다시 시도해주세요.');
     }
   }
 
@@ -12585,20 +12585,20 @@ Proceed to payment?
         this.availableSpins = (this.availableSpins || 0) + reward.spins;
         await this.saveSpinCount();
         this.updateSpinCount();
-        alert('🎉 축하합니다!\n\n랜덤박스 ' + reward.spins + '회가 지급되었습니다!\n\n상단의 "랜덤박스 열기" 버튼을 눌러 행운을 시험해보세요!');
+        toast.success('🎉 축하합니다!\n\n랜덤박스 ' + reward.spins + '회가 지급되었습니다!\n\n상단의 "랜덤박스 열기" 버튼을 눌러 행운을 시험해보세요!');
       } else if (reward.type === 'premium') {
-        alert('🎉 축하합니다!\n\n프리미엄 ' + reward.days + '일 무료 체험권이 지급되었습니다!');
+        toast.success('🎉 축하합니다!\n\n프리미엄 ' + reward.days + '일 무료 체험권이 지급되었습니다!');
       } else if (reward.type === 'xp+spin') {
         this.availableSpins = (this.availableSpins || 0) + reward.spins;
         await this.saveSpinCount();
         this.updateSpinCount();
-        alert('🎉 축하합니다!\n\nLevel 83으로 즉시 상승 + 랜덤박스 ' + reward.spins + '회 기회가 지급되었습니다!');
+        toast.success('🎉 축하합니다!\n\nLevel 83으로 즉시 상승 + 랜덤박스 ' + reward.spins + '회 기회가 지급되었습니다!');
       } else if (reward.type === 'coupon') {
-        alert('✈️ 축하합니다!\n\n대한항공 ' + reward.value + ' 쿠폰이 지급되었습니다!\n쿠폰은 이메일로 전송됩니다.');
+        toast.error('✈️ 축하합니다!\n\n대한항공 ' + reward.value + ' 쿠폰이 지급되었습니다!\n쿠폰은 이메일로 전송됩니다.');
       }
     } catch (error) {
       console.error('Claim reward error:', error);
-      alert('보상 수령 중 오류가 발생했습니다.');
+      toast.error('보상 수령 중 오류가 발생했습니다.');
     }
   }
   
@@ -12668,7 +12668,7 @@ Proceed to payment?
   spinTheWheel() {
     // Check available spins from Rewards page
     if (!this.availableSpins || this.availableSpins <= 0) {
-      alert('보유한 돌림판 횟수가 없습니다!');
+      toast.error('보유한 돌림판 횟수가 없습니다!');
       return;
     }
     
@@ -12749,13 +12749,13 @@ Proceed to payment?
       if (!this.currentUser) {
         console.error('Current user is null or undefined');
         console.error('localStorage user:', localStorage.getItem('worvox_user'));
-        alert('XP 지급 중 오류가 발생했습니다. (User not loaded)');
+        toast.error('XP 지급 중 오류가 발생했습니다. (User not loaded)');
         return;
       }
       
       if (!this.currentUser.id) {
         console.error('Current user has no id:', this.currentUser);
-        alert('XP 지급 중 오류가 발생했습니다. (User ID missing)');
+        toast.error('XP 지급 중 오류가 발생했습니다. (User ID missing)');
         return;
       }
       
@@ -12815,7 +12815,7 @@ Proceed to payment?
       if (error.response?.data?.message) {
         errorMsg += '\n' + error.response.data.message;
       }
-      alert(errorMsg);
+      toast.error(errorMsg);
     }
   }
   
@@ -13700,7 +13700,7 @@ Proceed to payment?
       `;
     } catch (error) {
       console.error('Error loading plan page:', error);
-      alert('Failed to load plan page. Please try again.');
+      toast.error('Failed to load plan page. Please try again.');
     }
   }
 
@@ -13723,12 +13723,12 @@ Proceed to payment?
         this.vocabularyWords = response.data.words;
         this.showVocabularyCard();
       } else {
-        alert('No words available for your level. Try a different level!');
+        toast.error('No words available for your level. Try a different level!');
         this.showTopicSelection();
       }
     } catch (error) {
       console.error('Error loading vocabulary:', error);
-      alert('Failed to load vocabulary. Please try again.');
+      toast.error('Failed to load vocabulary. Please try again.');
       this.showTopicSelection();
     }
   }
@@ -13911,7 +13911,7 @@ Proceed to payment?
       englishAudio.play();
     } catch (error) {
       console.error('Error playing pronunciation:', error);
-      alert('Failed to play pronunciation. Please try again.');
+      toast.error('Failed to play pronunciation. Please try again.');
     }
   }
 
@@ -13936,7 +13936,7 @@ Proceed to payment?
       audio.play();
     } catch (error) {
       console.error('Error playing Korean meaning:', error);
-      alert('Failed to play audio. Please try again.');
+      toast.error('Failed to play audio. Please try again.');
     }
   }
 
@@ -14205,7 +14205,7 @@ Proceed to payment?
       
     } catch (error) {
       console.error('❌ Show report error:', error);
-      alert('리포트를 불러오는 데 실패했습니다:\n' + error.message);
+      toast.error('리포트를 불러오는 데 실패했습니다:\n' + error.message);
       this.showTopicSelection();
     }
   }
@@ -14357,7 +14357,7 @@ Proceed to payment?
 
   async startMicroDrillRecording() {
     if (this.microDrill.currentAttempt >= this.microDrill.maxAttempts) {
-      alert('최대 시도 횟수에 도달했습니다!');
+      toast.error('최대 시도 횟수에 도달했습니다!');
       return;
     }
     
@@ -14386,7 +14386,7 @@ Proceed to payment?
       
     } catch (error) {
       console.error('Microphone access error:', error);
-      alert('마이크 접근 권한이 필요합니다.');
+      toast.error('마이크 접근 권한이 필요합니다.');
     }
   }
 
@@ -14462,7 +14462,7 @@ Proceed to payment?
       
     } catch (error) {
       console.error('Analysis error:', error);
-      alert('분석 중 오류가 발생했습니다: ' + (error.response?.data?.error || error.message));
+      toast.error('분석 중 오류가 발생했습니다: ' + (error.response?.data?.error || error.message));
       this.renderMicroDrillUI();
     }
   }
@@ -14507,7 +14507,7 @@ Proceed to payment?
       message = `💪 좋은 연습이었어요!\n\n최고 점수: ${bestScore}%\n평균 점수: ${avgScore}%\n\n꾸준히 연습하면 실력이 늘어요!`;
     }
     
-    alert(message);
+    toast.error(message);
     
     // 리포트로 돌아가기
     await this.showSessionReportById(this.microDrill.sessionId);
@@ -14534,14 +14534,14 @@ Proceed to payment?
         if (response.data.success && response.data.report) {
           this.showSessionReport(response.data.report.id);
         } else {
-          alert('이 세션의 리포트를 찾을 수 없습니다.');
+          toast.error('이 세션의 리포트를 찾을 수 없습니다.');
           this.showHistory();
         }
       }
     } catch (error) {
       console.error('❌ Report error:', error);
       console.error('❌ Error details:', error.response?.data);
-      alert('리포트를 불러오는 데 실패했습니다.\n' + (error.response?.data?.error || error.message));
+      toast.error('리포트를 불러오는 데 실패했습니다.\n' + (error.response?.data?.error || error.message));
       this.showHistory();
     }
   }
@@ -16580,7 +16580,7 @@ Proceed to payment?
     const level = document.getElementById('profileLevel').value;
 
     if (!username) {
-      alert('이름을 입력해주세요.');
+      toast.error('이름을 입력해주세요.');
       return;
     }
 
@@ -16601,12 +16601,12 @@ Proceed to payment?
       this.currentUser.level = level;
       localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
 
-      alert('프로필이 업데이트되었습니다!');
+      toast.error('프로필이 업데이트되었습니다!');
       this.showProfile(); // Refresh page
 
     } catch (error) {
       console.error('Profile update error:', error);
-      alert('프로필 업데이트에 실패했습니다. 다시 시도해주세요.');
+      toast.error('프로필 업데이트에 실패했습니다. 다시 시도해주세요.');
     }
   }
 
@@ -16618,17 +16618,17 @@ Proceed to payment?
 
     // Validation
     if (!currentPassword || !newPassword || !confirmPassword) {
-      alert('모든 필드를 입력해주세요.');
+      toast.error('모든 필드를 입력해주세요.');
       return;
     }
 
     if (newPassword.length < 8) {
-      alert('새 비밀번호는 8자 이상이어야 합니다.');
+      toast.error('새 비밀번호는 8자 이상이어야 합니다.');
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      alert('새 비밀번호가 일치하지 않습니다.');
+      toast.error('새 비밀번호가 일치하지 않습니다.');
       return;
     }
 
@@ -16640,7 +16640,7 @@ Proceed to payment?
         newPassword
       });
 
-      alert('비밀번호가 변경되었습니다!');
+      toast.error('비밀번호가 변경되었습니다!');
       
       // Clear password fields
       document.getElementById('currentPassword').value = '';
@@ -16650,9 +16650,9 @@ Proceed to payment?
     } catch (error) {
       console.error('Password change error:', error);
       if (error.response?.status === 401) {
-        alert('현재 비밀번호가 올바르지 않습니다.');
+        toast.error('현재 비밀번호가 올바르지 않습니다.');
       } else {
-        alert('비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
+        toast.error('비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
       }
     }
   }
@@ -16660,7 +16660,7 @@ Proceed to payment?
   // Toggle AI prompts
   async toggleAIPrompts(enabled) {
     if (!this.isPremiumUser()) {
-      alert('AI 프롬프트 생성은 Premium 플랜 이상에서 사용 가능합니다.');
+      toast.error('AI 프롬프트 생성은 Premium 플랜 이상에서 사용 가능합니다.');
       return;
     }
 
@@ -16675,9 +16675,9 @@ Proceed to payment?
       localStorage.setItem('worvox_user', JSON.stringify(this.currentUser));
 
       if (enabled) {
-        alert('✨ AI 프롬프트 생성이 활성화되었습니다!\n\n타이머/시나리오/시험 모드에서 매번 새로운 맞춤형 문장이 생성됩니다.');
+        toast.error('✨ AI 프롬프트 생성이 활성화되었습니다!\n\n타이머/시나리오/시험 모드에서 매번 새로운 맞춤형 문장이 생성됩니다.');
       } else {
-        alert('AI 프롬프트 생성이 비활성화되었습니다.\n기본 문장 풀을 사용합니다.');
+        toast.error('AI 프롬프트 생성이 비활성화되었습니다.\n기본 문장 풀을 사용합니다.');
       }
       
       // Refresh profile page to show updated button state
@@ -16685,7 +16685,7 @@ Proceed to payment?
 
     } catch (error) {
       console.error('AI prompts toggle error:', error);
-      alert('설정 변경에 실패했습니다. 다시 시도해주세요.');
+      toast.error('설정 변경에 실패했습니다. 다시 시도해주세요.');
       document.getElementById('aiPromptsToggle').checked = !enabled;
     }
   }
@@ -16709,7 +16709,7 @@ Proceed to payment?
       const response = await axios.post(`/api/users/${this.currentUser.id}/cancel-subscription`);
 
       if (response.data.success) {
-        alert('구독이 취소되었습니다.\n현재 구독 기간이 종료될 때까지 플랜 혜택을 계속 사용하실 수 있습니다.');
+        toast.error('구독이 취소되었습니다.\n현재 구독 기간이 종료될 때까지 플랜 혜택을 계속 사용하실 수 있습니다.');
         
         // Update local user data
         this.currentUser.plan = 'free';
@@ -16721,12 +16721,12 @@ Proceed to payment?
         // Refresh profile page
         this.showProfile();
       } else {
-        alert('구독 취소에 실패했습니다. 다시 시도해주세요.');
+        toast.error('구독 취소에 실패했습니다. 다시 시도해주세요.');
       }
 
     } catch (error) {
       console.error('Cancel subscription error:', error);
-      alert('구독 취소에 실패했습니다. 다시 시도해주세요.\n' + (error.response?.data?.error || error.message));
+      toast.error('구독 취소에 실패했습니다. 다시 시도해주세요.\n' + (error.response?.data?.error || error.message));
     }
   }
 
@@ -16755,7 +16755,7 @@ Proceed to payment?
       });
 
       if (response.data.success) {
-        alert(`체험이 해지되었습니다.\n${trialEndDate}까지 계속 사용하실 수 있습니다.`);
+        toast.error(`체험이 해지되었습니다.\n${trialEndDate}까지 계속 사용하실 수 있습니다.`);
         
         // Update local user data
         this.currentUser.auto_billing_enabled = false;
@@ -16764,12 +16764,12 @@ Proceed to payment?
         // Refresh profile page
         this.showProfile();
       } else {
-        alert('체험 해지에 실패했습니다. 다시 시도해주세요.');
+        toast.error('체험 해지에 실패했습니다. 다시 시도해주세요.');
       }
 
     } catch (error) {
       console.error('Cancel trial error:', error);
-      alert('체험 해지에 실패했습니다. 다시 시도해주세요.\n' + (error.response?.data?.error || error.message));
+      toast.error('체험 해지에 실패했습니다. 다시 시도해주세요.\n' + (error.response?.data?.error || error.message));
     }
   }
 
@@ -16799,7 +16799,7 @@ Proceed to payment?
       });
 
       if (response.data.success) {
-        alert(
+        toast.error(
           isTrial 
             ? '무료 체험 자동 갱신이 취소되었습니다.\n체험 종료일까지 계속 사용하실 수 있습니다.'
             : `${planName} 플랜 구독이 취소되었습니다.\n현재 구독 기간까지 계속 사용하실 수 있습니다.\n\n환불 문의: support@worvox.com`
@@ -16812,12 +16812,12 @@ Proceed to payment?
         // Refresh profile page
         this.showProfile();
       } else {
-        alert('구독 취소에 실패했습니다. 다시 시도해주세요.');
+        toast.error('구독 취소에 실패했습니다. 다시 시도해주세요.');
       }
 
     } catch (error) {
       console.error('Cancel subscription error:', error);
-      alert('구독 취소에 실패했습니다. 다시 시도해주세요.\n' + (error.response?.data?.error || error.message));
+      toast.error('구독 취소에 실패했습니다. 다시 시도해주세요.\n' + (error.response?.data?.error || error.message));
     }
   }
 
@@ -16842,17 +16842,17 @@ Proceed to payment?
       });
 
       if (response.data.success) {
-        alert('월정기 구독 자동 갱신이 취소되었습니다.\n남은 수업권은 만료일까지 계속 사용하실 수 있습니다.\n\n환불 문의: support@worvox.com');
+        toast.error('월정기 구독 자동 갱신이 취소되었습니다.\n남은 수업권은 만료일까지 계속 사용하실 수 있습니다.\n\n환불 문의: support@worvox.com');
         
         // Refresh profile page to show updated status
         this.showProfile();
       } else {
-        alert('구독 취소에 실패했습니다. 다시 시도해주세요.');
+        toast.error('구독 취소에 실패했습니다. 다시 시도해주세요.');
       }
 
     } catch (error) {
       console.error('Cancel Hiing subscription error:', error);
-      alert('구독 취소에 실패했습니다. 다시 시도해주세요.\n' + (error.response?.data?.error || error.message));
+      toast.error('구독 취소에 실패했습니다. 다시 시도해주세요.\n' + (error.response?.data?.error || error.message));
     }
   }
 
@@ -17046,7 +17046,7 @@ Proceed to payment?
 
     } catch (error) {
       console.error('Free trial confirmation error:', error);
-      alert('무료 체험 시작 중 오류가 발생했습니다: ' + (error.message || ''));
+      toast.error('무료 체험 시작 중 오류가 발생했습니다: ' + (error.message || ''));
     }
   }
 
@@ -17188,13 +17188,13 @@ Proceed to payment?
         errorMsg = error.message;
       }
       
-      alert('Toss 무료 체험 시작 중 오류가 발생했습니다:\n\n' + errorMsg);
+      toast.error('Toss 무료 체험 시작 중 오류가 발생했습니다:\n\n' + errorMsg);
     }
   }
 
   async selectPlan(planName) {
     if (!this.currentUser) {
-      alert('로그인이 필요합니다.');
+      toast.error('로그인이 필요합니다.');
       return;
     }
 
@@ -17291,10 +17291,10 @@ Proceed to payment?
         console.error('Response status:', error.response.status);
         console.error('Response data:', error.response.data);
         const errorMsg = error.response.data?.error || error.response.data?.details || error.message;
-        alert(`❌ 구독 시작 중 오류가 발생했습니다.\n\n${errorMsg}\n\n잠시 후 다시 시도해주세요.`);
+        toast.error(`❌ 구독 시작 중 오류가 발생했습니다.\n\n${errorMsg}\n\n잠시 후 다시 시도해주세요.`);
       } else {
         // Network error or other error
-        alert(`❌ 구독 시작 중 오류가 발생했습니다.\n\n${error.message}\n\n인터넷 연결을 확인하고 다시 시도해주세요.`);
+        toast.error(`❌ 구독 시작 중 오류가 발생했습니다.\n\n${error.message}\n\n인터넷 연결을 확인하고 다시 시도해주세요.`);
       }
     }
   }
@@ -17406,7 +17406,7 @@ Proceed to payment?
 
     } catch (error) {
       console.error('Toss payment error:', error);
-      alert('Toss 결제 시작 중 오류가 발생했습니다.\n' + (error.message || ''));
+      toast.error('Toss 결제 시작 중 오류가 발생했습니다.\n' + (error.message || ''));
     }
   }
 
@@ -18029,12 +18029,12 @@ Proceed to payment?
 
       if (response.data.success) {
         const periodText = billingPeriod === 'yearly' ? '12개월' : '1개월';
-        alert(`✅ 플랜이 변경되었습니다.\n\n새 플랜: ${newPlan.toUpperCase()}\n구독 기간: ${periodText}`);
+        toast.error(`✅ 플랜이 변경되었습니다.\n\n새 플랜: ${newPlan.toUpperCase()}\n구독 기간: ${periodText}`);
         this.loadAdminData();
       }
     } catch (error) {
       console.error('Change plan error:', error);
-      alert('❌ 플랜 변경에 실패했습니다: ' + (error.response?.data?.error || error.message));
+      toast.error('❌ 플랜 변경에 실패했습니다: ' + (error.response?.data?.error || error.message));
     }
   }
 
@@ -18065,13 +18065,13 @@ Proceed to payment?
       });
 
       if (response.data.success) {
-        alert(`✅ 사용자 "${username}"이(가) 삭제되었습니다.`);
+        toast.error(`✅ 사용자 "${username}"이(가) 삭제되었습니다.`);
         // Reload admin data to refresh the user list
         this.loadAdminData();
       }
     } catch (error) {
       console.error('Delete user error:', error);
-      alert('❌ 사용자 삭제에 실패했습니다: ' + (error.response?.data?.error || error.message));
+      toast.error('❌ 사용자 삭제에 실패했습니다: ' + (error.response?.data?.error || error.message));
     }
   }
 
@@ -18279,14 +18279,14 @@ Proceed to payment?
       }
     } catch (error) {
       console.error('View user detail error:', error);
-      alert('사용자 정보 로딩 실패: ' + (error.response?.data?.error || error.response?.data?.details || error.message));
+      toast.error('사용자 정보 로딩 실패: ' + (error.response?.data?.error || error.response?.data?.details || error.message));
     }
   }
 
   // 🎁 Show prize draw wheel
   async showSpinWheel() {
     if (!this.currentUser || !this.currentUser.id) {
-      alert('로그인이 필요합니다.');
+      toast.error('로그인이 필요합니다.');
       return;
     }
 
@@ -18296,7 +18296,7 @@ Proceed to payment?
       const prizes = prizesResponse.data.prizes || [];
 
       if (prizes.length === 0) {
-        alert('현재 레벨에서 사용 가능한 상품이 없습니다.');
+        toast.error('현재 레벨에서 사용 가능한 상품이 없습니다.');
         return;
       }
 
@@ -18378,14 +18378,14 @@ Proceed to payment?
 
     } catch (error) {
       console.error('Show spin wheel error:', error);
-      alert('상품 정보를 불러오는데 실패했습니다.');
+      toast.error('상품 정보를 불러오는데 실패했습니다.');
     }
   }
 
   // 🎲 Spin the wheel
   async spinWheel() {
     if (!this.currentUser || !this.currentUser.id) {
-      alert('로그인이 필요합니다.');
+      toast.error('로그인이 필요합니다.');
       return;
     }
 
@@ -18446,22 +18446,22 @@ Proceed to payment?
         // Scroll to result
         resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-        alert(response.data.message);
+        toast.error(response.data.message);
 
       } else {
-        alert(response.data.message || '뽑기에 실패했습니다.');
+        toast.error(response.data.message || '뽑기에 실패했습니다.');
       }
 
     } catch (error) {
       console.error('Spin wheel error:', error);
-      alert(error.response?.data?.message || '뽑기에 실패했습니다.');
+      toast.error(error.response?.data?.message || '뽑기에 실패했습니다.');
     }
   }
 
   // 📋 Show my prizes in modal
   async showMyPrizes() {
     if (!this.currentUser || !this.currentUser.id) {
-      alert('로그인이 필요합니다.');
+      toast.error('로그인이 필요합니다.');
       return;
     }
 
@@ -18548,7 +18548,7 @@ Proceed to payment?
 
     } catch (error) {
       console.error('Show my prizes error:', error);
-      alert('당첨 내역을 불러오는데 실패했습니다.');
+      toast.error('당첨 내역을 불러오는데 실패했습니다.');
     }
   }
 
@@ -18620,15 +18620,15 @@ Proceed to payment?
         });
 
         if (response.data.success) {
-          alert(response.data.message);
+          toast.error(response.data.message);
           modal.remove();
           this.showMyPrizes();
         } else {
-          alert('제출 실패: ' + response.data.error);
+          toast.error('제출 실패: ' + response.data.error);
         }
       } catch (error) {
         console.error('Claim submission error:', error);
-        alert('제출에 실패했습니다.');
+        toast.error('제출에 실패했습니다.');
       }
     });
   }
@@ -18696,7 +18696,7 @@ window.handleGoogleLogin = async (response) => {
       errorMsg += '\n오류: ' + error.message;
     }
     
-    alert(errorMsg);
+    toast.error(errorMsg);
   }
 };
 
