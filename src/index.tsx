@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1774933420532'; // Update manually or via build script
+const BUILD_TIME = '1775017625985'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -4115,7 +4115,7 @@ app.get('/', (c) => {
   
   // Language toggle function
   const toggleLang = isKorean ? 'en' : 'ko';
-  const langButton = isKorean ? 'ENG' : 'KOR';
+  const langButton = isKorean ? 'KR' : 'EN';
   
   return c.html(`
     <!DOCTYPE html>
