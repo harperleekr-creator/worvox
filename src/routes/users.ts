@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import type { Bindings } from '../types';
 import { sendAdminSignupNotification } from '../utils/email-helpers';
+import bcrypt from 'bcryptjs';
+import { logger } from '../utils/logger';
 
 const users = new Hono<{ Bindings: Bindings }>();
 
@@ -24,7 +26,7 @@ users.post('/check-username', async (c) => {
     });
 
   } catch (error) {
-    console.error('Username check error:', error);
+    logger.error('Username check error:', error);
     return c.json({ 
       error: 'Failed to check username',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -35,27 +37,27 @@ users.post('/check-username', async (c) => {
 // Google Sign-In with JWT credential
 users.post('/google-login', async (c) => {
   try {
-    console.log('🔐 Google login attempt...');
+    logger.info('🔐 Google login attempt...');
     const body = await c.req.json();
-    console.log('📦 Request body keys:', Object.keys(body));
+    logger.info('📦 Request body keys:', Object.keys(body));
     
     const { credential } = body;
 
     if (!credential) {
-      console.error('❌ No credential provided');
+      logger.error('❌ No credential provided');
       return c.json({ error: 'Google credential is required' }, 400);
     }
 
-    console.log('🔑 Credential received, length:', credential.length);
+    logger.info('🔑 Credential received, length:', credential.length);
 
     // Decode JWT token (payload is base64 encoded)
     const parts = credential.split('.');
     if (parts.length !== 3) {
-      console.error('❌ Invalid JWT format, parts:', parts.length);
+      logger.error('❌ Invalid JWT format, parts:', parts.length);
       return c.json({ error: 'Invalid JWT token format' }, 400);
     }
 
-    console.log('🔓 Decoding JWT payload...');
+    logger.info('🔓 Decoding JWT payload...');
     let payload;
     try {
       // Decode base64 and parse JSON with proper UTF-8 handling
@@ -70,8 +72,8 @@ users.post('/google-login', async (c) => {
       );
       
       payload = JSON.parse(utf8Payload);
-      console.log('✅ JWT decoded successfully with UTF-8');
-      console.log('👤 User info:', { 
+      logger.info('✅ JWT decoded successfully with UTF-8');
+      logger.info('👤 User info:', { 
         email: payload.email, 
         name: payload.name,
         sub: payload.sub 
@@ -80,9 +82,9 @@ users.post('/google-login', async (c) => {
       // Fallback to simple atob if UTF-8 conversion fails
       try {
         payload = JSON.parse(atob(parts[1]));
-        console.log('✅ JWT decoded with fallback method');
+        logger.info('✅ JWT decoded with fallback method');
       } catch (fallbackError) {
-        console.error('❌ JWT decode error:', decodeError);
+        logger.error('❌ JWT decode error:', decodeError);
         return c.json({ error: 'Failed to decode JWT token' }, 400);
       }
     }
@@ -92,17 +94,17 @@ users.post('/google-login', async (c) => {
     
     // Get name from payload (already UTF-8 decoded)
     const name = payload.name || email?.split('@')[0] || 'User';
-    console.log('👤 Final username:', name);
-    console.log('👤 Username char codes:', Array.from(name).map(c => c.charCodeAt(0)));
+    logger.info('👤 Final username:', name);
+    logger.info('👤 Username char codes:', Array.from(name).map(c => c.charCodeAt(0)));
     
     const picture = payload.picture || null;
 
     if (!googleId || !email) {
-      console.error('❌ Missing required fields:', { googleId, email });
+      logger.error('❌ Missing required fields:', { googleId, email });
       return c.json({ error: 'Invalid Google token data (missing email or ID)' }, 400);
     }
 
-    console.log('🔍 Checking existing user with google_id:', googleId);
+    logger.info('🔍 Checking existing user with google_id:', googleId);
 
     // Check if user exists with this Google ID
     const existingUser = await c.env.DB.prepare(
@@ -110,12 +112,12 @@ users.post('/google-login', async (c) => {
     ).bind(googleId).first();
 
     if (existingUser) {
-      console.log('✅ Existing user found:', existingUser.id);
-      console.log('📊 User plan:', existingUser.plan || 'free');
+      logger.info('✅ Existing user found:', existingUser.id);
+      logger.info('📊 User plan:', existingUser.plan || 'free');
       
       // Update profile picture if changed
       if (picture && existingUser.google_picture !== picture) {
-        console.log('🖼️ Updating profile picture...');
+        logger.info('🖼️ Updating profile picture...');
         await c.env.DB.prepare(
           'UPDATE users SET google_picture = ? WHERE id = ?'
         ).bind(picture, existingUser.id).run();
@@ -128,7 +130,7 @@ users.post('/google-login', async (c) => {
       });
     }
 
-    console.log('🔍 Checking existing user with email:', email);
+    logger.info('🔍 Checking existing user with email:', email);
 
     // Check if user exists with this email
     const emailUser = await c.env.DB.prepare(
@@ -136,7 +138,7 @@ users.post('/google-login', async (c) => {
     ).bind(email, email).first();
 
     if (emailUser) {
-      console.log('✅ Email user found, linking Google account...');
+      logger.info('✅ Email user found, linking Google account...');
       
       // Link Google account to existing user
       await c.env.DB.prepare(
@@ -148,8 +150,8 @@ users.post('/google-login', async (c) => {
         'SELECT id, username, email, google_id, google_email, google_picture, level, auth_provider, plan, user_level, xp, total_xp, coins, current_streak, longest_streak, created_at FROM users WHERE id = ?'
       ).bind(emailUser.id).first();
 
-      console.log('✅ Google account linked successfully');
-      console.log('📊 User plan:', updatedUser.plan || 'free');
+      logger.info('✅ Google account linked successfully');
+      logger.info('📊 User plan:', updatedUser.plan || 'free');
 
       return c.json({
         user: { ...updatedUser, plan: updatedUser.plan || 'free' },
@@ -159,7 +161,7 @@ users.post('/google-login', async (c) => {
       });
     }
 
-    console.log('🆕 Creating new user...');
+    logger.info('🆕 Creating new user...');
 
     // Create new user with Google account (plan defaults to 'free' via DB schema)
     const username = name;
@@ -170,7 +172,7 @@ users.post('/google-login', async (c) => {
     ).bind(username, email, googleId, email, picture).run();
 
     const userId = result.meta.last_row_id;
-    console.log('✅ New user created with ID:', userId);
+    logger.info('✅ New user created with ID:', userId);
 
     const newUser = await c.env.DB.prepare(
       'SELECT id, username, email, google_id, google_email, google_picture, level, auth_provider, plan, user_level, xp, total_xp, coins, current_streak, longest_streak, created_at FROM users WHERE id = ?'
@@ -186,9 +188,9 @@ users.post('/google-login', async (c) => {
           name: username
         })
       });
-      console.log('📧 Welcome email sent to:', email);
+      logger.info('📧 Welcome email sent to:', email);
     } catch (emailError) {
-      console.warn('⚠️ Failed to send welcome email (non-critical):', emailError);
+      logger.warn('⚠️ Failed to send welcome email (non-critical):', emailError);
     }
 
     // Send admin notification for new Google signup (async, non-blocking)
@@ -201,13 +203,13 @@ users.post('/google-login', async (c) => {
         is_trial: 0,
         created_at: new Date().toISOString()
       });
-      console.log('📧 Admin signup notification sent for:', email);
+      logger.info('📧 Admin signup notification sent for:', email);
     } catch (adminEmailError) {
-      console.warn('⚠️ Failed to send admin notification (non-critical):', adminEmailError);
+      logger.warn('⚠️ Failed to send admin notification (non-critical):', adminEmailError);
     }
 
-    console.log('🎉 Google login successful!');
-    console.log('📊 New user plan:', newUser.plan || 'free');
+    logger.info('🎉 Google login successful!');
+    logger.info('📊 New user plan:', newUser.plan || 'free');
 
     return c.json({
       user: { ...newUser, plan: newUser.plan || 'free' },
@@ -216,8 +218,8 @@ users.post('/google-login', async (c) => {
     });
 
   } catch (error) {
-    console.error('❌ Google login error:', error);
-    console.error('Error details:', {
+    logger.error('❌ Google login error:', error);
+    logger.error('Error details:', {
       message: error instanceof Error ? error.message : 'Unknown',
       stack: error instanceof Error ? error.stack : undefined
     });
@@ -313,7 +315,7 @@ users.post('/auth/google', async (c) => {
     });
 
   } catch (error) {
-    console.error('Google auth error:', error);
+    logger.error('Google auth error:', error);
     return c.json({ 
       error: 'Failed to authenticate with Google',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -368,7 +370,7 @@ users.post('/auth', async (c) => {
     });
 
   } catch (error) {
-    console.error('Auth error:', error);
+    logger.error('Auth error:', error);
     return c.json({ 
       error: 'Failed to authenticate user',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -381,7 +383,7 @@ users.post('/signup', async (c) => {
   try {
     const { name, email, password } = await c.req.json();
 
-    console.log('📧 Signup attempt:', { name, email });
+    logger.info('📧 Signup attempt:', { name, email });
 
     // Validation
     if (!name || !email || !password) {
@@ -404,12 +406,12 @@ users.post('/signup', async (c) => {
     ).bind(email).first();
 
     if (existingUser) {
-      console.log('❌ Email already exists:', email);
+      logger.info('❌ Email already exists:', email);
       return c.json({ error: 'Email already registered' }, 409);
     }
 
-    // Hash password (simple encoding for demo - use proper hashing in production)
-    const passwordHash = btoa(password); // Base64 encoding (NOT secure for production!)
+    // Hash password with bcrypt (secure)
+    const passwordHash = await bcrypt.hash(password, 10);
 
     // Create new user
     const result = await c.env.DB.prepare(
@@ -418,7 +420,7 @@ users.post('/signup', async (c) => {
     ).bind(name, email, passwordHash).run();
 
     const userId = result.meta.last_row_id;
-    console.log('✅ User created with ID:', userId);
+    logger.info('✅ User created with ID:', userId);
 
     // Get created user
     const newUser = await c.env.DB.prepare(
@@ -435,9 +437,9 @@ users.post('/signup', async (c) => {
           name: name
         })
       });
-      console.log('📧 Welcome email sent to:', email);
+      logger.info('📧 Welcome email sent to:', email);
     } catch (emailError) {
-      console.warn('⚠️ Failed to send welcome email (non-critical):', emailError);
+      logger.warn('⚠️ Failed to send welcome email (non-critical):', emailError);
       // Don't fail signup if email fails
     }
 
@@ -451,9 +453,9 @@ users.post('/signup', async (c) => {
         is_trial: 0,
         created_at: new Date().toISOString()
       });
-      console.log('📧 Admin signup notification sent for:', email);
+      logger.info('📧 Admin signup notification sent for:', email);
     } catch (adminEmailError) {
-      console.warn('⚠️ Failed to send admin notification (non-critical):', adminEmailError);
+      logger.warn('⚠️ Failed to send admin notification (non-critical):', adminEmailError);
       // Don't fail signup if admin email fails
     }
 
@@ -464,7 +466,7 @@ users.post('/signup', async (c) => {
     });
 
   } catch (error) {
-    console.error('❌ Signup error:', error);
+    logger.error('❌ Signup error:', error);
     return c.json({ 
       error: 'Failed to create account',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -477,7 +479,7 @@ users.post('/login', async (c) => {
   try {
     const { email, password } = await c.req.json();
 
-    console.log('🔐 Login attempt:', { email });
+    logger.info('🔐 Login attempt:', { email });
 
     // Validation
     if (!email || !password) {
@@ -490,18 +492,18 @@ users.post('/login', async (c) => {
     ).bind(email).first();
 
     if (!user) {
-      console.log('❌ User not found:', email);
+      logger.info('❌ User not found:', email);
       return c.json({ error: 'Invalid email or password' }, 401);
     }
 
-    // Verify password
-    const passwordHash = btoa(password); // Base64 encoding (match signup)
-    if (user.password_hash !== passwordHash) {
-      console.log('❌ Invalid password for:', email);
+    // Verify password with bcrypt
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash as string);
+    if (!isPasswordValid) {
+      logger.info('❌ Invalid password for:', email);
       return c.json({ error: 'Invalid email or password' }, 401);
     }
 
-    console.log('✅ Login successful:', email);
+    logger.info('✅ Login successful:', email);
 
     // Return user without password_hash
     const { password_hash, ...userWithoutPassword } = user;
@@ -512,7 +514,7 @@ users.post('/login', async (c) => {
     });
 
   } catch (error) {
-    console.error('❌ Login error:', error);
+    logger.error('❌ Login error:', error);
     return c.json({ 
       error: 'Failed to login',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -539,7 +541,7 @@ users.get('/:userId', async (c) => {
     });
 
   } catch (error) {
-    console.error('Get user error:', error);
+    logger.error('Get user error:', error);
     return c.json({ 
       error: 'Failed to fetch user',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -553,7 +555,7 @@ users.patch('/:userId', async (c) => {
     const userId = c.req.param('userId');
     const updates = await c.req.json();
 
-    console.log('📝 User update:', userId, updates);
+    logger.info('📝 User update:', userId, updates);
 
     // Build dynamic UPDATE query
     const allowedFields = ['use_ai_prompts', 'username', 'level'];
@@ -583,7 +585,7 @@ users.patch('/:userId', async (c) => {
     });
 
   } catch (error) {
-    console.error('Update user error:', error);
+    logger.error('Update user error:', error);
     return c.json({ 
       error: 'Failed to update user settings',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -611,7 +613,7 @@ users.patch('/:userId/level', async (c) => {
     });
 
   } catch (error) {
-    console.error('Update level error:', error);
+    logger.error('Update level error:', error);
     return c.json({ 
       error: 'Failed to update level',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -650,7 +652,7 @@ users.get('/:userId/stats', async (c) => {
     });
 
   } catch (error) {
-    console.error('Get stats error:', error);
+    logger.error('Get stats error:', error);
     return c.json({ 
       error: 'Failed to fetch statistics',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -664,7 +666,7 @@ users.patch('/:userId/password', async (c) => {
     const userId = c.req.param('userId');
     const { currentPassword, newPassword } = await c.req.json();
 
-    console.log('🔐 Password change attempt for user:', userId);
+    logger.info('🔐 Password change attempt for user:', userId);
 
     // Validation
     if (!currentPassword || !newPassword) {
@@ -689,22 +691,22 @@ users.patch('/:userId/password', async (c) => {
       return c.json({ error: 'Password change is only available for email accounts' }, 400);
     }
 
-    // Verify current password
-    const currentPasswordHash = btoa(currentPassword);
-    if (user.password_hash !== currentPasswordHash) {
-      console.log('❌ Invalid current password');
+    // Verify current password with bcrypt
+    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password_hash as string);
+    if (!isCurrentPasswordValid) {
+      logger.info('❌ Invalid current password');
       return c.json({ error: 'Current password is incorrect' }, 401);
     }
 
-    // Hash new password
-    const newPasswordHash = btoa(newPassword);
+    // Hash new password with bcrypt
+    const newPasswordHash = await bcrypt.hash(newPassword, 10);
 
     // Update password
     await c.env.DB.prepare(
       'UPDATE users SET password_hash = ? WHERE id = ?'
     ).bind(newPasswordHash, userId).run();
 
-    console.log('✅ Password changed successfully for user:', userId);
+    logger.info('✅ Password changed successfully for user:', userId);
 
     return c.json({
       success: true,
@@ -712,7 +714,7 @@ users.patch('/:userId/password', async (c) => {
     });
 
   } catch (error) {
-    console.error('❌ Password change error:', error);
+    logger.error('❌ Password change error:', error);
     return c.json({ 
       error: 'Failed to change password',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -724,7 +726,7 @@ users.patch('/:userId/password', async (c) => {
 users.post('/:id/cancel-subscription', async (c) => {
   try {
     const userId = parseInt(c.req.param('id'));
-    console.log('🚫 Canceling subscription for user:', userId);
+    logger.info('🚫 Canceling subscription for user:', userId);
 
     // Get current user
     const user = await c.env.DB.prepare(
@@ -732,17 +734,17 @@ users.post('/:id/cancel-subscription', async (c) => {
     ).bind(userId).first();
 
     if (!user) {
-      console.log('❌ User not found:', userId);
+      logger.info('❌ User not found:', userId);
       return c.json({ error: 'User not found' }, 404);
     }
 
     // Check if user has an active subscription
     if (!user.plan || user.plan === 'free') {
-      console.log('❌ No active subscription for user:', userId);
+      logger.info('❌ No active subscription for user:', userId);
       return c.json({ error: 'No active subscription found' }, 400);
     }
 
-    console.log('✅ Current plan:', user.plan, 'Period:', user.billing_period);
+    logger.info('✅ Current plan:', user.plan, 'Period:', user.billing_period);
 
     // Reset subscription fields
     await c.env.DB.prepare(`
@@ -754,7 +756,7 @@ users.post('/:id/cancel-subscription', async (c) => {
       WHERE id = ?
     `).bind(userId).run();
 
-    console.log('✅ Subscription canceled successfully for user:', userId);
+    logger.info('✅ Subscription canceled successfully for user:', userId);
 
     return c.json({
       success: true,
@@ -762,7 +764,7 @@ users.post('/:id/cancel-subscription', async (c) => {
     });
 
   } catch (error) {
-    console.error('❌ Cancel subscription error:', error);
+    logger.error('❌ Cancel subscription error:', error);
     return c.json({ 
       error: 'Failed to cancel subscription',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -775,7 +777,7 @@ users.post('/sync', async (c) => {
   try {
     const { id, username, email, plan, level, use_ai_prompts } = await c.req.json();
 
-    console.log('🔄 User sync request:', { id, username, email, plan, level, use_ai_prompts });
+    logger.info('🔄 User sync request:', { id, username, email, plan, level, use_ai_prompts });
 
     // Validate required fields
     if (!username || !email) {
@@ -791,7 +793,7 @@ users.post('/sync', async (c) => {
     ).bind(email).first();
 
     if (existingUser) {
-      console.log('✅ User already exists in DB:', existingUser);
+      logger.info('✅ User already exists in DB:', existingUser);
       
       // IMPORTANT: Don't overwrite paid plans (premium, core, etc.) with 'free'
       // Only update plan if:
@@ -810,7 +812,7 @@ users.post('/sync', async (c) => {
           await c.env.DB.prepare(
             'UPDATE users SET use_ai_prompts = ?, level = ? WHERE email = ?'
           ).bind(use_ai_prompts ? 1 : 0, level || 'beginner', email).run();
-          console.log('✅ User settings updated (plan unchanged)');
+          logger.info('✅ User settings updated (plan unchanged)');
         }
       }
       
@@ -834,7 +836,7 @@ users.post('/sync', async (c) => {
       use_ai_prompts ? 1 : 0
     ).run();
 
-    console.log('✅ New user inserted into DB:', result.meta);
+    logger.info('✅ New user inserted into DB:', result.meta);
 
     return c.json({ 
       success: true, 
@@ -844,7 +846,7 @@ users.post('/sync', async (c) => {
     });
 
   } catch (error) {
-    console.error('❌ User sync error:', error);
+    logger.error('❌ User sync error:', error);
     return c.json({ 
       success: false,
       error: 'Failed to sync user',

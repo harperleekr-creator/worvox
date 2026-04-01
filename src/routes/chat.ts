@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import { Hono } from 'hono';
 import type { Bindings, Message } from '../types';
 
@@ -65,7 +66,7 @@ chat.post('/message', async (c) => {
 
     if (!response.ok) {
       const error = await response.text();
-      console.error('OpenAI API error:', error);
+      logger.error('OpenAI API error:', error);
       return c.json({ error: 'Failed to generate response' }, 500);
     }
 
@@ -113,7 +114,7 @@ chat.post('/message', async (c) => {
           });
         }
       } catch (xpError) {
-        console.error('Failed to award chat XP:', xpError);
+        logger.error('Failed to award chat XP:', xpError);
         // Don't fail the whole request
       }
     }
@@ -124,7 +125,7 @@ chat.post('/message', async (c) => {
     });
 
   } catch (error) {
-    console.error('Chat error:', error);
+    logger.error('Chat error:', error);
     return c.json({ 
       error: 'Internal server error during chat',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -147,7 +148,7 @@ chat.get('/history/:sessionId', async (c) => {
     });
 
   } catch (error) {
-    console.error('History error:', error);
+    logger.error('History error:', error);
     return c.json({ 
       error: 'Failed to fetch conversation history',
       details: error instanceof Error ? error.message : 'Unknown error'

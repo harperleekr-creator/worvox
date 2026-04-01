@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import type { Bindings } from '../types';
 import { sendAdminPaymentNotification } from '../utils/email-helpers';
+import { logger } from '../utils/logger';
 
 const payments = new Hono<{ Bindings: Bindings }>();
 
@@ -222,7 +223,7 @@ payments.post('/prepare', async (c) => {
         VALUES (?, ?, ?, ?, 'pending', datetime('now'))
       `).bind(orderId, userId, planName, price).run();
     } catch (dbError) {
-      console.log('DB insert failed (table may not exist):', dbError);
+      logger.info('DB insert failed (table may not exist):', dbError);
       // Continue even if DB insert fails
     }
 
@@ -234,7 +235,7 @@ payments.post('/prepare', async (c) => {
     });
 
   } catch (error) {
-    console.error('Payment prepare error:', error);
+    logger.error('Payment prepare error:', error);
     return c.json({ 
       error: 'Failed to prepare payment',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -273,7 +274,7 @@ payments.post('/confirm', async (c) => {
     const result = await response.json();
 
     if (!response.ok) {
-      console.error('Toss Payments confirm error:', result);
+      logger.error('Toss Payments confirm error:', result);
       return c.json({ 
         error: 'Payment confirmation failed',
         details: result
@@ -312,7 +313,7 @@ payments.post('/confirm', async (c) => {
           planType = 'premium';
         }
 
-        console.log('Updating user subscription:', {
+        logger.info('Updating user subscription:', {
           userId: order.user_id,
           planType,
           billingPeriod,
@@ -329,7 +330,7 @@ payments.post('/confirm', async (c) => {
           WHERE id = ?
         `).bind(planType, billingPeriod, months, order.user_id).run();
 
-        console.log('User subscription updated successfully (AI prompts auto-enabled)');
+        logger.info('User subscription updated successfully (AI prompts auto-enabled)');
 
         // Send admin notification for payment completion (async, non-blocking)
         try {
@@ -350,14 +351,14 @@ payments.post('/confirm', async (c) => {
               status: 'completed',
               created_at: new Date().toISOString()
             });
-            console.log('📧 Admin payment notification sent for order:', orderId);
+            logger.info('📧 Admin payment notification sent for order:', orderId);
           }
         } catch (emailError) {
-          console.warn('⚠️ Failed to send admin payment notification (non-critical):', emailError);
+          logger.warn('⚠️ Failed to send admin payment notification (non-critical):', emailError);
         }
       }
     } catch (dbError) {
-      console.log('DB update failed:', dbError);
+      logger.info('DB update failed:', dbError);
     }
 
     return c.json({
@@ -366,7 +367,7 @@ payments.post('/confirm', async (c) => {
     });
 
   } catch (error) {
-    console.error('Payment confirm error:', error);
+    logger.error('Payment confirm error:', error);
     return c.json({ 
       error: 'Failed to confirm payment',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -379,7 +380,7 @@ payments.post('/fail', async (c) => {
   try {
     const { orderId, code, message } = await c.req.json();
 
-    console.log('Payment failed:', { orderId, code, message });
+    logger.info('Payment failed:', { orderId, code, message });
 
     // Update order status
     try {
@@ -391,7 +392,7 @@ payments.post('/fail', async (c) => {
         WHERE order_id = ?
       `).bind(message, orderId).run();
     } catch (dbError) {
-      console.log('DB update failed:', dbError);
+      logger.info('DB update failed:', dbError);
     }
 
     return c.json({
@@ -400,7 +401,7 @@ payments.post('/fail', async (c) => {
     });
 
   } catch (error) {
-    console.error('Payment fail handler error:', error);
+    logger.error('Payment fail handler error:', error);
     return c.json({ 
       error: 'Failed to handle payment failure'
     }, 500);
@@ -426,7 +427,7 @@ payments.get('/history/:userId', async (c) => {
     });
 
   } catch (error) {
-    console.error('Payment history error:', error);
+    logger.error('Payment history error:', error);
     return c.json({ 
       error: 'Failed to fetch payment history'
     }, 500);
@@ -518,7 +519,7 @@ payments.post('/trial/start', async (c) => {
     });
 
   } catch (error) {
-    console.error('Trial start error:', error);
+    logger.error('Trial start error:', error);
     return c.json({ 
       error: 'Failed to start trial',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -556,7 +557,7 @@ payments.post('/subscription/confirm', async (c) => {
     const billingKeyResult = await billingKeyResponse.json();
 
     if (!billingKeyResponse.ok) {
-      console.error('Billing key error:', billingKeyResult);
+      logger.error('Billing key error:', billingKeyResult);
       return c.json({ 
         error: 'Failed to get billing key',
         details: billingKeyResult
@@ -571,9 +572,9 @@ payments.post('/subscription/confirm', async (c) => {
 
     // IMPORTANT: Wait 2 seconds for TossPayments to sync billing key
     // Without this delay, immediate payment may fail with 404
-    console.log('⏳ Waiting 2 seconds for billing key synchronization...');
+    logger.info('⏳ Waiting 2 seconds for billing key synchronization...');
     await new Promise(resolve => setTimeout(resolve, 2000));
-    console.log('✅ Billing key ready for use');
+    logger.info('✅ Billing key ready for use');
 
     // Determine billing amount and duration
     let amount;
@@ -634,7 +635,7 @@ payments.post('/subscription/confirm', async (c) => {
     const paymentResult = await paymentResponse.json();
 
     if (!paymentResponse.ok) {
-      console.error('Payment error:', paymentResult);
+      logger.error('Payment error:', paymentResult);
       return c.json({ 
         error: 'Payment failed',
         details: paymentResult
@@ -700,9 +701,9 @@ payments.post('/subscription/confirm', async (c) => {
         status: 'success',
         created_at: new Date().toISOString()
       });
-      console.log('📧 Admin payment notification sent for subscription:', orderId);
+      logger.info('📧 Admin payment notification sent for subscription:', orderId);
     } catch (emailError) {
-      console.warn('⚠️ Failed to send admin payment notification (non-critical):', emailError);
+      logger.warn('⚠️ Failed to send admin payment notification (non-critical):', emailError);
     }
 
     return c.json({
@@ -715,7 +716,7 @@ payments.post('/subscription/confirm', async (c) => {
     });
 
   } catch (error) {
-    console.error('Subscription confirm error:', error);
+    logger.error('Subscription confirm error:', error);
     return c.json({ 
       error: 'Failed to confirm subscription',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -753,7 +754,7 @@ payments.post('/trial/confirm', async (c) => {
     const billingKeyResult = await billingKeyResponse.json();
 
     if (!billingKeyResponse.ok) {
-      console.error('Billing key error:', billingKeyResult);
+      logger.error('Billing key error:', billingKeyResult);
       return c.json({ 
         error: 'Failed to get billing key',
         details: billingKeyResult
@@ -838,16 +839,16 @@ payments.post('/trial/confirm', async (c) => {
 
           if (emailResponse.ok) {
             const emailData = await emailResponse.json();
-            console.log('✅ Trial start email sent:', { email: user.email, emailId: emailData.id });
+            logger.info('✅ Trial start email sent:', { email: user.email, emailId: emailData.id });
           } else {
             const errorData = await emailResponse.json();
-            console.error('❌ Failed to send trial start email:', errorData);
+            logger.error('❌ Failed to send trial start email:', errorData);
           }
         } else {
-          console.log('⚠️ RESEND_API_KEY not configured, skipping trial start email');
+          logger.info('⚠️ RESEND_API_KEY not configured, skipping trial start email');
         }
       } catch (emailError) {
-        console.error('❌ Error sending trial start email:', emailError);
+        logger.error('❌ Error sending trial start email:', emailError);
         // Don't fail the trial activation if email fails
       }
     }
@@ -861,7 +862,7 @@ payments.post('/trial/confirm', async (c) => {
     });
 
   } catch (error) {
-    console.error('Trial confirm error:', error);
+    logger.error('Trial confirm error:', error);
     return c.json({ 
       error: 'Failed to confirm trial',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -920,7 +921,7 @@ payments.post('/subscription/start', async (c) => {
     });
 
   } catch (error) {
-    console.error('Subscription start error:', error);
+    logger.error('Subscription start error:', error);
     return c.json({ 
       error: 'Failed to start subscription',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -969,7 +970,7 @@ payments.post('/trial/cancel', async (c) => {
     });
 
   } catch (error) {
-    console.error('Trial cancel error:', error);
+    logger.error('Trial cancel error:', error);
     return c.json({ 
       error: 'Failed to cancel trial',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -1026,7 +1027,7 @@ payments.post('/subscription/cancel', async (c) => {
     });
 
   } catch (error) {
-    console.error('Subscription cancel error:', error);
+    logger.error('Subscription cancel error:', error);
     return c.json({ 
       error: 'Failed to cancel subscription',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -1045,7 +1046,7 @@ payments.post('/billing/execute', async (c) => {
       return c.json({ error: 'Unauthorized' }, 401);
     }
 
-    console.log('🤖 Running billing cron job...');
+    logger.info('🤖 Running billing cron job...');
 
     // Find users whose trial ends today and have auto billing enabled
     // Get today's date in Korea timezone (UTC+9)
@@ -1199,7 +1200,7 @@ payments.post('/billing/execute', async (c) => {
     });
 
   } catch (error) {
-    console.error('Billing execute error:', error);
+    logger.error('Billing execute error:', error);
     return c.json({ 
       error: 'Failed to execute billing',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -1211,31 +1212,31 @@ payments.post('/billing/execute', async (c) => {
 payments.post('/hiing/subscribe/start', async (c) => {
   try {
     const { userId, lessonCount, amount, packageType } = await c.req.json();
-    console.log('📥 Subscription start request:', { userId, lessonCount, amount, packageType });
+    logger.info('📥 Subscription start request:', { userId, lessonCount, amount, packageType });
 
     if (!userId || !lessonCount || !amount) {
-      console.error('❌ Missing required fields');
+      logger.error('❌ Missing required fields');
       return c.json({ error: 'Missing required fields' }, 400);
     }
 
     const db = c.env.DB;
     if (!db) {
-      console.error('❌ Database not initialized');
+      logger.error('❌ Database not initialized');
       return c.json({ error: 'Database not available' }, 500);
     }
 
     // Check if user exists
-    console.log('🔍 Looking up user:', userId);
+    logger.info('🔍 Looking up user:', userId);
     const user = await db.prepare('SELECT * FROM users WHERE id = ?').bind(userId).first();
     if (!user) {
-      console.error('❌ User not found:', userId);
+      logger.error('❌ User not found:', userId);
       return c.json({ error: 'User not found' }, 404);
     }
-    console.log('✅ User found:', user.email);
+    logger.info('✅ User found:', user.email);
 
     // Generate Toss customer key
     const customerKey = `hiing_customer_${userId}_${Date.now()}`;
-    console.log('🔑 Generated customer key:', customerKey);
+    logger.info('🔑 Generated customer key:', customerKey);
 
     // Store customer key in database
     try {
@@ -1244,9 +1245,9 @@ payments.post('/hiing/subscribe/start', async (c) => {
         SET toss_customer_key = ?
         WHERE id = ?
       `).bind(customerKey, userId).run();
-      console.log('✅ Updated user toss_customer_key, rows affected:', updateResult.meta?.changes || 0);
+      logger.info('✅ Updated user toss_customer_key, rows affected:', updateResult.meta?.changes || 0);
     } catch (dbError) {
-      console.error('❌ Database UPDATE error:', dbError);
+      logger.error('❌ Database UPDATE error:', dbError);
       // Check if column exists
       if (dbError instanceof Error && dbError.message.includes('no such column')) {
         return c.json({ 
@@ -1263,9 +1264,9 @@ payments.post('/hiing/subscribe/start', async (c) => {
         INSERT INTO activity_logs (user_id, activity_type, details)
         VALUES (?, 'hiing_subscribe_start', ?)
       `).bind(userId, `Started Live Speaking ${lessonCount}회 subscription (${packageType})`).run();
-      console.log('✅ Activity logged');
+      logger.info('✅ Activity logged');
     } catch (logError) {
-      console.warn('⚠️ Failed to log activity (non-critical):', logError);
+      logger.warn('⚠️ Failed to log activity (non-critical):', logError);
       // Don't fail the request if activity logging fails
     }
 
@@ -1276,12 +1277,12 @@ payments.post('/hiing/subscribe/start', async (c) => {
       amount: amount,
       packageType: packageType
     };
-    console.log('📤 Subscription start response:', response);
+    logger.info('📤 Subscription start response:', response);
     return c.json(response);
 
   } catch (error) {
-    console.error('❌ Hiing subscribe start error:', error);
-    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    logger.error('❌ Hiing subscribe start error:', error);
+    logger.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     return c.json({ 
       error: 'Failed to start subscription',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -1321,7 +1322,7 @@ payments.post('/hiing/subscribe/confirm', async (c) => {
     const billingKeyResult = await billingKeyResponse.json();
 
     if (!billingKeyResponse.ok) {
-      console.error('Billing key error:', billingKeyResult);
+      logger.error('Billing key error:', billingKeyResult);
       return c.json({ 
         error: 'Failed to get billing key',
         details: billingKeyResult
@@ -1362,7 +1363,7 @@ payments.post('/hiing/subscribe/confirm', async (c) => {
     const paymentResult = await paymentResponse.json();
 
     if (!paymentResponse.ok) {
-      console.error('First payment error:', paymentResult);
+      logger.error('First payment error:', paymentResult);
       return c.json({ 
         error: 'Failed to process first payment',
         details: paymentResult
@@ -1673,16 +1674,16 @@ support@worvox.com
 
           if (emailResponse.ok) {
             const emailData = await emailResponse.json();
-            console.log('✅ Live Speaking payment email sent:', { email: (user as any).email, emailId: emailData.id });
+            logger.info('✅ Live Speaking payment email sent:', { email: (user as any).email, emailId: emailData.id });
           } else {
             const errorData = await emailResponse.json();
-            console.error('❌ Failed to send Live Speaking payment email:', errorData);
+            logger.error('❌ Failed to send Live Speaking payment email:', errorData);
           }
         } else {
-          console.log('⚠️ RESEND_API_KEY not configured, skipping payment email');
+          logger.info('⚠️ RESEND_API_KEY not configured, skipping payment email');
         }
       } catch (emailError) {
-        console.error('❌ Error sending Live Speaking payment email:', emailError);
+        logger.error('❌ Error sending Live Speaking payment email:', emailError);
         // Don't fail the payment if email fails
       }
     }
@@ -1701,9 +1702,9 @@ support@worvox.com
         status: 'completed',
         created_at: new Date().toISOString()
       });
-      console.log('📧 Admin payment notification sent for Live Speaking:', orderId);
+      logger.info('📧 Admin payment notification sent for Live Speaking:', orderId);
     } catch (emailError) {
-      console.warn('⚠️ Failed to send admin payment notification (non-critical):', emailError);
+      logger.warn('⚠️ Failed to send admin payment notification (non-critical):', emailError);
     }
 
     return c.json({
@@ -1716,7 +1717,7 @@ support@worvox.com
     });
 
   } catch (error) {
-    console.error('Hiing subscribe confirm error:', error);
+    logger.error('Hiing subscribe confirm error:', error);
     return c.json({ 
       error: 'Failed to confirm subscription',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -1888,7 +1889,7 @@ payments.post('/hiing/monthly-billing', async (c) => {
     });
 
   } catch (error) {
-    console.error('❌ Monthly billing error:', error);
+    logger.error('❌ Monthly billing error:', error);
     return c.json({ 
       error: 'Monthly billing failed',
       details: error instanceof Error ? error.message : 'Unknown error'

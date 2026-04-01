@@ -16,7 +16,10 @@ build
 
 # Environment variables
 .env
+.env.*
+!.env.example
 .dev.vars
+*.vars
 
 # PM2
 .pm2/

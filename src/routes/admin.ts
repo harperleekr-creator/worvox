@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import { Hono } from 'hono'
 import type { Context } from 'hono'
 import type { Bindings } from '../types'
@@ -14,7 +15,7 @@ const requireAuth = async (c: Context<{ Bindings: Bindings }>, next: () => Promi
 
     await next()
   } catch (error) {
-    console.error('Auth error:', error)
+    logger.error('Auth error:', error)
     return c.json({ error: '인증 실패' }, 401)
   }
 }
@@ -84,7 +85,7 @@ admin.get('/users', requireAuth, async (c) => {
       }
     })
   } catch (error) {
-    console.error('Admin get users error:', error)
+    logger.error('Admin get users error:', error)
     return c.json({ error: '사용자 목록 조회 실패' }, 500)
   }
 })
@@ -189,7 +190,7 @@ admin.get('/stats', requireAuth, async (c) => {
       }
     })
   } catch (error) {
-    console.error('Admin get stats error:', error)
+    logger.error('Admin get stats error:', error)
     return c.json({ error: '통계 조회 실패' }, 500)
   }
 })
@@ -247,7 +248,7 @@ admin.get('/sessions', requireAuth, async (c) => {
       }
     })
   } catch (error) {
-    console.error('Admin get sessions error:', error)
+    logger.error('Admin get sessions error:', error)
     return c.json({ error: '세션 목록 조회 실패' }, 500)
   }
 })
@@ -311,7 +312,7 @@ admin.get('/payments', requireAuth, async (c) => {
       }
     })
   } catch (error) {
-    console.error('Admin get payments error:', error)
+    logger.error('Admin get payments error:', error)
     return c.json({ error: '결제 내역 조회 실패' }, 500)
   }
 })
@@ -375,7 +376,7 @@ admin.get('/activities', requireAuth, async (c) => {
       }
     })
   } catch (error) {
-    console.error('Admin get activities error:', error)
+    logger.error('Admin get activities error:', error)
     return c.json({ error: '활동 로그 조회 실패' }, 500)
   }
 })
@@ -468,7 +469,7 @@ admin.get('/users/:id', requireAuth, async (c) => {
       usageSummary
     })
   } catch (error) {
-    console.error('Admin get user detail error:', error)
+    logger.error('Admin get user detail error:', error)
     return c.json({ 
       error: '사용자 상세 정보 조회 실패',
       details: (error as Error).message 
@@ -522,7 +523,7 @@ admin.get('/users/:id/payments', requireAuth, async (c) => {
       }
     })
   } catch (error) {
-    console.error('Admin get user payments error:', error)
+    logger.error('Admin get user payments error:', error)
     return c.json({ 
       error: '결제 내역 조회 실패',
       details: (error as Error).message 
@@ -591,7 +592,7 @@ admin.post('/users/:id/plan', requireAuth, async (c) => {
       }
     })
   } catch (error) {
-    console.error('Admin update plan error:', error)
+    logger.error('Admin update plan error:', error)
     return c.json({ error: '플랜 업데이트 실패: ' + (error as Error).message }, 500)
   }
 })
@@ -611,7 +612,7 @@ admin.post('/users/:id/admin', requireAuth, async (c) => {
       message: '관리자 권한이 업데이트되었습니다'
     })
   } catch (error) {
-    console.error('Admin toggle admin error:', error)
+    logger.error('Admin toggle admin error:', error)
     return c.json({ error: '관리자 권한 업데이트 실패' }, 500)
   }
 })
@@ -691,9 +692,9 @@ admin.delete('/users/:id', requireAuth, async (c) => {
     // Finally delete the user (this must succeed)
     try {
       await c.env.DB.prepare('DELETE FROM users WHERE id = ?').bind(userId).run()
-      console.log('  ✓ Deleted user')
+      logger.info('  ✓ Deleted user')
     } catch (e) {
-      console.error('  ✗ Failed to delete user:', (e as Error).message)
+      logger.error('  ✗ Failed to delete user:', (e as Error).message)
       throw new Error('사용자 삭제 실패: ' + (e as Error).message)
     }
 
@@ -704,7 +705,7 @@ admin.delete('/users/:id', requireAuth, async (c) => {
       message: '사용자가 삭제되었습니다'
     })
   } catch (error) {
-    console.error('Admin delete user error:', error)
+    logger.error('Admin delete user error:', error)
     return c.json({ error: '사용자 삭제 실패: ' + (error as Error).message }, 500)
   }
 })
@@ -737,7 +738,7 @@ admin.post('/set-admin', async (c) => {
       message: `${email}이(가) 관리자로 설정되었습니다`
     })
   } catch (error) {
-    console.error('Set admin error:', error)
+    logger.error('Set admin error:', error)
     return c.json({ error: '관리자 설정 실패' }, 500)
   }
 })

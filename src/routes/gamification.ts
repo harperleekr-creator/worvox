@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import { Hono } from 'hono'
 import type { Context } from 'hono'
 
@@ -59,7 +60,7 @@ gamification.post('/xp/add', async (c: Context<{ Bindings: Bindings }>) => {
   try {
     const { userId, xp, activityType, details } = await c.req.json()
     
-    console.log('XP add request:', { userId, xp, activityType, details })
+    logger.info('XP add request:', { userId, xp, activityType, details })
     
     if (!userId || !xp) {
       return c.json({ success: false, error: 'Missing userId or xp' }, 400)
@@ -87,7 +88,7 @@ gamification.post('/xp/add', async (c: Context<{ Bindings: Bindings }>) => {
       WHERE id = ?
     `).bind(userId).first() as any
 
-    console.log('User found:', user ? 'yes' : 'no', 'userId:', userId)
+    logger.info('User found:', user ? 'yes' : 'no', 'userId:', userId)
 
     if (!user) {
       return c.json({ 
@@ -191,7 +192,7 @@ gamification.post('/xp/add', async (c: Context<{ Bindings: Bindings }>) => {
       dailyXP: newDailyXP
     })
   } catch (error) {
-    console.error('Error adding XP:', error)
+    logger.error('Error adding XP:', error)
     return c.json({ success: false, error: 'Failed to add XP' }, 500)
   }
 })
@@ -260,7 +261,7 @@ gamification.get('/stats/:userId', async (c: Context<{ Bindings: Bindings }>) =>
       recentActivity: recentActivity || []
     })
   } catch (error) {
-    console.error('Error getting stats:', error)
+    logger.error('Error getting stats:', error)
     return c.json({ success: false, error: 'Failed to get stats' }, 500)
   }
 })
@@ -287,7 +288,7 @@ gamification.get('/leaderboard', async (c: Context<{ Bindings: Bindings }>) => {
       leaderboard: results || []
     })
   } catch (error) {
-    console.error('Error getting leaderboard:', error)
+    logger.error('Error getting leaderboard:', error)
     return c.json({ success: false, error: 'Failed to get leaderboard' }, 500)
   }
 })
@@ -310,7 +311,7 @@ gamification.get('/spin-count/:userId', async (c: Context<{ Bindings: Bindings }
       spin_count: user.spin_count || 0
     })
   } catch (error) {
-    console.error('Error getting spin count:', error)
+    logger.error('Error getting spin count:', error)
     return c.json({ success: false, error: 'Failed to get spin count' }, 500)
   }
 })
@@ -333,7 +334,7 @@ gamification.post('/spin-count/update', async (c: Context<{ Bindings: Bindings }
       spin_count
     })
   } catch (error) {
-    console.error('Error updating spin count:', error)
+    logger.error('Error updating spin count:', error)
     return c.json({ success: false, error: 'Failed to update spin count' }, 500)
   }
 })
@@ -370,7 +371,7 @@ gamification.post('/spin/use', async (c: Context<{ Bindings: Bindings }>) => {
       spin_count: newSpinCount
     })
   } catch (error) {
-    console.error('Error using spin:', error)
+    logger.error('Error using spin:', error)
     return c.json({ success: false, error: 'Failed to use spin' }, 500)
   }
 })
@@ -476,7 +477,7 @@ gamification.post('/attendance/check', async (c: Context<{ Bindings: Bindings }>
       xpResult
     })
   } catch (error) {
-    console.error('Error checking attendance:', error)
+    logger.error('Error checking attendance:', error)
     return c.json({ success: false, error: 'Failed to check attendance' }, 500)
   }
 })
@@ -512,7 +513,7 @@ gamification.get('/attendance/streak/:userId', async (c: Context<{ Bindings: Bin
       streakDays: isActive ? (attendance.streak_days || 0) : 0
     })
   } catch (error) {
-    console.error('Error getting streak:', error)
+    logger.error('Error getting streak:', error)
     return c.json({ success: false, error: 'Failed to get streak' }, 500)
   }
 })
@@ -549,7 +550,7 @@ gamification.post('/words/add', async (c: Context<{ Bindings: Bindings }>) => {
     })
 
   } catch (error) {
-    console.error('Error adding words:', error)
+    logger.error('Error adding words:', error)
     return c.json({ success: false, error: 'Failed to add words' }, 500)
   }
 })

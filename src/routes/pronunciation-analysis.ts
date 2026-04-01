@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import { Hono } from 'hono';
 import type { Bindings } from '../types';
 import crypto from 'crypto';
@@ -154,7 +155,7 @@ pronunciationAnalysis.post('/analyze', async (c) => {
         });
       }
     } catch (error) {
-      console.warn('⚠️ Cache lookup failed, proceeding with API call:', error);
+      logger.warn('⚠️ Cache lookup failed, proceeding with API call:', error);
     }
 
     // Ultra-optimized prompt for streaming + GPT-4o
@@ -198,7 +199,7 @@ Be realistic, strict, encouraging. Native-like: 90+, Good: 70-85, Needs work: <7
 
     if (!response.ok) {
       const error = await response.text();
-      console.error('GPT analysis error:', error);
+      logger.error('GPT analysis error:', error);
       return c.json({ error: 'Failed to analyze pronunciation' }, 500);
     }
 
@@ -208,7 +209,7 @@ Be realistic, strict, encouraging. Native-like: 90+, Good: 70-85, Needs work: <7
     // Extract JSON from response
     const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.error('Failed to parse analysis:', analysisText);
+      logger.error('Failed to parse analysis:', analysisText);
       return c.json({ 
         error: 'Failed to parse analysis result',
         fallback: {
@@ -255,9 +256,9 @@ Be realistic, strict, encouraging. Native-like: 90+, Good: 70-85, Needs work: <7
         ON CONFLICT(date) DO UPDATE SET cache_misses = cache_misses + 1
       `).run();
 
-      console.log('✅ Analysis result cached for future use');
+      logger.info('✅ Analysis result cached for future use');
     } catch (error) {
-      console.warn('⚠️ Failed to cache result:', error);
+      logger.warn('⚠️ Failed to cache result:', error);
     }
 
     return c.json({
@@ -267,7 +268,7 @@ Be realistic, strict, encouraging. Native-like: 90+, Good: 70-85, Needs work: <7
     });
 
   } catch (error) {
-    console.error('Pronunciation analysis error:', error);
+    logger.error('Pronunciation analysis error:', error);
     return c.json({ 
       error: 'Internal server error during analysis',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -368,7 +369,7 @@ KEY POINTS should explain in Korean what makes each answer better.`;
 
     if (!response.ok) {
       const error = await response.text();
-      console.error('GPT batch improved answer error:', error);
+      logger.error('GPT batch improved answer error:', error);
       return c.json({ error: 'Failed to generate improved answers' }, 500);
     }
 
@@ -378,7 +379,7 @@ KEY POINTS should explain in Korean what makes each answer better.`;
     // Extract JSON array from response
     const jsonMatch = answerText.match(/\[[\s\S]*\]/);
     if (!jsonMatch) {
-      console.error('Failed to parse batch improved answers:', answerText);
+      logger.error('Failed to parse batch improved answers:', answerText);
       return c.json({ 
         error: 'Failed to parse improved answers',
         fallback: questions.map((_, i) => ({
@@ -398,7 +399,7 @@ KEY POINTS should explain in Korean what makes each answer better.`;
     });
 
   } catch (error) {
-    console.error('Batch improved answer generation error:', error);
+    logger.error('Batch improved answer generation error:', error);
     return c.json({ 
       error: 'Internal server error during batch answer generation',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -494,7 +495,7 @@ KEY POINTS should explain in Korean what makes this answer better (e.g., "구체
 
     if (!response.ok) {
       const error = await response.text();
-      console.error('GPT improved answer error:', error);
+      logger.error('GPT improved answer error:', error);
       return c.json({ error: 'Failed to generate improved answer' }, 500);
     }
 
@@ -504,7 +505,7 @@ KEY POINTS should explain in Korean what makes this answer better (e.g., "구체
     // Extract JSON from response
     const jsonMatch = answerText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.error('Failed to parse improved answer:', answerText);
+      logger.error('Failed to parse improved answer:', answerText);
       return c.json({ 
         error: 'Failed to parse improved answer',
         fallback: {
@@ -525,7 +526,7 @@ KEY POINTS should explain in Korean what makes this answer better (e.g., "구체
     });
 
   } catch (error) {
-    console.error('Improved answer generation error:', error);
+    logger.error('Improved answer generation error:', error);
     return c.json({ 
       error: 'Internal server error during answer generation',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -562,7 +563,7 @@ pronunciationAnalysis.post('/analyze-quick', async (c) => {
     });
 
   } catch (error) {
-    console.error('Quick analysis error:', error);
+    logger.error('Quick analysis error:', error);
     return c.json({ 
       error: 'Failed to calculate quick scores',
       details: error instanceof Error ? error.message : 'Unknown error'
@@ -599,7 +600,7 @@ pronunciationAnalysis.post('/analyze-stream', async (c) => {
       ).bind(cacheKey).first();
 
       if (cached) {
-        console.log('✅ Cache HIT - returning cached result for streaming');
+        logger.info('✅ Cache HIT - returning cached result for streaming');
         const cachedData = JSON.parse(cached.analysis_data as string);
         return c.json({
           success: true,
@@ -608,7 +609,7 @@ pronunciationAnalysis.post('/analyze-stream', async (c) => {
         });
       }
     } catch (error) {
-      console.warn('⚠️ Cache lookup failed:', error);
+      logger.warn('⚠️ Cache lookup failed:', error);
     }
 
     // Ultra-optimized streaming prompt for GPT-4o
@@ -652,7 +653,7 @@ Realistic scoring. Native: 90+, Good: 70-85, Needs work: <70`;
 
     if (!response.ok) {
       const error = await response.text();
-      console.error('GPT streaming error:', error);
+      logger.error('GPT streaming error:', error);
       return c.json({ error: 'Failed to analyze pronunciation' }, 500);
     }
 
@@ -701,11 +702,11 @@ Realistic scoring. Native: 90+, Good: 70-85, Needs work: <70`;
                       JSON.stringify(resultData)
                     ).run();
                   } catch (cacheError) {
-                    console.warn('⚠️ Failed to cache streaming result:', cacheError);
+                    logger.warn('⚠️ Failed to cache streaming result:', cacheError);
                   }
                 }
               } catch (parseError) {
-                console.warn('⚠️ Failed to parse streaming result for cache:', parseError);
+                logger.warn('⚠️ Failed to parse streaming result for cache:', parseError);
               }
 
               controller.close();
@@ -736,7 +737,7 @@ Realistic scoring. Native: 90+, Good: 70-85, Needs work: <70`;
             }
           }
         } catch (error) {
-          console.error('Streaming error:', error);
+          logger.error('Streaming error:', error);
           controller.error(error);
         }
       }
@@ -751,7 +752,7 @@ Realistic scoring. Native: 90+, Good: 70-85, Needs work: <70`;
     });
 
   } catch (error) {
-    console.error('Streaming analysis error:', error);
+    logger.error('Streaming analysis error:', error);
     return c.json({ 
       error: 'Internal server error during streaming analysis',
       details: error instanceof Error ? error.message : 'Unknown error'
