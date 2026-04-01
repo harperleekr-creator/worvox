@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1775017625985'; // Update manually or via build script
+const BUILD_TIME = '1775017928883'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -1401,7 +1401,7 @@ app.get('/landing', (c) => {
                     <div class="flex items-center gap-2 sm:gap-4">
                         <a href="/landing?lang=${isKorean ? 'en' : 'ko'}" class="flex items-center gap-1 text-gray-700 hover:text-purple-600 font-medium transition text-sm border-2 border-purple-200 hover:border-purple-400 rounded-lg px-3 py-1.5">
                             <i class="fas fa-globe"></i>
-                            <span>${isKorean ? 'ENG' : 'KOR'}</span>
+                            <span>${isKorean ? 'KR' : 'EN'}</span>
                         </a>
                         <a href="/pricing" class="text-gray-700 hover:text-purple-600 font-medium transition text-sm sm:text-base">
                             <i class="fas fa-tag mr-1 sm:mr-2"></i><span class="hidden xs:inline">${isKorean ? '요금제' : 'Pricing'}</span><span class="xs:hidden">${isKorean ? '요금' : 'Price'}</span>
