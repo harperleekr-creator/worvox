@@ -855,4 +855,326 @@ users.post('/sync', async (c) => {
   }
 });
 
+// ==========================================
+// Password Reset Flow
+// ==========================================
+
+/**
+ * Request password reset - Send reset email with token
+ * POST /api/users/password-reset/request
+ */
+users.post('/password-reset/request', async (c) => {
+  try {
+    const { email } = await c.req.json();
+
+    logger.info('🔐 Password reset requested for:', email);
+
+    if (!email) {
+      return c.json({ error: 'Email is required' }, 400);
+    }
+
+    // Find user by email
+    const user = await c.env.DB.prepare(
+      'SELECT id, username, email, auth_provider FROM users WHERE email = ?'
+    ).bind(email).first();
+
+    // Security: Don't reveal if user exists
+    if (!user) {
+      logger.info('⚠️ Password reset requested for non-existent email:', email);
+      // Still return success to prevent email enumeration
+      return c.json({
+        success: true,
+        message: '비밀번호 재설정 링크가 이메일로 발송되었습니다'
+      });
+    }
+
+    // Check if user uses email authentication
+    if (user.auth_provider !== 'email') {
+      logger.info(`⚠️ Password reset requested for ${user.auth_provider} user:`, email);
+      return c.json({
+        error: `${user.auth_provider === 'google' ? 'Google' : 'Social'} 계정으로 로그인하세요`,
+        provider: user.auth_provider
+      }, 400);
+    }
+
+    // Generate reset token (32 random bytes)
+    const tokenBytes = new Uint8Array(32);
+    crypto.getRandomValues(tokenBytes);
+    const token = Array.from(tokenBytes)
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+
+    // Token expires in 1 hour
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+
+    // Save token to database
+    await c.env.DB.prepare(
+      'INSERT INTO password_reset_tokens (user_id, email, token, expires_at) VALUES (?, ?, ?, ?)'
+    ).bind(user.id, email, token, expiresAt).run();
+
+    logger.info('✅ Password reset token generated for:', email);
+
+    // Send reset email
+    const resetUrl = `${new URL(c.req.url).origin}/app?reset_token=${token}`;
+    
+    try {
+      const resendApiKey = c.env.RESEND_API_KEY;
+      if (!resendApiKey) {
+        logger.error('⚠️ RESEND_API_KEY not configured');
+        throw new Error('Email service not configured');
+      }
+
+      const emailHtml = getPasswordResetEmailHTML(user.username as string, resetUrl);
+
+      const emailResponse = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${resendApiKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'WorVox <noreply@worvox.com>',
+          to: email,
+          subject: '🔐 WorVox 비밀번호 재설정',
+          html: emailHtml,
+          text: `비밀번호 재설정 링크: ${resetUrl}\n\n이 링크는 1시간 동안 유효합니다.`
+        })
+      });
+
+      if (!emailResponse.ok) {
+        const errorText = await emailResponse.text();
+        logger.error('❌ Failed to send reset email:', errorText);
+        throw new Error('Failed to send email');
+      }
+
+      const emailResult = await emailResponse.json();
+      logger.info('📧 Password reset email sent:', emailResult);
+
+    } catch (emailError) {
+      logger.error('❌ Email sending error:', emailError);
+      return c.json({
+        error: '이메일 발송에 실패했습니다. 잠시 후 다시 시도해주세요'
+      }, 500);
+    }
+
+    return c.json({
+      success: true,
+      message: '비밀번호 재설정 링크가 이메일로 발송되었습니다'
+    });
+
+  } catch (error) {
+    logger.error('❌ Password reset request error:', error);
+    return c.json({
+      error: 'Failed to process password reset request',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
+/**
+ * Verify reset token
+ * POST /api/users/password-reset/verify
+ */
+users.post('/password-reset/verify', async (c) => {
+  try {
+    const { token } = await c.req.json();
+
+    if (!token) {
+      return c.json({ error: 'Token is required' }, 400);
+    }
+
+    // Find token in database
+    const resetToken = await c.env.DB.prepare(
+      'SELECT * FROM password_reset_tokens WHERE token = ? AND used = 0'
+    ).bind(token).first();
+
+    if (!resetToken) {
+      return c.json({ error: '유효하지 않은 토큰입니다', valid: false }, 400);
+    }
+
+    // Check if token is expired
+    const now = new Date();
+    const expiresAt = new Date(resetToken.expires_at as string);
+
+    if (now > expiresAt) {
+      return c.json({ error: '만료된 토큰입니다', valid: false, expired: true }, 400);
+    }
+
+    return c.json({
+      valid: true,
+      email: resetToken.email
+    });
+
+  } catch (error) {
+    logger.error('❌ Token verification error:', error);
+    return c.json({
+      error: 'Failed to verify token',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
+/**
+ * Reset password with token
+ * POST /api/users/password-reset/confirm
+ */
+users.post('/password-reset/confirm', async (c) => {
+  try {
+    const { token, newPassword } = await c.req.json();
+
+    logger.info('🔐 Password reset confirmation attempt');
+
+    if (!token || !newPassword) {
+      return c.json({ error: 'Token and new password are required' }, 400);
+    }
+
+    if (newPassword.length < 8) {
+      return c.json({ error: '비밀번호는 최소 8자 이상이어야 합니다' }, 400);
+    }
+
+    // Find and verify token
+    const resetToken = await c.env.DB.prepare(
+      'SELECT * FROM password_reset_tokens WHERE token = ? AND used = 0'
+    ).bind(token).first();
+
+    if (!resetToken) {
+      return c.json({ error: '유효하지 않은 토큰입니다' }, 400);
+    }
+
+    // Check if token is expired
+    const now = new Date();
+    const expiresAt = new Date(resetToken.expires_at as string);
+
+    if (now > expiresAt) {
+      return c.json({ error: '만료된 토큰입니다. 다시 요청해주세요' }, 400);
+    }
+
+    // Hash new password with bcrypt
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+
+    // Update password
+    await c.env.DB.prepare(
+      'UPDATE users SET password_hash = ? WHERE id = ?'
+    ).bind(passwordHash, resetToken.user_id).run();
+
+    // Mark token as used
+    await c.env.DB.prepare(
+      'UPDATE password_reset_tokens SET used = 1 WHERE id = ?'
+    ).bind(resetToken.id).run();
+
+    logger.info('✅ Password reset successful for user:', resetToken.user_id);
+
+    return c.json({
+      success: true,
+      message: '비밀번호가 성공적으로 변경되었습니다'
+    });
+
+  } catch (error) {
+    logger.error('❌ Password reset confirmation error:', error);
+    return c.json({
+      error: 'Failed to reset password',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
+  }
+});
+
+/**
+ * Email template for password reset
+ */
+function getPasswordResetEmailHTML(userName: string, resetUrl: string): string {
+  return `
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>비밀번호 재설정 - WorVox</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f3f4f6;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          
+          <!-- Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%); padding: 40px 30px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: bold;">
+                🔐 비밀번호 재설정
+              </h1>
+              <p style="margin: 10px 0 0 0; color: #e9d5ff; font-size: 18px;">
+                보안 강화를 위한 비밀번호 변경
+              </p>
+            </td>
+          </tr>
+          
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px 30px;">
+              <p style="margin: 0 0 20px 0; color: #1f2937; font-size: 18px; line-height: 1.6;">
+                안녕하세요, <strong>${userName}</strong>님! 👋
+              </p>
+              <p style="margin: 0 0 20px 0; color: #4b5563; font-size: 16px; line-height: 1.6;">
+                WorVox 보안 강화를 위해 <strong>bcrypt 암호화 방식</strong>으로 업그레이드하였습니다.<br/>
+                더 안전한 서비스 이용을 위해 비밀번호를 재설정해주세요.
+              </p>
+              
+              <!-- Info Box -->
+              <div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-radius: 12px; padding: 20px; margin: 30px 0; border: 2px solid #3b82f6;">
+                <p style="margin: 0; color: #1e40af; font-size: 14px; line-height: 1.6;">
+                  <strong>💡 왜 재설정이 필요한가요?</strong><br/>
+                  기존의 비밀번호 암호화 방식에서 업계 표준인 bcrypt로 업그레이드했습니다.<br/>
+                  한 번만 재설정하시면 더욱 안전하게 계정을 보호할 수 있습니다.
+                </p>
+              </div>
+
+              <!-- CTA Button -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+                <tr>
+                  <td align="center">
+                    <a href="${resetUrl}" style="display: inline-block; background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 12px; font-size: 18px; font-weight: bold; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);">
+                      비밀번호 재설정하기
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin: 20px 0 0 0; color: #6b7280; font-size: 14px; line-height: 1.6;">
+                또는 아래 링크를 복사하여 브라우저에 붙여넣으세요:<br/>
+                <a href="${resetUrl}" style="color: #8b5cf6; word-break: break-all;">${resetUrl}</a>
+              </p>
+
+              <!-- Warning -->
+              <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 30px 0; border-radius: 8px;">
+                <p style="margin: 0; color: #92400e; font-size: 14px; line-height: 1.6;">
+                  ⚠️ <strong>보안 안내</strong><br/>
+                  • 이 링크는 <strong>1시간 동안만</strong> 유효합니다<br/>
+                  • 요청하지 않았다면 이 이메일을 무시하세요<br/>
+                  • 링크를 다른 사람과 공유하지 마세요
+                </p>
+              </div>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+              <p style="margin: 0 0 10px 0; color: #6b7280; font-size: 14px;">
+                문의사항이 있으시면 <a href="mailto:support@worvox.com" style="color: #8b5cf6; text-decoration: none;">support@worvox.com</a>으로 연락주세요
+              </p>
+              <p style="margin: 0; color: #9ca3af; font-size: 12px;">
+                © 2026 WorVox. All rights reserved.
+              </p>
+            </td>
+          </tr>
+          
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `;
+}
+
 export default users;

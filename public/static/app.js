@@ -471,6 +471,15 @@ class WorVox {
   }
 
   async init() {
+    // Check for password reset token in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const resetToken = urlParams.get('reset_token');
+    if (resetToken) {
+      console.log('🔐 Password reset token detected');
+      this.showPasswordResetConfirm(resetToken);
+      return;
+    }
+    
     // Setup browser history navigation
     this.setupHistoryNavigation();
     
@@ -6962,7 +6971,7 @@ Proceed to payment?
         
         <!-- Forgot Password Link -->
         <div class="text-right">
-          <a href="#" class="text-sm text-green-600 hover:text-green-700 font-medium">비밀번호를 잊으셨나요?</a>
+          <a href="#" onclick="event.preventDefault(); worvox.showPasswordResetRequest();" class="text-sm text-green-600 hover:text-green-700 font-medium">비밀번호를 잊으셨나요?</a>
         </div>
         
         <!-- Sign In Button -->
@@ -18733,3 +18742,169 @@ window.addEventListener('load', () => {
 // Initialize WorVox app
 window.worvox = new WorVox();
 console.log('WorVox app initialized');
+// Add to WorVox class - Password Reset functionality
+
+// Show password reset request form
+WorVox.prototype.showPasswordResetRequest = function() {
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="min-h-screen flex items-center justify-center p-4" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)">
+      <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8">
+        <div class="mb-6 text-center">
+          <div class="w-16 h-16 bg-purple-600 rounded-full mx-auto flex items-center justify-center mb-4">
+            <i class="fas fa-lock text-white text-2xl"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">비밀번호 재설정</h2>
+          <p class="text-gray-600 text-sm">등록된 이메일 주소를 입력하세요</p>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              <i class="fas fa-envelope text-gray-400 mr-2"></i>이메일
+            </label>
+            <input type="email" id="resetEmail" 
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+              placeholder="your@email.com">
+          </div>
+
+          <button onclick="worvox.requestPasswordReset()" 
+            class="w-full py-4 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-all">
+            재설정 링크 보내기
+          </button>
+
+          <button onclick="worvox.showLogin()" 
+            class="w-full py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-all">
+            <i class="fas fa-arrow-left mr-2"></i>로그인으로 돌아가기
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+// Request password reset
+WorVox.prototype.requestPasswordReset = async function() {
+  const email = document.getElementById('resetEmail').value.trim();
+  
+  if (!email) {
+    toast.warning('이메일을 입력해주세요');
+    return;
+  }
+
+  try {
+    const loadingToast = toast.loading('요청 처리 중...');
+    
+    const response = await axios.post('/api/users/password-reset/request', { email });
+    
+    toast.remove(loadingToast);
+    
+    if (response.data.success) {
+      toast.success('✅ 비밀번호 재설정 링크를 이메일로 발송했습니다');
+      setTimeout(() => this.showLogin(), 2000);
+    }
+  } catch (error) {
+    console.error('Password reset error:', error);
+    if (error.response?.data?.error) {
+      toast.error(error.response.data.error);
+    } else {
+      toast.error('재설정 요청에 실패했습니다');
+    }
+  }
+};
+
+// Show password reset confirmation form (when user clicks email link)
+WorVox.prototype.showPasswordResetConfirm = function(token) {
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="min-h-screen flex items-center justify-center p-4" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)">
+      <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8">
+        <div class="mb-6 text-center">
+          <div class="w-16 h-16 bg-green-600 rounded-full mx-auto flex items-center justify-center mb-4">
+            <i class="fas fa-key text-white text-2xl"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-900 mb-2">새 비밀번호 설정</h2>
+          <p class="text-gray-600 text-sm">안전한 비밀번호를 입력하세요</p>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              <i class="fas fa-lock text-gray-400 mr-2"></i>새 비밀번호
+            </label>
+            <input type="password" id="newPassword" 
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="최소 8자 이상">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              <i class="fas fa-lock text-gray-400 mr-2"></i>비밀번호 확인
+            </label>
+            <input type="password" id="confirmPassword" 
+              class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+              placeholder="비밀번호 재입력">
+          </div>
+
+          <div class="bg-blue-50 border border-blue-200 rounded-xl p-3">
+            <p class="text-sm text-blue-800">
+              <i class="fas fa-info-circle mr-2"></i>
+              비밀번호는 최소 8자 이상이어야 합니다
+            </p>
+          </div>
+
+          <button onclick="worvox.confirmPasswordReset('${token}')" 
+            class="w-full py-4 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition-all">
+            비밀번호 변경
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+// Confirm password reset
+WorVox.prototype.confirmPasswordReset = async function(token) {
+  const newPassword = document.getElementById('newPassword').value;
+  const confirmPassword = document.getElementById('confirmPassword').value;
+  
+  if (!newPassword || !confirmPassword) {
+    toast.warning('모든 항목을 입력해주세요');
+    return;
+  }
+
+  if (newPassword.length < 8) {
+    toast.error('비밀번호는 최소 8자 이상이어야 합니다');
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+    toast.error('비밀번호가 일치하지 않습니다');
+    return;
+  }
+
+  try {
+    const loadingToast = toast.loading('비밀번호 변경 중...');
+    
+    const response = await axios.post('/api/users/password-reset/confirm', {
+      token,
+      newPassword
+    });
+    
+    toast.remove(loadingToast);
+    
+    if (response.data.success) {
+      toast.success('✅ 비밀번호가 변경되었습니다!');
+      setTimeout(() => this.showLogin(), 2000);
+    }
+  } catch (error) {
+    console.error('Password reset confirm error:', error);
+    if (error.response?.data?.error) {
+      toast.error(error.response.data.error);
+    } else {
+      toast.error('비밀번호 변경에 실패했습니다');
+    }
+  }
+};
+
+console.log('✅ Password reset functionality added');
