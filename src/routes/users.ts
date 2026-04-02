@@ -3,6 +3,7 @@ import type { Bindings } from '../types';
 import { sendAdminSignupNotification } from '../utils/email-helpers';
 import bcrypt from 'bcryptjs';
 import { logger } from '../utils/logger';
+import { getKSTNowForDB } from '../utils/timezone';
 
 const users = new Hono<{ Bindings: Bindings }>();
 
@@ -165,11 +166,12 @@ users.post('/google-login', async (c) => {
 
     // Create new user with Google account (plan defaults to 'free' via DB schema)
     const username = name;
+    const kstNow = getKSTNowForDB();
     
     const result = await c.env.DB.prepare(
-      `INSERT INTO users (username, email, google_id, google_email, google_picture, auth_provider, level, plan) 
-       VALUES (?, ?, ?, ?, ?, 'google', 'beginner', 'free')`
-    ).bind(username, email, googleId, email, picture).run();
+      `INSERT INTO users (username, email, google_id, google_email, google_picture, auth_provider, level, plan, created_at) 
+       VALUES (?, ?, ?, ?, ?, 'google', 'beginner', 'free', ?)`
+    ).bind(username, email, googleId, email, picture, kstNow).run();
 
     const userId = result.meta.last_row_id;
     logger.info('✅ New user created with ID:', userId);
@@ -296,11 +298,12 @@ users.post('/auth/google', async (c) => {
 
     // Create new user with Google account
     const username = name || email.split('@')[0];
+    const kstNow = getKSTNowForDB();
     
     const result = await c.env.DB.prepare(
-      `INSERT INTO users (username, email, google_id, google_email, google_picture, auth_provider, level) 
-       VALUES (?, ?, ?, ?, ?, 'google', 'beginner')`
-    ).bind(username, email, googleId, email, picture || null).run();
+      `INSERT INTO users (username, email, google_id, google_email, google_picture, auth_provider, level, created_at) 
+       VALUES (?, ?, ?, ?, ?, 'google', 'beginner', ?)`
+    ).bind(username, email, googleId, email, picture || null, kstNow).run();
 
     const userId = result.meta.last_row_id;
 
@@ -347,14 +350,16 @@ users.post('/auth', async (c) => {
     }
 
     // Create new user with all profile fields
+    const kstNow = getKSTNowForDB();
     const result = await c.env.DB.prepare(
-      `INSERT INTO users (username, email, level, occupation) 
-       VALUES (?, ?, ?, ?)`
+      `INSERT INTO users (username, email, level, occupation, created_at) 
+       VALUES (?, ?, ?, ?, ?)`
     ).bind(
       username, 
       email || null, 
       level || 'beginner',
-      occupation || null
+      occupation || null,
+      kstNow
     ).run();
 
     const userId = result.meta.last_row_id;
@@ -412,12 +417,13 @@ users.post('/signup', async (c) => {
 
     // Hash password with bcrypt (secure)
     const passwordHash = await bcrypt.hash(password, 10);
+    const kstNow = getKSTNowForDB();
 
     // Create new user
     const result = await c.env.DB.prepare(
-      `INSERT INTO users (username, email, password_hash, auth_provider, level, plan) 
-       VALUES (?, ?, ?, 'email', 'beginner', 'free')`
-    ).bind(name, email, passwordHash).run();
+      `INSERT INTO users (username, email, password_hash, auth_provider, level, plan, created_at) 
+       VALUES (?, ?, ?, 'email', 'beginner', 'free', ?)`
+    ).bind(name, email, passwordHash, kstNow).run();
 
     const userId = result.meta.last_row_id;
     logger.info('✅ User created with ID:', userId);
@@ -825,15 +831,17 @@ users.post('/sync', async (c) => {
     }
 
     // Insert new user
+    const kstNow = getKSTNowForDB();
     const result = await c.env.DB.prepare(
-      `INSERT INTO users (username, email, plan, level, use_ai_prompts, auth_provider) 
-       VALUES (?, ?, ?, ?, ?, 'local')`
+      `INSERT INTO users (username, email, plan, level, use_ai_prompts, auth_provider, created_at) 
+       VALUES (?, ?, ?, ?, ?, 'local', ?)`
     ).bind(
       username,
       email,
       plan || 'free',
       level || 'beginner',
-      use_ai_prompts ? 1 : 0
+      use_ai_prompts ? 1 : 0,
+      kstNow
     ).run();
 
     logger.info('✅ New user inserted into DB:', result.meta);

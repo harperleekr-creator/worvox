@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1775027980123'; // Update manually or via build script
+const BUILD_TIME = '1775112517789'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -1708,49 +1708,49 @@ ${isKorean ? '💡 지금 시작하면 <span class="text-purple-600">2주 무료
             <div class="max-w-6xl mx-auto">
                 <div class="text-center mb-8">
                     <h2 class="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
-                        <span class="text-purple-600">이런 분들</span>을 위해 만들었어요
+                        ${isKorean ? '<span class="text-purple-600">이런 분들</span>을 위해 만들었어요' : 'Perfect for <span class="text-purple-600">These People</span>'}
                     </h2>
-                    <p class="text-gray-600">3초 만에 확인하세요 - 당신을 위한 솔루션인가요?</p>
+                    <p class="text-gray-600">${isKorean ? '3초 만에 확인하세요 - 당신을 위한 솔루션인가요?' : 'Check in 3 seconds - Is this the solution for you?'}</p>
                 </div>
 
                 <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <!-- Target 1: 영어 말문 막힘 -->
                     <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-6 text-center hover:shadow-lg transition transform hover:scale-105 cursor-pointer border-2 border-transparent hover:border-red-300">
                         <div class="text-5xl mb-3">😰</div>
-                        <div class="font-bold text-gray-900 mb-2">영어만 들으면<br/>말문이 막혀요</div>
-                        <div class="text-sm text-gray-600 mb-3">"무슨 말을 해야 할지<br/>생각이 안 나요"</div>
+                        <div class="font-bold text-gray-900 mb-2">${isKorean ? '영어만 들으면<br/>말문이 막혀요' : 'Tongue-tied when<br/>hearing English'}</div>
+                        <div class="text-sm text-gray-600 mb-3">${isKorean ? '"무슨 말을 해야 할지<br/>생각이 안 나요"' : '"I can\'t think of<br/>what to say"'}</div>
                         <div class="inline-block bg-red-200 text-red-800 px-3 py-1 rounded-full text-xs font-bold">
-                            ✓ WorVox로 해결
+                            ✓ ${isKorean ? 'WorVox로 해결' : 'Solved by WorVox'}
                         </div>
                     </div>
 
                     <!-- Target 2: 발음 자신 없음 -->
                     <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6 text-center hover:shadow-lg transition transform hover:scale-105 cursor-pointer border-2 border-transparent hover:border-orange-300">
                         <div class="text-5xl mb-3">🤐</div>
-                        <div class="font-bold text-gray-900 mb-2">발음이 창피해서<br/>말을 못해요</div>
-                        <div class="text-sm text-gray-600 mb-3">"틀린 발음으로<br/>말하기 두려워요"</div>
+                        <div class="font-bold text-gray-900 mb-2">${isKorean ? '발음이 창피해서<br/>말을 못해요' : 'Too embarrassed<br/>by pronunciation'}</div>
+                        <div class="text-sm text-gray-600 mb-3">${isKorean ? '"틀린 발음으로<br/>말하기 두려워요"' : '"Afraid to speak<br/>with wrong accent"'}</div>
                         <div class="inline-block bg-orange-200 text-orange-800 px-3 py-1 rounded-full text-xs font-bold">
-                            ✓ WorVox로 해결
+                            ✓ ${isKorean ? 'WorVox로 해결' : 'Solved by WorVox'}
                         </div>
                     </div>
 
                     <!-- Target 3: 시험 준비 -->
                     <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 text-center hover:shadow-lg transition transform hover:scale-105 cursor-pointer border-2 border-transparent hover:border-blue-300">
                         <div class="text-5xl mb-3">📝</div>
-                        <div class="font-bold text-gray-900 mb-2">OPIC/토스<br/>고득점 필요해요</div>
-                        <div class="text-sm text-gray-600 mb-3">"실전처럼 연습할<br/>방법이 없어요"</div>
+                        <div class="font-bold text-gray-900 mb-2">${isKorean ? 'OPIC/토스<br/>고득점 필요해요' : 'Need high score<br/>in OPIC/TOEIC'}</div>
+                        <div class="text-sm text-gray-600 mb-3">${isKorean ? '"실전처럼 연습할<br/>방법이 없어요"' : '"No way to practice<br/>like real test"'}</div>
                         <div class="inline-block bg-blue-200 text-blue-800 px-3 py-1 rounded-full text-xs font-bold">
-                            ✓ WorVox로 해결
+                            ✓ ${isKorean ? 'WorVox로 해결' : 'Solved by WorVox'}
                         </div>
                     </div>
 
                     <!-- Target 4: 바쁜 직장인 -->
                     <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 text-center hover:shadow-lg transition transform hover:scale-105 cursor-pointer border-2 border-transparent hover:border-purple-300">
                         <div class="text-5xl mb-3">⏰</div>
-                        <div class="font-bold text-gray-900 mb-2">학원 다닐<br/>시간이 없어요</div>
-                        <div class="text-sm text-gray-600 mb-3">"출퇴근 시간에<br/>공부하고 싶어요"</div>
+                        <div class="font-bold text-gray-900 mb-2">${isKorean ? '학원 다닐<br/>시간이 없어요' : 'No time for<br/>language school'}</div>
+                        <div class="text-sm text-gray-600 mb-3">${isKorean ? '"출퇴근 시간에<br/>공부하고 싶어요"' : '"Want to study<br/>during commute"'}</div>
                         <div class="inline-block bg-purple-200 text-purple-800 px-3 py-1 rounded-full text-xs font-bold">
-                            ✓ WorVox로 해결
+                            ✓ ${isKorean ? 'WorVox로 해결' : 'Solved by WorVox'}
                         </div>
                     </div>
                 </div>
@@ -1760,17 +1760,17 @@ ${isKorean ? '💡 지금 시작하면 <span class="text-purple-600">2주 무료
                     <div class="flex flex-wrap justify-center items-center gap-3 md:gap-6 text-white">
                         <div class="flex items-center gap-2">
                             <i class="fas fa-check-circle text-yellow-300 text-xl"></i>
-                            <span class="font-semibold">24시간 AI 영어 선생님</span>
+                            <span class="font-semibold">${isKorean ? '24시간 AI 영어 선생님' : '24/7 AI English Teacher'}</span>
                         </div>
                         <div class="hidden md:block text-white/50">|</div>
                         <div class="flex items-center gap-2">
                             <i class="fas fa-check-circle text-yellow-300 text-xl"></i>
-                            <span class="font-semibold">실시간 발음 교정</span>
+                            <span class="font-semibold">${isKorean ? '실시간 발음 교정' : 'Real-time Pronunciation Fix'}</span>
                         </div>
                         <div class="hidden md:block text-white/50">|</div>
                         <div class="flex items-center gap-2">
                             <i class="fas fa-check-circle text-yellow-300 text-xl"></i>
-                            <span class="font-semibold">월 1.9만원</span>
+                            <span class="font-semibold">${isKorean ? '월 1.9만원' : '$15/month'}</span>
                         </div>
                     </div>
                 </div>
@@ -1798,8 +1798,7 @@ ${isKorean ? '💡 지금 시작하면 <span class="text-purple-600">2주 무료
                         <div class="text-6xl mb-6 text-center">🌏</div>
                         <h3 class="text-2xl font-bold text-white mb-4 text-center">Created by Global Educators</h3>
                         <p class="text-white/90 text-lg leading-relaxed text-center">
-                            해외 출신 운영진들이 직접 설계한<br/>
-                            <strong class="text-yellow-300">대화 중심</strong> 학습 플랫폼
+                            ${isKorean ? '해외 출신 운영진들이 직접 설계한<br/><strong class="text-yellow-300">대화 중심</strong> 학습 플랫폼' : 'Designed by overseas educators<br/><strong class="text-yellow-300">Conversation-first</strong> learning platform'}
                         </p>
                     </div>
 
@@ -1808,8 +1807,7 @@ ${isKorean ? '💡 지금 시작하면 <span class="text-purple-600">2주 무료
                         <div class="text-6xl mb-6 text-center">💬</div>
                         <h3 class="text-2xl font-bold text-white mb-4 text-center">Built for Fluency</h3>
                         <p class="text-white/90 text-lg leading-relaxed text-center">
-                            많이 말할수록 자신감이 생깁니다<br/>
-                            <strong class="text-yellow-300">실전 대화</strong>로 영어 완성
+                            ${isKorean ? '많이 말할수록 자신감이 생깁니다<br/><strong class="text-yellow-300">실전 대화</strong>로 영어 완성' : 'More you speak, more confident you become<br/>Master English through <strong class="text-yellow-300">real conversations</strong>'}
                         </p>
                     </div>
                 </div>
@@ -1819,22 +1817,22 @@ ${isKorean ? '💡 지금 시작하면 <span class="text-purple-600">2주 무료
                     <div class="bg-white/10 rounded-xl p-6 text-center backdrop-blur-sm">
                         <div class="text-3xl mb-2">🎬</div>
                         <div class="font-bold text-white text-lg mb-1">30+ Scenarios</div>
-                        <div class="text-white/80 text-sm">실생활 모든 상황 연습</div>
+                        <div class="text-white/80 text-sm">${isKorean ? '실생활 모든 상황 연습' : 'Practice all real-life situations'}</div>
                     </div>
                     <div class="bg-white/10 rounded-xl p-6 text-center backdrop-blur-sm">
                         <div class="text-3xl mb-2">⚡</div>
                         <div class="font-bold text-white text-lg mb-1">Instant Feedback</div>
-                        <div class="text-white/80 text-sm">즉각적인 AI 피드백</div>
+                        <div class="text-white/80 text-sm">${isKorean ? '즉각적인 AI 피드백' : 'Immediate AI feedback'}</div>
                     </div>
                     <div class="bg-white/10 rounded-xl p-6 text-center backdrop-blur-sm">
                         <div class="text-3xl mb-2">📈</div>
                         <div class="font-bold text-white text-lg mb-1">Track Progress</div>
-                        <div class="text-white/80 text-sm">성장 과정 추적</div>
+                        <div class="text-white/80 text-sm">${isKorean ? '성장 과정 추적' : 'Monitor your growth'}</div>
                     </div>
                     <div class="bg-white/10 rounded-xl p-6 text-center backdrop-blur-sm">
                         <div class="text-3xl mb-2">🎯</div>
                         <div class="font-bold text-white text-lg mb-1">No Fear</div>
-                        <div class="text-white/80 text-sm">두려움 없이 연습</div>
+                        <div class="text-white/80 text-sm">${isKorean ? '두려움 없이 연습' : 'Practice without fear'}</div>
                     </div>
                 </div>
 
@@ -1845,7 +1843,7 @@ ${isKorean ? '💡 지금 시작하면 <span class="text-purple-600">2주 무료
                             "Fluency comes from conversation, not textbooks"
                         </p>
                         <p class="text-lg text-white/90">
-                            유창함은 교과서가 아닌 대화에서 나옵니다
+                            ${isKorean ? '유창함은 교과서가 아닌 대화에서 나옵니다' : 'Fluency comes from conversation, not textbooks'}
                         </p>
                     </div>
                 </div>
@@ -2301,7 +2299,7 @@ ${isKorean ? '💡 지금 시작하면 <span class="text-purple-600">2주 무료
                         2주 무료 체험으로 직접 경험해보세요. 신용카드 등록 없이 바로 시작!
                     </p>
                     <a href="/app" class="inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-xl transition transform hover:scale-105">
-                        <i class="fas fa-play-circle mr-2"></i>지금 바로 시작하기
+                        <i class="fas fa-play-circle mr-2"></i>${isKorean ? '지금 바로 시작하기' : 'Get Started Now'}
                     </a>
                 </div>
             </div>
@@ -3927,6 +3925,7 @@ app.get('/test', (c) => {
         console.log("Window loaded");
     </script>
     
+    <script src="/static/timezone.js?v=${BUILD_TIME}"></script>
     <script src="/static/app.min.js?v=${BUILD_TIME}" defer></script>
     
     <script>
