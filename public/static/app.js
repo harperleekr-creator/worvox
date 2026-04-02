@@ -35,6 +35,9 @@ class WorVox {
       aiConversations: 0,
       pronunciationPractice: 0,
       wordSearch: 0,
+      timerMode: 0,
+      scenarioMode: 0,
+      examMode: 0,
       lastReset: new Date().toDateString()
     };
     this.usageLimits = {
@@ -42,9 +45,9 @@ class WorVox {
         aiConversations: 5,
         pronunciationPractice: 10,
         wordSearch: 10,
-        timerMode: 0,  // Free users: no access
-        scenarioMode: 0,  // Free users: no access
-        examMode: 0  // Free users: no access
+        timerMode: 1,  // Free users: 1 per day
+        scenarioMode: 1,  // Free users: 1 per day
+        examMode: 1  // Free users: 1 per day
       },
       core: {
         aiConversations: Infinity,  // Core: unlimited
@@ -1450,12 +1453,10 @@ class WorVox {
     }
   }
 
-  // Timer Mode - Premium Feature
+  // Timer Mode
   showTimerMode() {
-    // Check if core or premium user
-    if (!this.isCoreOrPremiumUser()) {
-      toast.info('⏱️ 타이머 모드는 Core/Premium 전용 기능입니다!\n\n지금 업그레이드하고 압박 훈련을 시작하세요.');
-      this.showPlan();
+    // Check daily usage limit
+    if (!this.checkUsageLimit('timerMode')) {
       return;
     }
 
@@ -1611,6 +1612,9 @@ class WorVox {
 
   // Start Timer Challenge
   async startTimerChallenge(seconds) {
+    // Increment usage count
+    this.incrementUsage('timerMode');
+    
     let randomSentence, translation;
 
     // Check if AI prompts are enabled
@@ -2857,14 +2861,7 @@ class WorVox {
   // ========================================
   
   showScenarioMode() {
-    // Check if core or premium user
-    if (!this.isCoreOrPremiumUser()) {
-      toast.info('🎬 시나리오 모드는 Core/Premium 전용 기능입니다!\n\n실제 상황 기반 30가지 대화를 연습하고 실력을 향상하세요.');
-      this.showPlan();
-      return;
-    }
-    
-    // Check usage limit
+    // Check daily usage limit
     if (!this.checkUsageLimit('scenarioMode')) {
       return;
     }
@@ -4396,10 +4393,8 @@ class WorVox {
   // ==================== EXAM MODE ====================
   
   showExamMode() {
-    // Check if core or premium user
-    if (!this.isCoreOrPremiumUser()) {
-      toast.info('📝 시험 모드는 Core/Premium 전용 기능입니다!\n\n지금 업그레이드하고 실전 스피킹 테스트를 경험하세요.');
-      this.showPlan();
+    // Check daily usage limit
+    if (!this.checkUsageLimit('examMode')) {
       return;
     }
 
@@ -4546,6 +4541,9 @@ class WorVox {
   }
 
   async startExamTest(seconds) {
+    // Increment usage count
+    this.incrementUsage('examMode');
+    
     let examQuestions = [];
     
     // AI 생성 시험 문제 사용 여부 확인
@@ -10735,6 +10733,9 @@ Proceed to payment?
       aiConversations: 0,
       pronunciationPractice: 0,
       wordSearch: 0,
+      timerMode: 0,
+      scenarioMode: 0,
+      examMode: 0,
       lastReset: new Date().toDateString()
     };
     this.saveUsageData();
