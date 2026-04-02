@@ -8853,7 +8853,11 @@ Proceed to payment?
       document.getElementById('statusText').textContent = 'Tap the microphone to speak again';
 
     } catch (error) {
-      console.error('Error processing audio:', error);
+      console.error('❌❌❌ CRITICAL ERROR processing audio:', error);
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+      toast.error('음성 처리 중 오류가 발생했습니다: ' + error.message);
       
       let errorMessage = 'Failed to process your message.';
       if (error.response) {
