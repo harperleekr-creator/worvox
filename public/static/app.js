@@ -8823,19 +8823,26 @@ Proceed to payment?
       });
 
       console.log('TTS Response received:', ttsResponse.data.byteLength, 'bytes');
+      console.log('TTS Response type:', typeof ttsResponse.data);
+      console.log('TTS Response constructor:', ttsResponse.data.constructor.name);
       
       // Create audio blob and URL
       const ttsAudioBlob = new Blob([ttsResponse.data], { type: 'audio/mpeg' });
+      console.log('Blob created:', ttsAudioBlob.size, 'bytes, type:', ttsAudioBlob.type);
+      
       const audioUrl = URL.createObjectURL(ttsAudioBlob);
+      console.log('Audio URL created:', audioUrl);
       
       // Store audio URL for replay button
       const lastMessageIndex = this.messages.length - 1;
       this.messages[lastMessageIndex].audioUrl = audioUrl;
+      console.log('Audio URL stored in message index:', lastMessageIndex);
       
       // Add replay button to the last AI message
       this.addReplayButton(lastMessageIndex);
       
       // Play audio
+      console.log('Playing audio...');
       this.playAudio(audioUrl);
 
       // Reset UI
@@ -8972,7 +8979,19 @@ Proceed to payment?
     }
     
     this.currentAudio = new Audio(url);
-    this.currentAudio.play();
+    
+    // Add error handler
+    this.currentAudio.onerror = (error) => {
+      console.error('❌ Audio playback error:', error);
+      console.error('Audio URL:', url);
+      console.error('Audio src:', this.currentAudio?.src);
+      toast.error('오디오 재생 실패. 다시 시도해주세요.');
+    };
+    
+    this.currentAudio.play().catch(error => {
+      console.error('❌ Audio play() error:', error);
+      toast.error('오디오 재생 실패: ' + error.message);
+    });
   }
 
   async endSession() {
