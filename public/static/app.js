@@ -10849,7 +10849,11 @@ Proceed to payment?
   showUpgradeBanner(feature, current, limit) {
     const featureNames = {
       aiConversations: 'AI 영어 대화',
-      pronunciationPractice: '발음 연습'
+      pronunciationPractice: '발음 연습',
+      wordSearch: '단어 학습',
+      timerMode: '타이머 모드',
+      scenarioMode: '시나리오 모드',
+      examMode: '시험 모드'
     };
     
     const banner = document.createElement('div');
@@ -10895,7 +10899,11 @@ Proceed to payment?
   showUsageWarning(feature, current, limit) {
     const featureNames = {
       aiConversations: 'AI 영어 대화',
-      pronunciationPractice: '발음 연습'
+      pronunciationPractice: '발음 연습',
+      wordSearch: '단어 학습',
+      timerMode: '타이머 모드',
+      scenarioMode: '시나리오 모드',
+      examMode: '시험 모드'
     };
     
     const remaining = limit - current;
