@@ -163,8 +163,8 @@ async function cacheFirstStrategy(request) {
     
     const cachedResponse = await caches.match(request);
     if (cachedResponse) {
-      // 백그라운드에서 새로운 버전 확인 (Stale-While-Revalidate)
-      if (!url.pathname.includes('.min.')) {
+      // 백그라운드에서 새로운 버전 확인 (Stale-While-Revalidate) - GET 요청만
+      if (!url.pathname.includes('.min.') && request.method === 'GET') {
         fetch(request).then(networkResponse => {
           if (networkResponse && networkResponse.status === 200) {
             caches.open(cacheName).then(cache => {
@@ -177,7 +177,7 @@ async function cacheFirstStrategy(request) {
     }
 
     const networkResponse = await fetch(request);
-    if (networkResponse && networkResponse.status === 200) {
+    if (networkResponse && networkResponse.status === 200 && (request.method === 'GET' || request.method === 'HEAD')) {
       const cache = await caches.open(cacheName);
       
       // 이미지는 1주일 캐시
@@ -254,8 +254,8 @@ async function networkFirstStrategy(request) {
       signal: AbortSignal.timeout(5000)
     });
     
-    // 성공적인 응답이면 캐시에 저장
-    if (networkResponse && networkResponse.status === 200) {
+    // 성공적인 응답이면 캐시에 저장 (GET/HEAD 요청만)
+    if (networkResponse && networkResponse.status === 200 && (request.method === 'GET' || request.method === 'HEAD')) {
       const cache = await caches.open(API_CACHE);
       
       // 캐시 만료 시간과 타입 설정
