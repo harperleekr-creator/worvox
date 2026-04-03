@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1775141547478'; // Update manually or via build script
+const BUILD_TIME = '1775177993186'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -56,7 +56,7 @@ app.use('*', async (c, next) => {
     "connect-src 'self' https: wss:; " +  // Allow all HTTPS and WebSocket connections
     "frame-src 'self' https:; " +  // Allow all HTTPS frames
     "font-src 'self' data: https:; " +  // Allow fonts from anywhere
-    "media-src 'self' https:; " +  // Allow media
+    "media-src 'self' blob: data: https:; " +  // Allow media including blob URLs for TTS audio
     "object-src 'none'; " +  // Disable plugins
     "base-uri 'self'; " +  // Restrict base tag
     "form-action 'self' https:; " +  // Allow form submissions
