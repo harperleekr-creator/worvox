@@ -7981,7 +7981,7 @@ Proceed to payment?
                 </div>
                 
                 <!-- 5. 단어 학습 -->
-                <div class="bg-gray-800 dark:bg-gray-800/90 rounded-2xl p-5 md:p-6 mb-5 text-white shadow-lg border-2 border-green-600 dark:border-green-500">
+                <div class="bg-gray-800 dark:bg-gray-800/90 rounded-2xl p-5 md:p-6 mb-4 text-white shadow-lg border-2 border-green-600 dark:border-green-500">
                   <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-3">
                       <div class="text-2xl">📖</div>
@@ -7996,6 +7996,26 @@ Proceed to payment?
                   </div>
                   <button onclick="worvox.startVocabulary()" class="w-full bg-gray-700 dark:bg-gray-700 text-white font-bold py-3 rounded-lg hover:bg-gray-600 transition-all text-sm md:text-base shadow-lg">
                     <i class="fas fa-book mr-2"></i>지금 시작하기
+                  </button>
+                </div>
+                
+                <!-- 6. 실시간 튜터 수업 -->
+                <div class="bg-gray-800 dark:bg-gray-800/90 rounded-2xl p-5 md:p-6 mb-5 text-white shadow-lg border-2 border-pink-600 dark:border-pink-500">
+                  <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-3">
+                      <div class="text-2xl">👨‍🏫</div>
+                      <div>
+                        <div class="flex items-center gap-2">
+                          <h3 class="font-bold text-base md:text-lg">실시간 튜터 수업</h3>
+                          <span class="bg-pink-600 text-white text-xs px-2 py-0.5 rounded-full font-bold">프리미엄</span>
+                        </div>
+                        <p class="text-xs md:text-sm text-gray-300">원어민 튜터와 1:1 화상 수업</p>
+                      </div>
+                    </div>
+                    <div class="text-xs text-gray-400">~25분</div>
+                  </div>
+                  <button onclick="worvox.showRealConversation()" class="w-full bg-gray-700 dark:bg-gray-700 text-white font-bold py-3 rounded-lg hover:bg-gray-600 transition-all text-sm md:text-base shadow-lg">
+                    <i class="fas fa-video mr-2"></i>지금 시작하기
                   </button>
                 </div>
                 
@@ -8033,118 +8053,6 @@ Proceed to payment?
                       <div class="text-xs text-gray-500 dark:text-gray-400">오늘</div>
                     </div>
                   </div>
-                </div>
-                
-                <!-- Divider -->
-                <div class="border-t border-gray-200 dark:border-gray-700 my-5"></div>
-                
-                <!-- Practice Modes Section -->
-                <div class="mb-5">
-                  <h2 class="text-base md:text-lg font-bold text-gray-900 dark:text-white mb-3">
-                    📚 학습 모드 선택
-                  </h2>
-                  <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400 mb-3">
-                    레벨과 목표에 맞는 학습 방법을 선택하세요
-                  </p>
-                  <div class="space-y-3">
-                    <!-- AI Conversation -->
-                    <button onclick="worvox.showAIConversation()" class="w-full bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/30 dark:hover:to-indigo-900/30 text-gray-900 dark:text-white font-medium py-4 px-4 rounded-xl transition-all text-left border-2 border-blue-200 dark:border-blue-800">
-                      <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                          <div class="flex items-center gap-2 mb-1">
-                            <span class="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">1단계</span>
-                            <span class="text-sm md:text-base font-bold">🎤 AI 자유 대화</span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400">초급~고급</span>
-                          </div>
-                          <p class="text-xs text-gray-600 dark:text-gray-400">AI와 원하는 주제로 자유롭게 대화하세요</p>
-                        </div>
-                        <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">~5분</span>
-                      </div>
-                    </button>
-                    
-                    <!-- Scenario -->
-                    <button onclick="worvox.showScenarioMode()" class="w-full bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 hover:from-purple-100 hover:to-pink-100 dark:hover:from-purple-900/30 dark:hover:to-pink-900/30 text-gray-900 dark:text-white font-medium py-4 px-4 rounded-xl transition-all text-left border-2 border-purple-200 dark:border-purple-800">
-                      <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                          <div class="flex items-center gap-2 mb-1">
-                            <span class="bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">2단계</span>
-                            <span class="text-sm md:text-base font-bold">🎭 시나리오 연습</span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400">초급~중급</span>
-                          </div>
-                          <p class="text-xs text-gray-600 dark:text-gray-400">실생활 상황(레스토랑, 공항 등)을 연습하세요</p>
-                        </div>
-                        <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">~10분</span>
-                      </div>
-                    </button>
-                    
-                    <!-- Timer -->
-                    <button onclick="worvox.showTimerMode()" class="w-full bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 hover:from-orange-100 hover:to-red-100 dark:hover:from-orange-900/30 dark:hover:to-red-900/30 text-gray-900 dark:text-white font-medium py-4 px-4 rounded-xl transition-all text-left border-2 border-orange-200 dark:border-orange-800">
-                      <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                          <div class="flex items-center gap-2 mb-1">
-                            <span class="bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">3단계</span>
-                            <span class="text-sm md:text-base font-bold">⏱️ 타이머 모드</span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400">중급~고급</span>
-                          </div>
-                          <p class="text-xs text-gray-600 dark:text-gray-400">정해진 시간 동안 집중해서 말하기 연습</p>
-                        </div>
-                        <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">설정가능</span>
-                      </div>
-                    </button>
-                    
-                    <!-- Vocabulary -->
-                    <button onclick="worvox.startVocabulary()" class="w-full bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 hover:from-green-100 hover:to-teal-100 dark:hover:from-green-900/30 dark:hover:to-teal-900/30 text-gray-900 dark:text-white font-medium py-4 px-4 rounded-xl transition-all text-left border-2 border-green-200 dark:border-green-800">
-                      <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                          <div class="flex items-center gap-2 mb-1">
-                            <span class="bg-green-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">보충</span>
-                            <span class="text-sm md:text-base font-bold">📖 단어 학습</span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400">모든 레벨</span>
-                          </div>
-                          <p class="text-xs text-gray-600 dark:text-gray-400">대화 중 나온 단어를 복습하세요</p>
-                        </div>
-                        <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">~3분</span>
-                      </div>
-                    </button>
-                    
-                    <!-- Exam -->
-                    <button onclick="worvox.showExamMode()" class="w-full bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 hover:from-amber-100 hover:to-yellow-100 dark:hover:from-amber-900/30 dark:hover:to-yellow-900/30 text-gray-900 dark:text-white font-medium py-4 px-4 rounded-xl transition-all text-left border-2 border-amber-200 dark:border-amber-800">
-                      <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                          <div class="flex items-center gap-2 mb-1">
-                            <span class="bg-amber-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">고급</span>
-                            <span class="text-sm md:text-base font-bold">📝 시험 모드</span>
-                            <span class="text-xs text-gray-500 dark:text-gray-400">중급~고급</span>
-                          </div>
-                          <p class="text-xs text-gray-600 dark:text-gray-400">실전 면접/토익 스피킹 대비 연습</p>
-                        </div>
-                        <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">~15분</span>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-                
-                <!-- Divider -->
-                <div class="border-t border-gray-200 dark:border-gray-700 my-5"></div>
-                
-                <!-- Speak with a Tutor Section -->
-                <div class="mb-5">
-                  <h2 class="text-base md:text-lg font-bold text-gray-900 dark:text-white mb-3">
-                    👨‍🏫 원어민 튜터와 실전 대화
-                  </h2>
-                  <button onclick="worvox.showRealConversation()" class="w-full bg-gradient-to-r from-rose-50 to-pink-50 dark:from-rose-900/20 dark:to-pink-900/20 hover:from-rose-100 hover:to-pink-100 dark:hover:from-rose-900/30 dark:hover:to-pink-900/30 text-gray-900 dark:text-white font-medium py-4 px-4 rounded-xl transition-all text-left border-2 border-rose-200 dark:border-rose-800">
-                    <div class="flex items-start justify-between">
-                      <div class="flex-1">
-                        <div class="flex items-center gap-2 mb-1">
-                          <span class="bg-rose-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">프리미엄</span>
-                          <span class="text-sm md:text-base font-bold">🎁 실시간 튜터 수업</span>
-                          <span class="text-xs text-gray-500 dark:text-gray-400">모든 레벨</span>
-                        </div>
-                        <p class="text-xs text-gray-600 dark:text-gray-400">원어민 튜터와 1:1 화상 수업 (첫 수업 무료!)</p>
-                      </div>
-                      <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">25분</span>
-                    </div>
-                  </button>
                 </div>
                 
                 <!-- Daily Usage Tracker - Compact Grid -->
