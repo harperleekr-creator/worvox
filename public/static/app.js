@@ -7901,87 +7901,87 @@ Proceed to payment?
                 <!-- Quick Start Cards -->
                 
                 <!-- 1. AI 자유 대화 (추천) -->
-                <div class="bg-gradient-to-br from-emerald-600 to-teal-600 rounded-2xl p-5 md:p-6 mb-4 text-white shadow-lg border-2 border-emerald-400">
+                <div class="bg-gray-800 dark:bg-gray-800/90 rounded-2xl p-5 md:p-6 mb-4 text-white shadow-lg border-2 border-gray-700 dark:border-gray-600">
                   <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-3">
                       <div class="text-2xl">🎯</div>
                       <div>
                         <div class="flex items-center gap-2">
                           <h3 class="font-bold text-base md:text-lg">Start Here!</h3>
-                          <span class="bg-yellow-400 text-yellow-900 text-xs px-2 py-0.5 rounded-full font-bold">추천</span>
+                          <span class="bg-emerald-600 text-white text-xs px-2 py-0.5 rounded-full font-bold">추천</span>
                         </div>
-                        <p class="text-xs md:text-sm text-emerald-100">AI와 자유 대화 (초급~고급)</p>
+                        <p class="text-xs md:text-sm text-gray-300">AI와 자유 대화 (초급~고급)</p>
                       </div>
                     </div>
-                    <div class="text-xs text-emerald-100">~5분</div>
+                    <div class="text-xs text-gray-400">~5분</div>
                   </div>
-                  <button onclick="worvox.showAIConversation()" class="w-full bg-white text-emerald-700 font-bold py-3 rounded-lg hover:bg-emerald-50 transition-all text-sm md:text-base shadow-lg">
+                  <button onclick="worvox.showAIConversation()" class="w-full bg-gray-700 dark:bg-gray-700 text-white font-bold py-3 rounded-lg hover:bg-gray-600 transition-all text-sm md:text-base shadow-lg">
                     <i class="fas fa-play mr-2"></i>지금 시작하기
                   </button>
                 </div>
                 
                 <!-- 2. 타이머 모드 -->
-                <div class="bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl p-5 md:p-6 mb-4 text-white shadow-lg border-2 border-orange-300">
+                <div class="bg-gray-800 dark:bg-gray-800/90 rounded-2xl p-5 md:p-6 mb-4 text-white shadow-lg border-2 border-gray-700 dark:border-gray-600">
                   <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-3">
                       <div class="text-2xl">⏱️</div>
                       <div>
                         <div class="flex items-center gap-2">
                           <h3 class="font-bold text-base md:text-lg">타이머 모드</h3>
-                          ${this.userPlan === 'free' ? '<span class="bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">1회/일</span>' : ''}
+                          ${this.userPlan === 'free' ? '<span class="bg-orange-600 text-white text-xs px-2 py-0.5 rounded-full font-bold">1회/일</span>' : ''}
                         </div>
-                        <p class="text-xs md:text-sm text-orange-100">제한 시간 안에 빠르게 말하기</p>
+                        <p class="text-xs md:text-sm text-gray-300">제한 시간 안에 빠르게 말하기</p>
                       </div>
                     </div>
-                    <div class="text-xs text-orange-100">~3분</div>
+                    <div class="text-xs text-gray-400">~3분</div>
                   </div>
-                  <button onclick="worvox.showTimerMode()" class="w-full bg-white text-orange-600 font-bold py-3 rounded-lg hover:bg-orange-50 transition-all text-sm md:text-base shadow-lg">
+                  <button onclick="worvox.showTimerMode()" class="w-full bg-gray-700 dark:bg-gray-700 text-white font-bold py-3 rounded-lg hover:bg-gray-600 transition-all text-sm md:text-base shadow-lg">
                     <i class="fas fa-stopwatch mr-2"></i>지금 시작하기
                   </button>
                 </div>
                 
                 <!-- 3. 시나리오 모드 -->
-                <div class="bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl p-5 md:p-6 mb-4 text-white shadow-lg border-2 border-purple-300">
+                <div class="bg-gray-800 dark:bg-gray-800/90 rounded-2xl p-5 md:p-6 mb-4 text-white shadow-lg border-2 border-gray-700 dark:border-gray-600">
                   <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-3">
                       <div class="text-2xl">🎭</div>
                       <div>
                         <div class="flex items-center gap-2">
                           <h3 class="font-bold text-base md:text-lg">시나리오 모드</h3>
-                          ${this.userPlan === 'free' ? '<span class="bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">1회/일</span>' : ''}
+                          ${this.userPlan === 'free' ? '<span class="bg-purple-600 text-white text-xs px-2 py-0.5 rounded-full font-bold">1회/일</span>' : ''}
                         </div>
-                        <p class="text-xs md:text-sm text-purple-100">실전 상황 롤플레잉 연습</p>
+                        <p class="text-xs md:text-sm text-gray-300">실전 상황 롤플레잉 연습</p>
                       </div>
                     </div>
-                    <div class="text-xs text-purple-100">~10분</div>
+                    <div class="text-xs text-gray-400">~10분</div>
                   </div>
-                  <button onclick="worvox.showScenarioMode()" class="w-full bg-white text-purple-600 font-bold py-3 rounded-lg hover:bg-purple-50 transition-all text-sm md:text-base shadow-lg">
+                  <button onclick="worvox.showScenarioMode()" class="w-full bg-gray-700 dark:bg-gray-700 text-white font-bold py-3 rounded-lg hover:bg-gray-600 transition-all text-sm md:text-base shadow-lg">
                     <i class="fas fa-theater-masks mr-2"></i>지금 시작하기
                   </button>
                 </div>
                 
                 <!-- 4. 시험 모드 -->
-                <div class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-5 md:p-6 mb-4 text-white shadow-lg border-2 border-blue-300">
+                <div class="bg-gray-800 dark:bg-gray-800/90 rounded-2xl p-5 md:p-6 mb-4 text-white shadow-lg border-2 border-gray-700 dark:border-gray-600">
                   <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-3">
                       <div class="text-2xl">📝</div>
                       <div>
                         <div class="flex items-center gap-2">
                           <h3 class="font-bold text-base md:text-lg">시험 모드</h3>
-                          ${this.userPlan === 'free' ? '<span class="bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">1회/일</span>' : ''}
+                          ${this.userPlan === 'free' ? '<span class="bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full font-bold">1회/일</span>' : ''}
                         </div>
-                        <p class="text-xs md:text-sm text-blue-100">영어 실력 테스트 및 평가</p>
+                        <p class="text-xs md:text-sm text-gray-300">영어 실력 테스트 및 평가</p>
                       </div>
                     </div>
-                    <div class="text-xs text-blue-100">~15분</div>
+                    <div class="text-xs text-gray-400">~15분</div>
                   </div>
-                  <button onclick="worvox.showExamMode()" class="w-full bg-white text-blue-600 font-bold py-3 rounded-lg hover:bg-blue-50 transition-all text-sm md:text-base shadow-lg">
+                  <button onclick="worvox.showExamMode()" class="w-full bg-gray-700 dark:bg-gray-700 text-white font-bold py-3 rounded-lg hover:bg-gray-600 transition-all text-sm md:text-base shadow-lg">
                     <i class="fas fa-file-alt mr-2"></i>지금 시작하기
                   </button>
                 </div>
                 
                 <!-- 5. 단어 학습 -->
-                <div class="bg-gradient-to-br from-green-500 to-teal-500 rounded-2xl p-5 md:p-6 mb-5 text-white shadow-lg border-2 border-green-300">
+                <div class="bg-gray-800 dark:bg-gray-800/90 rounded-2xl p-5 md:p-6 mb-5 text-white shadow-lg border-2 border-gray-700 dark:border-gray-600">
                   <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-3">
                       <div class="text-2xl">📖</div>
@@ -7989,12 +7989,12 @@ Proceed to payment?
                         <div class="flex items-center gap-2">
                           <h3 class="font-bold text-base md:text-lg">단어 학습</h3>
                         </div>
-                        <p class="text-xs md:text-sm text-green-100">필수 영단어 암기 및 복습</p>
+                        <p class="text-xs md:text-sm text-gray-300">필수 영단어 암기 및 복습</p>
                       </div>
                     </div>
-                    <div class="text-xs text-green-100">~5분</div>
+                    <div class="text-xs text-gray-400">~5분</div>
                   </div>
-                  <button onclick="worvox.startVocabulary()" class="w-full bg-white text-green-600 font-bold py-3 rounded-lg hover:bg-green-50 transition-all text-sm md:text-base shadow-lg">
+                  <button onclick="worvox.startVocabulary()" class="w-full bg-gray-700 dark:bg-gray-700 text-white font-bold py-3 rounded-lg hover:bg-gray-600 transition-all text-sm md:text-base shadow-lg">
                     <i class="fas fa-book mr-2"></i>지금 시작하기
                   </button>
                 </div>
