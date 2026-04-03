@@ -7901,7 +7901,7 @@ Proceed to payment?
                 <!-- Quick Start Cards -->
                 
                 <!-- 1. AI 자유 대화 (추천) -->
-                <div class="bg-gray-800 dark:bg-gray-800/90 rounded-2xl p-5 md:p-6 mb-4 text-white shadow-lg border-2 border-gray-700 dark:border-gray-600">
+                <div class="bg-gray-800 dark:bg-gray-800/90 rounded-2xl p-5 md:p-6 mb-4 text-white shadow-lg border-2 border-blue-600 dark:border-blue-500">
                   <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-3">
                       <div class="text-2xl">🎯</div>
@@ -7921,7 +7921,7 @@ Proceed to payment?
                 </div>
                 
                 <!-- 2. 타이머 모드 -->
-                <div class="bg-gray-800 dark:bg-gray-800/90 rounded-2xl p-5 md:p-6 mb-4 text-white shadow-lg border-2 border-gray-700 dark:border-gray-600">
+                <div class="bg-gray-800 dark:bg-gray-800/90 rounded-2xl p-5 md:p-6 mb-4 text-white shadow-lg border-2 border-orange-600 dark:border-orange-500">
                   <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-3">
                       <div class="text-2xl">⏱️</div>
@@ -7941,7 +7941,7 @@ Proceed to payment?
                 </div>
                 
                 <!-- 3. 시나리오 모드 -->
-                <div class="bg-gray-800 dark:bg-gray-800/90 rounded-2xl p-5 md:p-6 mb-4 text-white shadow-lg border-2 border-gray-700 dark:border-gray-600">
+                <div class="bg-gray-800 dark:bg-gray-800/90 rounded-2xl p-5 md:p-6 mb-4 text-white shadow-lg border-2 border-purple-600 dark:border-purple-500">
                   <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-3">
                       <div class="text-2xl">🎭</div>
@@ -7961,7 +7961,7 @@ Proceed to payment?
                 </div>
                 
                 <!-- 4. 시험 모드 -->
-                <div class="bg-gray-800 dark:bg-gray-800/90 rounded-2xl p-5 md:p-6 mb-4 text-white shadow-lg border-2 border-gray-700 dark:border-gray-600">
+                <div class="bg-gray-800 dark:bg-gray-800/90 rounded-2xl p-5 md:p-6 mb-4 text-white shadow-lg border-2 border-orange-600 dark:border-orange-500">
                   <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-3">
                       <div class="text-2xl">📝</div>
@@ -7981,7 +7981,7 @@ Proceed to payment?
                 </div>
                 
                 <!-- 5. 단어 학습 -->
-                <div class="bg-gray-800 dark:bg-gray-800/90 rounded-2xl p-5 md:p-6 mb-5 text-white shadow-lg border-2 border-gray-700 dark:border-gray-600">
+                <div class="bg-gray-800 dark:bg-gray-800/90 rounded-2xl p-5 md:p-6 mb-5 text-white shadow-lg border-2 border-green-600 dark:border-green-500">
                   <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-3">
                       <div class="text-2xl">📖</div>
