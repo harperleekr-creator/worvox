@@ -1446,10 +1446,19 @@ class WorVox {
   }
 
   async startVocabulary() {
-    const topics = await axios.get('/api/topics');
-    const vocabTopic = topics.data.topics.find(t => t.name === 'Vocabulary');
-    if (vocabTopic) {
-      this.startSession(vocabTopic.id, vocabTopic.name, '', vocabTopic.level);
+    try {
+      const response = await axios.get('/api/topics');
+      const topics = response.data.data.topics; // Correct API response structure
+      const vocabTopic = topics.find(t => t.name === 'Vocabulary');
+      if (vocabTopic) {
+        this.startSession(vocabTopic.id, vocabTopic.name, '', vocabTopic.level);
+      } else {
+        console.error('❌ Vocabulary topic not found');
+        toast.error('단어 학습 기능을 찾을 수 없습니다.');
+      }
+    } catch (error) {
+      console.error('❌ Failed to start vocabulary:', error);
+      toast.error('단어 학습을 시작할 수 없습니다. 다시 시도해주세요.');
     }
   }
 
@@ -7757,7 +7766,7 @@ Proceed to payment?
       
       // Fetch topics
       const topicsResponse = await axios.get('/api/topics');
-      this.topics = topicsResponse.data.topics; // Store for later use
+      this.topics = topicsResponse.data.data.topics; // Store for later use (correct API structure)
 
       // ✅ CRITICAL: Fetch latest gamification stats FIRST for real-time updates
       let gamificationStats = { streak: 0, xp: 0, totalXp: 0, level: 1, coins: 0 };
