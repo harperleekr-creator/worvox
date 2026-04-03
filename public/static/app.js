@@ -7873,12 +7873,29 @@ Proceed to payment?
             <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900">
               <div class="p-4 md:px-6 md:py-6">
                 <div class="max-w-4xl mx-auto">
-                <!-- Welcome Message - ChatGPT Style -->
-                <div class="mb-6">
-                  <h1 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-1">
-                    Welcome back <span class="text-amber-500">👋</span>
-                  </h1>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">${this.currentUser.email === 'harperleekr@gmail.com' ? 'Harper' : (this.currentUser.username || this.currentUser.email?.split('@')[0] || 'User')}</p>
+                <!-- Welcome Message & Quick Guide -->
+                <div class="mb-6 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                  <!-- Welcome Message -->
+                  <div class="flex-shrink-0">
+                    <h1 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                      Welcome back <span class="text-amber-500">👋</span>
+                    </h1>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">${this.currentUser.email === 'harperleekr@gmail.com' ? 'Harper' : (this.currentUser.username || this.currentUser.email?.split('@')[0] || 'User')}</p>
+                  </div>
+                  
+                  <!-- Quick Guide (우측 이동) -->
+                  <div class="bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-4 flex-1 md:max-w-md">
+                    <div class="flex items-start gap-3">
+                      <div class="text-2xl">💡</div>
+                      <div>
+                        <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-1">학습 가이드</h3>
+                        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
+                          처음이신가요? <strong class="text-blue-600 dark:text-blue-400">1단계: AI 자유 대화</strong>부터 시작하세요!<br>
+                          편한 주제로 부담없이 말하다 보면 실력이 늘어요 🚀
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 
                 <!-- Quick Start Cards -->
@@ -7980,23 +7997,6 @@ Proceed to payment?
                   <button onclick="worvox.startVocabulary()" class="w-full bg-white text-green-600 font-bold py-3 rounded-lg hover:bg-green-50 transition-all text-sm md:text-base shadow-lg">
                     <i class="fas fa-book mr-2"></i>지금 시작하기
                   </button>
-                </div>
-                
-                <!-- Divider -->
-                <div class="border-t border-gray-200 dark:border-gray-700 my-5"></div>
-                
-                <!-- Quick Guide -->
-                <div class="bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-4 mb-5">
-                  <div class="flex items-start gap-3">
-                    <div class="text-2xl">💡</div>
-                    <div>
-                      <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-1">학습 가이드</h3>
-                      <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
-                        처음이신가요? <strong class="text-blue-600 dark:text-blue-400">1단계: AI 자유 대화</strong>부터 시작하세요!<br>
-                        편한 주제로 부담없이 말하다 보면 실력이 늘어요 🚀
-                      </p>
-                    </div>
-                  </div>
                 </div>
                 
                 <!-- Divider -->
