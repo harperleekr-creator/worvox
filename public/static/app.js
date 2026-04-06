@@ -8009,7 +8009,7 @@ Proceed to payment?
                           <h3 class="font-bold text-base md:text-lg">실시간 튜터 수업</h3>
                           <span class="bg-pink-600 text-white text-xs px-2 py-0.5 rounded-full font-bold">프리미엄</span>
                         </div>
-                        <p class="text-xs md:text-sm text-gray-300">원어민 튜터와 1:1 화상 수업</p>
+                        <p class="text-xs md:text-sm text-gray-300">1:1 전화영어 수업</p>
                       </div>
                     </div>
                     <div class="text-xs text-gray-400">~25분</div>
