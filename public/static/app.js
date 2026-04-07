@@ -2142,18 +2142,18 @@ class WorVox {
     // End timer session if exists
     if (this.timerChallenge.sessionId) {
       try {
-        // Save result as messages
+        // Save result as messages (silently ignore errors)
         await axios.post('/api/messages/create', {
           sessionId: this.timerChallenge.sessionId,
           role: 'system',
           content: `타이머 모드 ${timeLimit}초: ${originalSentence}`
-        });
+        }).catch(() => {});
         
         await axios.post('/api/messages/create', {
           sessionId: this.timerChallenge.sessionId,
           role: 'user',
           content: transcription || '(인식되지 않음)'
-        });
+        }).catch(() => {});
         
         // End session
         await axios.post(`/api/sessions/end/${this.timerChallenge.sessionId}`);
@@ -4137,19 +4137,19 @@ class WorVox {
     // End scenario session if exists
     if (sessionId) {
       try {
-        // Save all results as messages
+        // Save all results as messages (silently ignore errors)
         for (const result of results) {
           await axios.post('/api/messages/create', {
             sessionId: sessionId,
             role: 'system',
             content: `시나리오: ${scenario.title} - ${result.original}`
-          });
+          }).catch(() => {});
           
           await axios.post('/api/messages/create', {
             sessionId: sessionId,
             role: 'user',
             content: result.transcription || '(인식되지 않음)'
-          });
+          }).catch(() => {});
         }
         
         // End session
@@ -5203,22 +5203,22 @@ class WorVox {
         averageScore: Math.round((accuracy + pronunciation + fluency + grammar) / 4)
       });
 
-      // Save to session messages
+      // Save to session messages (silently ignore errors)
       if (this.currentExam.sessionId) {
         try {
           await axios.post('/api/messages/create', {
             sessionId: this.currentExam.sessionId,
             role: 'system',
             content: `Exam Q${question.id}: ${question.question}`
-          });
+          }).catch(() => {});
 
           await axios.post('/api/messages/create', {
             sessionId: this.currentExam.sessionId,
             role: 'user',
             content: transcription || '(인식되지 않음)'
-          });
+          }).catch(() => {});
         } catch (error) {
-          console.warn('⚠️ Failed to save messages:', error);
+          // Silently ignore
         }
       }
 
