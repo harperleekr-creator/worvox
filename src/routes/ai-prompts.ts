@@ -260,13 +260,18 @@ aiPrompts.post('/generate', async (c) => {
     // Get system prompt
     const systemPrompt = systemPrompts[level][mode];
 
-    // Build user prompt with topic/description if provided
+    // Build user prompt with topic/description AND request Korean translation in same call
     let userPrompt = `Generate a ${mode} prompt for ${level} level.`;
     if (mode === 'scenario' && topic) {
-      userPrompt = `Generate a realistic 5-sentence conversation scenario about: "${topic}". Description: ${description || 'A typical situation'}. Make it appropriate for ${level} level English learners. CRITICAL: Return ONLY the dialogue text (e.g., "Hello! How can I help you?") WITHOUT any role labels like "Waiter:", "Customer:", "Speaker:", etc.`;
+      userPrompt = `Generate a realistic 5-sentence conversation scenario about: "${topic}". Description: ${description || 'A typical situation'}. Make it appropriate for ${level} level English learners. CRITICAL: Return ONLY the dialogue text (e.g., "Hello! How can I help you?") WITHOUT any role labels like "Waiter:", "Customer:", "Speaker:", etc.
+
+IMPORTANT: After the English sentences, add a line "---KOREAN---" and then provide natural Korean translations of each sentence, one per line, in the same order.`;
+    } else {
+      // For timer and exam modes, also request Korean in one call
+      userPrompt += `\n\nIMPORTANT: After the English content, add a line "---KOREAN---" and then provide natural Korean translations, one per line, in the same order.`;
     }
 
-    // Call OpenAI API for English content
+    // Single API call for both English and Korean
     const client = getOpenAIClient(c.env);
     const completion = await client.chat.completions.create({
       model: 'gpt-4o-mini',
@@ -275,29 +280,15 @@ aiPrompts.post('/generate', async (c) => {
         { role: 'user', content: userPrompt }
       ],
       temperature: 0.8,
-      max_completion_tokens: 300
+      max_completion_tokens: 600
     });
 
-    const generatedContent = completion.choices[0].message.content?.trim() || '';
-
-    // Generate Korean translation
-    const translationCompletion = await client.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        { 
-          role: 'system', 
-          content: 'You are a professional English-to-Korean translator. Translate the given English text to natural Korean. Only provide the translation, no explanations.'
-        },
-        { 
-          role: 'user', 
-          content: generatedContent
-        }
-      ],
-      temperature: 0.3,
-      max_completion_tokens: 500
-    });
-
-    const koreanTranslation = translationCompletion.choices[0].message.content?.trim() || '';
+    const rawContent = completion.choices[0].message.content?.trim() || '';
+    
+    // Split English and Korean by marker
+    const [generatedContent, koreanTranslation] = rawContent.includes('---KOREAN---')
+      ? rawContent.split('---KOREAN---').map(s => s.trim())
+      : [rawContent, rawContent]; // Fallback if no marker
 
     // Parse content based on mode
     let result;
