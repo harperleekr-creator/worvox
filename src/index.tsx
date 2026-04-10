@@ -33,7 +33,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1775552139541'; // Update manually or via build script
+const BUILD_TIME = '1775790596095'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -1394,8 +1394,7 @@ app.get('/landing', (c) => {
         <nav class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
-                    <a href="/landing?lang=${isKorean ? 'ko' : 'en'}" class="flex items-center space-x-1 sm:space-x-2">
-                        <img src="/static/logo.webp" alt="WorVox Logo" class="h-6 w-6 sm:h-8 sm:w-8">
+                    <a href="/landing?lang=${isKorean ? 'ko' : 'en'}" class="flex items-center">
                         <span class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 text-transparent bg-clip-text">WorVox</span>
                     </a>
                     <div class="flex items-center gap-2 sm:gap-4">
@@ -3081,8 +3080,7 @@ app.get('/about', (c) => {
         <nav class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
-                    <a href="/" class="flex items-center space-x-2">
-                        <img src="/static/logo.webp" alt="WorVox Logo" class="h-8 w-8">
+                    <a href="/" class="flex items-center">
                         <span class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 text-transparent bg-clip-text">WorVox</span>
                     </a>
                     <div class="flex items-center gap-4">
@@ -3480,8 +3478,7 @@ app.get('/pricing', (c) => {
         <nav class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
-                    <a href="/" class="flex items-center space-x-2">
-                        <img src="/static/logo.webp" alt="WorVox Logo" class="h-8 w-8">
+                    <a href="/" class="flex items-center">
                         <span class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 text-transparent bg-clip-text">WorVox</span>
                     </a>
                     <div class="flex items-center gap-4">
