@@ -131,7 +131,7 @@ async function processAutoBilling(env: Bindings) {
     const today = new Date().toISOString().split('T')[0];
 
     const usersToCharge = await env.DB.prepare(`
-      SELECT id, username, email, plan, billing_key, billing_period, trial_end_date
+      SELECT id, username, email, plan, billing_key, toss_customer_key, billing_period, trial_end_date
       FROM users
       WHERE is_trial = 1
         AND auto_billing_enabled = 1
@@ -157,7 +157,7 @@ async function processAutoBilling(env: Bindings) {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            customerKey: user.billing_key,
+            customerKey: user.toss_customer_key || user.billing_key,
             amount,
             orderId: `auto_${user.id}_${Date.now()}`,
             orderName: `WorVox ${user.plan.toUpperCase()} ${billingPeriod === 'yearly' ? '연간' : '월간'} 구독`,
@@ -185,6 +185,8 @@ async function processAutoBilling(env: Bindings) {
           successCount++;
           console.log(`✅ User ${user.email} charged successfully (${amount}원)`);
         } else {
+          const errorData = await response.json().catch(() => ({}));
+          
           await env.DB.prepare(`
             UPDATE users
             SET 
@@ -194,7 +196,11 @@ async function processAutoBilling(env: Bindings) {
           `).bind(user.id).run();
           
           failCount++;
-          console.log(`❌ User ${user.email} billing failed`);
+          console.error(`❌ User ${user.email} billing failed:`, {
+            status: response.status,
+            statusText: response.statusText,
+            error: errorData
+          });
         }
       } catch (error) {
         console.error(`❌ Failed to charge ${user.email}:`, error);
