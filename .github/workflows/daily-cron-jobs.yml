@@ -1,0 +1,61 @@
+name: Daily Cron Jobs (Trial & Billing)
+
+on:
+  schedule:
+    # 매일 오전 3시 (KST) = 매일 18:00 (UTC)
+    # 트라이얼 알림 (3일 전) + 자동결제 + 만료 알림 모두 실행
+    - cron: '0 18 * * *'
+  
+  # 수동 실행 가능 (테스트용)
+  workflow_dispatch:
+
+jobs:
+  run-daily-tasks:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🔔 Run All Daily Tasks
+        run: |
+          echo "🚀 Starting daily cron jobs..."
+          echo "📅 Date: $(date)"
+          echo "⏰ UTC Time: $(date -u)"
+          
+          # Call main cron endpoint (runs all tasks)
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "https://worvox.com/api/cron/run" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -H "Content-Type: application/json")
+          
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          
+          echo ""
+          echo "📊 Response Details:"
+          echo "HTTP Status: $HTTP_CODE"
+          echo "Response Body:"
+          echo "$BODY" | jq '.' 2>/dev/null || echo "$BODY"
+          echo ""
+          
+          if [ "$HTTP_CODE" -eq 200 ] || [ "$HTTP_CODE" -eq 201 ]; then
+            echo "✅ All daily tasks completed successfully"
+            
+            # Parse results
+            TRIAL_REMINDERS=$(echo "$BODY" | jq -r '.results.trialReminders.processed // 0' 2>/dev/null || echo "N/A")
+            AUTO_BILLING=$(echo "$BODY" | jq -r '.results.autoBilling.processed // 0' 2>/dev/null || echo "N/A")
+            EXPIRED_REMINDERS=$(echo "$BODY" | jq -r '.results.trialExpiredReminders.processed // 0' 2>/dev/null || echo "N/A")
+            
+            echo ""
+            echo "📈 Summary:"
+            echo "  - Trial Reminders (3 days before): $TRIAL_REMINDERS users"
+            echo "  - Auto Billing (trial ended): $AUTO_BILLING users"
+            echo "  - Trial Expired Reminders: $EXPIRED_REMINDERS users"
+          else
+            echo "❌ Daily tasks failed with status $HTTP_CODE"
+            exit 1
+          fi
+      
+      - name: 📧 Send notification on failure
+        if: failure()
+        run: |
+          echo "⚠️ Daily cron job failed!"
+          echo "🔍 Check the logs above for details"
+          # 향후 Slack/Discord 알림 추가 가능

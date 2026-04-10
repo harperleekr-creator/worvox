@@ -187,10 +187,10 @@ emailNotifications.post('/send-reminders', async (c) => {
 
     // Get users whose trial ends in 3 days and haven't been notified
     const users = await c.env.DB.prepare(`
-      SELECT id, email, username, subscription_end_date, plan
+      SELECT id, email, username, trial_end_date, plan
       FROM users
       WHERE is_trial = 1
-        AND DATE(subscription_end_date) = ?
+        AND DATE(trial_end_date) = ?
         AND trial_reminder_sent = 0
         AND email IS NOT NULL
     `).bind(targetDate).all();
@@ -248,10 +248,10 @@ emailNotifications.get('/pending-reminders', async (c) => {
     const targetDate = threeDaysLater.toISOString().split('T')[0];
 
     const users = await c.env.DB.prepare(`
-      SELECT id, email, username, subscription_end_date, plan
+      SELECT id, email, username, trial_end_date, plan
       FROM users
       WHERE is_trial = 1
-        AND DATE(subscription_end_date) = ?
+        AND DATE(trial_end_date) = ?
         AND trial_reminder_sent = 0
     `).bind(targetDate).all();
 
@@ -263,6 +263,96 @@ emailNotifications.get('/pending-reminders', async (c) => {
     });
   } catch (error: any) {
     console.error('Get pending reminders error:', error);
+    return c.json({ success: false, error: error.message }, 500);
+  }
+});
+
+// Send trial expired payment reminder (after trial ends)
+emailNotifications.post('/send-trial-expired-reminders', async (c) => {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    
+    console.log(`📅 Checking for trials that expired today: ${today}`);
+
+    // Get users whose trial ended today and haven't been charged yet
+    const users = await c.env.DB.prepare(`
+      SELECT id, email, username, trial_end_date, plan, billing_key
+      FROM users
+      WHERE is_trial = 1
+        AND DATE(trial_end_date) = ?
+        AND auto_billing_enabled = 1
+        AND email IS NOT NULL
+    `).bind(today).all();
+
+    console.log(`📧 Found ${users.results.length} users with expired trials to notify`);
+
+    let successCount = 0;
+    let failCount = 0;
+    const results = [];
+
+    // Send payment confirmation emails
+    for (const user of users.results) {
+      try {
+        // Send email notification about upcoming payment
+        const emailSent = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${c.env.RESEND_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            from: 'WorVox <noreply@worvox.com>',
+            to: user.email,
+            subject: '🎉 무료 체험 종료 - 자동 결제 안내',
+            html: `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #7c3aed;">안녕하세요, ${user.username || '회원'}님!</h2>
+                
+                <p>WorVox ${user.plan.toUpperCase()} 플랜 무료 체험이 종료되었습니다.</p>
+                
+                <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                  <h3 style="margin-top: 0;">✅ 자동 결제가 진행됩니다</h3>
+                  <p>등록하신 결제 수단으로 자동 결제가 곧 진행됩니다.</p>
+                  <p><strong>플랜:</strong> ${user.plan.toUpperCase()}</p>
+                  <p><strong>결제 금액:</strong> ${user.plan === 'core' ? '9,900원' : '19,000원'}/월</p>
+                </div>
+                
+                <p>계속해서 WorVox의 모든 기능을 제한 없이 사용하실 수 있습니다!</p>
+                
+                <p>결제를 원하지 않으시면 <a href="https://worvox.com" style="color: #7c3aed;">프로필 → 구독 관리</a>에서 자동 결제를 해지하실 수 있습니다.</p>
+                
+                <p style="margin-top: 30px; color: #6b7280; font-size: 14px;">
+                  감사합니다,<br>
+                  WorVox 팀
+                </p>
+              </div>
+            `
+          })
+        });
+
+        if (emailSent.ok) {
+          successCount++;
+          results.push({ email: user.email, status: 'success' });
+        } else {
+          failCount++;
+          results.push({ email: user.email, status: 'failed', error: 'Email send failed' });
+        }
+      } catch (error: any) {
+        failCount++;
+        results.push({ email: user.email, status: 'error', error: error.message });
+      }
+    }
+
+    return c.json({
+      success: true,
+      targetDate: today,
+      totalUsers: users.results.length,
+      successCount,
+      failCount,
+      results
+    });
+  } catch (error: any) {
+    console.error('Send trial expired reminders error:', error);
     return c.json({ success: false, error: error.message }, 500);
   }
 });

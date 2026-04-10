@@ -7,6 +7,7 @@ export type Bindings = {
   TOSS_SECRET_KEY: string;
   TOSS_SECURITY_KEY?: string;
   RESEND_API_KEY?: string;
+  CRON_SECRET?: string;
 }
 
 export type Level = 'beginner' | 'intermediate' | 'advanced';

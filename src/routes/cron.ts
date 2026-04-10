@@ -1,51 +1,88 @@
-// Cloudflare Cron Job for sending notifications
-import type { Bindings } from './types';
-import { sendTrialExpirationEmail } from './routes/email-notifications';
-import { sendReminder1Hour, sendReminder10Minutes } from './routes/notification-helpers';
+// Manual cron endpoint for scheduled tasks
+import { Hono } from 'hono';
+import type { Bindings } from '../types';
+import { sendTrialExpirationEmail } from './email-notifications';
+import { sendReminder1Hour, sendReminder10Minutes } from './notification-helpers';
 
-export default {
-  async scheduled(event: ScheduledEvent, env: Bindings, ctx: ExecutionContext) {
-    console.log('🔔 Running scheduled job');
-    
-    try {
-      // Task 1: Trial expiration reminders (3 days before)
-      await sendTrialReminders(env);
-      
-      // Task 2: Auto-billing for expired trials
-      await processAutoBilling(env);
-      
-      // Task 3: Trial expired payment reminders (after trial ends)
-      await sendTrialExpiredReminders(env);
-      
-      // Task 4: Live Speaking reminders (1 hour before)
-      await sendLiveSpeaking1HourReminders(env);
-      
-      // Task 5: Live Speaking reminders (10 minutes before)
-      await sendLiveSpeaking10MinReminders(env);
+const cron = new Hono<{ Bindings: Bindings }>();
 
-      return new Response(JSON.stringify({
-        success: true,
-        timestamp: new Date().toISOString()
-      }), {
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-    } catch (error: any) {
-      console.error('❌ Scheduled job error:', error);
-      return new Response(JSON.stringify({
-        success: false,
-        error: error.message
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      });
-    }
+// Middleware: Verify CRON_SECRET
+const verifyCronSecret = async (c: any, next: any) => {
+  const authHeader = c.req.header('Authorization');
+  const cronSecret = c.env.CRON_SECRET;
+  
+  // If CRON_SECRET is not set, allow all requests (for backward compatibility)
+  if (!cronSecret) {
+    console.warn('⚠️ CRON_SECRET not set - all requests allowed');
+    return next();
   }
+  
+  // Check Authorization header
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return c.json({ error: 'Missing or invalid Authorization header' }, 401);
+  }
+  
+  const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+  
+  if (token !== cronSecret) {
+    console.error('❌ Invalid CRON_SECRET');
+    return c.json({ error: 'Invalid CRON_SECRET' }, 403);
+  }
+  
+  return next();
 };
 
-// Task 1: Trial expiration reminders
+// Apply middleware to all cron routes
+cron.use('/*', verifyCronSecret);
+
+// Main cron endpoint - call this daily
+cron.post('/run', async (c) => {
+  console.log('🔔 Running manual cron job');
+  
+  const results: any = {
+    timestamp: new Date().toISOString(),
+    tasks: []
+  };
+
+  try {
+    // Task 1: Trial reminders (3 days before expiration)
+    const task1 = await sendTrialReminders(c.env);
+    results.tasks.push({ name: 'trial_reminders', ...task1 });
+
+    // Task 2: Auto-billing for expired trials
+    const task2 = await processAutoBilling(c.env);
+    results.tasks.push({ name: 'auto_billing', ...task2 });
+
+    // Task 3: Trial expired reminders
+    const task3 = await sendTrialExpiredReminders(c.env);
+    results.tasks.push({ name: 'trial_expired_reminders', ...task3 });
+
+    return c.json({ success: true, ...results });
+  } catch (error: any) {
+    console.error('❌ Cron job error:', error);
+    return c.json({ success: false, error: error.message, ...results }, 500);
+  }
+});
+
+// Individual task endpoints for testing
+cron.post('/trial-reminders', async (c) => {
+  const result = await sendTrialReminders(c.env);
+  return c.json(result);
+});
+
+cron.post('/auto-billing', async (c) => {
+  const result = await processAutoBilling(c.env);
+  return c.json(result);
+});
+
+cron.post('/trial-expired-reminders', async (c) => {
+  const result = await sendTrialExpiredReminders(c.env);
+  return c.json(result);
+});
+
+// Task functions
 async function sendTrialReminders(env: Bindings) {
-  console.log('📧 Task 1: Trial expiration reminders');
+  console.log('📧 Task: Trial expiration reminders (3 days before)');
   
   try {
     const threeDaysLater = new Date();
@@ -80,14 +117,15 @@ async function sendTrialReminders(env: Bindings) {
     }
 
     console.log(`✅ Trial reminders: ${successCount}/${users.results.length} sent`);
-  } catch (error) {
+    return { success: true, total: users.results.length, sent: successCount };
+  } catch (error: any) {
     console.error('❌ Trial reminders failed:', error);
+    return { success: false, error: error.message };
   }
 }
 
-// Task 2: Auto-billing for expired trials
 async function processAutoBilling(env: Bindings) {
-  console.log('💳 Task 2: Auto-billing for expired trials');
+  console.log('💳 Task: Auto-billing for expired trials');
   
   try {
     const today = new Date().toISOString().split('T')[0];
@@ -104,6 +142,7 @@ async function processAutoBilling(env: Bindings) {
     console.log(`💳 Found ${usersToCharge.results.length} users to charge`);
 
     let successCount = 0;
+    let failCount = 0;
     for (const user of usersToCharge.results) {
       try {
         const billingPeriod = user.billing_period || 'monthly';
@@ -111,7 +150,6 @@ async function processAutoBilling(env: Bindings) {
           ? (user.plan === 'core' ? 97416 : 186960)
           : (user.plan === 'core' ? 9900 : 19000);
 
-        // Call Toss Payments API
         const response = await fetch('https://api.tosspayments.com/v1/billing/' + user.billing_key, {
           method: 'POST',
           headers: {
@@ -155,22 +193,25 @@ async function processAutoBilling(env: Bindings) {
             WHERE id = ?
           `).bind(user.id).run();
           
+          failCount++;
           console.log(`❌ User ${user.email} billing failed`);
         }
       } catch (error) {
         console.error(`❌ Failed to charge ${user.email}:`, error);
+        failCount++;
       }
     }
 
     console.log(`✅ Auto-billing: ${successCount}/${usersToCharge.results.length} successful`);
-  } catch (error) {
+    return { success: true, total: usersToCharge.results.length, charged: successCount, failed: failCount };
+  } catch (error: any) {
     console.error('❌ Auto-billing failed:', error);
+    return { success: false, error: error.message };
   }
 }
 
-// Task 3: Trial expired payment reminders
 async function sendTrialExpiredReminders(env: Bindings) {
-  console.log('📧 Task 3: Trial expired payment reminders');
+  console.log('📧 Task: Trial expired payment reminders');
   
   try {
     const today = new Date().toISOString().split('T')[0];
@@ -229,111 +270,11 @@ async function sendTrialExpiredReminders(env: Bindings) {
     }
 
     console.log(`✅ Trial expired reminders: ${successCount}/${users.results.length} sent`);
-  } catch (error) {
+    return { success: true, total: users.results.length, sent: successCount };
+  } catch (error: any) {
     console.error('❌ Trial expired reminders failed:', error);
+    return { success: false, error: error.message };
   }
 }
 
-// Task 4: Live Speaking 1-hour reminders
-async function sendLiveSpeaking1HourReminders(env: Bindings) {
-  console.log('📱 Task 2: Live Speaking 1-hour reminders');
-  
-  try {
-    // Get sessions starting in 55-65 minutes (to account for cron timing)
-    const now = new Date();
-    const oneHourLater = new Date(now.getTime() + 55 * 60 * 1000);
-    const oneHourPlus = new Date(now.getTime() + 65 * 60 * 1000);
-
-    const sessions = await env.DB.prepare(`
-      SELECT s.*, u.email as user_email, u.name as user_name, 
-             t.name as teacher_name, t.phone_number as teacher_phone, t.email as teacher_email
-      FROM hiing_sessions s
-      JOIN users u ON s.user_id = u.id
-      JOIN hiing_teachers t ON s.teacher_id = t.id
-      WHERE s.status = 'scheduled'
-        AND s.reminder_1h_sent = 0
-        AND s.scheduled_at BETWEEN ? AND ?
-    `).bind(oneHourLater.toISOString(), oneHourPlus.toISOString()).all();
-
-    console.log(`📱 Found ${sessions.results.length} sessions for 1h reminder`);
-
-    let successCount = 0;
-    for (const session of sessions.results) {
-      try {
-        const user = {
-          id: session.user_id,
-          email: session.user_email,
-          name: session.user_name
-        };
-        
-        const teacher = {
-          id: session.teacher_id,
-          name: session.teacher_name,
-          phone_number: session.teacher_phone,
-          email: session.teacher_email
-        };
-
-        await sendReminder1Hour(env, session, user, teacher);
-        successCount++;
-      } catch (error) {
-        console.error(`❌ Failed to send 1h reminder for session ${session.id}:`, error);
-      }
-    }
-
-    console.log(`✅ 1-hour reminders: ${successCount}/${sessions.results.length} sent`);
-  } catch (error) {
-    console.error('❌ 1-hour reminders failed:', error);
-  }
-}
-
-// Task 5: Live Speaking 10-minute reminders
-async function sendLiveSpeaking10MinReminders(env: Bindings) {
-  console.log('📱 Task 3: Live Speaking 10-minute reminders');
-  
-  try {
-    // Get sessions starting in 8-12 minutes
-    const now = new Date();
-    const tenMinLater = new Date(now.getTime() + 8 * 60 * 1000);
-    const tenMinPlus = new Date(now.getTime() + 12 * 60 * 1000);
-
-    const sessions = await env.DB.prepare(`
-      SELECT s.*, u.email as user_email, u.name as user_name,
-             t.name as teacher_name, t.phone_number as teacher_phone, t.email as teacher_email
-      FROM hiing_sessions s
-      JOIN users u ON s.user_id = u.id
-      JOIN hiing_teachers t ON s.teacher_id = t.id
-      WHERE s.status = 'scheduled'
-        AND s.reminder_10m_sent = 0
-        AND s.scheduled_at BETWEEN ? AND ?
-    `).bind(tenMinLater.toISOString(), tenMinPlus.toISOString()).all();
-
-    console.log(`📱 Found ${sessions.results.length} sessions for 10m reminder`);
-
-    let successCount = 0;
-    for (const session of sessions.results) {
-      try {
-        const user = {
-          id: session.user_id,
-          email: session.user_email,
-          name: session.user_name
-        };
-        
-        const teacher = {
-          id: session.teacher_id,
-          name: session.teacher_name,
-          phone_number: session.teacher_phone,
-          email: session.teacher_email
-        };
-
-        await sendReminder10Minutes(env, session, user, teacher);
-        successCount++;
-      } catch (error) {
-        console.error(`❌ Failed to send 10m reminder for session ${session.id}:`, error);
-      }
-    }
-
-    console.log(`✅ 10-minute reminders: ${successCount}/${sessions.results.length} sent`);
-  } catch (error) {
-    console.error('❌ 10-minute reminders failed:', error);
-  }
-}
+export default cron;
