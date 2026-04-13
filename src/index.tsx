@@ -30,11 +30,12 @@ import dailyGoals from './routes/daily-goals';
 import notifications from './routes/notifications';
 import retention from './routes/retention';
 import cron from './routes/cron';
+import messages from './routes/messages';
 import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1775896345470'; // Update manually or via build script
+const BUILD_TIME = '1776049134820'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -637,6 +638,7 @@ app.route('/api/daily-goals', dailyGoals);
 app.route('/api/notifications', notifications);
 app.route('/api/retention', retention);
 app.route('/api/cron', cron);
+app.route('/api/messages', messages);
 
 // Preview routes
 app.route('/preview', preview);
