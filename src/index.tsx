@@ -35,7 +35,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1776049134820'; // Update manually or via build script
+const BUILD_TIME = '1776050643845'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -2900,17 +2900,14 @@ ${isKorean ? '💡 지금 시작하면 <span class="text-purple-600">2주 무료
                             실시간 발음 교정과 맞춤형 회화 연습을 제공합니다.
                         </p>
                         <div class="flex gap-4">
-                            <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-purple-600 transition">
-                                <i class="fab fa-facebook-f"></i>
-                            </a>
-                            <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-purple-600 transition">
-                                <i class="fab fa-twitter"></i>
-                            </a>
-                            <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-purple-600 transition">
+                            <a href="https://www.instagram.com/worvox_official/" target="_blank" rel="noopener noreferrer" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-purple-600 transition" title="Instagram">
                                 <i class="fab fa-instagram"></i>
                             </a>
-                            <a href="#" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-purple-600 transition">
+                            <a href="https://www.youtube.com/@WorVoxOfficial" target="_blank" rel="noopener noreferrer" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-red-600 transition" title="YouTube">
                                 <i class="fab fa-youtube"></i>
+                            </a>
+                            <a href="https://www.tiktok.com/@worvox.official" target="_blank" rel="noopener noreferrer" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-pink-600 transition" title="TikTok">
+                                <i class="fab fa-tiktok"></i>
                             </a>
                         </div>
                     </div>
@@ -3340,6 +3337,20 @@ app.get('/about', (c) => {
                     <span class="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">WorVox</span>
                 </div>
                 <p class="mb-4">AI 기반 영어 학습의 새로운 기준</p>
+                
+                <!-- Social Media Links -->
+                <div class="flex justify-center gap-4 mb-6">
+                    <a href="https://www.instagram.com/worvox_official/" target="_blank" rel="noopener noreferrer" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-purple-600 transition" title="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://www.youtube.com/@WorVoxOfficial" target="_blank" rel="noopener noreferrer" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-red-600 transition" title="YouTube">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    <a href="https://www.tiktok.com/@worvox.official" target="_blank" rel="noopener noreferrer" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-pink-600 transition" title="TikTok">
+                        <i class="fab fa-tiktok"></i>
+                    </a>
+                </div>
+                
                 <p class="text-sm text-gray-500">
                     © 2026 WorVox. All rights reserved.
                 </p>
@@ -3876,6 +3887,20 @@ app.get('/pricing', (c) => {
                     <span class="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text">WorVox</span>
                 </div>
                 <p class="mb-4">AI 기반 영어 학습의 새로운 기준</p>
+                
+                <!-- Social Media Links -->
+                <div class="flex justify-center gap-4 mb-6">
+                    <a href="https://www.instagram.com/worvox_official/" target="_blank" rel="noopener noreferrer" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-purple-600 transition" title="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://www.youtube.com/@WorVoxOfficial" target="_blank" rel="noopener noreferrer" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-red-600 transition" title="YouTube">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    <a href="https://www.tiktok.com/@worvox.official" target="_blank" rel="noopener noreferrer" class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-pink-600 transition" title="TikTok">
+                        <i class="fab fa-tiktok"></i>
+                    </a>
+                </div>
+                
                 <p class="text-sm text-gray-500">
                     © 2026 WorVox. All rights reserved.
                 </p>
