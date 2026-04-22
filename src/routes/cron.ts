@@ -89,6 +89,31 @@ cron.post('/hiing-monthly-billing', async (c) => {
   return c.json(result);
 });
 
+// Get all user emails for announcement
+cron.get('/get-user-emails', async (c) => {
+  try {
+    const users = await c.env.DB.prepare(`
+      SELECT email FROM users 
+      WHERE email IS NOT NULL AND email != ''
+      ORDER BY created_at DESC
+    `).all();
+
+    const emails = users.results.map((user: any) => user.email);
+
+    return c.json({
+      success: true,
+      count: emails.length,
+      emails: emails
+    });
+  } catch (error: any) {
+    console.error('❌ Error fetching user emails:', error);
+    return c.json({ 
+      success: false, 
+      error: error.message 
+    }, 500);
+  }
+});
+
 // Task functions
 async function sendTrialReminders(env: Bindings) {
   console.log('📧 Task: Trial expiration reminders (3 days before)');

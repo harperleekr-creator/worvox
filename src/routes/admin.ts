@@ -636,69 +636,83 @@ admin.delete('/users/:id', requireAuth, async (c) => {
 
     console.log(`📝 Deleting user: ${user.username} (${user.email})`)
 
-    // Delete related data in correct order (respect foreign key constraints)
-    // Use try-catch for each deletion to handle tables that may not exist
-    const deleteTasks = [
-      { name: 'session_analysis', query: 'DELETE FROM session_analysis WHERE session_id IN (SELECT id FROM sessions WHERE user_id = ?)', params: [userId] },
-      { name: 'session_reports', query: 'DELETE FROM session_reports WHERE session_id IN (SELECT id FROM sessions WHERE user_id = ?)', params: [userId] },
-      { name: 'session_feedback', query: 'DELETE FROM session_feedback WHERE session_id IN (SELECT id FROM sessions WHERE user_id = ?)', params: [userId] },
-      { name: 'mode_reports', query: 'DELETE FROM mode_reports WHERE user_id = ?', params: [userId] },
-      { name: 'messages', query: 'DELETE FROM messages WHERE session_id IN (SELECT id FROM sessions WHERE user_id = ?)', params: [userId] },
-      { name: 'sessions', query: 'DELETE FROM sessions WHERE user_id = ?', params: [userId] },
-      { name: 'login_sessions', query: 'DELETE FROM login_sessions WHERE user_id = ?', params: [userId] },
-      { name: 'session_durations', query: 'DELETE FROM session_durations WHERE user_id = ?', params: [userId] },
-      { name: 'vocabulary_bookmarks', query: 'DELETE FROM vocabulary_bookmarks WHERE user_id = ?', params: [userId] },
-      { name: 'user_vocabulary_progress', query: 'DELETE FROM user_vocabulary_progress WHERE user_id = ?', params: [userId] },
-      { name: 'user_custom_wordbooks', query: 'DELETE FROM user_custom_wordbooks WHERE user_id = ?', params: [userId] },
-      { name: 'user_stats', query: 'DELETE FROM user_stats WHERE user_id = ?', params: [userId] },
-      { name: 'user_badges', query: 'DELETE FROM user_badges WHERE user_id = ?', params: [userId] },
-      { name: 'gamification_stats', query: 'DELETE FROM gamification_stats WHERE user_id = ?', params: [userId] },
-      { name: 'attendance', query: 'DELETE FROM attendance WHERE user_id = ?', params: [userId] },
-      { name: 'payment_orders', query: 'DELETE FROM payment_orders WHERE user_id = ?', params: [userId] },
-      { name: 'activity_logs', query: 'DELETE FROM activity_logs WHERE user_id = ?', params: [userId] },
-      { name: 'user_activity_log', query: 'DELETE FROM user_activity_log WHERE user_id = ?', params: [userId] },
-      { name: 'usage_tracking (by string)', query: 'DELETE FROM usage_tracking WHERE user_id = ?', params: [userId.toString()] },
-      { name: 'usage_tracking (by int)', query: 'DELETE FROM usage_tracking WHERE CAST(user_id AS INTEGER) = ?', params: [userId] },
-      // ✅ Daily goals & streak system tables (added recently)
-      { name: 'streak_milestones', query: 'DELETE FROM streak_milestones WHERE user_id = ?', params: [userId] },
-      { name: 'daily_goals', query: 'DELETE FROM daily_goals WHERE user_id = ?', params: [userId] },
-      { name: 'user_streaks', query: 'DELETE FROM user_streaks WHERE user_id = ?', params: [userId] },
-      // ✅ Daily missions & XP tracking
-      { name: 'daily_missions', query: 'DELETE FROM daily_missions WHERE user_id = ?', params: [userId] },
-      { name: 'daily_xp_tracking', query: 'DELETE FROM daily_xp_tracking WHERE user_id = ?', params: [userId] },
-      { name: 'daily_xp_history', query: 'DELETE FROM daily_xp_history WHERE user_id = ?', params: [userId] },
-      { name: 'user_attendance', query: 'DELETE FROM user_attendance WHERE user_id = ?', params: [userId] },
-      // ✅ Prize & reward system
-      { name: 'user_prize_wins', query: 'DELETE FROM user_prize_wins WHERE user_id = ?', params: [userId] },
-      { name: 'speed_quiz_scores', query: 'DELETE FROM speed_quiz_scores WHERE user_id = ?', params: [userId] },
-      // ✅ Live Speaking (Hiing) related tables
-      { name: 'hiing_notification_logs', query: 'DELETE FROM hiing_notification_logs WHERE session_id IN (SELECT id FROM hiing_sessions WHERE student_id = ? OR teacher_id = ?)', params: [userId, userId] },
-      { name: 'hiing_sessions', query: 'DELETE FROM hiing_sessions WHERE student_id = ? OR teacher_id = ?', params: [userId, userId] },
-      { name: 'hiing_credits', query: 'DELETE FROM hiing_credits WHERE user_id = ?', params: [userId] },
-      { name: 'hiing_teacher_availability', query: 'DELETE FROM hiing_teacher_availability WHERE teacher_id = ?', params: [userId] },
-      { name: 'hiing_notification_preferences', query: 'DELETE FROM hiing_notification_preferences WHERE user_id = ?', params: [userId] },
-      { name: 'hiing_teacher_notification_preferences', query: 'DELETE FROM hiing_teacher_notification_preferences WHERE teacher_id = ?', params: [userId] },
+    // Delete related data one by one, ignoring errors for non-existent tables
+    // CRITICAL: Delete in correct order - child tables first, then parent tables
+    const deleteQueries = [
+      // Level 3: Deepest dependencies (children of children)
+      { table: 'hiing_notification_logs', query: 'DELETE FROM hiing_notification_logs WHERE session_id IN (SELECT id FROM hiing_sessions WHERE student_id = ? OR teacher_id = ?)', params: 2 },
+      { table: 'session_analysis', query: 'DELETE FROM session_analysis WHERE session_id IN (SELECT id FROM sessions WHERE user_id = ?)', params: 1 },
+      { table: 'session_reports', query: 'DELETE FROM session_reports WHERE session_id IN (SELECT id FROM sessions WHERE user_id = ?)', params: 1 },
+      { table: 'session_feedback', query: 'DELETE FROM session_feedback WHERE session_id IN (SELECT id FROM sessions WHERE user_id = ?)', params: 1 },
+      { table: 'messages', query: 'DELETE FROM messages WHERE session_id IN (SELECT id FROM sessions WHERE user_id = ?)', params: 1 },
+      
+      // Level 2: Session and hiing dependencies
+      { table: 'hiing_sessions', query: 'DELETE FROM hiing_sessions WHERE student_id = ? OR teacher_id = ?', params: 2 },
+      { table: 'sessions', query: 'DELETE FROM sessions WHERE user_id = ?', params: 1 },
+      
+      // Level 1: Direct user dependencies
+      { table: 'mode_reports', query: 'DELETE FROM mode_reports WHERE user_id = ?', params: 1 },
+      { table: 'login_sessions', query: 'DELETE FROM login_sessions WHERE user_id = ?', params: 1 },
+      { table: 'session_durations', query: 'DELETE FROM session_durations WHERE user_id = ?', params: 1 },
+      { table: 'vocabulary_bookmarks', query: 'DELETE FROM vocabulary_bookmarks WHERE user_id = ?', params: 1 },
+      { table: 'user_vocabulary_progress', query: 'DELETE FROM user_vocabulary_progress WHERE user_id = ?', params: 1 },
+      { table: 'user_custom_wordbooks', query: 'DELETE FROM user_custom_wordbooks WHERE user_id = ?', params: 1 },
+      { table: 'user_stats', query: 'DELETE FROM user_stats WHERE user_id = ?', params: 1 },
+      { table: 'user_badges', query: 'DELETE FROM user_badges WHERE user_id = ?', params: 1 },
+      { table: 'gamification_stats', query: 'DELETE FROM gamification_stats WHERE user_id = ?', params: 1 },
+      { table: 'attendance', query: 'DELETE FROM attendance WHERE user_id = ?', params: 1 },
+      { table: 'user_attendance', query: 'DELETE FROM user_attendance WHERE user_id = ?', params: 1 },
+      { table: 'daily_goals', query: 'DELETE FROM daily_goals WHERE user_id = ?', params: 1 },
+      { table: 'user_streaks', query: 'DELETE FROM user_streaks WHERE user_id = ?', params: 1 },
+      { table: 'streak_milestones', query: 'DELETE FROM streak_milestones WHERE user_id = ?', params: 1 },
+      { table: 'daily_missions', query: 'DELETE FROM daily_missions WHERE user_id = ?', params: 1 },
+      { table: 'daily_xp_tracking', query: 'DELETE FROM daily_xp_tracking WHERE user_id = ?', params: 1 },
+      { table: 'daily_xp_history', query: 'DELETE FROM daily_xp_history WHERE user_id = ?', params: 1 },
+      { table: 'user_prize_wins', query: 'DELETE FROM user_prize_wins WHERE user_id = ?', params: 1 },
+      { table: 'speed_quiz_scores', query: 'DELETE FROM speed_quiz_scores WHERE user_id = ?', params: 1 },
+      { table: 'payment_orders', query: 'DELETE FROM payment_orders WHERE user_id = ?', params: 1 },
+      { table: 'activity_logs', query: 'DELETE FROM activity_logs WHERE user_id = ?', params: 1 },
+      { table: 'user_activity_log', query: 'DELETE FROM user_activity_log WHERE user_id = ?', params: 1 },
+      { table: 'usage_tracking', query: 'DELETE FROM usage_tracking WHERE user_id = ? OR CAST(user_id AS INTEGER) = ?', params: 2 },
+      { table: 'hiing_credits', query: 'DELETE FROM hiing_credits WHERE user_id = ?', params: 1 },
+      { table: 'hiing_teacher_availability', query: 'DELETE FROM hiing_teacher_availability WHERE teacher_id = ?', params: 1 },
+      { table: 'hiing_notification_preferences', query: 'DELETE FROM hiing_notification_preferences WHERE user_id = ?', params: 1 },
+      { table: 'hiing_teacher_notification_preferences', query: 'DELETE FROM hiing_teacher_notification_preferences WHERE teacher_id = ?', params: 1 },
     ]
-
-    for (const task of deleteTasks) {
+    
+    let deletedCount = 0
+    let skippedCount = 0
+    
+    // Execute delete statements one by one, catching errors for non-existent tables
+    for (const { table, query, params } of deleteQueries) {
       try {
-        await c.env.DB.prepare(task.query).bind(...task.params).run()
-        console.log(`  ✓ Deleted ${task.name}`)
+        const paramArray = Array(params).fill(userId)
+        await c.env.DB.prepare(query).bind(...paramArray).run()
+        console.log(`  ✓ Deleted from ${table}`)
+        deletedCount++
       } catch (e) {
-        console.log(`  - ${task.name}: ${(e as Error).message}`)
+        const errorMsg = (e as Error).message
+        if (errorMsg.includes('no such table')) {
+          console.log(`  - ${table}: table doesn't exist (skipped)`)
+          skippedCount++
+        } else {
+          console.log(`  ⚠ ${table}: ${errorMsg}`)
+        }
       }
     }
     
     // Finally delete the user (this must succeed)
     try {
       await c.env.DB.prepare('DELETE FROM users WHERE id = ?').bind(userId).run()
-      logger.info('  ✓ Deleted user')
+      console.log(`  ✓ Deleted user from users table`)
+      deletedCount++
     } catch (e) {
       logger.error('  ✗ Failed to delete user:', (e as Error).message)
       throw new Error('사용자 삭제 실패: ' + (e as Error).message)
     }
-
+    
     console.log(`✅ User ${userId} deleted successfully`)
+    console.log(`📊 Stats: ${deletedCount} deleted, ${skippedCount} skipped`)
 
     return c.json({
       success: true,
