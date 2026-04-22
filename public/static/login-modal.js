@@ -231,8 +231,17 @@
       try {
         console.log('🔵 Starting Google login...');
         
+        // Wait for Google Sign-In to load (up to 5 seconds)
+        let attempts = 0;
+        while (typeof google === 'undefined' && attempts < 50) {
+          console.log(`⏳ Waiting for Google Sign-In to load... (${attempts}/50)`);
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+        }
+        
         // Use existing Google Sign-In implementation
         if (typeof google !== 'undefined' && google.accounts) {
+          console.log('✅ Google Sign-In API loaded');
           google.accounts.id.initialize({
             client_id: '506018364729-ichplnfnqlk2hmh1bhblepm0un44ltdr.apps.googleusercontent.com',
             callback: async (response) => {
