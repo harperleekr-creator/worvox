@@ -4090,8 +4090,9 @@ app.get('/app', (c) => {
         <script src="/static/daily-goals.js?v=${version}"></script>
         <script src="/static/daily-goals-integration.js?v=${version}"></script>
         <script src="/static/app.min.js?v=${version}"></script>
-        <!-- CRITICAL: Patch must load immediately after app.min.js -->
+        <!-- CRITICAL: Patches must load immediately after app.min.js -->
         <script src="/static/app-login-patch.js?v=${version}"></script>
+        <script src="/static/app-topic-patch.js?v=${version}"></script>
         
         <script>
           // Auto-start the app after all scripts are loaded
