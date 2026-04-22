@@ -623,132 +623,42 @@ admin.delete('/users/:id', requireAuth, async (c) => {
     const userId = parseInt(c.req.param('id'))
     const adminUserId = parseInt(c.req.header('X-User-Id') || '0')
 
-    console.log(`🗑️ Admin ${adminUserId} attempting to delete user ${userId}`)
+    console.log(`🗑️ Admin ${adminUserId} attempting to soft-delete user ${userId}`)
 
     // Check if user exists
     const user = await c.env.DB.prepare(
-      'SELECT id, username, email FROM users WHERE id = ?'
+      'SELECT id, username, email, is_deleted FROM users WHERE id = ?'
     ).bind(userId).first()
 
     if (!user) {
       return c.json({ error: '사용자를 찾을 수 없습니다' }, 404)
     }
 
-    console.log(`📝 Deleting user: ${user.username} (${user.email})`)
+    if (user.is_deleted) {
+      return c.json({ error: '이미 삭제된 사용자입니다' }, 400)
+    }
 
-    // Delete related data one by one, ignoring errors for non-existent tables
-    // CRITICAL: Delete in correct order - child tables first, then parent tables
-    const deleteQueries = [
-      // Level 3: Deepest dependencies (children of children)
-      { table: 'hiing_notification_logs', query: 'DELETE FROM hiing_notification_logs WHERE session_id IN (SELECT id FROM hiing_sessions WHERE student_id = ? OR teacher_id = ?)', params: 2 },
-      { table: 'session_analysis', query: 'DELETE FROM session_analysis WHERE session_id IN (SELECT id FROM sessions WHERE user_id = ?)', params: 1 },
-      { table: 'session_reports', query: 'DELETE FROM session_reports WHERE user_id = ?', params: 1 },  // Direct user_id reference
-      { table: 'session_feedback', query: 'DELETE FROM session_feedback WHERE session_id IN (SELECT id FROM sessions WHERE user_id = ?)', params: 1 },
-      { table: 'messages', query: 'DELETE FROM messages WHERE session_id IN (SELECT id FROM sessions WHERE user_id = ?)', params: 1 },
-      
-      // Level 2: Session and hiing dependencies
-      { table: 'hiing_sessions', query: 'DELETE FROM hiing_sessions WHERE student_id = ? OR teacher_id = ?', params: 2 },
-      { table: 'sessions', query: 'DELETE FROM sessions WHERE user_id = ?', params: 1 },
-      
-      // Level 1: Direct user dependencies
-      { table: 'mode_reports', query: 'DELETE FROM mode_reports WHERE user_id = ?', params: 1 },
-      { table: 'login_sessions', query: 'DELETE FROM login_sessions WHERE user_id = ?', params: 1 },
-      { table: 'session_durations', query: 'DELETE FROM session_durations WHERE user_id = ?', params: 1 },
-      { table: 'vocabulary_bookmarks', query: 'DELETE FROM vocabulary_bookmarks WHERE user_id = ?', params: 1 },
-      { table: 'user_vocabulary_progress', query: 'DELETE FROM user_vocabulary_progress WHERE user_id = ?', params: 1 },
-      { table: 'user_custom_wordbooks', query: 'DELETE FROM user_custom_wordbooks WHERE user_id = ?', params: 1 },
-      { table: 'user_stats', query: 'DELETE FROM user_stats WHERE user_id = ?', params: 1 },
-      { table: 'user_badges', query: 'DELETE FROM user_badges WHERE user_id = ?', params: 1 },
-      { table: 'gamification_stats', query: 'DELETE FROM gamification_stats WHERE user_id = ?', params: 1 },
-      { table: 'attendance', query: 'DELETE FROM attendance WHERE user_id = ?', params: 1 },
-      { table: 'user_attendance', query: 'DELETE FROM user_attendance WHERE user_id = ?', params: 1 },
-      { table: 'daily_goals', query: 'DELETE FROM daily_goals WHERE user_id = ?', params: 1 },
-      { table: 'user_streaks', query: 'DELETE FROM user_streaks WHERE user_id = ?', params: 1 },
-      { table: 'streak_milestones', query: 'DELETE FROM streak_milestones WHERE user_id = ?', params: 1 },
-      { table: 'daily_missions', query: 'DELETE FROM daily_missions WHERE user_id = ?', params: 1 },
-      { table: 'daily_xp_tracking', query: 'DELETE FROM daily_xp_tracking WHERE user_id = ?', params: 1 },
-      { table: 'daily_xp_history', query: 'DELETE FROM daily_xp_history WHERE user_id = ?', params: 1 },
-      { table: 'user_prize_wins', query: 'DELETE FROM user_prize_wins WHERE user_id = ?', params: 1 },
-      { table: 'speed_quiz_scores', query: 'DELETE FROM speed_quiz_scores WHERE user_id = ?', params: 1 },
-      { table: 'payment_orders', query: 'DELETE FROM payment_orders WHERE user_id = ?', params: 1 },
-      { table: 'password_reset_tokens', query: 'DELETE FROM password_reset_tokens WHERE user_id = ?', params: 1 },
-      { table: 'activity_logs', query: 'DELETE FROM activity_logs WHERE user_id = ?', params: 1 },
-      { table: 'user_activity_log', query: 'DELETE FROM user_activity_log WHERE user_id = ?', params: 1 },
-      { table: 'usage_tracking', query: 'DELETE FROM usage_tracking WHERE user_id = ? OR CAST(user_id AS INTEGER) = ?', params: 2 },
-      { table: 'ai_generated_prompts', query: 'DELETE FROM ai_generated_prompts WHERE user_id = ?', params: 1 },
-      { table: 'hiing_credits', query: 'DELETE FROM hiing_credits WHERE user_id = ?', params: 1 },
-      { table: 'hiing_teacher_availability', query: 'DELETE FROM hiing_teacher_availability WHERE teacher_id = ?', params: 1 },
-      { table: 'hiing_notification_preferences', query: 'DELETE FROM hiing_notification_preferences WHERE user_id = ?', params: 1 },
-      { table: 'hiing_teacher_notification_preferences', query: 'DELETE FROM hiing_teacher_notification_preferences WHERE teacher_id = ?', params: 1 },
-    ]
+    console.log(`📝 Soft-deleting user: ${user.username} (${user.email})`)
     
-    let deletedCount = 0
-    let skippedCount = 0
+    // SOFT DELETE: Mark user as deleted instead of actually deleting
+    // This avoids FK constraint issues with circular dependencies
+    const now = new Date().toISOString()
+    await c.env.DB.prepare(`
+      UPDATE users 
+      SET is_deleted = 1, 
+          deleted_at = ?,
+          email = ? || '_deleted_' || ?
+      WHERE id = ?
+    `).bind(now, user.email, userId, userId).run()
     
-    // Execute delete statements one by one, catching errors for non-existent tables
-    for (const { table, query, params } of deleteQueries) {
-      try {
-        const paramArray = Array(params).fill(userId)
-        const result = await c.env.DB.prepare(query).bind(...paramArray).run()
-        console.log(`  ✓ Deleted from ${table} (${result.meta.changes || 0} rows)`)
-        deletedCount++
-      } catch (e) {
-        const errorMsg = (e as Error).message
-        if (errorMsg.includes('no such table')) {
-          console.log(`  - ${table}: table doesn't exist (skipped)`)
-          skippedCount++
-        } else if (errorMsg.includes('FOREIGN KEY')) {
-          // Foreign key constraint - log but don't fail
-          console.log(`  ⚠ ${table}: FOREIGN KEY constraint (will retry after other deletes)`)
-        } else {
-          console.log(`  ⚠ ${table}: ${errorMsg}`)
-        }
-      }
-    }
+    console.log(`✅ User ${userId} marked as deleted (soft delete)`)
     
-    // Try deleting the user again (in case FK constraints are now resolved)
-    // Repeat the process to catch any stragglers
-    console.log(`🔄 Second pass: cleaning up any remaining dependencies...`)
-    for (const { table, query, params } of deleteQueries) {
-      try {
-        const paramArray = Array(params).fill(userId)
-        const result = await c.env.DB.prepare(query).bind(...paramArray).run()
-        if (result.meta.changes && result.meta.changes > 0) {
-          console.log(`  ✓ Second pass deleted from ${table} (${result.meta.changes} rows)`)
-        }
-      } catch (e) {
-        // Ignore errors on second pass
-      }
-    }
-    
-    // Finally delete the user (this must succeed)
-    try {
-      const result = await c.env.DB.prepare('DELETE FROM users WHERE id = ?').bind(userId).run()
-      console.log(`  ✓ Deleted user from users table (${result.meta.changes || 0} rows)`)
-      deletedCount++
-    } catch (e) {
-      const errorMsg = (e as Error).message
-      logger.error('  ✗ Failed to delete user:', errorMsg)
-      
-      // Try one more time with a direct query to see what's blocking
-      if (errorMsg.includes('FOREIGN KEY')) {
-        console.log('🔍 Checking for remaining foreign key references...')
-        // This will help us debug what's still referencing the user
-        throw new Error(`사용자 삭제 실패: 다른 테이블에서 참조 중입니다. 관리자에게 문의하세요. (${errorMsg})`)
-      }
-      
-      throw new Error('사용자 삭제 실패: ' + errorMsg)
-    }
-    
-    console.log(`✅ User ${userId} deleted successfully`)
-    console.log(`📊 Stats: ${deletedCount} deleted, ${skippedCount} skipped`)
-
     return c.json({
       success: true,
-      message: '사용자가 삭제되었습니다'
+      message: '사용자가 삭제되었습니다 (비활성화됨)'
     })
   } catch (error) {
-    logger.error('Admin delete user error:', error)
+    logger.error('Admin soft-delete user error:', error)
     return c.json({ error: '사용자 삭제 실패: ' + (error as Error).message }, 500)
   }
 })

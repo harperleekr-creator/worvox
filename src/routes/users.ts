@@ -107,9 +107,9 @@ users.post('/google-login', async (c) => {
 
     logger.info('🔍 Checking existing user with google_id:', googleId);
 
-    // Check if user exists with this Google ID
+    // Check if user exists with this Google ID (exclude soft-deleted users)
     const existingUser = await c.env.DB.prepare(
-      'SELECT id, username, email, google_id, google_email, google_picture, level, auth_provider, plan, user_level, xp, total_xp, coins, current_streak, longest_streak, created_at FROM users WHERE google_id = ?'
+      'SELECT id, username, email, google_id, google_email, google_picture, level, auth_provider, plan, user_level, xp, total_xp, coins, current_streak, longest_streak, created_at, is_deleted FROM users WHERE google_id = ? AND (is_deleted = 0 OR is_deleted IS NULL)'
     ).bind(googleId).first();
 
     if (existingUser) {
