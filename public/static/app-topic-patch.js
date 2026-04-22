@@ -47,10 +47,47 @@
           this.topics = topicsResponse.data.data.topics;
           
           const app = document.getElementById('app');
+          
+          // Create guest sidebar without calling getSidebar() (which requires currentUser)
+          const guestSidebar = `
+            <div id="sidebar" class="fixed md:static inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out bg-gray-900 text-white w-64 flex flex-col z-50">
+              <div class="flex items-center justify-between p-4 border-b border-gray-800">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-graduation-cap text-white"></i>
+                  </div>
+                  <span class="text-xl font-bold">WorVox</span>
+                </div>
+                <button onclick="worvox.closeMobileSidebar()" class="md:hidden text-gray-400 hover:text-white">
+                  <i class="fas fa-times text-xl"></i>
+                </button>
+              </div>
+              
+              <nav class="flex-1 p-4 overflow-y-auto">
+                <a href="/app" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-emerald-600 text-white mb-2">
+                  <i class="fas fa-home"></i>
+                  <span>홈</span>
+                </a>
+              </nav>
+              
+              <div class="p-4 border-t border-gray-800">
+                <button onclick="window.loginModal && window.loginModal.open('guest-sidebar')" class="flex items-center gap-3 w-full hover:bg-gray-800 p-3 rounded-lg transition-all bg-gray-800">
+                  <div class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center text-white">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div class="flex-1 text-left">
+                    <div class="font-medium text-sm">게스트</div>
+                    <div class="text-xs text-gray-400">로그인하기</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+          `;
+          
           app.innerHTML = `
             <div class="flex h-screen bg-gray-50 dark:bg-gray-900">
               <!-- Sidebar -->
-              ${this.getSidebar('home')}
+              ${guestSidebar}
               
               <!-- Main Content -->
               <div class="flex-1 flex flex-col overflow-hidden border-l border-gray-200 dark:border-gray-700">
