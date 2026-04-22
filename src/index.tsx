@@ -35,7 +35,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1776831744548'; // Update manually or via build script
+const BUILD_TIME = '1776832727607'; // Update manually or via build script
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -4081,6 +4081,10 @@ app.get('/app', (c) => {
         <script src="/static/mobile-utils.js?v=${version}"></script>
         <script src="/static/module-loader.js?v=${version}"></script>
         
+        <!-- Login Modal (must load before app.js) -->
+        <script src="/static/login-modal.js?v=${version}"></script>
+        <script src="/static/guest-ui.js?v=${version}"></script>
+        
         <!-- App Scripts -->
         <script src="/static/gamification.js?v=${version}"></script>
         <script src="/static/daily-goals.js?v=${version}"></script>
@@ -4125,10 +4129,13 @@ app.get('/app', (c) => {
                   window.worvox.showTopicSelection();
                 } catch (e) {
                   console.error('Failed to parse stored user:', e);
-                  window.worvox.showLogin();
+                  // Don't redirect to login - just show topic selection as guest
+                  window.worvox.showTopicSelection();
                 }
               } else {
-                window.worvox.showLogin();
+                // CHANGED: Allow guest users to see the app
+                console.log('👤 Guest user - showing app interface');
+                window.worvox.showTopicSelection();
               }
             } else {
               console.error('WorVox app failed to initialize');
