@@ -35,7 +35,7 @@ import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
 const APP_VERSION = '20260315-cache-fix';
-const BUILD_TIME = '1776840059860'; // Update manually or via build script
+const BUILD_TIME = Date.now().toString(); // Auto-update on each build
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -4090,8 +4090,7 @@ app.get('/app', (c) => {
         <script src="/static/daily-goals.js?v=${version}"></script>
         <script src="/static/daily-goals-integration.js?v=${version}"></script>
         <script src="/static/app.min.js?v=${version}"></script>
-        
-        <!-- Patch showLogin to use modal (must load AFTER app.js) -->
+        <!-- CRITICAL: Patch must load immediately after app.min.js -->
         <script src="/static/app-login-patch.js?v=${version}"></script>
         
         <script>

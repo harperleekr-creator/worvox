@@ -6,9 +6,9 @@
 (function() {
   'use strict';
 
-  // Wait for worvox app to be initialized
+  // Patch immediately when window.worvox becomes available
   function patchShowLogin() {
-    if (window.worvox && window.loginModal) {
+    if (window.worvox) {
       console.log('🔧 Patching worvox.showLogin() to use modal...');
       
       // Store original function (in case we need it)
@@ -23,7 +23,9 @@
           window.loginModal.open('app-redirect');
         } else {
           console.error('❌ Login modal not available, falling back to original');
-          this._originalShowLogin();
+          if (this._originalShowLogin) {
+            this._originalShowLogin.call(this);
+          }
         }
       };
       
@@ -37,24 +39,35 @@
             window.loginModal.open('login-form');
           } else {
             console.error('❌ Login modal not available, falling back to original');
-            this._originalShowLoginForm();
+            if (this._originalShowLoginForm) {
+              this._originalShowLoginForm.call(this);
+            }
           }
         };
       }
       
       console.log('✅ showLogin() successfully patched to use modal');
-    } else {
-      // Retry after a short delay
-      setTimeout(patchShowLogin, 100);
+      return true; // Success
     }
+    return false; // Not ready yet
   }
 
-  // Start patching when DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(patchShowLogin, 200);
-    });
-  } else {
-    setTimeout(patchShowLogin, 200);
+  // Try to patch immediately
+  let patched = patchShowLogin();
+  
+  // If not patched, use polling
+  if (!patched) {
+    let attempts = 0;
+    const maxAttempts = 100; // 10 seconds max
+    
+    const pollInterval = setInterval(() => {
+      attempts++;
+      if (patchShowLogin() || attempts >= maxAttempts) {
+        clearInterval(pollInterval);
+        if (attempts >= maxAttempts) {
+          console.error('❌ Failed to patch showLogin() - worvox not initialized');
+        }
+      }
+    }, 100);
   }
 })();
