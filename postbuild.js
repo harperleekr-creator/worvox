@@ -10,6 +10,31 @@ const __dirname = path.dirname(__filename);
 
 const routesPath = path.join(__dirname, 'dist', '_routes.json');
 
+// Copy app.js to app.min.js in both public/static and dist/static
+console.log('📦 Copying app.js to app.min.js...');
+try {
+  const appJsSource = path.join(__dirname, 'public', 'static', 'app.js');
+  const appJsDestPublic = path.join(__dirname, 'public', 'static', 'app.min.js');
+  const appJsDestDist = path.join(__dirname, 'dist', 'static', 'app.min.js');
+  
+  if (fs.existsSync(appJsSource)) {
+    // Copy to public/static
+    fs.copyFileSync(appJsSource, appJsDestPublic);
+    console.log('✅ app.min.js created in public/static');
+    
+    // Copy to dist/static (for deployment)
+    const distStaticDir = path.join(__dirname, 'dist', 'static');
+    if (fs.existsSync(distStaticDir)) {
+      fs.copyFileSync(appJsSource, appJsDestDist);
+      console.log('✅ app.min.js copied to dist/static');
+    }
+  } else {
+    console.warn('⚠️ app.js not found, skipping app.min.js creation');
+  }
+} catch (error) {
+  console.error('❌ Failed to copy app.js:', error);
+}
+
 console.log('📝 Updating _routes.json...');
 
 try {
