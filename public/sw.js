@@ -51,7 +51,8 @@ const NO_CACHE_PATTERNS = [
   /\/api\/audio/,
   /\/api\/payment/,
   /\/api\/signup/,
-  /\/api\/login/
+  /\/api\/login/,
+  /\/api\/retention/  // Retention API는 캐시하지 않음 (POST 요청)
 ];
 
 /**
@@ -250,8 +251,8 @@ async function networkFirstStrategy(request) {
   
   try {
     const networkResponse = await fetch(request.clone(), {
-      // 네트워크 타임아웃 설정 (5초)
-      signal: AbortSignal.timeout(5000)
+      // 네트워크 타임아웃 설정 (10초)
+      signal: AbortSignal.timeout(10000)
     });
     
     // 성공적인 응답이면 캐시에 저장 (GET/HEAD 요청만)
