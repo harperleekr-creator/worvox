@@ -5842,6 +5842,31 @@ app.get('/teacher/:teacherCode', (c) => {
   `);
 });
 
+// App V2 - Modern UI Prototype with Real API Integration
+app.get('/app-v2', (c) => {
+  const version = BUILD_TIME;
+  
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>WorVox V2 - Modern Dashboard</title>
+        
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js"></script>
+    </head>
+    <body>
+        <div id="app"></div>
+        
+        <script src="/static/app-v2.js?v=${version}"></script>
+    </body>
+    </html>
+  `);
+});
+
 // Export both app and scheduled job
 export default {
   fetch: app.fetch,
