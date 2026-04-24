@@ -132,10 +132,10 @@ async function generateOpenAITTS(c: any, text: string, voice: string) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'tts-1',
+      model: 'tts-1-hd', // HD model for better quality (same speed as tts-1)
       input: text,
       voice: voice,
-      speed: 1.0,
+      speed: 1.15, // 15% faster playback for quicker responses
     }),
   });
 

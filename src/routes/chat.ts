@@ -57,7 +57,7 @@ chat.post('/message', async (c) => {
         'Authorization': `Bearer ${openaiApiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo', // Fast and efficient for conversation
+        model: 'gpt-4o-mini', // 2-3x faster than gpt-3.5-turbo + better quality
         messages: messages,
         temperature: 0.7,
         max_tokens: 60, // Reduced to 60 for TTS-friendly shorter responses (prevents audio cutoff)
