@@ -3,7 +3,7 @@
  * PWA 오프라인 기능 및 캐싱 전략
  */
 
-const CACHE_VERSION = 'worvox-v4-optimized';
+const CACHE_VERSION = 'worvox-v5-20260424';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const API_CACHE = `${CACHE_VERSION}-api`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
@@ -59,7 +59,7 @@ const NO_CACHE_PATTERNS = [
  * Service Worker 설치 - 개선된 캐싱 전략
  */
 self.addEventListener('install', (event) => {
-  console.log('🔧 Service Worker installing (v4-optimized)...');
+  console.log('🔧 Service Worker installing (v5-20260424)...');
   
   event.waitUntil(
     Promise.all([
@@ -95,7 +95,7 @@ self.addEventListener('install', (event) => {
  * Service Worker 활성화 - 개선된 캐시 정리
  */
 self.addEventListener('activate', (event) => {
-  console.log('✅ Service Worker activating (v4-optimized)...');
+  console.log('✅ Service Worker activating (v5-20260424)...');
   
   event.waitUntil(
     caches.keys()

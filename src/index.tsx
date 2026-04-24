@@ -34,7 +34,7 @@ import messages from './routes/messages';
 import scheduled from './scheduled';
 
 // Cache busting version - update this when deploying new code
-const APP_VERSION = '20260315-cache-fix';
+const APP_VERSION = '20260424-api-fix';
 const BUILD_TIME = Date.now().toString(); // Auto-update on each build
 
 const app = new Hono<{ Bindings: Bindings }>();
