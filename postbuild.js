@@ -10,29 +10,58 @@ const __dirname = path.dirname(__filename);
 
 const routesPath = path.join(__dirname, 'dist', '_routes.json');
 
-// Copy app.js to app.min.js in both public/static and dist/static
-console.log('📦 Copying app.js to app.min.js...');
+// Minify app.js to app.min.js using Terser
+console.log('📦 Minifying app.js to app.min.js with Terser...');
 try {
+  const { minify } = await import('terser');
   const appJsSource = path.join(__dirname, 'public', 'static', 'app.js');
   const appJsDestPublic = path.join(__dirname, 'public', 'static', 'app.min.js');
   const appJsDestDist = path.join(__dirname, 'dist', 'static', 'app.min.js');
   
   if (fs.existsSync(appJsSource)) {
-    // Copy to public/static
-    fs.copyFileSync(appJsSource, appJsDestPublic);
-    console.log('✅ app.min.js created in public/static');
+    const code = fs.readFileSync(appJsSource, 'utf8');
+    const originalSize = Buffer.byteLength(code, 'utf8');
     
-    // Copy to dist/static (for deployment)
-    const distStaticDir = path.join(__dirname, 'dist', 'static');
-    if (fs.existsSync(distStaticDir)) {
-      fs.copyFileSync(appJsSource, appJsDestDist);
-      console.log('✅ app.min.js copied to dist/static');
+    // Minify with Terser
+    const result = await minify(code, {
+      compress: {
+        dead_code: true,
+        drop_console: false, // Keep console for debugging
+        drop_debugger: true,
+        passes: 2
+      },
+      mangle: {
+        toplevel: false,
+        keep_fnames: true // Keep function names for better debugging
+      },
+      format: {
+        comments: false
+      }
+    });
+    
+    if (result.code) {
+      const minifiedSize = Buffer.byteLength(result.code, 'utf8');
+      const reduction = ((1 - minifiedSize / originalSize) * 100).toFixed(2);
+      
+      // Write to public/static
+      fs.writeFileSync(appJsDestPublic, result.code, 'utf8');
+      console.log('✅ app.min.js created in public/static');
+      
+      // Write to dist/static (for deployment)
+      const distStaticDir = path.join(__dirname, 'dist', 'static');
+      if (fs.existsSync(distStaticDir)) {
+        fs.writeFileSync(appJsDestDist, result.code, 'utf8');
+        console.log('✅ app.min.js copied to dist/static');
+      }
+      
+      console.log(`📉 Compression: ${reduction}%`);
+      console.log(`💾 Saved: ${Math.round((originalSize - minifiedSize) / 1024)}KB`);
     }
   } else {
     console.warn('⚠️ app.js not found, skipping app.min.js creation');
   }
 } catch (error) {
-  console.error('❌ Failed to copy app.js:', error);
+  console.error('❌ Failed to minify app.js:', error);
 }
 
 console.log('📝 Updating _routes.json...');
