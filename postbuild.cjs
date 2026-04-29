@@ -8,13 +8,7 @@ async function optimizeFiles() {
   const files = [
     { src: 'public/static/app.js', dest: 'public/static/app.min.js', name: 'app.js' },
     { src: 'public/static/scenario-data.js', dest: 'public/static/scenario-data.min.js', name: 'scenario-data.js' },
-    { src: 'public/static/module-loader.js', dest: 'public/static/module-loader.min.js', name: 'module-loader.js' },
-    { src: 'public/static/payment.js', dest: 'public/static/payment.min.js', name: 'payment.js' },
-    { src: 'public/static/timer.js', dest: 'public/static/timer.min.js', name: 'timer.js' },
-    { src: 'public/static/exam.js', dest: 'public/static/exam.min.js', name: 'exam.js' },
-    { src: 'public/static/vocabulary.js', dest: 'public/static/vocabulary.min.js', name: 'vocabulary.js' },
-    { src: 'public/static/history.js', dest: 'public/static/history.min.js', name: 'history.js' },
-    { src: 'public/static/profile.js', dest: 'public/static/profile.min.js', name: 'profile.js' }
+    { src: 'public/static/module-loader.js', dest: 'public/static/module-loader.min.js', name: 'module-loader.js' }
   ];
   
   let totalOriginal = 0;
