@@ -76,9 +76,378 @@ class WorVox {
     };
     
     // Scenario Mode Data (30 real-life scenarios with practice sentences)
-    
-    // Scenario Mode Data - Loaded from scenario-data.js module
-    this.scenarios = window.WORVOX_SCENARIOS || [];
+    this.scenarios = [
+      { id: 1, title: "공항 체크인", category: "여행", difficulty: "beginner", icon: "✈️", description: "항공편 체크인과 수하물 처리",
+        sentences: [
+          "I'd like to check in for flight KE123 to New York.",
+          "Can I have a window seat, please?",
+          "I have two bags to check in.",
+          "Is the flight on time?",
+          "Where is gate number fifteen?"
+        ],
+        translations: [
+          "뉴욕행 KE123편으로 체크인하고 싶습니다.",
+          "창가 좌석으로 부탁드립니다.",
+          "위탁 수하물이 두 개 있습니다.",
+          "비행기가 정시에 출발하나요?",
+          "15번 게이트가 어디인가요?"
+        ]
+      },
+      { id: 2, title: "호텔 예약", category: "여행", difficulty: "beginner", icon: "🏨", description: "호텔 룸 예약 및 체크인",
+        sentences: [
+          "I have a reservation under the name Smith.",
+          "What time is checkout?",
+          "Could you call a taxi for me, please?",
+          "Does the room have Wi-Fi?",
+          "Is breakfast included in the rate?"
+        ],
+        translations: [
+          "스미스 이름으로 예약했습니다.",
+          "체크아웃 시간이 언제인가요?",
+          "택시를 불러주시겠어요?",
+          "방에 와이파이가 있나요?",
+          "조식이 요금에 포함되어 있나요?"
+        ]
+      },
+      { id: 3, title: "레스토랑 주문", category: "일상", difficulty: "beginner", icon: "🍽️", description: "레스토랑에서 음식 주문하기",
+        sentences: [
+          "Can I see the menu, please?",
+          "I'll have the grilled salmon with vegetables.",
+          "Could I get the bill, please?",
+          "What would you recommend?",
+          "Is this dish spicy?"
+        ],
+        translations: [
+          "메뉴판을 볼 수 있을까요?",
+          "그릴에 구운 연어와 야채로 주세요.",
+          "계산서를 받을 수 있을까요?",
+          "추천해주실 만한 게 있나요?",
+          "이 요리는 매운가요?"
+        ]
+      },
+      { id: 4, title: "길 묻기", category: "일상", difficulty: "beginner", icon: "🗺️", description: "길을 잃었을 때 방향 묻기",
+        sentences: [
+          "Excuse me, how do I get to the train station?",
+          "Is it within walking distance?",
+          "Thank you for your help.",
+          "Should I turn left or right at the traffic light?",
+          "How long will it take to walk there?"
+        ],
+        translations: [
+          "실례합니다, 기차역으로 어떻게 가나요?",
+          "걸어갈 수 있는 거리인가요?",
+          "도와주셔서 감사합니다.",
+          "신호등에서 왼쪽으로 돌아야 하나요, 오른쪽으로 돌아야 하나요?",
+          "걸어서 얼마나 걸리나요?"
+        ]
+      },
+      { id: 5, title: "카페 주문", category: "일상", difficulty: "beginner", icon: "☕", description: "커피숍에서 음료 주문",
+        sentences: [
+          "I'd like a large cappuccino to go, please.",
+          "Do you have any sugar-free options?",
+          "Can I pay with a credit card?",
+          "Could I also get a blueberry muffin?",
+          "Do you have almond milk?"
+        ],
+        translations: [
+          "큰 사이즈 카푸치노 테이크아웃으로 주세요.",
+          "무설탕 옵션이 있나요?",
+          "신용카드로 결제할 수 있나요?",
+          "블루베리 머핀도 하나 주시겠어요?",
+          "아몬드 우유가 있나요?"
+        ]
+      },
+      { id: 6, title: "택시 타기", category: "교통", difficulty: "beginner", icon: "🚕", description: "택시 타고 목적지 가기",
+        sentences: [
+          "Could you take me to the airport, please?",
+          "How long will it take to get there?",
+          "Keep the change, thank you.",
+          "Can you help me with my luggage?",
+          "Could you turn on the air conditioning?"
+        ],
+        translations: [
+          "공항으로 가주시겠어요?",
+          "거기까지 얼마나 걸리나요?",
+          "거스름돈은 가지세요, 감사합니다.",
+          "짐 좀 도와주시겠어요?",
+          "에어컨 좀 켜주시겠어요?"
+        ]
+      },
+      { id: 7, title: "쇼핑하기", category: "일상", difficulty: "beginner", icon: "🛍️", description: "매장에서 물건 구매하기",
+        sentences: [
+          "Do you have this in a smaller size?",
+          "How much does this cost?",
+          "I'll take it. Can I pay by card?",
+          "Can I try this on?",
+          "Do you have this in a different color?"
+        ],
+        translations: [
+          "이것보다 작은 사이즈가 있나요?",
+          "이것은 얼마인가요?",
+          "이걸로 하겠습니다. 카드로 결제할 수 있나요?",
+          "이것 입어봐도 될까요?",
+          "이것 다른 색깔로 있나요?"
+        ]
+      },
+      { id: 8, title: "은행 업무", category: "비즈니스", difficulty: "intermediate", icon: "🏦", description: "계좌 개설 및 은행 업무",
+        sentences: [
+          "I'd like to open a checking account.",
+          "What documents do I need to bring?",
+          "What's the minimum balance requirement?",
+          "Are there any monthly fees?",
+          "How long will it take to process?"
+        ],
+        translations: [
+          "당좌예금 계좌를 개설하고 싶습니다.",
+          "어떤 서류를 가져와야 하나요?",
+          "최소 잔액 요건이 얼마인가요?",
+          "월 수수료가 있나요?",
+          "처리하는 데 얼마나 걸리나요?"
+        ]
+      },
+      { id: 9, title: "병원 예약", category: "일상", difficulty: "intermediate", icon: "🏥", description: "의사 진료 예약하기",
+        sentences: [
+          "I'd like to make an appointment with Doctor Johnson.",
+          "I've been having headaches for the past week.",
+          "Do you accept my insurance?",
+          "What's the earliest available appointment?",
+          "Should I bring my medical records?"
+        ],
+        translations: [
+          "존슨 박사님과 진료 예약을 하고 싶습니다.",
+          "지난 주부터 계속 두통이 있었습니다.",
+          "제 보험을 받으시나요?",
+          "가장 빠른 예약 가능한 시간이 언제인가요?",
+          "진료 기록을 가져와야 하나요?"
+        ]
+      },
+      { id: 10, title: "전화 예약", category: "일상", difficulty: "intermediate", icon: "📞", description: "전화로 레스토랑 예약",
+        sentences: [
+          "I'd like to make a reservation for four people at seven PM.",
+          "Do you have any tables available by the window?",
+          "Could you please confirm my reservation?",
+          "Is there a dress code?",
+          "Can we bring our own wine?"
+        ],
+        translations: [
+          "저녁 7시에 4명으로 예약하고 싶습니다.",
+          "창가 자리가 있나요?",
+          "예약을 확인해주시겠어요?",
+          "복장 규정이 있나요?",
+          "와인을 직접 가져가도 되나요?"
+        ]
+      },
+      { id: 11, title: "면접 대비", category: "비즈니스", difficulty: "advanced", icon: "💼", description: "영어 취업 면접 준비",
+        sentences: [
+          "I have five years of experience in digital marketing.",
+          "I believe my skills align perfectly with this position.",
+          "What opportunities are there for professional development?",
+          "Why should we hire you for this role?",
+          "Where do you see yourself in five years?"
+        ],
+        translations: [
+          "저는 디지털 마케팅 분야에서 5년의 경력이 있습니다.",
+          "제 능력이 이 직책에 완벽하게 부합한다고 생각합니다.",
+          "전문성 개발을 위한 기회는 어떤 것이 있나요?",
+          "왜 저를 이 역할에 채용해야 할까요?",
+          "5년 후 자신의 모습을 어떻게 보시나요?"
+        ]
+      },
+      { id: 12, title: "회의 진행", category: "비즈니스", difficulty: "advanced", icon: "👥", description: "영어 비즈니스 미팅",
+        sentences: [
+          "Let's move on to the next item on the agenda.",
+          "I'd like to propose an alternative approach.",
+          "Could we schedule a follow-up meeting next week?",
+          "Does anyone have any questions or concerns?",
+          "Let's take a five-minute break."
+        ]
+      },
+      { id: 13, title: "프레젠테이션", category: "비즈니스", difficulty: "advanced", icon: "📊", description: "영어 발표 연습",
+        sentences: [
+          "Today, I'll be presenting our quarterly sales results.",
+          "As you can see from this chart, sales increased by fifteen percent.",
+          "Are there any questions before we proceed?",
+          "Let me highlight the key findings.",
+          "In conclusion, we exceeded our targets this quarter."
+        ]
+      },
+      { id: 14, title: "고객 응대", category: "비즈니스", difficulty: "intermediate", icon: "🤝", description: "고객 서비스 상황",
+        sentences: [
+          "How may I assist you today?",
+          "I apologize for any inconvenience this may have caused.",
+          "Is there anything else I can help you with?",
+          "Let me look into that for you right away.",
+          "Thank you for bringing this to our attention."
+        ]
+      },
+      { id: 15, title: "클레임 처리", category: "비즈니스", difficulty: "intermediate", icon: "⚠️", description: "불만 사항 처리하기",
+        sentences: [
+          "I understand your frustration, and I'm here to help.",
+          "Let me check what options are available for you.",
+          "We'll process your refund within three business days.",
+          "I'll personally ensure this issue is resolved.",
+          "Would you like to speak with a supervisor?"
+        ]
+      },
+      { id: 16, title: "헬스장 등록", category: "일상", difficulty: "beginner", icon: "💪", description: "체육관 회원 가입",
+        sentences: [
+          "I'm interested in signing up for a gym membership.",
+          "What are your membership options?",
+          "Do you offer personal training sessions?",
+          "Can I get a tour of the facility?",
+          "What are your operating hours?"
+        ]
+      },
+      { id: 17, title: "영화관 예매", category: "여가", difficulty: "beginner", icon: "🎬", description: "영화표 예매하기",
+        sentences: [
+          "Two tickets for the seven o'clock showing, please.",
+          "Are there any seats available in the middle section?",
+          "Can I get a large popcorn and two drinks?",
+          "Do you offer student discounts?",
+          "How long is the movie?"
+        ]
+      },
+      { id: 18, title: "우체국 업무", category: "일상", difficulty: "intermediate", icon: "📮", description: "소포 발송하기",
+        sentences: [
+          "I'd like to send this package to Los Angeles.",
+          "How long will it take to arrive?",
+          "I'd like to insure it for one hundred dollars.",
+          "Do you offer tracking service?",
+          "What's the weight limit for this package?"
+        ]
+      },
+      { id: 19, title: "렌터카 빌리기", category: "여행", difficulty: "intermediate", icon: "🚗", description: "렌터카 대여 절차",
+        sentences: [
+          "I have a reservation for a compact car.",
+          "Is insurance included in the price?",
+          "What time should I return the car?",
+          "Is there a mileage limit?",
+          "Can I drop off the car at a different location?"
+        ]
+      },
+      { id: 20, title: "부동산 문의", category: "비즈니스", difficulty: "advanced", icon: "🏠", description: "집 구하기 및 계약",
+        sentences: [
+          "I'm looking for a two-bedroom apartment in the downtown area.",
+          "What's included in the monthly rent?",
+          "When would be the earliest move-in date?",
+          "Are pets allowed in the building?",
+          "What's the lease term?"
+        ]
+      },
+      { id: 21, title: "전화 영어", category: "비즈니스", difficulty: "intermediate", icon: "☎️", description: "업무 전화 통화",
+        sentences: [
+          "This is John Smith calling from ABC Company.",
+          "Could I speak with Mr. Johnson, please?",
+          "I'll send you an email with the details shortly.",
+          "May I leave a message?",
+          "Could you please repeat that?"
+        ]
+      },
+      { id: 22, title: "이메일 작성", category: "비즈니스", difficulty: "intermediate", icon: "✉️", description: "비즈니스 이메일 상황",
+        sentences: [
+          "I'm writing to inquire about the product specifications.",
+          "Could you please provide more information?",
+          "I look forward to hearing from you soon.",
+          "Thank you for your prompt response.",
+          "Please let me know if you need any additional information."
+        ]
+      },
+      { id: 23, title: "네트워킹", category: "비즈니스", difficulty: "advanced", icon: "🌐", description: "네트워킹 이벤트 대화",
+        sentences: [
+          "It's a pleasure to meet you. I work in software development.",
+          "What brings you to this conference?",
+          "Here's my business card. Let's keep in touch.",
+          "Have you attended this event before?",
+          "I'd love to connect on LinkedIn."
+        ]
+      },
+      { id: 24, title: "협상하기", category: "비즈니스", difficulty: "advanced", icon: "🤝", description: "비즈니스 협상 연습",
+        sentences: [
+          "I believe we can reach a mutually beneficial agreement.",
+          "Would you be open to discussing a volume discount?",
+          "Let's review the terms one more time before finalizing.",
+          "What are your payment terms?",
+          "Can we schedule a follow-up call next week?"
+        ]
+      },
+      { id: 25, title: "미용실 가기", category: "일상", difficulty: "beginner", icon: "💇", description: "헤어 스타일 주문",
+        sentences: [
+          "I'd like a haircut and a blow-dry, please.",
+          "Could you take about two inches off the length?",
+          "That looks great, thank you.",
+          "Can you recommend a good shampoo?",
+          "How often should I get a trim?"
+        ]
+      },
+      { id: 26, title: "약국 방문", category: "일상", difficulty: "intermediate", icon: "💊", description: "약국에서 약 구매",
+        sentences: [
+          "I need something for a headache.",
+          "Do I need a prescription for this medication?",
+          "How often should I take this?",
+          "Are there any side effects I should know about?",
+          "Can I take this with food?"
+        ]
+      },
+      { id: 27, title: "스몰톡", category: "일상", difficulty: "beginner", icon: "💬", description: "일상적인 가벼운 대화",
+        sentences: [
+          "How's your day going so far?",
+          "The weather is beautiful today, isn't it?",
+          "Have a great weekend!",
+          "Did you do anything fun recently?",
+          "I hope you have a wonderful day!"
+        ]
+      },
+      { id: 28, title: "날씨 이야기", category: "일상", difficulty: "beginner", icon: "🌤️", description: "날씨에 관한 대화",
+        sentences: [
+          "It looks like it's going to rain later.",
+          "I hope the weather stays nice for the weekend.",
+          "It's been unusually warm this year.",
+          "I heard there's a storm coming tomorrow.",
+          "The forecast says it'll be sunny all week."
+        ]
+      },
+      { id: 29, title: "취미 이야기", category: "일상", difficulty: "intermediate", icon: "🎨", description: "취미와 관심사 공유",
+        sentences: [
+          "I enjoy hiking on the weekends.",
+          "Have you tried any new restaurants lately?",
+          "I've been learning to play the guitar recently.",
+          "What do you like to do in your free time?",
+          "I'm thinking about taking up photography."
+        ]
+      },
+      { id: 30, title: "여행 경험", category: "여가", difficulty: "intermediate", icon: "🌍", description: "여행 경험 나누기",
+        sentences: [
+          "I visited Paris last summer, and it was amazing.",
+          "The local food was absolutely delicious.",
+          "I'd love to go back someday.",
+          "Have you ever been to Europe?",
+          "I'm planning a trip to Japan next year."
+        ],
+        translations: [
+          "지난 여름에 파리를 방문했는데 정말 놀라웠습니다.",
+          "현지 음식이 정말 맛있었습니다.",
+          "언젠가 다시 가고 싶습니다.",
+          "유럽에 가본 적 있으신가요?",
+          "내년에 일본 여행을 계획하고 있습니다."
+        ]
+      },
+      { id: 31, title: "Military English", category: "비즈니스", difficulty: "advanced", icon: "🎖️", description: "군사 작전 및 임무 관련 대화",
+        sentences: [
+          "Roger that, we're proceeding to the designated checkpoint.",
+          "Request permission to engage the target.",
+          "All units, stand by for further instructions.",
+          "Enemy contact at grid coordinates three-one-seven-niner.",
+          "Mission accomplished, returning to base."
+        ],
+        translations: [
+          "알겠습니다, 지정된 검문소로 이동 중입니다.",
+          "목표물 교전 허가를 요청합니다.",
+          "전 부대, 추가 지시가 있을 때까지 대기하십시오.",
+          "좌표 3179에서 적과 조우했습니다.",
+          "임무 완수, 기지로 복귀 중입니다."
+        ]
+      }
+    ];
     
     // Onboarding state
     this.onboardingData = {

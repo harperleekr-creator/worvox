@@ -4089,6 +4089,8 @@ app.get('/app', (c) => {
         <script src="/static/gamification.js?v=${version}"></script>
         <script src="/static/daily-goals.js?v=${version}"></script>
         <script src="/static/daily-goals-integration.js?v=${version}"></script>
+        <!-- Load scenario data before app.min.js -->
+        <script src="/static/scenario-data.js?v=${version}"></script>
         <script src="/static/app.min.js?v=${version}"></script>
         <!-- CRITICAL: Patches must load immediately after app.min.js -->
         <script src="/static/app-login-patch.js?v=${version}"></script>
