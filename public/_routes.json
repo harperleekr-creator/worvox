@@ -12,14 +12,6 @@
     "/*.webp",
     "/sw.js",
     "/manifest.json",
-    "/static/dashboard-modern-prototype.html",
-    "/static/dashboard-preview.html",
-    "/static/design-preview.html",
-    "/static/prototype-courses.html",
-    "/static/prototype-courses-v2.html",
-    "/static/prototype-mobile.html",
-    "/static/prototype-profile.html",
-    "/static/prototype-profile-v2.html",
     "/test-toss.html",
     "/test.html"
   ]
