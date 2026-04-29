@@ -1136,7 +1136,7 @@ window.toast.remove(loadingToast);
     - 매출 통계 (이번 달, 총 매출)
     - 활성 상태 표시
   - ✅ **보안**:
-    - 관리자 PIN (9999) 인증 필수
+    - 관리자 PIN 인증 필수 (환경변수로 관리)
     - 로그아웃 기능
   - ✅ **디자인**:
     - Indigo-Pink 그라데이션 테마
@@ -1151,7 +1151,7 @@ window.toast.remove(loadingToast);
   
 **접속 방법**:
 1. https://worvox.com/admin/dashboard 접속
-2. Admin PIN 입력: `9999`
+2. Admin PIN 입력 (관리자에게 문의)
 3. 전체 강사 통계 및 관리 화면 확인
 
 ---
