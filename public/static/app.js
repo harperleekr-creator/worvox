@@ -8377,35 +8377,41 @@ Proceed to payment?
 
   async processAudio(recordedAudio) {
     try {
-      console.log('Processing audio blob:', recordedAudio.size, 'bytes, type:', recordedAudio.type);
+      console.log('⚡ Fast processing audio:', recordedAudio.size, 'bytes');
+      
+      // Show immediate feedback
+      document.getElementById('statusText').textContent = 'Transcribing...';
       
       // Step 1: Transcribe audio
       const formData = new FormData();
-      // Determine file extension based on mime type
       const fileExt = recordedAudio.type.includes('webm') ? 'webm' : 
                      recordedAudio.type.includes('mp4') ? 'm4a' : 
                      recordedAudio.type.includes('ogg') ? 'ogg' : 'webm';
       formData.append('audio', recordedAudio, `recording.${fileExt}`);
 
-      console.log('Sending to STT API...');
+      console.log('⚡ Sending to STT API...');
+      const sttStart = Date.now();
       const transcriptionResponse = await axios.post('/api/stt/transcribe', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
+      console.log(`⚡ STT completed in ${Date.now() - sttStart}ms`);
 
-      console.log('STT Response:', transcriptionResponse.data);
       const transcription = transcriptionResponse.data.transcription;
       
       if (!transcription || transcription.trim() === '') {
         throw new Error('No transcription received. Please speak clearly.');
       }
       
-      // Add user message to UI
+      // Add user message to UI immediately
       this.addMessage(transcription, 'user');
-
-      // Step 2: Get AI response
-      console.log('Sending to Chat API...');
       
-      // Use scenario context if available, otherwise use topic system prompt
+      // Update status
+      document.getElementById('statusText').textContent = 'AI is thinking...';
+
+      // Step 2: Get AI response & TTS in parallel (where possible)
+      console.log('⚡ Sending to Chat API...');
+      const chatStart = Date.now();
+      
       const systemPrompt = this.currentScenarioContext || this.currentTopic.systemPrompt;
       
       const chatResponse = await axios.post('/api/chat/message', {
@@ -8413,65 +8419,61 @@ Proceed to payment?
         userMessage: transcription,
         systemPrompt: systemPrompt
       });
+      console.log(`⚡ Chat completed in ${Date.now() - chatStart}ms`);
 
-      console.log('Chat Response:', chatResponse.data);
       const aiMessage = chatResponse.data.message;
       
-      // Add AI message to UI (without audio yet)
+      // Add AI message to UI immediately (before TTS completes)
       this.addMessage(aiMessage, 'assistant');
       
-      // ✅ Add words count (estimate based on transcription length)
+      // Update status
+      document.getElementById('statusText').textContent = 'Generating voice...';
+      
+      // Background tasks (non-blocking)
       if (this.currentUser) {
-        try {
-          const wordCount = transcription.split(/\s+/).length;
-          const wordsResponse = await axios.post('/api/gamification/words/add', {
-            userId: this.currentUser.id,
-            words: wordCount,
-            activityType: 'ai_conversation'
-          });
-          if (wordsResponse.data.success) {
-            console.log('✅ Words added:', wordsResponse.data.wordsAdded, '| Total:', wordsResponse.data.totalWords);
+        const wordCount = transcription.split(/\s+/).length;
+        // Fire and forget - don't block on this
+        axios.post('/api/gamification/words/add', {
+          userId: this.currentUser.id,
+          words: wordCount,
+          activityType: 'ai_conversation'
+        }).then(res => {
+          if (res.data.success) {
+            console.log('✅ Words added:', res.data.wordsAdded);
           }
-          
-          // ✅ Update daily goal: conversation count
-          if (typeof window.updateDailyGoalProgress === 'function') {
-            await window.updateDailyGoalProgress('conversation', 1);
-            console.log('✅ Daily goal updated: +1 conversation');
-          }
-        } catch (error) {
-          console.error('❌ Failed to add words:', error);
+        }).catch(err => console.error('❌ Failed to add words:', err));
+        
+        // Update daily goal (non-blocking)
+        if (typeof window.updateDailyGoalProgress === 'function') {
+          window.updateDailyGoalProgress('conversation', 1)
+            .then(() => console.log('✅ Daily goal updated'))
+            .catch(err => console.error('❌ Failed to update goal:', err));
         }
       }
 
       // Step 3: Generate speech for AI response
-      console.log('Sending to TTS API...');
+      console.log('⚡ Sending to TTS API...');
+      const ttsStart = Date.now();
       const ttsResponse = await axios.post('/api/tts/speak', {
         text: aiMessage
       }, {
         responseType: 'arraybuffer'
       });
-
-      console.log('TTS Response received:', ttsResponse.data.byteLength, 'bytes');
-      console.log('TTS Response type:', typeof ttsResponse.data);
-      console.log('TTS Response constructor:', ttsResponse.data.constructor.name);
+      console.log(`⚡ TTS completed in ${Date.now() - ttsStart}ms`);
       
       // Create audio blob and URL
       const ttsAudioBlob = new Blob([ttsResponse.data], { type: 'audio/mpeg' });
-      console.log('Blob created:', ttsAudioBlob.size, 'bytes, type:', ttsAudioBlob.type);
-      
       const audioUrl = URL.createObjectURL(ttsAudioBlob);
-      console.log('Audio URL created:', audioUrl);
       
       // Store audio URL for replay button
       const lastMessageIndex = this.messages.length - 1;
       this.messages[lastMessageIndex].audioUrl = audioUrl;
-      console.log('Audio URL stored in message index:', lastMessageIndex);
       
-      // Add replay button to the last AI message
+      // Add replay button
       this.addReplayButton(lastMessageIndex);
       
-      // Play audio
-      console.log('Playing audio...');
+      // Play audio immediately
+      console.log('⚡ Playing audio...');
       this.playAudio(audioUrl);
 
       // Reset UI
