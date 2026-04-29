@@ -525,8 +525,12 @@ app.post('/admin/dashboard', async (c: Context) => {
   const { DB } = c.env as Bindings
 
   try {
-    // Verify admin PIN (you can change this to a more secure method)
-    const ADMIN_PIN = '9999' // 관리자 PIN
+    // Verify admin PIN from environment variable
+    const ADMIN_PIN = c.env.ADMIN_PIN
+    
+    if (!ADMIN_PIN) {
+      return c.json({ success: false, error: 'Admin PIN not configured' }, 500)
+    }
     
     if (adminPin !== ADMIN_PIN) {
       return c.json({ success: false, error: 'Invalid admin PIN' }, 401)
@@ -668,8 +672,12 @@ app.post('/admin/teacher-detail', async (c: Context) => {
   const { DB } = c.env as Bindings
 
   try {
-    // Verify admin PIN
-    const ADMIN_PIN = '9999'
+    // Verify admin PIN from environment variable
+    const ADMIN_PIN = c.env.ADMIN_PIN
+    
+    if (!ADMIN_PIN) {
+      return c.json({ success: false, error: 'Admin PIN not configured' }, 500)
+    }
     
     if (adminPin !== ADMIN_PIN) {
       return c.json({ success: false, error: 'Invalid admin PIN' }, 401)
