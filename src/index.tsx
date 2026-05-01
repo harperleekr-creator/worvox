@@ -4218,7 +4218,7 @@ app.get('/career-seminar', (c) => {
             <div class="max-w-5xl mx-auto">
                 <div class="text-center mb-12">
                     <h2 class="text-3xl md:text-4xl font-bold mb-4">연사 소개</h2>
-                    <p class="text-lg text-indigo-200">15년 이상 글로벌 기업 경험을 가진 전문가</p>
+                    <p class="text-lg text-indigo-200">한국 기업과 외국계 기업을 모두 경험한 글로벌 전문가</p>
                 </div>
 
                 <div class="bg-white/10 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-white/20">
@@ -4234,49 +4234,52 @@ app.get('/career-seminar', (c) => {
                         <div class="md:col-span-2">
                             <div class="mb-6">
                                 <h3 class="text-3xl md:text-4xl font-bold mb-2">James Rosenberg II</h3>
-                                <p class="text-indigo-200 text-lg">Global Business Expert</p>
                             </div>
 
-                            <div class="space-y-4">
+                            <div class="space-y-3 mb-6">
                                 <div class="flex items-start gap-3">
-                                    <div class="bg-indigo-500 rounded-lg p-2 mt-1">
-                                        <i class="fas fa-briefcase"></i>
-                                    </div>
-                                    <div>
-                                        <div class="font-bold text-lg">Current</div>
-                                        <div class="text-indigo-200">General Manager, Triple J Technologies</div>
-                                    </div>
+                                    <div class="text-indigo-300 text-sm flex-shrink-0">현)</div>
+                                    <div class="text-white font-semibold">Neo Pacific Consulting Founder & Managing Director</div>
                                 </div>
 
                                 <div class="flex items-start gap-3">
-                                    <div class="bg-purple-500 rounded-lg p-2 mt-1">
-                                        <i class="fas fa-building"></i>
-                                    </div>
-                                    <div>
-                                        <div class="font-bold text-lg">Former</div>
-                                        <div class="text-indigo-200">Team Lead, LG H&H (Global Business Division)</div>
-                                    </div>
+                                    <div class="text-indigo-300 text-sm flex-shrink-0">전)</div>
+                                    <div class="text-indigo-200">LG생활건강 글로벌 사업 Advisor</div>
                                 </div>
 
                                 <div class="flex items-start gap-3">
-                                    <div class="bg-pink-500 rounded-lg p-2 mt-1">
-                                        <i class="fas fa-rocket"></i>
-                                    </div>
-                                    <div>
-                                        <div class="font-bold text-lg">Former</div>
-                                        <div class="text-indigo-200">Director of Business Development, Blink Charging</div>
-                                    </div>
+                                    <div class="text-indigo-300 text-sm flex-shrink-0">전)</div>
+                                    <div class="text-indigo-200">Blink Charging Asia 총괄 Director</div>
+                                </div>
+
+                                <div class="flex items-start gap-3">
+                                    <div class="text-indigo-300 text-sm flex-shrink-0">전)</div>
+                                    <div class="text-indigo-200">Triple J Technologies General Manager</div>
+                                </div>
+
+                                <div class="pt-2 border-t border-white/20">
+                                    <p class="text-indigo-200 text-sm">
+                                        <i class="fas fa-building mr-2"></i>NTT, T-Mobile 등 글로벌 기업 경험 포함
+                                    </p>
                                 </div>
                             </div>
 
-                            <div class="mt-6 bg-white/10 rounded-xl p-4 border border-white/20">
-                                <p class="text-sm text-indigo-100 leading-relaxed">
-                                    <i class="fas fa-quote-left text-indigo-400 mr-2"></i>
-                                    한국과 미국에서 15년 이상 글로벌 비즈니스를 이끌어온 전문가입니다. 
-                                    실제 외국계 기업의 채용 프로세스, 업무 문화, 커리어 개발 전략을 
-                                    생생하게 공유합니다.
-                                    <i class="fas fa-quote-right text-indigo-400 ml-2"></i>
-                                </p>
+                            <div class="space-y-3 bg-white/10 rounded-xl p-5 border border-white/20">
+                                <div class="flex items-start gap-3">
+                                    <div class="text-yellow-400 text-xl flex-shrink-0">👉</div>
+                                    <p class="text-white text-sm leading-relaxed">
+                                        15년 이상 한국과 글로벌 기업을 오가며<br/>
+                                        <strong>"외국계 기업에서 어떻게 일하고 성장하는지"</strong>를 직접 경험
+                                    </p>
+                                </div>
+                                
+                                <div class="flex items-start gap-3">
+                                    <div class="text-yellow-400 text-xl flex-shrink-0">👉</div>
+                                    <p class="text-white text-sm leading-relaxed">
+                                        단순 이론이 아닌,<br/>
+                                        <strong>현실적인 취업 전략과 커리어 방향</strong>을 제시
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
