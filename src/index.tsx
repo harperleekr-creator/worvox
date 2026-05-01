@@ -4220,10 +4220,10 @@ app.get('/career-seminar', (c) => {
 
                 <div class="bg-white/10 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-white/20">
                     <div class="grid md:grid-cols-3 gap-8 items-center">
-                        <!-- Speaker Photo Placeholder -->
+                        <!-- Speaker Photo -->
                         <div class="md:col-span-1">
-                            <div class="bg-gradient-to-br from-indigo-400 to-purple-400 rounded-2xl aspect-square flex items-center justify-center text-8xl float-animation">
-                                👨‍💼
+                            <div class="rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20 float-animation">
+                                <img src="https://www.genspark.ai/api/files/s/g115Utgq" alt="James Rosenberg II" class="w-full h-full object-cover"/>
                             </div>
                         </div>
 
