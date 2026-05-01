@@ -4032,9 +4032,6 @@ app.get('/career-seminar', (c) => {
                     </h1>
                     
                     <!-- Sub Headline -->
-                    <p class="text-xl md:text-2xl text-gray-700 mb-4 font-medium">
-                        LG H&H 출신 미국인 전문가가 직접 알려주는
-                    </p>
                     <p class="text-lg md:text-xl text-gray-600 mb-8">
                         글로벌 기업 면접 · 커리어 개발 · 영어 커뮤니케이션 실전 노하우
                     </p>
@@ -4397,7 +4394,8 @@ app.get('/career-seminar', (c) => {
 
                 <!-- Program Schedule -->
                 <div class="bg-gradient-to-br from-gray-900 to-indigo-900 rounded-3xl p-8 md:p-12 text-white">
-                    <h3 class="text-2xl md:text-3xl font-bold mb-8 text-center">세미나 프로그램</h3>
+                    <h3 class="text-2xl md:text-3xl font-bold mb-2 text-center">세미나 프로그램</h3>
+                    <p class="text-center text-indigo-300 text-sm mb-6">(일정 변동 가능)</p>
                     
                     <div class="space-y-4">
                         <div class="flex items-start gap-4 bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/20">
