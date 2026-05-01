@@ -3925,6 +3925,899 @@ app.get('/pricing', (c) => {
   `);
 });
 
+// WorVox Career Seminar Landing Page
+app.get('/career-seminar', (c) => {
+  return c.html(`
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-1W0YMPPVH7"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-1W0YMPPVH7');
+        </script>
+        
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+        <meta name="theme-color" content="#6366f1">
+        <title>WorVox Career 세미나 | 외국계 취업 성공 전략 - 5월 21일</title>
+        
+        <!-- SEO Meta Tags -->
+        <meta name="description" content="외국계 기업 취업을 위한 실전 전략! LG H&H 출신 James Rosenberg와 함께하는 WorVox Career 세미나. 5월 21일, 한남대학교 무어관 2층. 선착순 70명, 50% 할인 24,500원.">
+        <meta name="keywords" content="외국계 취업, 취업 세미나, 이직 준비, 영어 면접, 커리어 개발, LG H&H, James Rosenberg, WorVox Career">
+        <meta name="robots" content="index, follow">
+        
+        <!-- Open Graph -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://worvox.com/career-seminar">
+        <meta property="og:title" content="WorVox Career 세미나 | 외국계 취업 성공 전략">
+        <meta property="og:description" content="외국계 기업 출신 전문가와 함께하는 실전 취업 전략! 5월 21일, 선착순 70명 한정.">
+        <meta property="og:image" content="https://worvox.com/logo.png">
+        
+        <link rel="canonical" href="https://worvox.com/career-seminar">
+        
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+        
+        <style>
+          @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+          }
+          .float-animation {
+            animation: float 3s ease-in-out infinite;
+          }
+          @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.6); }
+          }
+          .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+          }
+          .gradient-text {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+          }
+        </style>
+    </head>
+    <body class="bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+        <!-- Fixed CTA Button (Mobile) -->
+        <div class="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t-2 border-indigo-200 p-3 shadow-2xl">
+            <a href="https://hiing.co.kr/index/view/6082786" 
+               target="_blank"
+               class="block w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-bold text-center text-lg shadow-xl transform active:scale-95 transition-all"
+               onclick="gtag('event', 'cta_click', { 'event_category': 'seminar', 'event_label': 'mobile_fixed_cta', 'value': 1 })">
+                <i class="fas fa-bolt mr-2"></i>지금 바로 신청하기
+            </a>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="bg-white/90 backdrop-blur-md border-b border-gray-200 sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <a href="/" class="flex items-center gap-2">
+                        <span class="text-2xl font-bold gradient-text">WorVox Career</span>
+                    </a>
+                    <a href="https://hiing.co.kr/index/view/6082786" 
+                       target="_blank"
+                       class="hidden md:inline-block bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-2 rounded-lg font-semibold hover:shadow-lg transition transform hover:scale-105"
+                       onclick="gtag('event', 'cta_click', { 'event_category': 'seminar', 'event_label': 'nav_cta', 'value': 1 })">
+                        <i class="fas fa-calendar-check mr-2"></i>신청하기
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="pt-12 md:pt-20 pb-16 px-4">
+            <div class="max-w-5xl mx-auto">
+                <!-- Urgency Badge -->
+                <div class="flex justify-center mb-6">
+                    <div class="inline-flex items-center gap-2 bg-red-100 text-red-700 px-5 py-2 rounded-full text-sm font-bold pulse-glow border-2 border-red-300">
+                        <i class="fas fa-fire text-red-600"></i>
+                        <span>선착순 70명 한정 · 조기 마감 예상</span>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <!-- Main Headline -->
+                    <h1 class="text-4xl md:text-6xl lg:text-7xl font-black text-gray-900 mb-6 leading-tight">
+                        <span class="block mb-2">외국계 기업 취업,</span>
+                        <span class="gradient-text">실전 전략이 필요합니다</span>
+                    </h1>
+                    
+                    <!-- Sub Headline -->
+                    <p class="text-xl md:text-2xl text-gray-700 mb-4 font-medium">
+                        LG H&H 출신 미국인 전문가가 직접 알려주는
+                    </p>
+                    <p class="text-lg md:text-xl text-gray-600 mb-8">
+                        글로벌 기업 면접 · 커리어 개발 · 영어 커뮤니케이션 실전 노하우
+                    </p>
+
+                    <!-- Event Info Cards -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 max-w-3xl mx-auto">
+                        <div class="bg-white rounded-xl p-4 shadow-lg border-2 border-indigo-100">
+                            <div class="text-indigo-600 text-2xl mb-2"><i class="fas fa-calendar-day"></i></div>
+                            <div class="text-sm text-gray-600">날짜</div>
+                            <div class="font-bold text-gray-900">5월 21일 (목)</div>
+                        </div>
+                        <div class="bg-white rounded-xl p-4 shadow-lg border-2 border-purple-100">
+                            <div class="text-purple-600 text-2xl mb-2"><i class="fas fa-clock"></i></div>
+                            <div class="text-sm text-gray-600">시간</div>
+                            <div class="font-bold text-gray-900">18:00 - 20:00</div>
+                        </div>
+                        <div class="bg-white rounded-xl p-4 shadow-lg border-2 border-pink-100">
+                            <div class="text-pink-600 text-2xl mb-2"><i class="fas fa-users"></i></div>
+                            <div class="text-sm text-gray-600">정원</div>
+                            <div class="font-bold text-gray-900">선착순 70명</div>
+                        </div>
+                        <div class="bg-white rounded-xl p-4 shadow-lg border-2 border-green-100">
+                            <div class="text-green-600 text-2xl mb-2"><i class="fas fa-tag"></i></div>
+                            <div class="text-sm text-gray-600 line-through">49,000원</div>
+                            <div class="font-bold text-green-600">24,500원</div>
+                        </div>
+                    </div>
+
+                    <!-- Primary CTA -->
+                    <a href="https://hiing.co.kr/index/view/6082786" 
+                       target="_blank"
+                       class="inline-block bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-10 py-5 rounded-2xl font-bold text-xl hover:shadow-2xl transition-all transform hover:scale-105 mb-4"
+                       onclick="gtag('event', 'cta_click', { 'event_category': 'seminar', 'event_label': 'hero_primary_cta', 'value': 1 })">
+                        <i class="fas fa-rocket mr-2"></i>지금 바로 신청하기
+                    </a>
+                    
+                    <p class="text-sm text-gray-600 mb-2">
+                        <i class="fas fa-check-circle text-green-600 mr-1"></i>현장 결제 가능 · 핑거푸드 제공
+                    </p>
+                    <p class="text-sm text-gray-600">
+                        <i class="fas fa-map-marker-alt text-indigo-600 mr-1"></i>한남대학교 무어관 2층 (대전)
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Target Audience Section -->
+        <section class="py-16 px-4 bg-white">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                        이런 분들을 위한 세미나입니다
+                    </h2>
+                    <p class="text-lg text-gray-600">하나라도 해당된다면, 꼭 참여하세요!</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border-2 border-indigo-100 hover:shadow-xl transition-all">
+                        <div class="text-5xl mb-4">🎓</div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">취업 준비생</h3>
+                        <ul class="text-gray-700 space-y-2 text-sm">
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-indigo-600 mt-1"></i>
+                                <span>외국계 기업 입사를 목표로 하는 대학생</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-indigo-600 mt-1"></i>
+                                <span>글로벌 커리어를 꿈꾸는 취준생</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-indigo-600 mt-1"></i>
+                                <span>영어 면접이 두려운 분</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border-2 border-purple-100 hover:shadow-xl transition-all">
+                        <div class="text-5xl mb-4">💼</div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">이직 준비자</h3>
+                        <ul class="text-gray-700 space-y-2 text-sm">
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-purple-600 mt-1"></i>
+                                <span>국내 기업에서 외국계로 이직 희망</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-purple-600 mt-1"></i>
+                                <span>더 나은 커리어 기회를 찾는 직장인</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-purple-600 mt-1"></i>
+                                <span>글로벌 업무 환경 적응이 필요한 분</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-100 hover:shadow-xl transition-all">
+                        <div class="text-5xl mb-4">🚀</div>
+                        <h3 class="text-xl font-bold text-gray-900 mb-3">커리어 성장</h3>
+                        <ul class="text-gray-700 space-y-2 text-sm">
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-green-600 mt-1"></i>
+                                <span>영어 커뮤니케이션 스킬 향상</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-green-600 mt-1"></i>
+                                <span>외국계 기업 문화 이해가 필요한 분</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check text-green-600 mt-1"></i>
+                                <span>글로벌 네트워킹을 원하는 분</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pain Points Section -->
+        <section class="py-16 px-4 bg-gradient-to-b from-gray-50 to-white">
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                        이런 고민, 하고 계신가요?
+                    </h2>
+                    <p class="text-lg text-gray-600">외국계 취업의 가장 큰 장벽들</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-xl p-6 shadow-lg border-l-4 border-red-500">
+                        <div class="flex items-start gap-4">
+                            <div class="text-3xl">😰</div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 mb-2">영어 면접이 두렵습니다</h3>
+                                <p class="text-gray-600 text-sm">"영어로 자기소개도 버벅거리는데, 면접을 어떻게 준비해야 할까요?"</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl p-6 shadow-lg border-l-4 border-orange-500">
+                        <div class="flex items-start gap-4">
+                            <div class="text-3xl">🤔</div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 mb-2">외국계 기업 문화가 낯섭니다</h3>
+                                <p class="text-gray-600 text-sm">"업무 방식, 커뮤니케이션 스타일... 국내 기업과 뭐가 다를까요?"</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl p-6 shadow-lg border-l-4 border-yellow-500">
+                        <div class="flex items-start gap-4">
+                            <div class="text-3xl">📄</div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 mb-2">이력서가 통과되지 않습니다</h3>
+                                <p class="text-gray-600 text-sm">"영문 이력서, Cover Letter... 어떻게 써야 눈에 띌까요?"</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl p-6 shadow-lg border-l-4 border-blue-500">
+                        <div class="flex items-start gap-4">
+                            <div class="text-3xl">🎯</div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 mb-2">어떤 회사를 목표로 해야 할까요?</h3>
+                                <p class="text-gray-600 text-sm">"내 역량에 맞는 외국계 기업, 어떻게 찾고 준비할까요?"</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12 text-center">
+                    <div class="inline-block bg-gradient-to-r from-indigo-100 to-purple-100 rounded-2xl p-8 max-w-2xl">
+                        <p class="text-xl font-bold text-gray-900 mb-2">✨ 이 모든 고민의 해답을</p>
+                        <p class="text-2xl md:text-3xl font-black gradient-text">실제 외국계 전문가가 직접 알려드립니다</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Speaker Section -->
+        <section class="py-16 px-4 bg-gradient-to-br from-indigo-900 to-purple-900 text-white">
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">연사 소개</h2>
+                    <p class="text-lg text-indigo-200">15년 이상 글로벌 기업 경험을 가진 전문가</p>
+                </div>
+
+                <div class="bg-white/10 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-white/20">
+                    <div class="grid md:grid-cols-3 gap-8 items-center">
+                        <!-- Speaker Photo Placeholder -->
+                        <div class="md:col-span-1">
+                            <div class="bg-gradient-to-br from-indigo-400 to-purple-400 rounded-2xl aspect-square flex items-center justify-center text-8xl float-animation">
+                                👨‍💼
+                            </div>
+                        </div>
+
+                        <!-- Speaker Info -->
+                        <div class="md:col-span-2">
+                            <div class="mb-6">
+                                <h3 class="text-3xl md:text-4xl font-bold mb-2">James Rosenberg II</h3>
+                                <p class="text-indigo-200 text-lg">Global Business Expert</p>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div class="flex items-start gap-3">
+                                    <div class="bg-indigo-500 rounded-lg p-2 mt-1">
+                                        <i class="fas fa-briefcase"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-lg">Current</div>
+                                        <div class="text-indigo-200">General Manager, Triple J Technologies</div>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-3">
+                                    <div class="bg-purple-500 rounded-lg p-2 mt-1">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-lg">Former</div>
+                                        <div class="text-indigo-200">Team Lead, LG H&H (Global Business Division)</div>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-start gap-3">
+                                    <div class="bg-pink-500 rounded-lg p-2 mt-1">
+                                        <i class="fas fa-rocket"></i>
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-lg">Former</div>
+                                        <div class="text-indigo-200">Director of Business Development, Blink Charging</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 bg-white/10 rounded-xl p-4 border border-white/20">
+                                <p class="text-sm text-indigo-100 leading-relaxed">
+                                    <i class="fas fa-quote-left text-indigo-400 mr-2"></i>
+                                    한국과 미국에서 15년 이상 글로벌 비즈니스를 이끌어온 전문가입니다. 
+                                    실제 외국계 기업의 채용 프로세스, 업무 문화, 커리어 개발 전략을 
+                                    생생하게 공유합니다.
+                                    <i class="fas fa-quote-right text-indigo-400 ml-2"></i>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Benefits & Program Section -->
+        <section class="py-16 px-4 bg-white">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                        세미나에서 얻을 수 있는 것들
+                    </h2>
+                    <p class="text-lg text-gray-600">2시간의 집중 학습으로 커리어 전환점을 만드세요</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 mb-12">
+                    <!-- Benefit 1 -->
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 border-2 border-indigo-100 hover:shadow-xl transition-all">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-indigo-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold flex-shrink-0">1</div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-3">실전 영어 면접 전략</h3>
+                                <ul class="space-y-2 text-gray-700">
+                                    <li class="flex items-start gap-2">
+                                        <i class="fas fa-check-circle text-indigo-600 mt-1"></i>
+                                        <span>자주 나오는 질문과 모범 답안</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i class="fas fa-check-circle text-indigo-600 mt-1"></i>
+                                        <span>영어 인터뷰 실전 시뮬레이션</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i class="fas fa-check-circle text-indigo-600 mt-1"></i>
+                                        <span>면접관이 원하는 답변 구조</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Benefit 2 -->
+                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-8 border-2 border-purple-100 hover:shadow-xl transition-all">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-purple-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold flex-shrink-0">2</div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-3">외국계 기업 문화 이해</h3>
+                                <ul class="space-y-2 text-gray-700">
+                                    <li class="flex items-start gap-2">
+                                        <i class="fas fa-check-circle text-purple-600 mt-1"></i>
+                                        <span>업무 방식과 커뮤니케이션 스타일</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i class="fas fa-check-circle text-purple-600 mt-1"></i>
+                                        <span>조직 문화와 승진 시스템</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i class="fas fa-check-circle text-purple-600 mt-1"></i>
+                                        <span>외국인 동료와 협업하는 법</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Benefit 3 -->
+                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 border-2 border-green-100 hover:shadow-xl transition-all">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-green-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold flex-shrink-0">3</div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-3">이력서 & 지원 전략</h3>
+                                <ul class="space-y-2 text-gray-700">
+                                    <li class="flex items-start gap-2">
+                                        <i class="fas fa-check-circle text-green-600 mt-1"></i>
+                                        <span>합격하는 영문 이력서 작성법</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i class="fas fa-check-circle text-green-600 mt-1"></i>
+                                        <span>효과적인 Cover Letter 쓰는 법</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i class="fas fa-check-circle text-green-600 mt-1"></i>
+                                        <span>LinkedIn 프로필 최적화</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Benefit 4 -->
+                    <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-8 border-2 border-orange-100 hover:shadow-xl transition-all">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-orange-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-xl font-bold flex-shrink-0">4</div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900 mb-3">커리어 개발 로드맵</h3>
+                                <ul class="space-y-2 text-gray-700">
+                                    <li class="flex items-start gap-2">
+                                        <i class="fas fa-check-circle text-orange-600 mt-1"></i>
+                                        <span>산업별 외국계 기업 분석</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i class="fas fa-check-circle text-orange-600 mt-1"></i>
+                                        <span>내 역량에 맞는 포지션 찾기</span>
+                                    </li>
+                                    <li class="flex items-start gap-2">
+                                        <i class="fas fa-check-circle text-orange-600 mt-1"></i>
+                                        <span>장기적 커리어 전략 수립</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Program Schedule -->
+                <div class="bg-gradient-to-br from-gray-900 to-indigo-900 rounded-3xl p-8 md:p-12 text-white">
+                    <h3 class="text-2xl md:text-3xl font-bold mb-8 text-center">세미나 프로그램</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4 bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/20">
+                            <div class="bg-indigo-500 rounded-lg px-4 py-2 font-bold text-sm flex-shrink-0">18:00</div>
+                            <div class="flex-1">
+                                <div class="font-bold text-lg mb-1">Opening & Ice Breaking</div>
+                                <div class="text-indigo-200 text-sm">자기소개 및 세미나 목표 설정</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4 bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/20">
+                            <div class="bg-purple-500 rounded-lg px-4 py-2 font-bold text-sm flex-shrink-0">18:15</div>
+                            <div class="flex-1">
+                                <div class="font-bold text-lg mb-1">외국계 기업의 모든 것</div>
+                                <div class="text-indigo-200 text-sm">조직 문화, 업무 방식, 채용 프로세스 완전 분석</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4 bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/20">
+                            <div class="bg-pink-500 rounded-lg px-4 py-2 font-bold text-sm flex-shrink-0">18:45</div>
+                            <div class="flex-1">
+                                <div class="font-bold text-lg mb-1">실전 영어 면접 마스터</div>
+                                <div class="text-indigo-200 text-sm">자주 나오는 질문, 모범 답안, 실전 시뮬레이션</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4 bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/20">
+                            <div class="bg-green-500 rounded-lg px-4 py-2 font-bold text-sm flex-shrink-0">19:20</div>
+                            <div class="flex-1">
+                                <div class="font-bold text-lg mb-1">Break Time (핑거푸드 제공)</div>
+                                <div class="text-indigo-200 text-sm">네트워킹 & 간단한 다과</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4 bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/20">
+                            <div class="bg-orange-500 rounded-lg px-4 py-2 font-bold text-sm flex-shrink-0">19:35</div>
+                            <div class="flex-1">
+                                <div class="font-bold text-lg mb-1">이력서 & 커리어 전략</div>
+                                <div class="text-indigo-200 text-sm">영문 이력서 작성법, LinkedIn 활용, 커리어 로드맵</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4 bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/20">
+                            <div class="bg-red-500 rounded-lg px-4 py-2 font-bold text-sm flex-shrink-0">19:50</div>
+                            <div class="flex-1">
+                                <div class="font-bold text-lg mb-1">Q&A & Networking</div>
+                                <div class="text-indigo-200 text-sm">자유로운 질의응답 및 개별 상담</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Event Details -->
+        <section class="py-16 px-4 bg-gradient-to-b from-gray-50 to-white">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">세미나 상세 정보</h2>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border-2 border-indigo-100">
+                    <!-- Info Grid -->
+                    <div class="divide-y divide-gray-200">
+                        <div class="p-6 flex items-center gap-4">
+                            <div class="bg-indigo-100 rounded-xl p-4 text-indigo-600 text-2xl">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="text-sm text-gray-600 mb-1">일시</div>
+                                <div class="text-lg font-bold text-gray-900">2026년 5월 21일 (목) 18:00 - 20:00</div>
+                            </div>
+                        </div>
+
+                        <div class="p-6 flex items-center gap-4">
+                            <div class="bg-purple-100 rounded-xl p-4 text-purple-600 text-2xl">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="text-sm text-gray-600 mb-1">장소</div>
+                                <div class="text-lg font-bold text-gray-900">한남대학교 무어관 2층</div>
+                                <div class="text-sm text-gray-600 mt-1">대전광역시 대덕구 한남로 70</div>
+                            </div>
+                        </div>
+
+                        <div class="p-6 flex items-center gap-4">
+                            <div class="bg-pink-100 rounded-xl p-4 text-pink-600 text-2xl">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="text-sm text-gray-600 mb-1">정원</div>
+                                <div class="text-lg font-bold text-gray-900">선착순 70명</div>
+                                <div class="text-sm text-red-600 mt-1 font-semibold">
+                                    <i class="fas fa-exclamation-circle"></i> 조기 마감 예상
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-6 flex items-center gap-4">
+                            <div class="bg-green-100 rounded-xl p-4 text-green-600 text-2xl">
+                                <i class="fas fa-won-sign"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="text-sm text-gray-600 mb-1">참가비</div>
+                                <div class="flex items-center gap-3">
+                                    <div class="text-lg text-gray-400 line-through">49,000원</div>
+                                    <div class="text-2xl font-bold text-green-600">24,500원</div>
+                                    <div class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">50% 할인</div>
+                                </div>
+                                <div class="text-sm text-gray-600 mt-1">
+                                    <i class="fas fa-check-circle text-green-600"></i> 현장 결제 가능
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-6 flex items-center gap-4">
+                            <div class="bg-orange-100 rounded-xl p-4 text-orange-600 text-2xl">
+                                <i class="fas fa-gift"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="text-sm text-gray-600 mb-1">제공 사항</div>
+                                <div class="text-lg font-bold text-gray-900">핑거푸드 제공</div>
+                                <div class="text-sm text-gray-600 mt-1">세미나 자료, 네트워킹 다과</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Urgency Section -->
+        <section class="py-16 px-4 bg-gradient-to-br from-red-50 to-orange-50">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="bg-white rounded-3xl p-8 md:p-12 shadow-2xl border-4 border-red-200">
+                    <div class="text-6xl mb-6">⚠️</div>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                        선착순 70명, 빠르게 마감됩니다
+                    </h2>
+                    <p class="text-lg text-gray-700 mb-6">
+                        이전 세미나는 <span class="font-bold text-red-600">3일 만에 조기 마감</span>되었습니다
+                    </p>
+
+                    <div class="grid grid-cols-3 gap-4 mb-8 max-w-2xl mx-auto">
+                        <div class="bg-red-100 rounded-xl p-4 border-2 border-red-300">
+                            <div class="text-3xl font-bold text-red-600 mb-1">70</div>
+                            <div class="text-sm text-gray-700">총 정원</div>
+                        </div>
+                        <div class="bg-orange-100 rounded-xl p-4 border-2 border-orange-300">
+                            <div class="text-3xl font-bold text-orange-600 mb-1">50%</div>
+                            <div class="text-sm text-gray-700">할인율</div>
+                        </div>
+                        <div class="bg-yellow-100 rounded-xl p-4 border-2 border-yellow-300">
+                            <div class="text-3xl font-bold text-yellow-600 mb-1">2시간</div>
+                            <div class="text-sm text-gray-700">집중 학습</div>
+                        </div>
+                    </div>
+
+                    <a href="https://hiing.co.kr/index/view/6082786" 
+                       target="_blank"
+                       class="inline-block bg-gradient-to-r from-red-600 to-orange-600 text-white px-12 py-5 rounded-2xl font-bold text-xl hover:shadow-2xl transition-all transform hover:scale-105 mb-4"
+                       onclick="gtag('event', 'cta_click', { 'event_category': 'seminar', 'event_label': 'urgency_cta', 'value': 1 })">
+                        <i class="fas fa-bolt mr-2"></i>지금 바로 신청하기
+                    </a>
+
+                    <p class="text-sm text-gray-600">
+                        <i class="fas fa-lock text-green-600 mr-1"></i>안전한 결제 시스템 · 24시간 고객 지원
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="py-16 px-4 bg-white">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">자주 묻는 질문</h2>
+                    <p class="text-lg text-gray-600">궁금하신 점을 확인하세요</p>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- FAQ 1 -->
+                    <div class="bg-gray-50 rounded-xl p-6 border-2 border-gray-200 hover:border-indigo-300 transition-all">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">Q</div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-900 mb-2">영어를 못해도 참여할 수 있나요?</h3>
+                                <p class="text-gray-700 text-sm">네, 가능합니다! 세미나는 <strong>한국어로 진행</strong>되며, 영어 면접 전략과 표현은 쉽게 설명해드립니다. 영어 초보자도 충분히 이해할 수 있는 내용입니다.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 2 -->
+                    <div class="bg-gray-50 rounded-xl p-6 border-2 border-gray-200 hover:border-indigo-300 transition-all">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">Q</div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-900 mb-2">대학생도 참여할 수 있나요?</h3>
+                                <p class="text-gray-700 text-sm">물론입니다! 외국계 기업 취업을 준비하는 <strong>대학생, 취준생, 이직 준비자</strong> 모두 환영합니다. 조기 준비가 성공의 핵심입니다.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 3 -->
+                    <div class="bg-gray-50 rounded-xl p-6 border-2 border-gray-200 hover:border-indigo-300 transition-all">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">Q</div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-900 mb-2">환불이 가능한가요?</h3>
+                                <p class="text-gray-700 text-sm">세미나 <strong>7일 전까지 100% 환불</strong> 가능하며, 3일 전까지는 50% 환불됩니다. 당일 취소는 환불이 불가능합니다.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 4 -->
+                    <div class="bg-gray-50 rounded-xl p-6 border-2 border-gray-200 hover:border-indigo-300 transition-all">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">Q</div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-900 mb-2">주차는 가능한가요?</h3>
+                                <p class="text-gray-700 text-sm">한남대학교 내 <strong>무료 주차</strong>가 가능합니다. 무어관 인근 주차장을 이용하시면 됩니다.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 5 -->
+                    <div class="bg-gray-50 rounded-xl p-6 border-2 border-gray-200 hover:border-indigo-300 transition-all">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">Q</div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-900 mb-2">세미나 자료는 제공되나요?</h3>
+                                <p class="text-gray-700 text-sm">네! <strong>PDF 자료와 체크리스트</strong>를 제공하며, 세미나 후에도 복습할 수 있도록 이메일로 전송해드립니다.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 6 -->
+                    <div class="bg-gray-50 rounded-xl p-6 border-2 border-gray-200 hover:border-indigo-300 transition-all">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">Q</div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-900 mb-2">개별 상담도 가능한가요?</h3>
+                                <p class="text-gray-700 text-sm">세미나 종료 후 <strong>Q&A 시간</strong>에 개별 상담이 가능합니다. 시간이 부족할 경우 별도 상담 일정을 조율할 수 있습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ 7 -->
+                    <div class="bg-gray-50 rounded-xl p-6 border-2 border-gray-200 hover:border-indigo-300 transition-all">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">Q</div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-gray-900 mb-2">현장 결제가 가능한가요?</h3>
+                                <p class="text-gray-700 text-sm">네, <strong>현장 결제 가능</strong>합니다. 다만 사전 등록 후 현장에서 결제하시는 것을 권장드립니다 (좌석 확보).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- WorVox Introduction -->
+        <section class="py-16 px-4 bg-gradient-to-br from-indigo-900 to-purple-900 text-white">
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">WorVox Career란?</h2>
+                    <p class="text-lg text-indigo-200">글로벌 커리어 성장을 위한 교육 프로그램</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 mb-12">
+                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20">
+                        <div class="text-4xl mb-4">🎯</div>
+                        <h3 class="text-2xl font-bold mb-3">Our Mission</h3>
+                        <p class="text-indigo-200 leading-relaxed">
+                            한국의 인재들이 글로벌 무대에서 성공할 수 있도록 
+                            <strong class="text-white">실전 경험과 전문 지식</strong>을 공유합니다.
+                        </p>
+                    </div>
+
+                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20">
+                        <div class="text-4xl mb-4">🌏</div>
+                        <h3 class="text-2xl font-bold mb-3">Global Network</h3>
+                        <p class="text-indigo-200 leading-relaxed">
+                            실제 외국계 기업에서 일하는 <strong class="text-white">글로벌 전문가들</strong>과 
+                            직접 네트워킹할 수 있는 기회를 제공합니다.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-center">
+                    <p class="text-xl md:text-2xl font-bold mb-4">
+                        세미나 이후에도 함께 성장합니다
+                    </p>
+                    <p class="text-indigo-100">
+                        WorVox Career 커뮤니티에 가입하여 지속적인 커리어 코칭과 
+                        네트워킹 기회를 누리세요
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final CTA Section -->
+        <section class="py-20 px-4 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white">
+            <div class="max-w-4xl mx-auto text-center">
+                <div class="text-6xl mb-6">🚀</div>
+                <h2 class="text-3xl md:text-5xl font-black mb-6 leading-tight">
+                    지금 신청하고<br/>
+                    커리어의 전환점을 만드세요
+                </h2>
+                <p class="text-xl md:text-2xl mb-8 text-indigo-100">
+                    2시간이 당신의 커리어를 바꿀 수 있습니다
+                </p>
+
+                <div class="bg-white/20 backdrop-blur-md rounded-2xl p-8 mb-8 border border-white/30">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+                        <div>
+                            <div class="text-3xl font-bold mb-1">70명</div>
+                            <div class="text-sm text-indigo-100">선착순 마감</div>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold mb-1">2시간</div>
+                            <div class="text-sm text-indigo-100">집중 학습</div>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold mb-1">50%</div>
+                            <div class="text-sm text-indigo-100">특별 할인</div>
+                        </div>
+                        <div>
+                            <div class="text-3xl font-bold mb-1">5/21</div>
+                            <div class="text-sm text-indigo-100">목요일 저녁</div>
+                        </div>
+                    </div>
+
+                    <a href="https://hiing.co.kr/index/view/6082786" 
+                       target="_blank"
+                       class="inline-block bg-white text-indigo-600 px-12 py-5 rounded-2xl font-bold text-xl hover:shadow-2xl transition-all transform hover:scale-105"
+                       onclick="gtag('event', 'cta_click', { 'event_category': 'seminar', 'event_label': 'final_cta', 'value': 1 })">
+                        <i class="fas fa-rocket mr-2"></i>선착순 마감 전 등록하기
+                    </a>
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-6 text-sm text-indigo-100">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-check-circle"></i>
+                        <span>현장 결제 가능</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-check-circle"></i>
+                        <span>핑거푸드 제공</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-check-circle"></i>
+                        <span>세미나 자료 제공</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-check-circle"></i>
+                        <span>무료 주차</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-gray-900 text-gray-400 py-12 px-4">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid md:grid-cols-3 gap-8 mb-8">
+                    <div>
+                        <h3 class="text-white text-xl font-bold mb-4 gradient-text">WorVox Career</h3>
+                        <p class="text-sm leading-relaxed">
+                            글로벌 커리어 성장을 위한<br/>
+                            실전 교육 프로그램
+                        </p>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-bold mb-4">Contact</h4>
+                        <div class="space-y-2 text-sm">
+                            <p><i class="fas fa-envelope mr-2"></i>info@worvox.com</p>
+                            <p><i class="fas fa-globe mr-2"></i>www.worvox.com</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-white font-bold mb-4">Location</h4>
+                        <div class="text-sm">
+                            <p>한남대학교 무어관 2층</p>
+                            <p>대전광역시 대덕구 한남로 70</p>
+                            <p class="mt-2 text-indigo-400">
+                                <i class="fas fa-parking mr-1"></i>무료 주차 가능
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-t border-gray-800 pt-6 text-center text-sm">
+                    <p>&copy; 2026 WorVox Career. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Google Analytics Event Tracking -->
+        <script>
+          // Track page view
+          gtag('event', 'page_view', {
+            page_title: 'Career Seminar Landing',
+            page_location: window.location.href,
+            page_path: '/career-seminar'
+          });
+
+          // Track scroll depth
+          let scrollTracked = false;
+          window.addEventListener('scroll', function() {
+            if (!scrollTracked && window.scrollY > document.body.scrollHeight * 0.5) {
+              scrollTracked = true;
+              gtag('event', 'scroll', {
+                event_category: 'engagement',
+                event_label: 'scroll_50_percent',
+                value: 50
+              });
+            }
+          });
+        </script>
+    </body>
+    </html>
+  `);
+});
+
 // Health check
 app.get('/api/health', (c) => {
   return c.json({ 
