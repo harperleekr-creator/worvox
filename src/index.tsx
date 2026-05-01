@@ -4466,7 +4466,7 @@ app.get('/career-seminar', (c) => {
                             </div>
                             <div class="flex-1">
                                 <div class="text-sm text-gray-600 mb-1">일시</div>
-                                <div class="text-lg font-bold text-gray-900">2026년 5월 21일 (목) 18:00 - 20:00</div>
+                                <div class="text-lg font-bold text-gray-900">2026년 5월 21일 (목) 오후 6시 ~ 8시</div>
                             </div>
                         </div>
 
@@ -4483,13 +4483,13 @@ app.get('/career-seminar', (c) => {
 
                         <div class="p-6 flex items-center gap-4">
                             <div class="bg-pink-100 rounded-xl p-4 text-pink-600 text-2xl">
-                                <i class="fas fa-users"></i>
+                                <i class="fas fa-ticket-alt"></i>
                             </div>
                             <div class="flex-1">
-                                <div class="text-sm text-gray-600 mb-1">정원</div>
-                                <div class="text-lg font-bold text-gray-900">선착순 50명</div>
+                                <div class="text-sm text-gray-600 mb-1">티켓</div>
+                                <div class="text-lg font-bold text-gray-900">사전등록</div>
                                 <div class="text-sm text-red-600 mt-1 font-semibold">
-                                    <i class="fas fa-exclamation-circle"></i> 조기 마감 예상
+                                    <i class="fas fa-exclamation-circle"></i> 선착순 50명 한정
                                 </div>
                             </div>
                         </div>
