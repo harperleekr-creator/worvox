@@ -3946,7 +3946,7 @@ app.get('/career-seminar', (c) => {
         <title>WorVox Career 세미나 | 외국계 취업 성공 전략 - 5월 21일</title>
         
         <!-- SEO Meta Tags -->
-        <meta name="description" content="외국계 기업 취업을 위한 실전 전략! LG H&H 출신 James Rosenberg와 함께하는 WorVox Career 세미나. 5월 21일, 한남대학교 무어관 2층. 선착순 70명, 50% 할인 24,500원.">
+        <meta name="description" content="외국계 기업 취업을 위한 실전 전략! LG H&H 출신 James Rosenberg와 함께하는 WorVox Career 세미나. 5월 21일, 한남대학교 무어아트홀 2층. 선착순 50명, 50% 할인 24,500원.">
         <meta name="keywords" content="외국계 취업, 취업 세미나, 이직 준비, 영어 면접, 커리어 개발, LG H&H, James Rosenberg, WorVox Career">
         <meta name="robots" content="index, follow">
         
@@ -3954,7 +3954,7 @@ app.get('/career-seminar', (c) => {
         <meta property="og:type" content="website">
         <meta property="og:url" content="https://worvox.com/career-seminar">
         <meta property="og:title" content="WorVox Career 세미나 | 외국계 취업 성공 전략">
-        <meta property="og:description" content="외국계 기업 출신 전문가와 함께하는 실전 취업 전략! 5월 21일, 선착순 70명 한정.">
+        <meta property="og:description" content="외국계 기업 출신 전문가와 함께하는 실전 취업 전략! 5월 21일, 선착순 50명 한정.">
         <meta property="og:image" content="https://worvox.com/logo.png">
         
         <link rel="canonical" href="https://worvox.com/career-seminar">
@@ -4020,7 +4020,7 @@ app.get('/career-seminar', (c) => {
                 <div class="flex justify-center mb-6">
                     <div class="inline-flex items-center gap-2 bg-red-100 text-red-700 px-5 py-2 rounded-full text-sm font-bold pulse-glow border-2 border-red-300">
                         <i class="fas fa-fire text-red-600"></i>
-                        <span>선착순 70명 한정 · 조기 마감 예상</span>
+                        <span>선착순 50명 한정 · 조기 마감 예상</span>
                     </div>
                 </div>
 
@@ -4054,7 +4054,7 @@ app.get('/career-seminar', (c) => {
                         <div class="bg-white rounded-xl p-4 shadow-lg border-2 border-pink-100">
                             <div class="text-pink-600 text-2xl mb-2"><i class="fas fa-users"></i></div>
                             <div class="text-sm text-gray-600">정원</div>
-                            <div class="font-bold text-gray-900">선착순 70명</div>
+                            <div class="font-bold text-gray-900">선착순 50명</div>
                         </div>
                         <div class="bg-white rounded-xl p-4 shadow-lg border-2 border-green-100">
                             <div class="text-green-600 text-2xl mb-2"><i class="fas fa-tag"></i></div>
@@ -4075,7 +4075,7 @@ app.get('/career-seminar', (c) => {
                         <i class="fas fa-check-circle text-green-600 mr-1"></i>현장 결제 가능 · 핑거푸드 제공
                     </p>
                     <p class="text-sm text-gray-600">
-                        <i class="fas fa-map-marker-alt text-indigo-600 mr-1"></i>한남대학교 무어관 2층 (대전)
+                        <i class="fas fa-map-marker-alt text-indigo-600 mr-1"></i>한남대학교 무어아트홀 2층 (대전)
                     </p>
                 </div>
             </div>
@@ -4475,7 +4475,7 @@ app.get('/career-seminar', (c) => {
                             </div>
                             <div class="flex-1">
                                 <div class="text-sm text-gray-600 mb-1">장소</div>
-                                <div class="text-lg font-bold text-gray-900">한남대학교 무어관 2층</div>
+                                <div class="text-lg font-bold text-gray-900">한남대학교 무어아트홀 2층</div>
                                 <div class="text-sm text-gray-600 mt-1">대전광역시 대덕구 한남로 70</div>
                             </div>
                         </div>
@@ -4486,7 +4486,7 @@ app.get('/career-seminar', (c) => {
                             </div>
                             <div class="flex-1">
                                 <div class="text-sm text-gray-600 mb-1">정원</div>
-                                <div class="text-lg font-bold text-gray-900">선착순 70명</div>
+                                <div class="text-lg font-bold text-gray-900">선착순 50명</div>
                                 <div class="text-sm text-red-600 mt-1 font-semibold">
                                     <i class="fas fa-exclamation-circle"></i> 조기 마감 예상
                                 </div>
@@ -4531,7 +4531,7 @@ app.get('/career-seminar', (c) => {
                 <div class="bg-white rounded-3xl p-8 md:p-12 shadow-2xl border-4 border-red-200">
                     <div class="text-6xl mb-6">⚠️</div>
                     <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                        선착순 70명, 빠르게 마감됩니다
+                        선착순 50명, 빠르게 마감됩니다
                     </h2>
                     <p class="text-lg text-gray-700 mb-6">
                         이전 세미나는 <span class="font-bold text-red-600">3일 만에 조기 마감</span>되었습니다
@@ -4539,7 +4539,7 @@ app.get('/career-seminar', (c) => {
 
                     <div class="grid grid-cols-3 gap-4 mb-8 max-w-2xl mx-auto">
                         <div class="bg-red-100 rounded-xl p-4 border-2 border-red-300">
-                            <div class="text-3xl font-bold text-red-600 mb-1">70</div>
+                            <div class="text-3xl font-bold text-red-600 mb-1">50</div>
                             <div class="text-sm text-gray-700">총 정원</div>
                         </div>
                         <div class="bg-orange-100 rounded-xl p-4 border-2 border-orange-300">
@@ -4614,7 +4614,7 @@ app.get('/career-seminar', (c) => {
                             <div class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">Q</div>
                             <div class="flex-1">
                                 <h3 class="font-bold text-gray-900 mb-2">주차는 가능한가요?</h3>
-                                <p class="text-gray-700 text-sm">한남대학교 내 <strong>무료 주차</strong>가 가능합니다. 무어관 인근 주차장을 이용하시면 됩니다.</p>
+                                <p class="text-gray-700 text-sm">한남대학교 무어아트홀 인근 주차장을 이용하시면 됩니다.</p>
                             </div>
                         </div>
                     </div>
@@ -4624,19 +4624,8 @@ app.get('/career-seminar', (c) => {
                         <div class="flex items-start gap-4">
                             <div class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">Q</div>
                             <div class="flex-1">
-                                <h3 class="font-bold text-gray-900 mb-2">세미나 자료는 제공되나요?</h3>
-                                <p class="text-gray-700 text-sm">네! <strong>PDF 자료와 체크리스트</strong>를 제공하며, 세미나 후에도 복습할 수 있도록 이메일로 전송해드립니다.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- FAQ 6 -->
-                    <div class="bg-gray-50 rounded-xl p-6 border-2 border-gray-200 hover:border-indigo-300 transition-all">
-                        <div class="flex items-start gap-4">
-                            <div class="bg-indigo-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">Q</div>
-                            <div class="flex-1">
                                 <h3 class="font-bold text-gray-900 mb-2">개별 상담도 가능한가요?</h3>
-                                <p class="text-gray-700 text-sm">세미나 종료 후 <strong>Q&A 시간</strong>에 개별 상담이 가능합니다. 시간이 부족할 경우 별도 상담 일정을 조율할 수 있습니다.</p>
+                                <p class="text-gray-700 text-sm">1:1 컨설팅 상담은 별도 문의 바랍니다.</p>
                             </div>
                         </div>
                     </div>
@@ -4710,7 +4699,7 @@ app.get('/career-seminar', (c) => {
                 <div class="bg-white/20 backdrop-blur-md rounded-2xl p-8 mb-8 border border-white/30">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
                         <div>
-                            <div class="text-3xl font-bold mb-1">70명</div>
+                            <div class="text-3xl font-bold mb-1">50명</div>
                             <div class="text-sm text-indigo-100">선착순 마감</div>
                         </div>
                         <div>
@@ -4750,7 +4739,7 @@ app.get('/career-seminar', (c) => {
                     </div>
                     <div class="flex items-center gap-2">
                         <i class="fas fa-check-circle"></i>
-                        <span>무료 주차</span>
+                        <span>주차 가능</span>
                     </div>
                 </div>
             </div>
@@ -4770,17 +4759,17 @@ app.get('/career-seminar', (c) => {
                     <div>
                         <h4 class="text-white font-bold mb-4">Contact</h4>
                         <div class="space-y-2 text-sm">
-                            <p><i class="fas fa-envelope mr-2"></i>info@worvox.com</p>
+                            <p><i class="fas fa-envelope mr-2"></i>support@worvox.com</p>
                             <p><i class="fas fa-globe mr-2"></i>www.worvox.com</p>
                         </div>
                     </div>
                     <div>
                         <h4 class="text-white font-bold mb-4">Location</h4>
                         <div class="text-sm">
-                            <p>한남대학교 무어관 2층</p>
+                            <p>한남대학교 무어아트홀 2층</p>
                             <p>대전광역시 대덕구 한남로 70</p>
                             <p class="mt-2 text-indigo-400">
-                                <i class="fas fa-parking mr-1"></i>무료 주차 가능
+                                <i class="fas fa-parking mr-1"></i>주차 가능
                             </p>
                         </div>
                     </div>
